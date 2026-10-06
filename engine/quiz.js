@@ -40,7 +40,7 @@ const PLAN=[
 const MOD_SIZE=10; // questions par module
 const MODS_PER_DAY=5; // 5 modules × 10 q = 50 q/jour
 
-const KEY="clf7.v2";
+const KEY=window.QKEY||"clf7.v2";
 let store={};
 try{store=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){store={}}
 store.r=store.r||{}; // results: "day-idx" -> 1 correct / 0 wrong
