@@ -209,14 +209,88 @@ function buildFreePool(days){
 }
 
 /* ── ERRORS ────────────────────────────────────────────── */
+function fmtDate(ts){
+  if(!ts)return"–";
+  try{
+    const d=ts.toDate?ts.toDate():new Date(ts.seconds*1000);
+    return d.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"2-digit"});
+  }catch(e){return"–"}
+}
+
 function errHTML(){
   const e=errors();
-  if(!e.length)return `<div class="empty"><h2 style="margin-bottom:6px">Aucune erreur en attente</h2>Les questions ratées apparaîtront ici. Une question réussie au rejeu sort de la liste.</div>`;
-  const byDay={};e.forEach(([d])=>byDay[d]=(byDay[d]||0)+1);
-  return `<p class="intro">${e.length} question${e.length>1?"s":""} à revoir. Rejoue-les jusqu'à ce que la liste soit vide.</p>
-  <div class="row" style="margin-bottom:16px"><button class="btn" data-replay="all">Rejouer les ${e.length} erreurs</button></div>
-  <ul class="missed">${e.slice(0,60).map(([d,i])=>`<li><span class="eyebrow">J${d} · ${esc(Q(d,i).t)}</span><br>${esc(Q(d,i).q)}</li>`).join("")}</ul>
-  ${e.length>60?`<p class="note">… et ${e.length-60} autres.</p>`:""}`;
+  const baseHTML=e.length
+    ?`<p class="intro">${e.length} question${e.length>1?"s":""} à revoir localement. Rejoue-les jusqu'à ce que la liste soit vide.</p>
+      <div class="row" style="margin-bottom:16px"><button class="btn" data-replay="all">Rejouer les ${e.length} erreurs</button></div>
+      <ul class="missed">${e.slice(0,60).map(([d,i])=>`<li><span class="eyebrow">J${d} · ${esc(Q(d,i).t)}</span><br>${esc(Q(d,i).q)}</li>`).join("")}</ul>
+      ${e.length>60?`<p class="note">… et ${e.length-60} autres.</p>`:""}`
+    :`<div class="empty"><h2 style="margin-bottom:6px">Aucune erreur en attente</h2>Les questions ratées apparaîtront ici. Une question réussie au rejeu sort de la liste.</div>`;
+
+  // Section historique Firebase (chargée en async)
+  const histId="fb-hist-"+Date.now();
+  const histHTML=`
+  <div style="margin-top:32px">
+    <h3 style="font-size:1rem;margin-bottom:4px">Historique multi-appareils</h3>
+    <p class="eyebrow" style="margin-bottom:12px">Toutes tes erreurs depuis le premier quiz, tous appareils confondus</p>
+    <div id="${histId}" style="color:var(--muted);font-size:.85rem">Chargement…</div>
+  </div>`;
+
+  // Charger les données Firebase en async et injecter dans le DOM
+  if(typeof window.getErrors==="function"){
+    window.getErrors(KEY).then(rows=>{
+      const el=document.getElementById(histId);
+      if(!el)return;
+      if(!rows.length){el.innerHTML=`<p style="font-size:.85rem;color:var(--muted)">Aucune erreur enregistrée dans Firebase pour cette certification.</p>`;return;}
+
+      const tbody=rows.slice(0,100).map(r=>{
+        const total=(r.attempts||0)+(r.successes||0);
+        const pct=total?Math.round((r.successes||0)/total*100):0;
+        const bar=`<span style="display:inline-block;width:${Math.max(4,pct)}%;height:5px;border-radius:3px;background:${pct>=80?"var(--ok)":pct>=50?"var(--accent)":"var(--ko)"}"></span><span style="display:inline-block;width:${100-Math.max(4,pct)}%;height:5px;border-radius:3px;background:var(--line)"></span>`;
+        return `<tr>
+          <td style="padding:8px 6px 8px 0;border-bottom:1px solid var(--line);max-width:320px;font-size:.83rem">${esc(r.question||"–")}${r.question&&r.question.length>=120?"…":""}</td>
+          <td style="padding:8px 6px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:.78rem;color:var(--muted)">${esc(r.theme||"–")}</td>
+          <td style="padding:8px 6px;border-bottom:1px solid var(--line);text-align:center" class="num">${r.attempts||0}</td>
+          <td style="padding:8px 6px;border-bottom:1px solid var(--line);min-width:80px"><div style="display:flex;gap:1px;align-items:center">${bar}</div><span style="font-size:.7rem;color:var(--muted)">${pct} %</span></td>
+          <td style="padding:8px 0 8px 6px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:.78rem;color:var(--muted)">${fmtDate(r.lastFail)}</td>
+        </tr>`;
+      }).join("");
+
+      el.innerHTML=`
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-family:var(--f-body)">
+          <thead>
+            <tr style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">
+              <th style="text-align:left;padding-bottom:8px;border-bottom:2px solid var(--line)">Question</th>
+              <th style="text-align:left;padding:0 6px 8px;border-bottom:2px solid var(--line)">Thème</th>
+              <th style="padding:0 6px 8px;border-bottom:2px solid var(--line)" class="num">Échecs</th>
+              <th style="text-align:left;padding:0 6px 8px;border-bottom:2px solid var(--line);min-width:80px">Réussite</th>
+              <th style="text-align:left;padding:0 0 8px 6px;border-bottom:2px solid var(--line)">Dernier échec</th>
+            </tr>
+          </thead>
+          <tbody>${tbody}</tbody>
+        </table>
+        </div>
+        ${rows.length>100?`<p class="note" style="margin-top:8px">… et ${rows.length-100} autres erreurs.</p>`:""}`;
+    }).catch(()=>{
+      const el=document.getElementById(histId);
+      if(el)el.innerHTML=`<p style="font-size:.85rem;color:var(--muted)">Impossible de charger l'historique Firebase.</p>`;
+    });
+  } else {
+    // Firebase pas encore prêt, réessayer dans 2s
+    setTimeout(()=>{
+      const el=document.getElementById(histId);
+      if(el&&typeof window.getErrors==="function"){
+        window.getErrors(KEY).then(rows=>{
+          if(!rows.length){el.innerHTML=`<p style="font-size:.85rem;color:var(--muted)">Aucune erreur Firebase pour cette certification.</p>`;return;}
+          el.innerHTML=`<p style="font-size:.85rem;color:var(--muted)">${rows.length} erreur${rows.length>1?"s":""} chargée${rows.length>1?"s":""}. Recharge l'onglet pour voir le tableau complet.</p>`;
+        });
+      } else if(el){
+        el.innerHTML=`<p style="font-size:.85rem;color:var(--muted)">Firebase non connecté.</p>`;
+      }
+    },2000);
+  }
+
+  return baseHTML+histHTML;
 }
 
 /* ── SESSION ───────────────────────────────────────────── */
@@ -315,7 +389,16 @@ function bind(){
     session.checked=true;
     if(ok)session.score++;else session.missed.push([it.d,it.i]);
     // Only persist to store.r if NOT a live session
-    if(!session.isLive){store.r[it.d+"-"+it.i]=ok?1:0;save();}
+    if(!session.isLive){
+      const wasWrong=store.r[it.d+"-"+it.i]===0;
+      store.r[it.d+"-"+it.i]=ok?1:0;save();
+      // Firebase tracking (multi-appareils)
+      if(!ok && typeof window.logError==="function"){
+        window.logError(KEY,it.d,it.i,q.t,q.q);
+      } else if(ok && wasWrong && typeof window.logSuccess==="function"){
+        window.logSuccess(KEY,it.d,it.i);
+      }
+    }
     render();
   };
   // Next

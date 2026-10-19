@@ -1,0 +1,11 @@
+# Clés API Firebase — à ne jamais committer
+engine/firebase-config.js
+
+# OS / éditeurs
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Node (si jamais)
+node_modules/
