@@ -1,0 +1,361 @@
+<title>Certifs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+
+<style>
+  /* Layout: grid de cartes par fournisseur, hero minimaliste avec barre de progression globale */
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --surface-hover: #f0f4ff;
+    --fg: #1a1d23;
+    --fg-muted: #6b7280;
+    --border: #e5e7eb;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,.12);
+    --radius: 12px;
+
+    /* Accents par cloud */
+    --gcp:  #1a73e8;
+    --az:   #0078d4;
+    --aws:  #ff9900;
+    --ms:   #107c10;
+    --gh:   #24292f;
+
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1117;
+      --surface: #1a1d26;
+      --surface-hover: #1e2433;
+      --fg: #e8eaf0;
+      --fg-muted: #9ca3af;
+      --border: #2a2d3a;
+      --shadow: 0 1px 3px rgba(0,0,0,.3);
+      --shadow-hover: 0 4px 12px rgba(0,0,0,.5);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1117;
+    --surface: #1a1d26;
+    --surface-hover: #1e2433;
+    --fg: #e8eaf0;
+    --fg-muted: #9ca3af;
+    --border: #2a2d3a;
+    --shadow: 0 1px 3px rgba(0,0,0,.3);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,.5);
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0 40px;
+    min-height: 100%;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    max-width: 860px;
+    margin: 0 auto;
+    padding-block: 48px 36px;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    margin-bottom: 12px;
+  }
+  .hero h1 {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    text-wrap: balance;
+    margin: 0 0 12px;
+    letter-spacing: -.02em;
+  }
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--fg-muted);
+    max-width: 480px;
+    margin: 0 auto 28px;
+    line-height: 1.6;
+  }
+
+  /* ── Stats bar ── */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--fg-muted);
+  }
+
+  /* ── Divider ── */
+  .divider {
+    max-width: 860px;
+    margin: 28px auto 0;
+    border: none;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Provider sections ── */
+  .providers {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    padding-top: 36px;
+  }
+
+  .provider-section {}
+  .provider-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .provider-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .provider-name {
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  /* ── Cert cards ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow);
+    transition: box-shadow .18s, transform .18s, background .12s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--card-accent, #888);
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .card:hover {
+    background: var(--surface-hover);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
+  .card:focus-visible {
+    outline: 2px solid var(--card-accent, #888);
+    outline-offset: 2px;
+  }
+
+  .card-eyebrow {
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--card-accent, #888);
+  }
+  .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .card-meta {
+    font-size: .8rem;
+    color: var(--fg-muted);
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-meta::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background: var(--card-accent, #888);
+    opacity: .18;
+    border-radius: 50%;
+  }
+
+  /* ── Footer ── */
+  footer {
+    max-width: 860px;
+    margin: 48px auto 0;
+    text-align: center;
+    font-size: .78rem;
+    color: var(--fg-muted);
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+</style>
+
+<div class="hero">
+  <p class="hero-eyebrow">Révision Cloud &amp; Tech</p>
+  <h1>Quiz de Certification</h1>
+  <p class="hero-sub">7 certifications · 50 questions par jour · 7 jours de révision structurée</p>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-num">7</span>
+      <span class="stat-label">Certifications</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">2&thinsp;450</span>
+      <span class="stat-label">Questions</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">49</span>
+      <span class="stat-label">Jours de révision</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="providers">
+
+  <!-- Google Cloud -->
+  <section class="provider-section">
+    <div class="provider-label">
+      <span class="provider-dot" style="background:var(--gcp)"></span>
+      <span class="provider-name">Google Cloud</span>
+    </div>
+    <div class="cards">
+      <a href="google-cloud-digital-leader/" class="card" style="--card-accent:var(--gcp)">
+        <span class="card-eyebrow">GCDL</span>
+        <h2 class="card-title">Cloud Digital Leader</h2>
+        <p class="card-meta">350 questions · 7 jours</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Microsoft Azure -->
+  <section class="provider-section">
+    <div class="provider-label">
+      <span class="provider-dot" style="background:var(--az)"></span>
+      <span class="provider-name">Microsoft Azure</span>
+    </div>
+    <div class="cards">
+      <a href="az-900-azure-fundamentals/" class="card" style="--card-accent:var(--az)">
+        <span class="card-eyebrow">AZ-900</span>
+        <h2 class="card-title">Azure Fundamentals</h2>
+        <p class="card-meta">350 questions · 7 jours</p>
+      </a>
+      <a href="ai-900-azure-ai-fundamentals/" class="card" style="--card-accent:#7b2d8b">
+        <span class="card-eyebrow">AI-900</span>
+        <h2 class="card-title">Azure AI Fundamentals</h2>
+        <p class="card-meta">350 questions · 7 jours</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Microsoft 365 -->
+  <section class="provider-section">
+    <div class="provider-label">
+      <span class="provider-dot" style="background:var(--ms)"></span>
+      <span class="provider-name">Microsoft 365</span>
+    </div>
+    <div class="cards">
+      <a href="ms-900-microsoft-365/" class="card" style="--card-accent:var(--ms)">
+        <span class="card-eyebrow">MS-900</span>
+        <h2 class="card-title">Microsoft 365 Fundamentals</h2>
+        <p class="card-meta">350 questions · 7 jours</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- AWS -->
+  <section class="provider-section">
+    <div class="provider-label">
+      <span class="provider-dot" style="background:var(--aws)"></span>
+      <span class="provider-name">Amazon Web Services</span>
+    </div>
+    <div class="cards">
+      <a href="aws-clf-c02/" class="card" style="--card-accent:var(--aws)">
+        <span class="card-eyebrow">CLF-C02</span>
+        <h2 class="card-title">Cloud Practitioner</h2>
+        <p class="card-meta">350 questions · 7 jours</p>
+      </a>
+      <a href="aws-ai-practitioner/" class="card" style="--card-accent:var(--aws)">
+        <span class="card-eyebrow">AIF-C01</span>
+        <h2 class="card-title">AI Practitioner</h2>
+        <p class="card-meta">350 questions · 7 jours</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- GitHub -->
+  <section class="provider-section">
+    <div class="provider-label">
+      <span class="provider-dot" style="background:var(--gh)"></span>
+      <span class="provider-name">GitHub</span>
+    </div>
+    <div class="cards">
+      <a href="github-foundations/" class="card" style="--card-accent:var(--gh)">
+        <span class="card-eyebrow">GHF</span>
+        <h2 class="card-title">GitHub Foundations</h2>
+        <p class="card-meta">350 questions · 7 jours</p>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Questions générées depuis la documentation officielle uniquement
+</footer>
