@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fiche AIF-C01 — AWS AI Practitioner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#fff8f4;
+  --sheet:#ffffff;
+  --ink:#1a0f00;
+  --muted:#7c5637;
+  --line:#f0d5c0;
+  --accent:#e25b00;
+  --accent-soft:#fff0e8;
+  --tag-bg:#fff0e0;
+  --tag-fg:#b34700;
+  --warn:#c0392b;
+  --warn-soft:#fdecea;
+  --ok:#1e6f2e;
+  --ok-soft:#e8f5e9;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#1a0d00;
+  --sheet:#241408;
+  --ink:#ffe8d6;
+  --muted:#d4905a;
+  --line:#3d2010;
+  --accent:#ff9d45;
+  --accent-soft:#2a1500;
+  --tag-bg:#2a1200;
+  --tag-fg:#ffb874;
+  --warn:#f28b82;
+  --warn-soft:#3a0f0d;
+  --ok:#81c995;
+  --ok-soft:#0a2a10;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#1a0d00;--sheet:#241408;--ink:#ffe8d6;--muted:#d4905a;--line:#3d2010;
+  --accent:#ff9d45;--accent-soft:#2a1500;--tag-bg:#2a1200;--tag-fg:#ffb874;
+  --warn:#f28b82;--warn-soft:#3a0f0d;--ok:#81c995;--ok-soft:#0a2a10;color-scheme:dark
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body)}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+.sidebar{background:var(--sheet);border-right:1px solid var(--line);padding:24px 0 40px;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
+@media(max-width:860px){.sidebar{display:none}}
+.sidebar-head{padding:0 18px 16px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.sidebar-head .cert-label{font:500 .68rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.sidebar-head h2{font:700 .95rem var(--f-display);color:var(--ink);line-height:1.2}
+.toc-list{list-style:none}
+.toc-list li a{display:block;padding:5px 18px;font-size:.8rem;color:var(--muted);text-decoration:none;border-left:3px solid transparent;transition:border-color .15s,color .15s}
+.toc-list li a:hover{color:var(--accent);border-left-color:var(--accent-soft)}
+.toc-list li a.active{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.toc-num{font:500 .65rem var(--f-mono);color:var(--accent);margin-right:5px;opacity:.7}
+.main{max-width:860px;padding:40px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))}
+.hero{background:linear-gradient(135deg,#e25b00 0%,#ff9d45 100%);color:#fff;border-radius:12px;padding:32px 28px;margin-bottom:36px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.06);border-radius:50%;pointer-events:none}
+.hero .eyebrow{font:500 .7rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:8px}
+.hero h1{font:700 2rem var(--f-display);line-height:1.15;text-wrap:balance;margin-bottom:12px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.85rem;color:rgba(255,255,255,.85)}
+.hero-meta span::before{content:"• ";opacity:.5}
+.hero-meta span:first-child::before{content:""}
+.back-link{display:inline-flex;align-items:center;gap:6px;font:500 .8rem var(--f-mono);color:rgba(255,255,255,.8);text-decoration:none;margin-bottom:14px}
+.back-link:hover{color:#fff}
+.exam-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:36px}
+.exam-cell{background:var(--sheet);padding:14px 16px}
+.exam-cell .label{font:500 .68rem var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.exam-cell .val{font:600 .95rem var(--f-display)}
+section{margin-bottom:44px;scroll-margin-top:24px}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--accent)}
+.section-num{font:500 .7rem var(--f-mono);background:var(--accent);color:#fff;padding:2px 7px;border-radius:4px;letter-spacing:.05em}
+.section-header h2{font:700 1.15rem var(--f-display);color:var(--ink)}
+.domain-badge{display:inline-flex;align-items:center;gap:6px;font:500 .72rem var(--f-mono);background:var(--tag-bg);color:var(--tag-fg);padding:3px 10px;border-radius:20px;margin-bottom:12px}
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+thead th{background:var(--accent);color:#fff;padding:8px 12px;text-align:left;font:600 .78rem var(--f-mono);letter-spacing:.04em;text-transform:uppercase}
+tbody tr:nth-child(even){background:var(--accent-soft)}
+tbody td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:hover{background:var(--accent-soft)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.card h3{font:600 .85rem var(--f-display);color:var(--accent);margin-bottom:6px}
+.card ul{list-style:none;font-size:.85rem}
+.card ul li{padding:2px 0;border-bottom:1px solid var(--line)}
+.card ul li:last-child{border:0}
+.card ul li::before{content:"›";color:var(--accent);margin-right:6px;font-weight:700}
+.check-list{list-style:none;display:grid;gap:6px;margin:8px 0}
+.check-list li{display:grid;grid-template-columns:20px 1fr;gap:6px;font-size:.88rem;align-items:start}
+.check-list li::before{content:"✦";color:var(--accent);font-size:.75rem;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tag{font:500 .7rem var(--f-mono);background:var(--tag-bg);color:var(--tag-fg);padding:2px 8px;border-radius:4px}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.callout{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.875rem}
+.callout.warn{background:var(--warn-soft);border-left-color:var(--warn)}
+.callout strong{display:block;margin-bottom:4px;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+.kv{display:grid;gap:8px;margin:8px 0}
+.kv-row{display:grid;grid-template-columns:200px 1fr;gap:8px;font-size:.875rem;align-items:start}
+.kv-row .k{font:600 .78rem var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding-top:2px}
+@media(max-width:500px){.kv-row{grid-template-columns:1fr}}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font:400 .78rem var(--f-mono);color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between}
+footer a{color:var(--accent);text-decoration:none}
+mark{background:rgba(226,91,0,.15);color:inherit;border-radius:2px;padding:0 2px}
+code{font-family:var(--f-mono);font-size:.85em;background:var(--accent-soft);color:var(--tag-fg);padding:1px 5px;border-radius:3px}
+p{margin:8px 0;font-size:.9rem;line-height:1.6}
+h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" aria-label="Table des matières">
+  <div class="sidebar-head">
+    <div class="cert-label">AIF-C01</div>
+    <h2>AWS AI Practitioner</h2>
+  </div>
+  <ul class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>L'examen</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Fondamentaux IA &amp; ML</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>IA Générative</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Applications des FM</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>IA Responsable</a></li>
+    <li><a href="#s6"><span class="toc-num">06</span>Sécurité &amp; Conformité</a></li>
+    <li><a href="#s7"><span class="toc-num">07</span>Services AWS IA clés</a></li>
+    <li><a href="#s8"><span class="toc-num">08</span>Mots-clés examen</a></li>
+    <li><a href="#s9"><span class="toc-num">09</span>Pièges classiques</a></li>
+  </ul>
+</nav>
+<main class="main">
+  <div class="hero">
+    <a href="../aws-ai-practitioner/index.html" class="back-link">← Retour au quiz</a>
+    <div class="eyebrow">AWS Certification · AIF-C01</div>
+    <h1>AWS AI Practitioner</h1>
+    <div class="hero-meta">
+      <span>Score minimal : 700/1000</span>
+      <span>65 questions</span>
+      <span>90 minutes</span>
+      <span>Niveau : fondamental</span>
+    </div>
+  </div>
+
+  <div class="exam-grid">
+    <div class="exam-cell"><div class="label">Domain 1</div><div class="val">Fondamentaux IA &amp; ML</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">20%</div></div>
+    <div class="exam-cell"><div class="label">Domain 2</div><div class="val">IA Générative</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">24%</div></div>
+    <div class="exam-cell"><div class="label">Domain 3</div><div class="val">Applications FM</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">28%</div></div>
+    <div class="exam-cell"><div class="label">Domain 4</div><div class="val">IA Responsable</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">14%</div></div>
+    <div class="exam-cell"><div class="label">Domain 5</div><div class="val">Sécurité &amp; Conformité</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">14%</div></div>
+  </div>
+
+  <section id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2>L'examen AIF-C01</h2></div>
+    <div class="callout"><strong>Profil visé</strong>Non-technique : décideurs, chefs de projet, professionnels métiers qui souhaitent comprendre les capacités IA/ML d'AWS et l'IA générative. Valable 3 ans.</div>
+    <div class="cards">
+      <div class="card"><h3>Format</h3><ul><li>65 questions (dont 15 non notées)</li><li>90 minutes</li><li>Score passage : 700/1000</li><li>QCM simple et multiple, classement, correspondance</li></ul></div>
+      <div class="card"><h3>Accès</h3><ul><li>Pearson VUE (en centre ou en ligne)</li><li>$100 USD</li><li>Recommandé : 6 mois exp. AWS + connaissance IA/ML basique</li></ul></div>
+      <div class="card"><h3>Ressources officielles</h3><ul><li>aws.amazon.com/certification/certified-ai-practitioner</li><li>AWS Skill Builder (cours gratuits)</li><li>AWS Well-Architected Framework - ML Lens</li></ul></div>
+    </div>
+  </section>
+
+  <section id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2>Fondamentaux IA et ML</h2></div>
+    <div class="domain-badge">🧠 Domain 1 · 20%</div>
+    <h3>Types d'apprentissage ML</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Paradigme</th><th>Description</th><th>Exemples</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Supervisé</strong></td><td>Données labelisées. Apprend la correspondance entrée → sortie.</td><td>Classification (spam/pas spam), régression (prédiction de prix)</td></tr>
+          <tr><td><strong>Non supervisé</strong></td><td>Données sans labels. Trouve des patterns cachés.</td><td>Clustering (segmentation clients), réduction de dimension</td></tr>
+          <tr><td><strong>Par renforcement</strong></td><td>Agent qui apprend par essai/erreur avec récompenses.</td><td>Jeux, robotique, optimisation</td></tr>
+          <tr><td><strong>Semi-supervisé</strong></td><td>Mélange : quelques données labelisées + beaucoup non labelisées.</td><td>Reconnaissance vocale, NLP</td></tr>
+          <tr><td><strong>Auto-supervisé</strong></td><td>Crée ses propres labels à partir des données. Base des LLMs.</td><td>Transformer, GPT, BERT</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Concepts ML fondamentaux</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Feature</span><span>Variable d'entrée du modèle. Feature engineering = transformer les données brutes en features utiles.</span></div>
+      <div class="kv-row"><span class="k">Overfitting</span><span>Modèle trop adapté aux données d'entraînement, mauvaise généralisation. Solution : régularisation, plus de données, dropout.</span></div>
+      <div class="kv-row"><span class="k">Underfitting</span><span>Modèle trop simple, ne capture pas les patterns. Solution : modèle plus complexe, plus de features.</span></div>
+      <div class="kv-row"><span class="k">Biais / Variance</span><span>Biais élevé = underfitting. Variance élevée = overfitting. Trouver le bon équilibre (bias-variance tradeoff).</span></div>
+      <div class="kv-row"><span class="k">Train / Validation / Test</span><span>Split classique : 70% train, 15% validation (tuning), 15% test (évaluation finale).</span></div>
+      <div class="kv-row"><span class="k">MLOps</span><span>DevOps pour le ML : automatiser l'entraînement, le déploiement, la surveillance des modèles.</span></div>
+    </div>
+    <h3>Types de données ML</h3>
+    <div class="tags">
+      <span class="tag ok">Structurées (tables SQL)</span>
+      <span class="tag">Semi-structurées (JSON, XML)</span>
+      <span class="tag warn">Non structurées (images, audio, texte)</span>
+      <span class="tag ok">Séries temporelles (IoT, métriques)</span>
+    </div>
+    <h3>Métriques d'évaluation classiques</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Métrique</th><th>Calcul</th><th>Quand l'utiliser</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Accuracy</strong></td><td>(VP+VN) / Total</td><td>Classes équilibrées</td></tr>
+          <tr><td><strong>Precision</strong></td><td>VP / (VP + FP)</td><td>Éviter les faux positifs (spam)</td></tr>
+          <tr><td><strong>Recall (sensibilité)</strong></td><td>VP / (VP + FN)</td><td>Éviter les faux négatifs (maladie)</td></tr>
+          <tr><td><strong>F1 Score</strong></td><td>2 × (P×R) / (P+R)</td><td>Classes déséquilibrées</td></tr>
+          <tr><td><strong>RMSE</strong></td><td>√(Σ(pred-réel)²/n)</td><td>Régression</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2>Fondamentaux de l'IA Générative</h2></div>
+    <div class="domain-badge">✨ Domain 2 · 24%</div>
+    <h3>Concepts clés</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Foundation Model (FM)</span><span>Grand modèle pré-entraîné sur des données massives. Peut être adapté à de nombreuses tâches. Ex : Claude, Llama, Titan.</span></div>
+      <div class="kv-row"><span class="k">LLM (Large Language Model)</span><span>FM spécialisé dans le texte. Génère du texte cohérent basé sur des milliards de paramètres.</span></div>
+      <div class="kv-row"><span class="k">Token</span><span>Unité de traitement du texte (~0.75 mots). La longueur du contexte = fenêtre de tokens (context window). 1K tokens ≈ 750 mots.</span></div>
+      <div class="kv-row"><span class="k">Embeddings</span><span>Représentation vectorielle (numérique) du texte. Permet de mesurer la similarité sémantique. Base des moteurs de recherche IA.</span></div>
+      <div class="kv-row"><span class="k">Temperature</span><span>Contrôle la créativité/variabilité des sorties. 0 = déterministe (reproductible), 1 = créatif/aléatoire.</span></div>
+      <div class="kv-row"><span class="k">Hallucination</span><span>Le modèle génère des informations fausses mais confiantes. Risque clé des LLMs. Atténué par RAG, grounding.</span></div>
+      <div class="kv-row"><span class="k">Multimodal</span><span>Modèle traitant plusieurs types de données : texte, images, audio, vidéo. Ex : Amazon Nova.</span></div>
+    </div>
+    <h3>Amazon Bedrock</h3>
+    <div class="callout">
+      <strong>💡 Service clé AIF-C01</strong>
+      Amazon Bedrock = API unifiée pour accéder à des FMs via AWS sans gérer d'infrastructure. Modèles disponibles : Anthropic Claude, Meta Llama, Mistral, Amazon Titan, Stability AI, Cohere. Fonctionnalités : Knowledge Bases (RAG), Agents, Guardrails, Model Evaluation, Prompt Flows.
+    </div>
+    <h3>Amazon SageMaker JumpStart</h3>
+    <div class="callout">Hub de modèles pré-entraînés déployables en 1 clic. FMs open-source : Llama, Mistral. Différent de Bedrock : JumpStart déploie dans votre compte (contrôle total), Bedrock est serverless (API managée).</div>
+    <h3>Prompt Engineering</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Technique</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Zero-shot</strong></td><td>Instruction directe sans exemples. Simple, peut manquer de précision.</td></tr>
+          <tr><td><strong>Few-shot</strong></td><td>1–5 exemples dans le prompt. Guide le format et le style de réponse.</td></tr>
+          <tr><td><strong>Chain-of-thought (CoT)</strong></td><td>Demander au modèle de "penser étape par étape". Améliore le raisonnement.</td></tr>
+          <tr><td><strong>System prompt</strong></td><td>Instructions permanentes données au modèle (persona, règles, format).</td></tr>
+          <tr><td><strong>Prompt template</strong></td><td>Structure réutilisable avec des variables. Utilisé dans Bedrock Prompt Flows.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2>Applications des Foundation Models</h2></div>
+    <div class="domain-badge">🔧 Domain 3 · 28%</div>
+    <h3>RAG — Retrieval Augmented Generation</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Définition</span><span>Augmenter le LLM avec des données externes récupérées en temps réel. Évite l'hallucination et le knowledge cutoff.</span></div>
+      <div class="kv-row"><span class="k">Architecture</span><span>Documents → Chunks → Embeddings → Vector Store → Requête → Recherche sémantique → Contexte → LLM → Réponse.</span></div>
+      <div class="kv-row"><span class="k">Amazon Bedrock Knowledge Bases</span><span>Service RAG managé. Sources : S3, Confluence, SharePoint, Salesforce. Vector store : OpenSearch, Aurora, Pinecone, Redis.</span></div>
+      <div class="kv-row"><span class="k">Vector Database</span><span>BDD spécialisée pour stocker et rechercher des embeddings. Recherche par similarité cosinus. Ex : OpenSearch, Pinecone.</span></div>
+    </div>
+    <h3>Fine-tuning des modèles</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Technique</th><th>Description</th><th>Quand utiliser</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Fine-tuning complet</strong></td><td>Réentraîner tous les paramètres du modèle sur des données spécifiques.</td><td>Domaine très spécifique, données suffisantes (1K+)</td></tr>
+          <tr><td><strong>PEFT / LoRA</strong></td><td>Adapter seulement une petite fraction des paramètres. Efficace.</td><td>Ressources limitées, résultats proches du full fine-tuning</td></tr>
+          <tr><td><strong>RLHF</strong></td><td>Reinforcement Learning from Human Feedback. Aligne le modèle sur les préférences humaines.</td><td>Amélioration comportement, sécurité, utilité</td></tr>
+          <tr><td><strong>Continued pre-training</strong></td><td>Continuer l'entraînement sur des données de domaine non-labelisées.</td><td>Intégrer vocabulaire/concepts d'un domaine (médical, juridique)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Évaluation des modèles génératifs</h3>
+    <div class="cards">
+      <div class="card"><h3>ROUGE</h3><ul><li>Recall-Oriented Understudy for Gisting Evaluation</li><li>Compare résumés générés vs référence</li><li>ROUGE-N : chevauchement n-grammes</li></ul></div>
+      <div class="card"><h3>BLEU</h3><ul><li>Bilingual Evaluation Understudy</li><li>Score de traduction automatique</li><li>Chevauchement avec traduction de référence</li></ul></div>
+      <div class="card"><h3>BERTScore</h3><ul><li>Compare les embeddings BERT</li><li>Sémantique, pas juste mots-clés</li><li>Plus précis que ROUGE/BLEU</li></ul></div>
+    </div>
+    <h3>Agents IA (Amazon Bedrock Agents)</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Agent</span><span>LLM + outils (APIs, bases de données, code) + mémoire. Capable d'agir sur l'environnement pour accomplir des tâches complexes.</span></div>
+      <div class="kv-row"><span class="k">Action Groups</span><span>APIs définies que l'agent peut appeler (Lambda fonctions). Le modèle décide quand appeler quel outil.</span></div>
+      <div class="kv-row"><span class="k">ReAct pattern</span><span>Reasoning + Acting. L'agent alterne réflexion et action jusqu'à résoudre la tâche.</span></div>
+    </div>
+  </section>
+
+  <section id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2>Lignes directrices pour une IA responsable</h2></div>
+    <div class="domain-badge">⚖️ Domain 4 · 14%</div>
+    <h3>Dimensions de l'IA responsable</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Dimension</th><th>Description</th><th>Outils AWS</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Équité (Fairness)</strong></td><td>Éviter les biais discriminatoires dans les prédictions.</td><td>SageMaker Clarify</td></tr>
+          <tr><td><strong>Explicabilité</strong></td><td>Comprendre pourquoi le modèle prend une décision.</td><td>SageMaker Clarify (SHAP values)</td></tr>
+          <tr><td><strong>Robustesse</strong></td><td>Résistance aux perturbations, données adversariales.</td><td>SageMaker Model Monitor</td></tr>
+          <tr><td><strong>Confidentialité</strong></td><td>Protection des données d'entraînement et d'inférence.</td><td>Differential Privacy, chiffrement</td></tr>
+          <tr><td><strong>Transparence</strong></td><td>Documenter les capacités, limites et origines du modèle.</td><td>Model Cards (SageMaker)</td></tr>
+          <tr><td><strong>Sécurité</strong></td><td>Prévenir les usages malveillants et la manipulation.</td><td>Bedrock Guardrails</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Types de biais en ML</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Biais de données</span><span>Données d'entraînement non représentatives ou historiquement biaisées. Entraîne des prédictions discriminatoires.</span></div>
+      <div class="kv-row"><span class="k">Biais algorithmique</span><span>Le modèle amplifie les patterns biaisés présents dans les données.</span></div>
+      <div class="kv-row"><span class="k">Data drift</span><span>Les données de production diffèrent des données d'entraînement. Dégrade les performances au fil du temps.</span></div>
+      <div class="kv-row"><span class="k">Concept drift</span><span>La relation entre features et labels change (ex : comportements clients post-COVID).</span></div>
+    </div>
+    <h3>Bedrock Guardrails</h3>
+    <div class="callout">Filtres de contenu pour les applications Bedrock : blocage de contenu nuisible, toxique, discriminatoire. Filtrage de contenu sensible (PII). Hallucination detection. Grounding check : vérifier que les réponses sont fondées sur les sources fournies.</div>
+    <h3>Risques propriété intellectuelle</h3>
+    <div class="callout warn"><strong>⚠️ Risques légaux</strong>Les FMs peuvent mémoriser et reproduire des données d'entraînement protégées par copyright. Utiliser des données d'entraînement licenciées. AWS indemnisation copyright disponible pour certains services Bedrock.</div>
+  </section>
+
+  <section id="s6">
+    <div class="section-header"><span class="section-num">06</span><h2>Sécurité, conformité et gouvernance IA</h2></div>
+    <div class="domain-badge">🔐 Domain 5 · 14%</div>
+    <h3>Sécurité des workloads IA sur AWS</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">IAM pour IA</span><span>Politiques IAM granulaires pour contrôler l'accès à Bedrock, SageMaker, Rekognition. Principe du moindre privilège.</span></div>
+      <div class="kv-row"><span class="k">Chiffrement</span><span>Données chiffrées au repos (KMS) et en transit (TLS). Les modèles Bedrock n'utilisent pas vos données pour entraîner d'autres modèles.</span></div>
+      <div class="kv-row"><span class="k">VPC Endpoints</span><span>Accès privé à Bedrock/SageMaker sans passer par Internet. Interface Endpoints (PrivateLink).</span></div>
+      <div class="kv-row"><span class="k">AWS Config</span><span>Surveiller la conformité des ressources IA. Détecter les configs non conformes.</span></div>
+      <div class="kv-row"><span class="k">Amazon Inspector</span><span>Détecte les vulnérabilités dans les conteneurs de ML/IA et les instances EC2.</span></div>
+      <div class="kv-row"><span class="k">AWS Audit Manager</span><span>Audits de conformité continus pour les workloads IA.</span></div>
+    </div>
+    <h3>Menaces spécifiques à l'IA</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Menace</th><th>Description</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Prompt Injection</strong></td><td>Manipulation du modèle via des inputs malveillants pour contourner les instructions.</td><td>Bedrock Guardrails, validation des inputs</td></tr>
+          <tr><td><strong>Data Poisoning</strong></td><td>Injecter des données corrompues dans l'entraînement pour manipuler le modèle.</td><td>Validation des données, surveillance entraînement</td></tr>
+          <tr><td><strong>Model Inversion</strong></td><td>Extraire des données d'entraînement confidentielles depuis un modèle.</td><td>Differential privacy</td></tr>
+          <tr><td><strong>Model Stealing</strong></td><td>Reproduire un modèle propriétaire via ses sorties.</td><td>Rate limiting, monitoring des requêtes</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Conformité et gouvernance</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">AWS AI Service Cards</span><span>Documentation des capacités, limites, biais et utilisations appropriées de chaque service IA AWS.</span></div>
+      <div class="kv-row"><span class="k">SageMaker Model Cards</span><span>Fiche technique d'un modèle : objectif, métriques, biais, données d'entraînement. Standard de l'industrie.</span></div>
+      <div class="kv-row"><span class="k">CloudTrail</span><span>Audit de tous les appels API vers Bedrock, SageMaker. Qui a appelé quoi, quand.</span></div>
+    </div>
+  </section>
+
+  <section id="s7">
+    <div class="section-header"><span class="section-num">07</span><h2>Services AWS IA / ML clés</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Service</th><th>Catégorie</th><th>Rôle principal</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Amazon Bedrock</strong></td><td>IA générative</td><td>API FMs (Claude, Llama, Titan…), RAG, Agents, Guardrails</td></tr>
+          <tr><td><strong>Amazon SageMaker</strong></td><td>ML complet</td><td>Entraîner, déployer, surveiller les modèles ML</td></tr>
+          <tr><td><strong>SageMaker JumpStart</strong></td><td>FMs open-source</td><td>Déployer des FMs dans votre compte AWS</td></tr>
+          <tr><td><strong>SageMaker Clarify</strong></td><td>IA responsable</td><td>Détecter les biais, expliquer les prédictions (SHAP)</td></tr>
+          <tr><td><strong>SageMaker Model Monitor</strong></td><td>MLOps</td><td>Surveiller les dérives de données et de modèle en production</td></tr>
+          <tr><td><strong>Amazon Rekognition</strong></td><td>Vision IA</td><td>Analyse d'images/vidéos : visages, objets, texte, modération</td></tr>
+          <tr><td><strong>Amazon Transcribe</strong></td><td>Audio → Texte</td><td>Transcription audio (Speech-to-Text)</td></tr>
+          <tr><td><strong>Amazon Polly</strong></td><td>Texte → Audio</td><td>Text-to-Speech (TTS)</td></tr>
+          <tr><td><strong>Amazon Translate</strong></td><td>Traduction</td><td>Traduction automatique en temps réel</td></tr>
+          <tr><td><strong>Amazon Comprehend</strong></td><td>NLP</td><td>Analyse de sentiments, entités, topics sur du texte</td></tr>
+          <tr><td><strong>Amazon Lex</strong></td><td>Chatbot</td><td>Créer des chatbots avec NLU (même techno qu'Alexa)</td></tr>
+          <tr><td><strong>Amazon Kendra</strong></td><td>Recherche IA</td><td>Moteur de recherche intelligent sur documents internes</td></tr>
+          <tr><td><strong>Amazon Personalize</strong></td><td>Recommandations</td><td>Système de recommandation personnalisé</td></tr>
+          <tr><td><strong>Amazon Forecast</strong></td><td>Prévisions</td><td>Prévisions de séries temporelles (demande, stocks)</td></tr>
+          <tr><td><strong>Amazon Fraud Detector</strong></td><td>Détection fraude</td><td>Détecter les activités frauduleuses en temps réel</td></tr>
+          <tr><td><strong>Amazon Q</strong></td><td>Assistant IA entreprise</td><td>Assistant IA basé sur les données de l'entreprise</td></tr>
+          <tr><td><strong>Amazon Nova</strong></td><td>FM multimodal AWS</td><td>Modèle fondation AWS natif (Lite, Micro, Pro, Canvas, Reel)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s8">
+    <div class="section-header"><span class="section-num">08</span><h2>Mots-clés examen → Service AWS</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Scénario / mot-clé</th><th>Réponse</th></tr></thead>
+        <tbody>
+          <tr><td>« Accéder à Claude/Llama/Titan via API »</td><td>Amazon Bedrock</td></tr>
+          <tr><td>« RAG avec mes documents S3 »</td><td>Bedrock Knowledge Bases</td></tr>
+          <tr><td>« Agent IA pour automatiser des tâches »</td><td>Bedrock Agents</td></tr>
+          <tr><td>« Filtrer le contenu nuisible d'un LLM »</td><td>Bedrock Guardrails</td></tr>
+          <tr><td>« Entraîner un modèle ML personnalisé »</td><td>Amazon SageMaker</td></tr>
+          <tr><td>« Déployer Llama dans mon propre compte »</td><td>SageMaker JumpStart</td></tr>
+          <tr><td>« Détecter les biais dans mon modèle »</td><td>SageMaker Clarify</td></tr>
+          <tr><td>« Surveiller la dérive des données »</td><td>SageMaker Model Monitor</td></tr>
+          <tr><td>« Reconnaissance de visages/objets »</td><td>Amazon Rekognition</td></tr>
+          <tr><td>« Transcrire de l'audio en texte »</td><td>Amazon Transcribe</td></tr>
+          <tr><td>« Chatbot intelligent »</td><td>Amazon Lex</td></tr>
+          <tr><td>« Recherche dans documents internes »</td><td>Amazon Kendra</td></tr>
+          <tr><td>« Recommandations personnalisées »</td><td>Amazon Personalize</td></tr>
+          <tr><td>« Prévisions de demande »</td><td>Amazon Forecast</td></tr>
+          <tr><td>« Analyse de sentiments sur texte »</td><td>Amazon Comprehend</td></tr>
+          <tr><td>« Injection de prompt »</td><td>Menace → Bedrock Guardrails</td></tr>
+          <tr><td>« Modèle qui génère fausses informations »</td><td>Hallucination → RAG / Guardrails grounding</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s9">
+    <div class="section-header"><span class="section-num">09</span><h2>Pièges classiques</h2></div>
+    <ul class="check-list">
+      <li><strong>Bedrock ≠ SageMaker</strong> : Bedrock = API serverless pour FMs pre-built (pas de gestion infra). SageMaker = entraîner et déployer VOS propres modèles (plus de contrôle, plus complexe).</li>
+      <li><strong>SageMaker JumpStart ≠ Bedrock</strong> : JumpStart déploie le modèle dans votre infrastructure (coût EC2). Bedrock est serverless (pay-per-token, pas de gestion d'instances).</li>
+      <li><strong>RAG ≠ Fine-tuning</strong> : RAG enrichit les prompts avec des données externes (temps réel). Fine-tuning modifie les poids du modèle (entraînement). RAG est plus flexible et moins coûteux pour des données changeantes.</li>
+      <li><strong>Precision vs Recall</strong> : Precision = parmi ce qu'on prédit positif, combien est vrai. Recall = parmi tous les vrais positifs, combien on en trouve. F1 = équilibre entre les deux.</li>
+      <li><strong>Temperature 0 ≠ meilleure qualité</strong> : Temperature 0 = déterministe (reproductible). Pas forcément meilleur pour tout. Résumés et faits = faible température. Créativité = haute température.</li>
+      <li><strong>Tokens ≠ mots</strong> : 1 token ≈ 4 caractères ou 0.75 mots. "ChatGPT" = 1 token, mais "tokenization" peut être 2-3 tokens. Coût et limite de contexte calculés en tokens.</li>
+      <li><strong>Data drift ≠ Concept drift</strong> : Data drift = distribution des données change. Concept drift = relation features-labels change. Les deux dégradent les modèles en production.</li>
+      <li><strong>Prompt Injection ≠ SQL Injection</strong> : Prompt Injection = manipulation d'un LLM via son input pour ignorer ses instructions. Spécifique aux LLMs.</li>
+      <li><strong>ROUGE pour résumés, BLEU pour traductions</strong> : ROUGE mesure le chevauchement pour les résumés. BLEU mesure la qualité de traduction. Les deux sont basés sur les n-grammes.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Fiche de révision AIF-C01 · Auteur : RB · Repo : <a href="https://github.com/Crachdev/certifs" target="_blank" rel="noopener">Crachdev/certifs</a></span>
+    <span>Sources : <a href="https://aws.amazon.com/certification/certified-ai-practitioner/" target="_blank" rel="noopener">aws.amazon.com/certification</a> · Octobre 2026</span>
+  </footer>
+</main>
+</div>
+<script>
+const sections=document.querySelectorAll('section[id]');
+const tocLinks=document.querySelectorAll('.toc-list a');
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){tocLinks.forEach(a=>a.classList.remove('active'));const link=document.querySelector(`.toc-list a[href="#${e.target.id}"]`);if(link)link.classList.add('active')}})},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>

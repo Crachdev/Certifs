@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fiche GCDL — Google Cloud Digital Leader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f0f7f4;
+  --sheet:#ffffff;
+  --ink:#0d1f18;
+  --muted:#4a6358;
+  --line:#c0d9ce;
+  --accent:#1a73e8;
+  --accent2:#34a853;
+  --accent-soft:#e8f0fe;
+  --tag-bg:#e8f5e9;
+  --tag-fg:#1e7e34;
+  --warn:#d93025;
+  --warn-soft:#fce8e6;
+  --ok:#188038;
+  --ok-soft:#e6f4ea;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0d1f18;
+  --sheet:#112a1f;
+  --ink:#e8f5ee;
+  --muted:#7aab92;
+  --line:#1e3d2d;
+  --accent:#8ab4f8;
+  --accent2:#81c995;
+  --accent-soft:#112a1f;
+  --tag-bg:#0f2d1a;
+  --tag-fg:#81c995;
+  --warn:#f28b82;
+  --warn-soft:#3a0f0d;
+  --ok:#81c995;
+  --ok-soft:#0a2a10;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0d1f18;--sheet:#112a1f;--ink:#e8f5ee;--muted:#7aab92;--line:#1e3d2d;
+  --accent:#8ab4f8;--accent2:#81c995;--accent-soft:#112a1f;--tag-bg:#0f2d1a;--tag-fg:#81c995;
+  --warn:#f28b82;--warn-soft:#3a0f0d;--ok:#81c995;--ok-soft:#0a2a10;color-scheme:dark
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body)}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+.sidebar{background:var(--sheet);border-right:1px solid var(--line);padding:24px 0 40px;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
+@media(max-width:860px){.sidebar{display:none}}
+.sidebar-head{padding:0 18px 16px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.sidebar-head .cert-label{font:500 .68rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.sidebar-head h2{font:700 .95rem var(--f-display);color:var(--ink);line-height:1.2}
+.toc-list{list-style:none}
+.toc-list li a{display:block;padding:5px 18px;font-size:.8rem;color:var(--muted);text-decoration:none;border-left:3px solid transparent;transition:border-color .15s,color .15s}
+.toc-list li a:hover{color:var(--accent);border-left-color:var(--accent-soft)}
+.toc-list li a.active{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.toc-num{font:500 .65rem var(--f-mono);color:var(--accent);margin-right:5px;opacity:.7}
+.main{max-width:860px;padding:40px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))}
+.hero{background:linear-gradient(135deg,#1a73e8 0%,#34a853 100%);color:#fff;border-radius:12px;padding:32px 28px;margin-bottom:36px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.06);border-radius:50%;pointer-events:none}
+.hero .eyebrow{font:500 .7rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:8px}
+.hero h1{font:700 2rem var(--f-display);line-height:1.15;text-wrap:balance;margin-bottom:12px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.85rem;color:rgba(255,255,255,.85)}
+.hero-meta span::before{content:"• ";opacity:.5}
+.hero-meta span:first-child::before{content:""}
+.back-link{display:inline-flex;align-items:center;gap:6px;font:500 .8rem var(--f-mono);color:rgba(255,255,255,.8);text-decoration:none;margin-bottom:14px}
+.back-link:hover{color:#fff}
+.exam-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:36px}
+.exam-cell{background:var(--sheet);padding:14px 16px}
+.exam-cell .label{font:500 .68rem var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.exam-cell .val{font:600 .95rem var(--f-display)}
+.exam-cell .val.accent{color:var(--accent)}
+section{margin-bottom:44px;scroll-margin-top:24px}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--accent)}
+.section-num{font:500 .7rem var(--f-mono);background:var(--accent);color:#fff;padding:2px 7px;border-radius:4px;letter-spacing:.05em}
+.section-header h2{font:700 1.15rem var(--f-display);color:var(--ink)}
+.domain-badge{display:inline-flex;align-items:center;gap:6px;font:500 .72rem var(--f-mono);background:var(--tag-bg);color:var(--tag-fg);padding:3px 10px;border-radius:20px;margin-bottom:12px}
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+thead th{background:var(--accent);color:#fff;padding:8px 12px;text-align:left;font:600 .78rem var(--f-mono);letter-spacing:.04em;text-transform:uppercase}
+tbody tr:nth-child(even){background:var(--accent-soft)}
+tbody td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:hover{background:var(--accent-soft)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.card h3{font:600 .85rem var(--f-display);color:var(--accent);margin-bottom:6px}
+.card ul{list-style:none;font-size:.85rem}
+.card ul li{padding:2px 0;border-bottom:1px solid var(--line)}
+.card ul li:last-child{border:0}
+.card ul li::before{content:"›";color:var(--accent);margin-right:6px;font-weight:700}
+.check-list{list-style:none;display:grid;gap:6px;margin:8px 0}
+.check-list li{display:grid;grid-template-columns:20px 1fr;gap:6px;font-size:.88rem;align-items:start}
+.check-list li::before{content:"✦";color:var(--accent);font-size:.75rem;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tag{font:500 .7rem var(--f-mono);background:var(--tag-bg);color:var(--tag-fg);padding:2px 8px;border-radius:4px}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.callout{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.875rem}
+.callout.warn{background:var(--warn-soft);border-left-color:var(--warn)}
+.callout strong{display:block;margin-bottom:4px;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+.kv{display:grid;gap:8px;margin:8px 0}
+.kv-row{display:grid;grid-template-columns:180px 1fr;gap:8px;font-size:.875rem;align-items:start}
+.kv-row .k{font:600 .78rem var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding-top:2px}
+@media(max-width:500px){.kv-row{grid-template-columns:1fr}}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font:400 .78rem var(--f-mono);color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between}
+footer a{color:var(--accent);text-decoration:none}
+mark{background:rgba(26,115,232,.15);color:inherit;border-radius:2px;padding:0 2px}
+code{font-family:var(--f-mono);font-size:.85em;background:var(--accent-soft);color:var(--tag-fg);padding:1px 5px;border-radius:3px}
+p{margin:8px 0;font-size:.9rem;line-height:1.6}
+h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" aria-label="Table des matières">
+  <div class="sidebar-head">
+    <div class="cert-label">GCDL</div>
+    <h2>Cloud Digital Leader</h2>
+  </div>
+  <ul class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>L'examen</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Transformation digitale</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Data &amp; Analytics</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Intelligence artificielle</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Modernisation infra &amp; apps</a></li>
+    <li><a href="#s6"><span class="toc-num">06</span>Confiance &amp; Sécurité</a></li>
+    <li><a href="#s7"><span class="toc-num">07</span>Opérations &amp; Coûts</a></li>
+    <li><a href="#s8"><span class="toc-num">08</span>Produits GCP clés</a></li>
+    <li><a href="#s9"><span class="toc-num">09</span>Mots-clés examen</a></li>
+    <li><a href="#s10"><span class="toc-num">10</span>Pièges classiques</a></li>
+  </ul>
+</nav>
+<main class="main">
+  <div class="hero">
+    <a href="../google-cloud-digital-leader/index.html" class="back-link">← Retour au quiz</a>
+    <div class="eyebrow">Google Cloud Certification</div>
+    <h1>Cloud Digital Leader</h1>
+    <div class="hero-meta">
+      <span>Score minimal : 700/1000</span>
+      <span>~50–60 questions</span>
+      <span>90 minutes</span>
+      <span>Niveau : fondamental</span>
+    </div>
+  </div>
+
+  <div class="exam-grid">
+    <div class="exam-cell"><div class="label">Section 1</div><div class="val">Transformation digitale</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">~18%</div></div>
+    <div class="exam-cell"><div class="label">Section 2</div><div class="val">Data &amp; Analytics</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">~18%</div></div>
+    <div class="exam-cell"><div class="label">Section 3</div><div class="val">Intelligence Artificielle</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">~18%</div></div>
+    <div class="exam-cell"><div class="label">Section 4</div><div class="val">Infra &amp; Applications</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">~18%</div></div>
+    <div class="exam-cell"><div class="label">Section 5</div><div class="val">Sécurité &amp; Confiance</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">~18%</div></div>
+    <div class="exam-cell"><div class="label">Section 6</div><div class="val">Opérations Cloud</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">~10%</div></div>
+  </div>
+
+  <section id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2>L'examen GCDL</h2></div>
+    <div class="callout"><strong>Profil visé</strong>Non-technique : décideurs, chefs de projet, managers souhaitant comprendre la valeur du cloud Google. Aucune compétence technique requise.</div>
+    <div class="cards">
+      <div class="card"><h3>Format</h3><ul><li>~50–60 questions</li><li>90 minutes</li><li>Score passage : 700/1000</li><li>QCM, vrai/faux, cas pratiques</li></ul></div>
+      <div class="card"><h3>Accès</h3><ul><li>Webassessor / Kryterion</li><li>En centre ou en ligne</li><li>Disponible en français</li><li>Valide 3 ans</li></ul></div>
+      <div class="card"><h3>Ressources officielles</h3><ul><li>cloud.google.com/learn/certification/cloud-digital-leader</li><li>Google Cloud Skills Boost (gratuit)</li><li>Parcours : Cloud Digital Leader Learning Path</li></ul></div>
+    </div>
+  </section>
+
+  <section id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2>Transformation digitale avec Google Cloud</h2></div>
+    <div class="domain-badge">☁️ Section 1 · ~18%</div>
+    <h3>Concepts cloud fondamentaux</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Cloud computing</span><span>Livraison de ressources informatiques (calcul, stockage, réseau, IA) via Internet, à la demande, avec facturation à l'usage.</span></div>
+      <div class="kv-row"><span class="k">IA agentique</span><span>Agents IA autonomes capables de planifier et exécuter des tâches complexes en plusieurs étapes. Différenciateur clé de Google Cloud 2025–2026.</span></div>
+      <div class="kv-row"><span class="k">Open source / open standard</span><span>Engagement Google pour éviter le vendor lock-in : Kubernetes, TensorFlow, Apache Kafka, etc.</span></div>
+    </div>
+    <h3>Architectures cloud</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Architecture</th><th>Description</th><th>Usage</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Cloud privé</strong></td><td>Infrastructure dédiée à une organisation</td><td>Conformité réglementaire stricte</td></tr>
+          <tr><td><strong>Cloud hybride</strong></td><td>On-premises + cloud public connectés</td><td>Migration progressive, données sensibles</td></tr>
+          <tr><td><strong>Multi-cloud</strong></td><td>Plusieurs fournisseurs cloud</td><td>Éviter le vendor lock-in, résilience</td></tr>
+          <tr><td><strong>Cloud public</strong></td><td>Infrastructure Google partagée</td><td>Scalabilité maximale, coût optimisé</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Bénéfices du cloud Google</h3>
+    <div class="cards">
+      <div class="card"><h3>Business</h3><ul><li>Scalabilité élastique</li><li>Réduction des coûts (CapEx → OpEx)</li><li>Agilité et rapidité de mise sur le marché</li><li>Focus stratégique (vs. gestion IT)</li></ul></div>
+      <div class="card"><h3>Technique</h3><ul><li>Haute disponibilité mondiale</li><li>Sécurité intégrée (secure by design)</li><li>Réseau backbone mondial (edge locations)</li><li>Accès aux données en temps réel</li></ul></div>
+      <div class="card"><h3>Différenciateurs GCP</h3><ul><li>AI Hypercomputer (GPU/TPU)</li><li>Gemini (IA générative)</li><li>Ouverture : Kubernetes, Anthos</li><li>Réseau mondial Google (le plus rapide)</li></ul></div>
+    </div>
+  </section>
+
+  <section id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2>Transformation Data avec Google Cloud</h2></div>
+    <div class="domain-badge">📊 Section 2 · ~18%</div>
+    <h3>Rôle des données</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Base de données</span><span>Stockage structuré, transactions ACID, requêtes SQL. Ex : Cloud SQL, Spanner, AlloyDB.</span></div>
+      <div class="kv-row"><span class="k">Data warehouse</span><span>Données historiques agrégées pour l'analytique et le reporting. Ex : <strong>BigQuery</strong>.</span></div>
+      <div class="kv-row"><span class="k">Data lake</span><span>Stockage massif de données brutes (structurées, semi-structurées, non structurées). Ex : <strong>Cloud Storage</strong>.</span></div>
+      <div class="kv-row"><span class="k">Gouvernance des données</span><span>Politiques pour assurer qualité, sécurité, confidentialité et conformité. Éviter les silos de données.</span></div>
+    </div>
+    <h3>Types de données</h3>
+    <div class="tags">
+      <span class="tag ok">First-party (propres)</span>
+      <span class="tag">Second-party (partenaires)</span>
+      <span class="tag warn">Third-party (achetées)</span>
+      <span class="tag ok">Structurées (tables)</span>
+      <span class="tag">Semi-structurées (JSON)</span>
+      <span class="tag warn">Non structurées (images, vidéos)</span>
+    </div>
+    <h3>Produits de gestion des données GCP</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Service</th><th>Type</th><th>Usage</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Cloud Storage</strong></td><td>Stockage objet</td><td>Fichiers, backups, data lake. Classes : Standard, Nearline, Coldline, Archive</td></tr>
+          <tr><td><strong>Cloud SQL</strong></td><td>BDD relationnelle managée</td><td>MySQL, PostgreSQL, SQL Server</td></tr>
+          <tr><td><strong>AlloyDB</strong></td><td>BDD relationnelle haute perf.</td><td>PostgreSQL 100× plus rapide, IA intégrée</td></tr>
+          <tr><td><strong>Spanner</strong></td><td>BDD relationnelle globale</td><td>Transactions mondiales, 99,999% disponibilité</td></tr>
+          <tr><td><strong>Bigtable</strong></td><td>NoSQL wide-column</td><td>IoT, séries temporelles, analytics temps réel</td></tr>
+          <tr><td><strong>Firestore</strong></td><td>NoSQL document</td><td>Apps mobiles/web, données hiérarchiques</td></tr>
+          <tr><td><strong>BigQuery</strong></td><td>Data warehouse serverless</td><td>Analytique à grande échelle, ML intégré, SQL</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Analytics &amp; Streaming</h3>
+    <div class="cards">
+      <div class="card"><h3>Pub/Sub</h3><ul><li>Messagerie asynchrone temps réel</li><li>Découplage producteur/consommateur</li><li>Échelle mondiale, faible latence</li></ul></div>
+      <div class="card"><h3>Dataflow</h3><ul><li>Pipeline de traitement batch + streaming</li><li>Basé sur Apache Beam</li><li>ETL et transformation de données</li></ul></div>
+      <div class="card"><h3>Looker</h3><ul><li>Business Intelligence et reporting</li><li>Dashboards en temps réel</li><li>Intégré dans BigQuery</li></ul></div>
+    </div>
+  </section>
+
+  <section id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2>Intelligence Artificielle avec Google Cloud</h2></div>
+    <div class="domain-badge">🤖 Section 3 · ~18%</div>
+    <h3>Concepts IA/ML fondamentaux</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">IA (Intelligence Artificielle)</span><span>Systèmes capables d'effectuer des tâches nécessitant normalement l'intelligence humaine.</span></div>
+      <div class="kv-row"><span class="k">ML (Machine Learning)</span><span>Sous-ensemble de l'IA : systèmes qui apprennent à partir des données sans être explicitement programmés.</span></div>
+      <div class="kv-row"><span class="k">Deep Learning</span><span>Sous-ensemble du ML utilisant des réseaux de neurones profonds pour analyser images, textes, sons.</span></div>
+      <div class="kv-row"><span class="k">IA Générative</span><span>Modèles capables de créer du contenu nouveau : texte, images, code, audio. Ex : Gemini.</span></div>
+      <div class="kv-row"><span class="k">IA Agentique</span><span>Agents IA autonomes qui planifient, raisonnent et exécutent des tâches multi-étapes. Différenciateur Google 2025.</span></div>
+    </div>
+    <h3>Qualité des données ML — 6 dimensions</h3>
+    <div class="tags">
+      <span class="tag ok">Complétude</span>
+      <span class="tag ok">Unicité</span>
+      <span class="tag ok">Actualité</span>
+      <span class="tag ok">Validité</span>
+      <span class="tag ok">Exactitude</span>
+      <span class="tag ok">Cohérence</span>
+    </div>
+    <h3>Produits IA Google Cloud</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Produit</th><th>Type</th><th>Usage</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Gemini</strong></td><td>Modèle fondation multimodal</td><td>Texte, image, code, audio, vidéo. Intégré dans tout GCP.</td></tr>
+          <tr><td><strong>Vertex AI</strong></td><td>Plateforme ML unifiée</td><td>Entraîner, déployer, gérer des modèles ML/IA</td></tr>
+          <tr><td><strong>Agent Platform / Agent Studio</strong></td><td>IA agentique</td><td>Construire des agents IA avec Gemini</td></tr>
+          <tr><td><strong>Vision API</strong></td><td>API pré-entraînée</td><td>Reconnaissance d'images, OCR</td></tr>
+          <tr><td><strong>Speech-to-Text / Translation</strong></td><td>API pré-entraînée</td><td>Transcription audio, traduction</td></tr>
+          <tr><td><strong>AutoML</strong></td><td>ML custom sans code</td><td>Modèles personnalisés avec peu de données</td></tr>
+          <tr><td><strong>BigQuery ML</strong></td><td>ML dans le data warehouse</td><td>Entraîner des modèles directement en SQL</td></tr>
+          <tr><td><strong>AI Hypercomputer</strong></td><td>Infrastructure IA</td><td>GPU/TPU optimisés pour entraîner de grands modèles</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <strong>💡 IA responsable</strong>
+      Google engage ses principes d'IA responsable : équité, explicabilité, confidentialité, sécurité. Éviter les biais dans les données et les modèles. L'IA explainable permet de comprendre POURQUOI un modèle prend une décision.
+    </div>
+  </section>
+
+  <section id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2>Moderniser l'infrastructure et les applications</h2></div>
+    <div class="domain-badge">🏗️ Section 4 · ~18%</div>
+    <h3>Stratégies de migration — les 6 R</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Stratégie</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Rehost (Lift &amp; Shift)</strong></td><td>Déplacer la VM telle quelle sur GCP. Rapide, sans modification.</td></tr>
+          <tr><td><strong>Replatform</strong></td><td>Migration + quelques optimisations cloud (ex : BDD managée). Sans réécriture.</td></tr>
+          <tr><td><strong>Refactor</strong></td><td>Réécriture pour exploiter pleinement le cloud (microservices, conteneurs).</td></tr>
+          <tr><td><strong>Reimagine</strong></td><td>Repenser complètement l'application avec une architecture cloud-native.</td></tr>
+          <tr><td><strong>Retire</strong></td><td>Supprimer les applications obsolètes. Réduire les coûts.</td></tr>
+          <tr><td><strong>Retain</strong></td><td>Garder on-premises pour l'instant (conformité, dépendances).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Options de calcul GCP</h3>
+    <div class="cards">
+      <div class="card"><h3>Compute Engine</h3><ul><li>VMs IaaS sur GCP</li><li>Contrôle total de l'OS</li><li>Spot VMs (préemptibles, -90% coût)</li><li>Autoscaling, load balancing</li></ul></div>
+      <div class="card"><h3>Google Kubernetes Engine</h3><ul><li>Kubernetes managé</li><li>Orchestration de conteneurs</li><li>Autopilot ou Standard</li><li>Multi-cloud avec Anthos/GKE Enterprise</li></ul></div>
+      <div class="card"><h3>Cloud Run</h3><ul><li>Conteneurs serverless</li><li>Scale-to-zero automatique</li><li>Pay-per-request</li><li>Idéal microservices HTTP</li></ul></div>
+      <div class="card"><h3>Cloud Run Functions</h3><ul><li>Fonctions serverless (event-driven)</li><li>Anciennement Cloud Functions</li><li>Déclencheurs : HTTP, Pub/Sub, Cloud Storage</li></ul></div>
+    </div>
+    <div class="callout">
+      <strong>💡 APIs avec Apigee</strong>
+      Apigee API Management : gérer, sécuriser et monétiser des APIs publiques. Gateway entre clients et services backend. Idéal pour exposer des APIs à des partenaires ou au marché.
+    </div>
+  </section>
+
+  <section id="s6">
+    <div class="section-header"><span class="section-num">06</span><h2>Confiance et Sécurité avec Google Cloud</h2></div>
+    <div class="domain-badge">🔒 Section 5 · ~18%</div>
+    <h3>Menaces courantes</h3>
+    <div class="cards">
+      <div class="card"><h3>Menaces externes</h3><ul><li>DDoS (attaques volumétriques)</li><li>Ransomware (chiffrement + rançon)</li><li>Phishing (usurpation d'identité)</li><li>Malware / cryptomining</li></ul></div>
+      <div class="card"><h3>Menaces internes</h3><ul><li>Mauvaise configuration (misconfiguration)</li><li>Tiers non sécurisés (supply chain)</li><li>Attaques LLM (injection de prompt)</li><li>Dommages physiques</li></ul></div>
+    </div>
+    <h3>Principes de sécurité</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Zero Trust</span><span>Ne jamais faire confiance, toujours vérifier. Chaque accès est authentifié et autorisé, même sur le réseau interne.</span></div>
+      <div class="kv-row"><span class="k">Moindre privilège</span><span>Accorder uniquement les droits minimum nécessaires (IAM sur GCP).</span></div>
+      <div class="kv-row"><span class="k">Chiffrement</span><span>3 états : au repos (at rest), en transit (in transit), en utilisation (in use / Confidential Computing).</span></div>
+      <div class="kv-row"><span class="k">DLP</span><span>Data Loss Prevention : détecter et protéger les données sensibles. Sensitive Data Protection sur GCP.</span></div>
+    </div>
+    <h3>Produits sécurité GCP</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Service</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Security Command Center</strong></td><td>Tableau de bord centralisé de posture de sécurité GCP. Détecte les misconfigrations et menaces.</td></tr>
+          <tr><td><strong>Google Threat Intelligence</strong></td><td>Renseignement sur les menaces (Mandiant + VirusTotal). Contexte sur les attaquants.</td></tr>
+          <tr><td><strong>Google Security Operations (SecOps)</strong></td><td>SIEM/SOAR pour détecter, investiguer et répondre aux incidents de sécurité.</td></tr>
+          <tr><td><strong>Cloud Armor</strong></td><td>Protection DDoS et WAF (Web Application Firewall).</td></tr>
+          <tr><td><strong>IAM</strong></td><td>Identity and Access Management. Contrôle qui peut faire quoi sur quelles ressources GCP.</td></tr>
+          <tr><td><strong>Sensitive Data Protection</strong></td><td>Découverte et masquage des données sensibles (ex-DLP API).</td></tr>
+          <tr><td><strong>Cloud VPN / Cloud Interconnect</strong></td><td>Connexion sécurisée on-premises ↔ GCP. VPN via Internet, Interconnect via fibre dédiée.</td></tr>
+          <tr><td><strong>Identity-Aware Proxy (IAP)</strong></td><td>Contrôle d'accès aux apps web sans VPN. Zero Trust pour les applications.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s7">
+    <div class="section-header"><span class="section-num">07</span><h2>Opérations cloud &amp; Gestion des coûts</h2></div>
+    <div class="domain-badge">⚙️ Section 6 · ~10%</div>
+    <h3>Contrôle des coûts GCP</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">CapEx → OpEx</span><span>Le cloud remplace l'investissement initial (CapEx) par des dépenses opérationnelles à l'usage (OpEx). TCO = Total Cost of Ownership.</span></div>
+      <div class="kv-row"><span class="k">Hiérarchie ressources</span><span>Organisation → Dossiers → Projets → Ressources. Les budgets et politiques s'appliquent à chaque niveau.</span></div>
+      <div class="kv-row"><span class="k">Spot VMs</span><span>VMs préemptibles jusqu'à 91% moins chères. Peuvent être arrêtées par Google à tout moment. Pour workloads tolérants aux interruptions.</span></div>
+      <div class="kv-row"><span class="k">Quota policies</span><span>Limites d'utilisation des ressources pour éviter les dépenses imprévues.</span></div>
+      <div class="kv-row"><span class="k">Budget alerts</span><span>Alertes automatiques quand les dépenses approchent d'un seuil défini. Pas un hard cap par défaut.</span></div>
+    </div>
+    <h3>Observabilité et fiabilité</h3>
+    <div class="cards">
+      <div class="card"><h3>Cloud Monitoring</h3><ul><li>Métriques en temps réel</li><li>Dashboards personnalisés</li><li>Alertes sur seuils</li></ul></div>
+      <div class="card"><h3>Cloud Logging</h3><ul><li>Centralisation des logs</li><li>Rétention configurable</li><li>Intégration avec Security Operations</li></ul></div>
+      <div class="card"><h3>SRE &amp; DevOps</h3><ul><li>SLI : indicateur (ex : latence)</li><li>SLO : objectif (ex : 99,9%)</li><li>SLA : accord contractuel</li><li>Error budget : tolérance d'erreurs</li></ul></div>
+    </div>
+  </section>
+
+  <section id="s8">
+    <div class="section-header"><span class="section-num">08</span><h2>Produits GCP clés à connaître</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Produit</th><th>Catégorie</th><th>Mémo</th></tr></thead>
+        <tbody>
+          <tr><td>Compute Engine</td><td>Calcul</td><td>VMs IaaS</td></tr>
+          <tr><td>GKE</td><td>Conteneurs</td><td>Kubernetes managé</td></tr>
+          <tr><td>Cloud Run</td><td>Serverless</td><td>Conteneurs HTTP sans serveur</td></tr>
+          <tr><td>BigQuery</td><td>Data</td><td>Data warehouse serverless SQL</td></tr>
+          <tr><td>Cloud Storage</td><td>Stockage</td><td>Objets / data lake</td></tr>
+          <tr><td>Cloud SQL / AlloyDB / Spanner</td><td>BDD</td><td>Relationnelle managée</td></tr>
+          <tr><td>Pub/Sub + Dataflow</td><td>Streaming</td><td>Messagerie + pipeline ETL</td></tr>
+          <tr><td>Gemini / Vertex AI</td><td>IA</td><td>Modèle + plateforme ML</td></tr>
+          <tr><td>Looker</td><td>Analytics</td><td>BI et dashboards</td></tr>
+          <tr><td>Apigee</td><td>APIs</td><td>Gestion et monétisation d'APIs</td></tr>
+          <tr><td>Cloud Armor</td><td>Sécurité</td><td>DDoS + WAF</td></tr>
+          <tr><td>Security Command Center</td><td>Sécurité</td><td>Posture sécurité centralisée</td></tr>
+          <tr><td>Cloud Monitoring / Logging</td><td>Ops</td><td>Observabilité</td></tr>
+          <tr><td>Anthos / GKE Enterprise</td><td>Hybride</td><td>Kubernetes multi-cloud/on-prem</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s9">
+    <div class="section-header"><span class="section-num">09</span><h2>Mots-clés examen → Service GCP</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Scénario / mot-clé</th><th>Réponse</th></tr></thead>
+        <tbody>
+          <tr><td>« Analytique SQL sur des pétaoctets »</td><td>BigQuery</td></tr>
+          <tr><td>« Stockage massif de fichiers bruts »</td><td>Cloud Storage</td></tr>
+          <tr><td>« Kubernetes sans gérer le control plane »</td><td>GKE (Autopilot)</td></tr>
+          <tr><td>« Conteneurs HTTP scale-to-zero »</td><td>Cloud Run</td></tr>
+          <tr><td>« BDD mondiale transactionnelle »</td><td>Spanner</td></tr>
+          <tr><td>« Messages asynchrones temps réel »</td><td>Pub/Sub</td></tr>
+          <tr><td>« Pipeline ETL batch + streaming »</td><td>Dataflow</td></tr>
+          <tr><td>« Dashboards BI sur BigQuery »</td><td>Looker</td></tr>
+          <tr><td>« Reconnaissance d'images sans ML »</td><td>Vision API</td></tr>
+          <tr><td>« Modèle IA générative multimodal »</td><td>Gemini</td></tr>
+          <tr><td>« Entraîner / déployer un modèle ML »</td><td>Vertex AI</td></tr>
+          <tr><td>« Protéger contre DDoS »</td><td>Cloud Armor</td></tr>
+          <tr><td>« Accéder aux apps sans VPN (Zero Trust) »</td><td>Identity-Aware Proxy (IAP)</td></tr>
+          <tr><td>« Gérer des ressources on-prem depuis GCP »</td><td>Anthos / GKE Enterprise</td></tr>
+          <tr><td>« VMs bon marché pour workloads interruptibles »</td><td>Spot VMs</td></tr>
+          <tr><td>« Monétiser des APIs »</td><td>Apigee</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s10">
+    <div class="section-header"><span class="section-num">10</span><h2>Pièges classiques</h2></div>
+    <ul class="check-list">
+      <li><strong>BigQuery ≠ base de données</strong> : c'est un data warehouse analytique. Ne pas l'utiliser pour des transactions OLTP (utiliser Cloud SQL ou Spanner).</li>
+      <li><strong>Cloud Storage classes</strong> : Standard = accès fréquent | Nearline = 1x/mois | Coldline = 1x/90 jours | Archive = 1x/an. Accès plus rare = stockage moins cher mais lecture plus chère.</li>
+      <li><strong>Spot VMs peuvent être arrêtées à tout moment</strong> : ne pas utiliser pour des workloads critiques ou avec état non sauvegardé.</li>
+      <li><strong>Cloud Run ≠ GKE</strong> : Cloud Run est serverless (containers HTTP), GKE est un cluster Kubernetes managé (plus de contrôle, plus complexe).</li>
+      <li><strong>Interconnect vs VPN</strong> : Cloud Interconnect = fibre dédiée (haute performance, coûteux). Cloud VPN = chiffré via Internet (moins cher, moins fiable).</li>
+      <li><strong>IAM ≠ Identity-Aware Proxy</strong> : IAM contrôle l'accès aux ressources GCP. IAP contrôle l'accès aux applications web via un proxy Zero Trust.</li>
+      <li><strong>IA Générative ≠ ML classique</strong> : le ML classique prédit une valeur. L'IA générative CRÉE du contenu nouveau (texte, image, code).</li>
+      <li><strong>Rehost ≠ Refactor</strong> : Rehost = déplacer sans modifier. Refactor = réécrire pour le cloud. L'examen distingue soigneusement les 6 R de migration.</li>
+      <li><strong>SLO ≠ SLA</strong> : SLO = objectif interne. SLA = engagement contractuel avec le client (seuil plus bas que le SLO). Error budget = 100% - SLO.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Fiche de révision GCDL · Auteur : RB · Repo : <a href="https://github.com/Crachdev/certifs" target="_blank" rel="noopener">Crachdev/certifs</a></span>
+    <span>Sources : <a href="https://cloud.google.com/learn/certification/cloud-digital-leader" target="_blank" rel="noopener">cloud.google.com/learn/certification</a> · Octobre 2026</span>
+  </footer>
+</main>
+</div>
+<script>
+const sections=document.querySelectorAll('section[id]');
+const tocLinks=document.querySelectorAll('.toc-list a');
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){tocLinks.forEach(a=>a.classList.remove('active'));const link=document.querySelector(`.toc-list a[href="#${e.target.id}"]`);if(link)link.classList.add('active')}})},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>

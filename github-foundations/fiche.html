@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fiche GH-900 — GitHub Foundations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f5f3ff;
+  --sheet:#ffffff;
+  --ink:#1a1033;
+  --muted:#574a7e;
+  --line:#d6cef5;
+  --accent:#6f42c1;
+  --accent-soft:#ede9fb;
+  --tag-bg:#f0eaff;
+  --tag-fg:#5a2fa3;
+  --warn:#c0392b;
+  --warn-soft:#fdecea;
+  --ok:#2e7d32;
+  --ok-soft:#e8f5e9;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#12092b;
+  --sheet:#1a1033;
+  --ink:#e9e4ff;
+  --muted:#a593e0;
+  --line:#2d1f5e;
+  --accent:#d2a8ff;
+  --accent-soft:#1d1040;
+  --tag-bg:#1a0d40;
+  --tag-fg:#c9a8f8;
+  --warn:#f28b82;
+  --warn-soft:#3a0f0d;
+  --ok:#81c995;
+  --ok-soft:#0a2a10;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#12092b;--sheet:#1a1033;--ink:#e9e4ff;--muted:#a593e0;--line:#2d1f5e;
+  --accent:#d2a8ff;--accent-soft:#1d1040;--tag-bg:#1a0d40;--tag-fg:#c9a8f8;
+  --warn:#f28b82;--warn-soft:#3a0f0d;--ok:#81c995;--ok-soft:#0a2a10;color-scheme:dark
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body)}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+.sidebar{background:var(--sheet);border-right:1px solid var(--line);padding:24px 0 40px;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
+@media(max-width:860px){.sidebar{display:none}}
+.sidebar-head{padding:0 18px 16px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.sidebar-head .cert-label{font:500 .68rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.sidebar-head h2{font:700 .95rem var(--f-display);color:var(--ink);line-height:1.2}
+.toc-list{list-style:none}
+.toc-list li a{display:block;padding:5px 18px;font-size:.8rem;color:var(--muted);text-decoration:none;border-left:3px solid transparent;transition:border-color .15s,color .15s}
+.toc-list li a:hover{color:var(--accent);border-left-color:var(--accent-soft)}
+.toc-list li a.active{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.toc-num{font:500 .65rem var(--f-mono);color:var(--accent);margin-right:5px;opacity:.7}
+.main{max-width:860px;padding:40px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))}
+.hero{background:linear-gradient(135deg,#24292f 0%,#6f42c1 100%);color:#fff;border-radius:12px;padding:32px 28px;margin-bottom:36px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.06);border-radius:50%;pointer-events:none}
+.hero .eyebrow{font:500 .7rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:8px}
+.hero h1{font:700 2rem var(--f-display);line-height:1.15;text-wrap:balance;margin-bottom:12px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.85rem;color:rgba(255,255,255,.85)}
+.hero-meta span::before{content:"• ";opacity:.5}
+.hero-meta span:first-child::before{content:""}
+.back-link{display:inline-flex;align-items:center;gap:6px;font:500 .8rem var(--f-mono);color:rgba(255,255,255,.8);text-decoration:none;margin-bottom:14px}
+.back-link:hover{color:#fff}
+.exam-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:36px}
+.exam-cell{background:var(--sheet);padding:14px 16px}
+.exam-cell .label{font:500 .68rem var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.exam-cell .val{font:600 .95rem var(--f-display)}
+section{margin-bottom:44px;scroll-margin-top:24px}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--accent)}
+.section-num{font:500 .7rem var(--f-mono);background:var(--accent);color:#fff;padding:2px 7px;border-radius:4px;letter-spacing:.05em}
+.section-header h2{font:700 1.15rem var(--f-display);color:var(--ink)}
+.domain-badge{display:inline-flex;align-items:center;gap:6px;font:500 .72rem var(--f-mono);background:var(--tag-bg);color:var(--tag-fg);padding:3px 10px;border-radius:20px;margin-bottom:12px}
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+thead th{background:var(--accent);color:#fff;padding:8px 12px;text-align:left;font:600 .78rem var(--f-mono);letter-spacing:.04em;text-transform:uppercase}
+tbody tr:nth-child(even){background:var(--accent-soft)}
+tbody td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:hover{background:var(--accent-soft)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.card h3{font:600 .85rem var(--f-display);color:var(--accent);margin-bottom:6px}
+.card ul{list-style:none;font-size:.85rem}
+.card ul li{padding:2px 0;border-bottom:1px solid var(--line)}
+.card ul li:last-child{border:0}
+.card ul li::before{content:"›";color:var(--accent);margin-right:6px;font-weight:700}
+.check-list{list-style:none;display:grid;gap:6px;margin:8px 0}
+.check-list li{display:grid;grid-template-columns:20px 1fr;gap:6px;font-size:.88rem;align-items:start}
+.check-list li::before{content:"✦";color:var(--accent);font-size:.75rem;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tag{font:500 .7rem var(--f-mono);background:var(--tag-bg);color:var(--tag-fg);padding:2px 8px;border-radius:4px}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.callout{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.875rem}
+.callout.warn{background:var(--warn-soft);border-left-color:var(--warn)}
+.callout strong{display:block;margin-bottom:4px;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+.kv{display:grid;gap:8px;margin:8px 0}
+.kv-row{display:grid;grid-template-columns:180px 1fr;gap:8px;font-size:.875rem;align-items:start}
+.kv-row .k{font:600 .78rem var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding-top:2px}
+@media(max-width:500px){.kv-row{grid-template-columns:1fr}}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font:400 .78rem var(--f-mono);color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between}
+footer a{color:var(--accent);text-decoration:none}
+mark{background:rgba(111,66,193,.15);color:inherit;border-radius:2px;padding:0 2px}
+code{font-family:var(--f-mono);font-size:.85em;background:var(--accent-soft);color:var(--tag-fg);padding:1px 5px;border-radius:3px}
+p{margin:8px 0;font-size:.9rem;line-height:1.6}
+h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" aria-label="Table des matières">
+  <div class="sidebar-head">
+    <div class="cert-label">GH-900</div>
+    <h2>GitHub Foundations</h2>
+  </div>
+  <ul class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>L'examen</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Git &amp; GitHub fondamentaux</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Fonctionnalités collaboration</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Développement moderne</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Sécurité &amp; Administration</a></li>
+    <li><a href="#s6"><span class="toc-num">06</span>Communauté GitHub</a></li>
+    <li><a href="#s7"><span class="toc-num">07</span>Gestion des dépôts</a></li>
+    <li><a href="#s8"><span class="toc-num">08</span>Gestion de projet</a></li>
+    <li><a href="#s9"><span class="toc-num">09</span>Commandes Git essentielles</a></li>
+    <li><a href="#s10"><span class="toc-num">10</span>Mots-clés examen</a></li>
+    <li><a href="#s11"><span class="toc-num">11</span>Pièges classiques</a></li>
+  </ul>
+</nav>
+<main class="main">
+  <div class="hero">
+    <a href="../github-foundations/index.html" class="back-link">← Retour au quiz</a>
+    <div class="eyebrow">GitHub Certification · GH-900</div>
+    <h1>GitHub Foundations</h1>
+    <div class="hero-meta">
+      <span>Score minimal : 700/1000</span>
+      <span>~75 questions</span>
+      <span>120 minutes</span>
+      <span>Niveau : fondamental</span>
+    </div>
+  </div>
+
+  <div class="exam-grid">
+    <div class="exam-cell"><div class="label">Domain 1</div><div class="val">Introduction Git &amp; GitHub</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">22%</div></div>
+    <div class="exam-cell"><div class="label">Domain 2</div><div class="val">Collaboration</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">30%</div></div>
+    <div class="exam-cell"><div class="label">Domain 3</div><div class="val">Dév. moderne</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">13%</div></div>
+    <div class="exam-cell"><div class="label">Domain 4</div><div class="val">Sécurité &amp; Admin</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">10%</div></div>
+    <div class="exam-cell"><div class="label">Domain 5</div><div class="val">Communauté</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">10%</div></div>
+    <div class="exam-cell"><div class="label">Domain 6</div><div class="val">Gestion dépôts</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">8%</div></div>
+    <div class="exam-cell"><div class="label">Domain 7</div><div class="val">Gestion projet</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px">7%</div></div>
+  </div>
+
+  <section id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2>L'examen GH-900</h2></div>
+    <div class="callout"><strong>Profil visé</strong>Développeurs débutants, chefs de projet, toute personne travaillant avec GitHub. Couvre l'utilisation quotidienne de GitHub et les fondamentaux de Git.</div>
+    <div class="cards">
+      <div class="card"><h3>Format</h3><ul><li>~75 questions (QCM, vrai/faux, listes)</li><li>120 minutes</li><li>Score passage : 700/1000</li><li>En ligne via GitHub Certifications</li></ul></div>
+      <div class="card"><h3>Ressources officielles</h3><ul><li>examregistration.github.com</li><li>GitHub Skills (skills.github.com)</li><li>GitHub Docs (docs.github.com)</li><li>Valide 3 ans</li></ul></div>
+      <div class="card"><h3>Tarif</h3><ul><li>Gratuit pour les étudiants (GitHub Education)</li><li>$99 pour les autres</li><li>Disponible dans plusieurs langues</li></ul></div>
+    </div>
+  </section>
+
+  <section id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2>Introduction à Git et GitHub</h2></div>
+    <div class="domain-badge">📘 Domain 1 · 22%</div>
+    <h3>Git — concepts fondamentaux</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Dépôt (Repository)</span><span>Projet Git contenant tous les fichiers + historique complet. Local (.git/) ou distant (GitHub).</span></div>
+      <div class="kv-row"><span class="k">Commit</span><span>Instantané (snapshot) de l'état du projet à un moment T. Chaque commit a un SHA unique.</span></div>
+      <div class="kv-row"><span class="k">Branche (Branch)</span><span>Pointeur vers un commit. Permet de travailler en isolation. <code>main</code> est la branche principale par convention.</span></div>
+      <div class="kv-row"><span class="k">Merge</span><span>Fusionner une branche dans une autre. Crée un merge commit (fast-forward si possible).</span></div>
+      <div class="kv-row"><span class="k">Clone</span><span>Copier un dépôt distant en local. <code>git clone &lt;url&gt;</code> — inclut tout l'historique.</span></div>
+      <div class="kv-row"><span class="k">Fork</span><span>Copier un dépôt sur son compte GitHub. Indépendant de l'original. Pour contribuer sans accès direct.</span></div>
+      <div class="kv-row"><span class="k">Staging Area</span><span>Zone intermédiaire entre les modifications et le commit. <code>git add</code> met en staging.</span></div>
+    </div>
+    <h3>Flux de travail Git</h3>
+    <div class="callout">
+      <strong>Workflow standard</strong>
+      <code>git status</code> → <code>git add .</code> → <code>git commit -m "message"</code> → <code>git push origin main</code>
+    </div>
+    <h3>GitHub — spécificités</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">GitHub vs Git</span><span>Git = outil de versioning local. GitHub = plateforme hébergeant des repos Git + outils de collaboration (PRs, Issues, Actions…).</span></div>
+      <div class="kv-row"><span class="k">README.md</span><span>Fichier affiché en page d'accueil d'un repo. Format Markdown. Décrit le projet, l'installation, l'utilisation.</span></div>
+      <div class="kv-row"><span class="k">Gist</span><span>Mini-dépôt GitHub pour partager des snippets de code ou notes. Public ou secret.</span></div>
+      <div class="kv-row"><span class="k">GitHub CLI</span><span>Outil <code>gh</code> pour interagir avec GitHub depuis le terminal. PRs, Issues, repos via CLI.</span></div>
+    </div>
+    <h3>Authentification GitHub</h3>
+    <div class="cards">
+      <div class="card"><h3>HTTPS + Token</h3><ul><li>PAT (Personal Access Token)</li><li>Scope : granulaire (repos, actions…)</li><li>Fine-grained PATs (recommandé)</li></ul></div>
+      <div class="card"><h3>SSH</h3><ul><li>Clé publique/privée</li><li>Plus sécurisé que HTTPS</li><li><code>ssh-keygen</code> + ajouter dans Settings</li></ul></div>
+      <div class="card"><h3>GitHub CLI / OAuth</h3><ul><li><code>gh auth login</code></li><li>OAuth App ou GitHub App</li><li>Token stocké sécurisé</li></ul></div>
+    </div>
+  </section>
+
+  <section id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2>Fonctionnalités de collaboration</h2></div>
+    <div class="domain-badge">🤝 Domain 2 · 30%</div>
+    <h3>Pull Requests (PRs)</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Pull Request</span><span>Demande de fusion d'une branche vers une autre. Inclut la revue de code, les commentaires, les modifications.</span></div>
+      <div class="kv-row"><span class="k">Merge options</span><span><strong>Merge commit</strong> : conserve l'historique complet | <strong>Squash & merge</strong> : un seul commit | <strong>Rebase</strong> : historique linéaire.</span></div>
+      <div class="kv-row"><span class="k">Draft PR</span><span>PR en cours de développement, pas encore prête pour revue. Signale le travail sans demander une revue formelle.</span></div>
+      <div class="kv-row"><span class="k">CODEOWNERS</span><span>Fichier <code>.github/CODEOWNERS</code> définissant qui doit approuver les modifications de certains fichiers.</span></div>
+      <div class="kv-row"><span class="k">Required reviewers</span><span>Revues obligatoires avant merge. Configuré dans les Branch Protection Rules.</span></div>
+    </div>
+    <h3>Issues</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Issue</span><span>Signalement de bug, demande de fonctionnalité, tâche. Peut être assignée, labelisée, liée à une PR.</span></div>
+      <div class="kv-row"><span class="k">Labels</span><span>Tags colorés pour catégoriser : <code>bug</code>, <code>enhancement</code>, <code>help wanted</code>, <code>good first issue</code>…</span></div>
+      <div class="kv-row"><span class="k">Milestones</span><span>Regrouper des Issues/PRs par objectif ou version. Pourcentage de complétion automatique.</span></div>
+      <div class="kv-row"><span class="k">Fermeture auto</span><span>Mots-clés dans un commit/PR : <code>Fixes #42</code>, <code>Closes #42</code>, <code>Resolves #42</code> → ferme l'issue au merge.</span></div>
+    </div>
+    <h3>Forking et contributions open source</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Fork workflow</span><span>Fork → clone → branche → modifications → commit → push → PR vers le repo original.</span></div>
+      <div class="kv-row"><span class="k">Upstream</span><span>Le dépôt original après fork. <code>git remote add upstream &lt;url&gt;</code> pour synchroniser.</span></div>
+      <div class="kv-row"><span class="k">CONTRIBUTING.md</span><span>Guide de contribution au projet. Conventions de code, process de PR, contact.</span></div>
+    </div>
+    <h3>GitHub Discussions</h3>
+    <div class="callout">Forum de conversation pour un repo ou une organisation. Différent des Issues : pour les questions, annonces, idées. Catégories : General, Q&amp;A, Show and tell, Announcements, Polls.</div>
+  </section>
+
+  <section id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2>Développement moderne — GitHub Actions</h2></div>
+    <div class="domain-badge">⚙️ Domain 3 · 13%</div>
+    <h3>GitHub Actions — concepts</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Workflow</span><span>Pipeline automatisé défini en YAML dans <code>.github/workflows/</code>. Déclenché par des événements.</span></div>
+      <div class="kv-row"><span class="k">Event (déclencheur)</span><span><code>push</code>, <code>pull_request</code>, <code>schedule</code> (cron), <code>workflow_dispatch</code> (manuel), <code>release</code>…</span></div>
+      <div class="kv-row"><span class="k">Job</span><span>Ensemble d'étapes (steps) s'exécutant sur un runner. Les jobs s'exécutent en parallèle par défaut (ou en série avec <code>needs</code>).</span></div>
+      <div class="kv-row"><span class="k">Step</span><span>Commande individuelle ou action réutilisable dans un job.</span></div>
+      <div class="kv-row"><span class="k">Runner</span><span>Machine qui exécute les jobs. GitHub-hosted (ubuntu, windows, macos) ou self-hosted.</span></div>
+      <div class="kv-row"><span class="k">Action</span><span>Bloc réutilisable. GitHub Marketplace : milliers d'actions disponibles. <code>uses: actions/checkout@v4</code>.</span></div>
+    </div>
+    <div class="callout">
+      <strong>💡 Exemple workflow minimal</strong>
+      <pre style="font:500 .8rem var(--f-mono);white-space:pre-wrap;margin-top:6px">on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm test</pre>
+    </div>
+    <h3>CI/CD avec GitHub Actions</h3>
+    <div class="cards">
+      <div class="card"><h3>CI (Intégration Continue)</h3><ul><li>Tests automatiques à chaque push/PR</li><li>Linting et analyse statique</li><li>Build et compilation</li></ul></div>
+      <div class="card"><h3>CD (Déploiement Continu)</h3><ul><li>Déploiement auto en staging</li><li>Déploiement en production sur tag</li><li>Environments &amp; Approvals</li></ul></div>
+      <div class="card"><h3>GitHub Packages</h3><ul><li>Registre de paquets intégré à GitHub</li><li>npm, Docker, Maven, NuGet…</li><li>Accès contrôlé par les permissions repo</li></ul></div>
+    </div>
+    <h3>GitHub Codespaces &amp; Copilot</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Codespaces</span><span>Environnement de développement cloud basé sur VS Code. Configuré via <code>.devcontainer/</code>. Lance en quelques secondes.</span></div>
+      <div class="kv-row"><span class="k">GitHub Copilot</span><span>IA d'assistance au code. Suggestions de code en temps réel, chat, revue de code IA. Abonnement payant (ou inclus pour étudiants/OS).</span></div>
+    </div>
+  </section>
+
+  <section id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2>Sécurité, confidentialité et administration</h2></div>
+    <div class="domain-badge">🔒 Domain 4 · 10%</div>
+    <h3>Protection des branches</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Branch Protection Rules</span><span>Règles sur <code>main</code> : revues obligatoires, checks CI requis, interdire le push direct, interdire le force push.</span></div>
+      <div class="kv-row"><span class="k">Ruleset (nouveau)</span><span>Remplace progressivement les Branch Protection Rules. Plus flexible, s'applique à plusieurs branches via patterns.</span></div>
+      <div class="kv-row"><span class="k">CODEOWNERS</span><span>Revue automatique des propriétaires de code. Placé dans <code>CODEOWNERS</code>, <code>docs/CODEOWNERS</code> ou <code>.github/CODEOWNERS</code>.</span></div>
+    </div>
+    <h3>Sécurité du code</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Outil</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Dependabot</strong></td><td>Mises à jour automatiques des dépendances vulnérables. Alerts + PRs auto.</td></tr>
+          <tr><td><strong>Code Scanning</strong></td><td>Analyse statique du code (SAST) avec CodeQL. Détecte les vulnérabilités dans le code.</td></tr>
+          <tr><td><strong>Secret Scanning</strong></td><td>Détecte les secrets (API keys, tokens) accidentellement commités. Alerte et révoque auto chez certains partenaires.</td></tr>
+          <tr><td><strong>Security Policy</strong></td><td>Fichier <code>SECURITY.md</code> : comment signaler des vulnérabilités. Affiché dans l'onglet Security.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Permissions et rôles</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Rôle</th><th>Accès</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Read</strong></td><td>Lire le code et créer des Issues</td></tr>
+          <tr><td><strong>Triage</strong></td><td>Gérer Issues et PRs sans écrire</td></tr>
+          <tr><td><strong>Write</strong></td><td>Pousser du code, gérer Issues et PRs</td></tr>
+          <tr><td><strong>Maintain</strong></td><td>Gérer le repo sans accès aux paramètres sensibles</td></tr>
+          <tr><td><strong>Admin</strong></td><td>Contrôle total, paramètres, accès</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Organisations et équipes</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Organisation</span><span>Compte partagé pour les entreprises/projets. Membres, équipes, repos. Facturation centralisée.</span></div>
+      <div class="kv-row"><span class="k">Teams</span><span>Groupes de membres avec permissions sur des repos. Mention <code>@org/team</code> dans les commentaires.</span></div>
+      <div class="kv-row"><span class="k">Enterprise</span><span>Plusieurs organisations sous une entreprise. SSO SAML, audit logs, politiques globales.</span></div>
+    </div>
+  </section>
+
+  <section id="s6">
+    <div class="section-header"><span class="section-num">06</span><h2>Bénéfices de la communauté GitHub</h2></div>
+    <div class="domain-badge">🌍 Domain 5 · 10%</div>
+    <h3>Open Source sur GitHub</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Licences open source</span><span>MIT (permissive), Apache 2.0 (permissive + brevets), GPL (copyleft), Creative Commons. Fichier <code>LICENSE</code> à la racine.</span></div>
+      <div class="kv-row"><span class="k">InnerSource</span><span>Pratiques open source appliquées en interne dans une entreprise. Collaboration entre équipes avec PRs, Issues, documentation.</span></div>
+      <div class="kv-row"><span class="k">Star</span><span>Marquer un repo comme favori / montrer son appréciation. Pas d'impact fonctionnel, mais indique la popularité.</span></div>
+      <div class="kv-row"><span class="k">Watch</span><span>S'abonner aux notifications d'un repo. Participating, All Activity, Custom ou Ignore.</span></div>
+    </div>
+    <h3>GitHub Sponsors</h3>
+    <div class="callout">Programme de financement des développeurs open source. Abonnements mensuels pour soutenir les mainteneurs. Sans commission GitHub (0%).</div>
+  </section>
+
+  <section id="s7">
+    <div class="section-header"><span class="section-num">07</span><h2>Gestion des dépôts</h2></div>
+    <div class="domain-badge">🗂️ Domain 6 · 8%</div>
+    <h3>Types de repos</h3>
+    <div class="cards">
+      <div class="card"><h3>Public</h3><ul><li>Visible par tout le monde</li><li>N'importe qui peut forker</li><li>Gratuit sur github.com</li></ul></div>
+      <div class="card"><h3>Privé</h3><ul><li>Visible uniquement aux collaborateurs</li><li>Gratuit (limites features)</li><li>Advanced Security en option</li></ul></div>
+      <div class="card"><h3>Internal</h3><ul><li>Visible aux membres de l'organisation</li><li>Enterprise uniquement</li><li>InnerSource use case</li></ul></div>
+    </div>
+    <h3>Fonctionnalités de gestion</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Templates</span><span>Créer un repo modèle. Utilisé via "Use this template" → nouveau repo avec les mêmes fichiers.</span></div>
+      <div class="kv-row"><span class="k">Topics</span><span>Tags ajoutés au repo pour le découvrir (ex : <code>react</code>, <code>api</code>). Affichés sur explore.github.com.</span></div>
+      <div class="kv-row"><span class="k">Releases</span><span>Versions publiées d'un projet. Tag Git + notes de version + binaires. Basées sur les tags Git.</span></div>
+      <div class="kv-row"><span class="k">GitHub Pages</span><span>Hébergement de sites statiques depuis un repo. Branch ou dossier <code>/docs</code>. URL : <code>username.github.io/repo</code>.</span></div>
+      <div class="kv-row"><span class="k">Wikis</span><span>Documentation collaborative attachée au repo. Peut être désactivée. Format Markdown.</span></div>
+      <div class="kv-row"><span class="k">Archivage</span><span>Repo en lecture seule. Pas de suppression, pas de modification. Conserver le code historique.</span></div>
+    </div>
+  </section>
+
+  <section id="s8">
+    <div class="section-header"><span class="section-num">08</span><h2>Gestion de projet</h2></div>
+    <div class="domain-badge">📋 Domain 7 · 7%</div>
+    <h3>GitHub Projects (v2)</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Projects</span><span>Tableau de bord flexible pour gérer les Issues et PRs. Vues : Table, Board (Kanban), Roadmap (timeline).</span></div>
+      <div class="kv-row"><span class="k">Custom fields</span><span>Ajouter des champs personnalisés : priorité, sprint, status, itération…</span></div>
+      <div class="kv-row"><span class="k">Automations</span><span>Déplacer automatiquement les items : ex. "Issue fermée → colonne Done". Workflows built-in.</span></div>
+      <div class="kv-row"><span class="k">Insights</span><span>Graphiques de burndown, vélocité, répartition. Visualisation de la progression.</span></div>
+    </div>
+    <div class="callout warn"><strong>⚠️ Projects v2 vs classic</strong>Projects (nouveau) = plus puissant, multi-repos, vues personnalisables. L'examen GH-900 couvre Projects v2 (l'actuel).</div>
+  </section>
+
+  <section id="s9">
+    <div class="section-header"><span class="section-num">09</span><h2>Commandes Git essentielles</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Commande</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>git init</code></td><td>Initialiser un nouveau dépôt Git local</td></tr>
+          <tr><td><code>git clone &lt;url&gt;</code></td><td>Copier un repo distant en local</td></tr>
+          <tr><td><code>git status</code></td><td>Voir l'état des fichiers (modifiés, staged, untracked)</td></tr>
+          <tr><td><code>git add &lt;file&gt;</code></td><td>Mettre des fichiers en staging area</td></tr>
+          <tr><td><code>git commit -m "msg"</code></td><td>Créer un commit avec les fichiers en staging</td></tr>
+          <tr><td><code>git push</code></td><td>Envoyer les commits locaux vers le remote</td></tr>
+          <tr><td><code>git pull</code></td><td>Récupérer et fusionner les modifications distantes</td></tr>
+          <tr><td><code>git fetch</code></td><td>Récupérer sans fusionner (voir avant de merger)</td></tr>
+          <tr><td><code>git branch &lt;name&gt;</code></td><td>Créer une nouvelle branche</td></tr>
+          <tr><td><code>git checkout -b &lt;name&gt;</code></td><td>Créer et basculer sur une nouvelle branche</td></tr>
+          <tr><td><code>git switch &lt;name&gt;</code></td><td>Basculer sur une branche (modern)</td></tr>
+          <tr><td><code>git merge &lt;branch&gt;</code></td><td>Fusionner une branche dans la courante</td></tr>
+          <tr><td><code>git rebase &lt;branch&gt;</code></td><td>Réécrire l'historique en replaying les commits</td></tr>
+          <tr><td><code>git log --oneline</code></td><td>Voir l'historique compact des commits</td></tr>
+          <tr><td><code>git stash</code></td><td>Sauvegarder temporairement les modifications non commitées</td></tr>
+          <tr><td><code>git tag &lt;v1.0&gt;</code></td><td>Étiqueter un commit (pour les releases)</td></tr>
+          <tr><td><code>git cherry-pick &lt;sha&gt;</code></td><td>Appliquer un commit spécifique sur la branche courante</td></tr>
+          <tr><td><code>git revert &lt;sha&gt;</code></td><td>Annuler un commit en créant un nouveau commit inverse</td></tr>
+          <tr><td><code>git reset --hard HEAD~1</code></td><td>Supprimer le dernier commit (⚠️ détruit les modifications)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s10">
+    <div class="section-header"><span class="section-num">10</span><h2>Mots-clés examen → Concept GitHub</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Scénario / mot-clé</th><th>Réponse</th></tr></thead>
+        <tbody>
+          <tr><td>« Demander la revue de code avant merge »</td><td>Pull Request + Required reviewers</td></tr>
+          <tr><td>« Travailler sur une fonctionnalité sans impacter main »</td><td>Branch (feature branch)</td></tr>
+          <tr><td>« Contribuer à un repo sans accès direct »</td><td>Fork + PR</td></tr>
+          <tr><td>« Automatiser tests à chaque push »</td><td>GitHub Actions (workflow CI)</td></tr>
+          <tr><td>« Empêcher le push direct sur main »</td><td>Branch Protection Rules</td></tr>
+          <tr><td>« Mettre à jour des dépendances vulnérables »</td><td>Dependabot</td></tr>
+          <tr><td>« Héberger un site statique »</td><td>GitHub Pages</td></tr>
+          <tr><td>« Environnement de dev cloud »</td><td>GitHub Codespaces</td></tr>
+          <tr><td>« Signaler une vulnérabilité secrètement »</td><td>Private security reporting (SECURITY.md)</td></tr>
+          <tr><td>« Classer et prioriser des Issues »</td><td>Labels + Milestones</td></tr>
+          <tr><td>« Fermer une issue via un commit »</td><td><code>Fixes #N</code> ou <code>Closes #N</code> dans le message</td></tr>
+          <tr><td>« Gérer les issues en tableau Kanban »</td><td>GitHub Projects (vue Board)</td></tr>
+          <tr><td>« Voir qui doit approuver quels fichiers »</td><td>CODEOWNERS</td></tr>
+          <tr><td>« Conserver un repo sans le modifier »</td><td>Archivage</td></tr>
+          <tr><td>« Open source en interne »</td><td>InnerSource</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s11">
+    <div class="section-header"><span class="section-num">11</span><h2>Pièges classiques</h2></div>
+    <ul class="check-list">
+      <li><strong>Fork ≠ Clone</strong> : Fork = copie sur GitHub (pour contribuer). Clone = copie locale (pour travailler). On clone toujours, même après un fork.</li>
+      <li><strong>Pull ≠ Fetch</strong> : <code>git fetch</code> récupère sans fusionner. <code>git pull</code> = fetch + merge. Fetch est plus sûr pour vérifier avant d'intégrer.</li>
+      <li><strong>Merge commit vs Squash vs Rebase</strong> : Merge conserve tout l'historique. Squash = un seul commit propre. Rebase = historique linéaire (réécriture). L'examen demande de choisir selon le contexte.</li>
+      <li><strong>Issues ≠ Discussions</strong> : Issues = tâches trackées, bugs, features (s'ouvrent et se ferment). Discussions = conversations ouvertes, Q&A, idées (pas fermées).</li>
+      <li><strong>CODEOWNERS n'est pas une protection seule</strong> : CODEOWNERS définit les reviewers, mais les Branch Protection Rules doivent exiger les reviews.</li>
+      <li><strong>Dependabot Alerts ≠ Dependabot Updates</strong> : Alerts = notifie des vulnérabilités. Updates = crée des PRs pour corriger. Deux fonctionnalités distinctes.</li>
+      <li><strong>git revert ≠ git reset</strong> : <code>revert</code> crée un nouveau commit qui inverse les changements (sûr). <code>reset --hard</code> supprime l'historique (dangereux, surtout si partagé).</li>
+      <li><strong>GitHub Actions runners</strong> : GitHub-hosted = provisionnés à chaque job (clean). Self-hosted = machine sous votre contrôle (persistante, réseau interne possible).</li>
+      <li><strong>Repo privé ≠ Repo interne</strong> : Privé = accès uniquement aux collaborateurs invités. Interne = visible à tous les membres de l'organisation (Enterprise uniquement).</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Fiche de révision GH-900 · Auteur : RB · Repo : <a href="https://github.com/Crachdev/certifs" target="_blank" rel="noopener">Crachdev/certifs</a></span>
+    <span>Sources : <a href="https://docs.github.com" target="_blank" rel="noopener">docs.github.com</a> · Octobre 2026</span>
+  </footer>
+</main>
+</div>
+<script>
+const sections=document.querySelectorAll('section[id]');
+const tocLinks=document.querySelectorAll('.toc-list a');
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){tocLinks.forEach(a=>a.classList.remove('active'));const link=document.querySelector(`.toc-list a[href="#${e.target.id}"]`);if(link)link.classList.add('active')}})},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
