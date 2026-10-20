@@ -465,7 +465,7 @@ function bind(){
     const it=session.items[session.idx],q=Q(it.d,it.i),ok=isRight(q,session.sel);
     session.checked=true;
     if(ok)session.score++;else session.missed.push([it.d,it.i]);
-    // Only persist to store.r if NOT a live session
+    // Progression quotidienne : uniquement hors session libre
     if(!session.isLive){
       const wasWrong=store.r[it.d+"-"+it.i]===0;
       store.r[it.d+"-"+it.i]=ok?1:0;save();
@@ -474,6 +474,14 @@ function bind(){
       if(!ok && typeof window.logError==="function"){
         window.logError(KEY,it.d,it.i,q.t,q.q,pseudo);
       } else if(ok && wasWrong && typeof window.logSuccess==="function"){
+        window.logSuccess(KEY,it.d,it.i,pseudo);
+      }
+    } else {
+      // Session libre : Firebase uniquement (pas de progression locale)
+      const pseudo=getPseudo();
+      if(!ok && typeof window.logError==="function"){
+        window.logError(KEY,it.d,it.i,q.t,q.q,pseudo);
+      } else if(ok && typeof window.logSuccess==="function"){
         window.logSuccess(KEY,it.d,it.i,pseudo);
       }
     }
