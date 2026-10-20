@@ -1,4 +1,64 @@
 window.QKEY = "aif.v1";
+
+// ── Métadonnées examen ──────────────────────────────────────────────────────
+window.QUIZ_META={
+  exam:"AWS AI Practitioner AIF-C01",
+  rules:[
+    ["85 q · 90 min","dont 15 non notées"],
+    ["700 / 1000","score de réussite"],
+    ["0 pénalité","ne jamais laisser vide"],
+    ["D1 › D3 › D2 › D4 › D5","26 · 24 · 20 · 18 · 12 %"]
+  ]
+};
+
+// ── Plan de révision 7 jours ────────────────────────────────────────────────
+const _GAIF="https://docs.aws.amazon.com/";
+window.QUIZ_PLAN=[
+ {d:1,theme:"Fondamentaux IA & ML",dom:["D1 · 26 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Concepts IA, ML, Deep Learning","Types d'apprentissage supervisé/non supervisé/par renforcement","Métriques d'évaluation des modèles"],
+  links:[["Qu'est-ce que le Machine Learning ?","https://docs.aws.amazon.com/machine-learning/latest/dg/what-is-amazon-machine-learning.html"],
+         ["Amazon SageMaker — Documentation","https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html"],
+         ["AWS AI Services","https://aws.amazon.com/fr/machine-learning/ai-services/"]],
+  focus:["IA ⊃ ML ⊃ Deep Learning : hiérarchie","Supervisé (labels) vs non supervisé (clusters) vs renforcement (récompenses)","Biais, variance, overfitting, underfitting"]},
+ {d:2,theme:"IA Générative et Foundation Models",dom:["D2 · 20 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Foundation Models et Large Language Models","Prompt Engineering : zero-shot, few-shot, chain-of-thought","Architecture Transformer, tokenization"],
+  links:[["Amazon Bedrock","https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"],
+         ["Prompt Engineering — AWS","https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html"],
+         ["Foundation Models sur Bedrock","https://docs.aws.amazon.com/bedrock/latest/userguide/foundation-models.html"]],
+  focus:["FM = modèle pré-entraîné sur de grandes données, adaptable","Zero-shot vs few-shot vs fine-tuning","Hallucination : cause et mitigation (RAG, température)"]},
+ {d:3,theme:"Applications FM : RAG, Agents et déploiement",dom:["D3 · 24 %"],time:"≈ 1 h 15 lecture + 1 h 15 quiz",
+  read:["Architecture RAG (Retrieval-Augmented Generation)","Agents IA avec Amazon Bedrock Agents","Optimisation des modèles : fine-tuning, RLHF, distillation"],
+  links:[["Knowledge Bases for Amazon Bedrock","https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html"],
+         ["Amazon Bedrock Agents","https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html"],
+         ["Amazon OpenSearch Service","https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html"]],
+  focus:["RAG = FM + base de connaissances externe actualisée","Agent = FM + outils (API, DB) + mémoire + chaîne de raisonnement","Fine-tuning = adapter sur données propriétaires ; coût ≠ RAG"]},
+ {d:4,theme:"IA Responsable et gouvernance",dom:["D4 · 18 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Principes IA responsable AWS : fairness, explainability, privacy","Détection et mitigation des biais dans les modèles","Amazon SageMaker Clarify"],
+  links:[["IA responsable — AWS","https://aws.amazon.com/fr/machine-learning/responsible-machine-learning/"],
+         ["Amazon SageMaker Clarify","https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-fairness-and-explainability.html"],
+         ["AWS AI Service Cards","https://aws.amazon.com/fr/machine-learning/responsible-machine-learning/"]],
+  focus:["Fairness = absence de biais discriminatoire","Explainability : SHAP values, feature importance","Gouvernance : Model Cards, SageMaker Model Monitor"]},
+ {d:5,theme:"Sécurité et conformité pour l'IA",dom:["D5 · 12 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Sécurité des pipelines ML : chiffrement, contrôle accès","Prompt injection et jailbreaking — Guardrails for Bedrock","Well-Architected ML : fiabilité, efficacité, durabilité"],
+  links:[["Amazon Bedrock Guardrails","https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html"],
+         ["Sécurité Amazon SageMaker","https://docs.aws.amazon.com/sagemaker/latest/dg/security.html"],
+         ["AWS Well-Architected — ML Lens","https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/welcome.html"]],
+  focus:["Guardrails : filtres de contenu, topics interdits, PII","Chiffrement at rest (KMS) et in transit (TLS) des données ML","VPC Endpoints pour SageMaker et Bedrock"]},
+ {d:6,theme:"Services AWS spécialisés — Bedrock, SageMaker, Rekognition…",dom:["D3 · 24 %","D1 · 26 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Amazon Rekognition, Comprehend, Transcribe, Polly, Translate","Amazon Kendra, Lex, Personalize, Forecast","SageMaker avancé : Pipelines, Feature Store, JumpStart"],
+  links:[["AWS AI Services — liste complète","https://aws.amazon.com/fr/machine-learning/ai-services/"],
+         ["Amazon Rekognition","https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html"],
+         ["Amazon Comprehend","https://docs.aws.amazon.com/comprehend/latest/dg/what-is.html"],
+         ["Amazon Kendra","https://docs.aws.amazon.com/kendra/latest/dg/what-is-kendra.html"]],
+  focus:["Rekognition = images/vidéos, Comprehend = texte, Transcribe = audio","Kendra = moteur de recherche IA sur documents","JumpStart = modèles pré-entraînés prêts à déployer"]},
+ {d:7,theme:"Examen blanc et révision finale",dom:["D1","D2","D3","D4","D5","pondéré"],time:"90 min chrono + 1 h révision",
+  read:["Révision : tableau FM vs services IA spécialisés","Révision : pièges classiques AIF-C01"],
+  links:[["Guide d'examen AIF-C01","https://aws.amazon.com/fr/certification/certified-ai-practitioner/"],
+         ["FAQ AWS Certified AI Practitioner","https://aws.amazon.com/fr/certification/certified-ai-practitioner/"]],
+  focus:["Différencier Bedrock (FM géré) vs SageMaker (ML custom) vs AI Services (API clé en main)","Scénarios : choisir le bon service selon le cas d'usage","Examen blanc 65 questions avant de passer"],
+  extra:"Objectif : 80 % ou plus avant de réserver l'examen.",timed:true}
+];
+
 window.QDATA = window.QDATA || {};
 
 // ─── Jour 1 · Fondamentaux IA & ML — Partie 1 (50 questions) ───

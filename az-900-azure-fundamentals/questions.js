@@ -1,4 +1,63 @@
 window.QKEY = "az900.v1";
+
+// ── Métadonnées examen ──────────────────────────────────────────────────────
+window.QUIZ_META={
+  exam:"Microsoft Azure Fundamentals AZ-900",
+  rules:[
+    ["60 q · 65 min","format QCM et drag-and-drop"],
+    ["700 / 1000","score de réussite"],
+    ["0 pénalité","ne jamais laisser vide"],
+    ["D1 › D2 › D3","25-30 · 35-40 · 30-35 %"]
+  ]
+};
+
+// ── Plan de révision 7 jours ────────────────────────────────────────────────
+const _GAZ="https://learn.microsoft.com/fr-fr/azure/";
+window.QUIZ_PLAN=[
+ {d:1,theme:"Concepts cloud et modèles de service",dom:["D1 · 25-30 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Avantages du cloud : HA, scalabilité, élasticité, agilité, résilience, prévisibilité","Modèles cloud : public, privé, hybride, multi-cloud","Modèles de service : IaaS, PaaS, SaaS — responsabilités partagées"],
+  links:[["Concepts du cloud computing","https://learn.microsoft.com/fr-fr/training/modules/describe-cloud-compute/"],
+         ["Modèles cloud (public, privé, hybride)","https://learn.microsoft.com/fr-fr/training/modules/describe-cloud-service-types/"],
+         ["Responsabilité partagée","https://learn.microsoft.com/fr-fr/azure/security/fundamentals/shared-responsibility"]],
+  focus:["CapEx vs OpEx : cloud = OpEx (pay-as-you-go, pas d'achat matériel)","Élasticité = scalabilité automatique selon la demande","Modèle de responsabilité partagée : Microsoft = physique, client = données et accès"]},
+ {d:2,theme:"Architecture Azure — Compute, Networking, Storage",dom:["D2 · 35-40 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Régions, zones de disponibilité, paires de régions Azure","Compute : VMs, Availability Sets, VMSS, App Service, Azure Functions, AKS","Storage : Blob, Files, Queue, Table, Disk — niveaux d'accès (Hot/Cool/Archive)"],
+  links:[["Architecture globale Azure","https://learn.microsoft.com/fr-fr/azure/reliability/availability-zones-overview"],
+         ["Vue d'ensemble des types de calcul","https://learn.microsoft.com/fr-fr/azure/architecture/guide/technology-choices/compute-decision-tree"],
+         ["Introduction au stockage Azure","https://learn.microsoft.com/fr-fr/azure/storage/common/storage-introduction"]],
+  focus:["Zone de disponibilité = datacenter indépendant dans une région (min. 3 par région)","App Service = PaaS web/API, Functions = serverless événementiel","Redondance stockage : LRS/ZRS/GRS/GZRS — connaître les acronymes"]},
+ {d:3,theme:"Bases de données, IA et outils DevOps",dom:["D2 · 35-40 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Base de données : Azure SQL, Cosmos DB (NoSQL, multi-API), Azure Database pour PostgreSQL/MySQL","IA : Azure AI Services (Vision, Speech, Language), Azure Machine Learning","DevOps : Azure DevOps, GitHub Actions, Azure Advisor, Azure Monitor"],
+  links:[["Azure SQL Database","https://learn.microsoft.com/fr-fr/azure/azure-sql/database/sql-database-paas-overview"],
+         ["Azure Cosmos DB","https://learn.microsoft.com/fr-fr/azure/cosmos-db/introduction"],
+         ["Azure AI Services","https://learn.microsoft.com/fr-fr/azure/ai-services/what-are-ai-services"]],
+  focus:["Cosmos DB = NoSQL globalement distribué, multi-API (SQL, MongoDB, Cassandra…)","Azure Monitor + Log Analytics = surveillance centralisée","Azure Advisor = recommandations personnalisées (coût, sécurité, fiabilité…)"]},
+ {d:4,theme:"Identité, sécurité et réseau avancé",dom:["D3 · 30-35 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Microsoft Entra ID : utilisateurs, groupes, MFA, SSPR, Accès conditionnel","Sécurité : Azure DDoS, Azure Firewall, NSG, Key Vault, Microsoft Defender for Cloud","Réseau avancé : VPN Gateway, ExpressRoute, Azure DNS, Load Balancer, Application Gateway"],
+  links:[["Microsoft Entra ID (Azure AD)","https://learn.microsoft.com/fr-fr/entra/fundamentals/whatis"],
+         ["Azure Key Vault","https://learn.microsoft.com/fr-fr/azure/key-vault/general/overview"],
+         ["Microsoft Defender for Cloud","https://learn.microsoft.com/fr-fr/azure/defender-for-cloud/defender-for-cloud-introduction"]],
+  focus:["Entra ID = IdaaS cloud (PAS un remplacement direct d'Active Directory on-prem)","Key Vault = coffre-fort pour secrets, clés, certificats","DDoS Standard vs Basic : Standard = protection avancée avec SLA"]},
+ {d:5,theme:"Gouvernance, conformité et gestion des coûts",dom:["D3 · 30-35 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Gouvernance : Azure Policy, Blueprints, Management Groups, RBAC, Tags","Conformité : Microsoft Trust Center, Service Trust Portal, ISO, SOC, RGPD","Coûts : Azure Pricing Calculator, TCO Calculator, Cost Management, Reservations"],
+  links:[["Azure Policy","https://learn.microsoft.com/fr-fr/azure/governance/policy/overview"],
+         ["RBAC Azure","https://learn.microsoft.com/fr-fr/azure/role-based-access-control/overview"],
+         ["Azure Cost Management","https://learn.microsoft.com/fr-fr/azure/cost-management-billing/cost-management-billing-overview"]],
+  focus:["RBAC = qui peut faire quoi sur quelle ressource (Owner/Contributor/Reader)","Tags = métadonnées clé-valeur sur les ressources → facturation et organisation","Reservations = engagement 1 ou 3 ans = jusqu'à 72 % d'économie"]},
+ {d:6,theme:"Well-Architected, hybride et migration",dom:["D2 · 35-40 %","D3 · 30-35 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Azure Well-Architected Framework : 5 piliers (fiabilité, sécurité, optimisation coûts, excellence opérationnelle, performance)","Hybride : Azure Arc, Azure Stack Hub/Edge/HCI","Migration : Azure Migrate, Azure Database Migration Service"],
+  links:[["Azure Well-Architected Framework","https://learn.microsoft.com/fr-fr/azure/well-architected/"],
+         ["Azure Arc","https://learn.microsoft.com/fr-fr/azure/azure-arc/overview"],
+         ["Azure Migrate","https://learn.microsoft.com/fr-fr/azure/migrate/migrate-services-overview"]],
+  focus:["5 piliers WAF : fiabilité, sécurité, optimisation des coûts, excellence opérationnelle, efficacité des performances","Azure Arc = gérer des ressources hors Azure (on-prem, multi-cloud) depuis Azure","Azure Migrate = hub central pour évaluation et migration lift-and-shift"]},
+ {d:7,theme:"Révision finale et examen blanc",dom:["D1","D2","D3","pondéré"],time:"65 min chrono + 1 h révision",
+  read:["Révision : comparatif IaaS/PaaS/SaaS — qui fait quoi","Révision : pièges classiques AZ-900 (Availability Zones vs Sets, etc.)"],
+  links:[["Examen AZ-900 — Page officielle","https://learn.microsoft.com/fr-fr/credentials/certifications/exams/az-900/"],
+         ["Parcours d'apprentissage AZ-900","https://learn.microsoft.com/fr-fr/training/paths/microsoft-azure-fundamentals-describe-cloud-concepts/"]],
+  focus:["Pièges fréquents : Availability Set ≠ Availability Zone","SLA composite = produit des SLA individuels","Modèle de consommation = OpEx = pas de CapEx initial"],
+  extra:"Objectif : 80 % ou plus avant de passer l'examen.",timed:true}
+];
+
 window.QDATA = window.QDATA || {};
 
 window.QDATA[1] = [

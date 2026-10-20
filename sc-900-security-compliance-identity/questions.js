@@ -1,4 +1,64 @@
 // SC-900 Security, Compliance & Identity — 350 questions (7 days × 50)
+
+window.QKEY = window.QKEY || "sc900.v1";
+
+// ── Métadonnées examen ──────────────────────────────────────────────────────
+window.QUIZ_META={
+  exam:"Microsoft Security, Compliance & Identity Fundamentals SC-900",
+  rules:[
+    ["60 q · 60 min","format QCM et cas pratiques"],
+    ["700 / 1000","score de réussite"],
+    ["0 pénalité","ne jamais laisser vide"],
+    ["D1 › D2 › D3 › D4","30 · 35 · 25 · 10 %"]
+  ]
+};
+
+// ── Plan de révision 7 jours ────────────────────────────────────────────────
+window.QUIZ_PLAN=[
+ {d:1,theme:"Responsabilité partagée, Zero Trust et défense en profondeur",dom:["D1 · 30 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Modèle de responsabilité partagée : IaaS, PaaS, SaaS — ce que Microsoft gère vs le client","Zero Trust : Never trust, always verify — 3 piliers Microsoft","Défense en profondeur : 7 couches (données, application, calcul, réseau, périmètre, identité, physique)"],
+  links:[["Responsabilité partagée dans le cloud","https://learn.microsoft.com/fr-fr/azure/security/fundamentals/shared-responsibility"],
+         ["Modèle Zero Trust","https://learn.microsoft.com/fr-fr/security/zero-trust/zero-trust-overview"],
+         ["Défense en profondeur","https://learn.microsoft.com/fr-fr/training/modules/describe-security-concepts-methodologies/"]],
+  focus:["Zero Trust : Vérifier explicitement + Moindre privilège + Supposer la violation","7 couches de défense en profondeur — les données sont la couche la plus interne","Responsabilité partagée : la sécurité physique est TOUJOURS Microsoft"]},
+ {d:2,theme:"Microsoft Entra ID : authentification et accès",dom:["D2 · 35 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Microsoft Entra ID : utilisateurs, groupes, licences (Free, P1, P2)","Authentification : MFA, SSPR, Passwordless (Windows Hello, FIDO2, Authenticator)","Accès conditionnel : signaux (qui, quoi, où, quel risque) → décision → application"],
+  links:[["Introduction à Microsoft Entra ID","https://learn.microsoft.com/fr-fr/entra/fundamentals/whatis"],
+         ["Accès conditionnel","https://learn.microsoft.com/fr-fr/entra/identity/conditional-access/overview"],
+         ["Méthodes d'authentification","https://learn.microsoft.com/fr-fr/entra/identity/authentication/concept-authentication-methods"]],
+  focus:["MFA = quelque chose que tu sais + as + es (3 facteurs)","Accès conditionnel = outil Zero Trust central (si X → alors Y)","Entra ID P2 = Identity Protection (risque utilisateur/connexion) + PIM"]},
+ {d:3,theme:"Gouvernance des identités : PIM et révisions d'accès",dom:["D2 · 35 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Privileged Identity Management (PIM) : élévation JIT, approbation, audit","Révisions d'accès : revalider périodiquement les accès des utilisateurs","Microsoft Entra Permissions Management : gestion des droits multi-cloud"],
+  links:[["Privileged Identity Management","https://learn.microsoft.com/fr-fr/entra/id-governance/privileged-identity-management/pim-configure"],
+         ["Révisions d'accès","https://learn.microsoft.com/fr-fr/entra/id-governance/access-reviews-overview"],
+         ["Microsoft Entra ID Governance","https://learn.microsoft.com/fr-fr/entra/id-governance/identity-governance-overview"]],
+  focus:["PIM = accès Just-In-Time aux rôles privilégiés (pas d'accès permanent)","Révisions d'accès = qui a encore besoin de ces droits ? → validation périodique","Entra Permissions Management = détection du risque lié aux droits excessifs (multi-cloud)"]},
+ {d:4,theme:"Microsoft Defender et protection contre les menaces",dom:["D3 · 25 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Microsoft Defender XDR : Defender for Endpoint, Identity, Office 365, Cloud Apps","Microsoft Sentinel : SIEM cloud-natif (collecte, corrélation, réponse)","Microsoft Defender for Cloud : score de sécurité, recommandations, alertes"],
+  links:[["Microsoft Defender XDR","https://learn.microsoft.com/fr-fr/defender-xdr/microsoft-365-defender"],
+         ["Microsoft Sentinel","https://learn.microsoft.com/fr-fr/azure/sentinel/overview"],
+         ["Microsoft Defender for Cloud","https://learn.microsoft.com/fr-fr/azure/defender-for-cloud/defender-for-cloud-introduction"]],
+  focus:["Sentinel = SIEM + SOAR (détection + réponse automatisée avec playbooks)","Defender XDR = suite coordonnée (endpoint + email + identity + apps cloud)","Secure Score dans Defender for Cloud = mesure de la posture de sécurité Azure"]},
+ {d:5,theme:"Microsoft Purview — conformité et protection des données",dom:["D3 · 25 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Microsoft Purview : portail unifié de conformité et gouvernance des données","Protection des données : étiquettes de sensibilité, DLP, chiffrement","Conformité : Compliance Manager, Score de conformité, eDiscovery, Audit"],
+  links:[["Microsoft Purview — Vue d'ensemble","https://learn.microsoft.com/fr-fr/purview/purview"],
+         ["Étiquettes de sensibilité","https://learn.microsoft.com/fr-fr/purview/sensitivity-labels"],
+         ["Microsoft Purview Compliance Manager","https://learn.microsoft.com/fr-fr/purview/compliance-manager"]],
+  focus:["Étiquettes de sensibilité : classer les données + appliquer la protection (chiffrement, watermark)","DLP = politique empêchant le partage non autorisé de données sensibles","Compliance Manager = score de conformité + plan d'action réglementaire"]},
+ {d:6,theme:"Opérations de sécurité et gouvernance Azure",dom:["D1 · 30 %","D3 · 25 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Azure Policy, Azure Blueprints, Microsoft Defender for Cloud (DevSecOps)","Service Trust Portal, Centre de confiance Microsoft","Gestion des risques : Azure Security Benchmark, NIST, ISO 27001"],
+  links:[["Service Trust Portal","https://servicetrust.microsoft.com/"],
+         ["Azure Security Benchmark","https://learn.microsoft.com/fr-fr/security/benchmark/azure/introduction"],
+         ["Centre de gestion de la confidentialité","https://www.microsoft.com/fr-fr/trust-center"]],
+  focus:["Service Trust Portal = rapports d'audit, certifications, documents de conformité","Azure Policy = appliquer des règles de gouvernance sur les ressources Azure","NIST/ISO 27001/SOC 2 → certifications que Microsoft détient pour ses datacenters"]},
+ {d:7,theme:"Révision finale et examen blanc",dom:["D1","D2","D3","D4","pondéré"],time:"60 min chrono + 1 h révision",
+  read:["Révision : Zero Trust vs défense en profondeur","Révision : PIM, accès conditionnel, MFA — quand utiliser quoi"],
+  links:[["Examen SC-900 — Page officielle","https://learn.microsoft.com/fr-fr/credentials/certifications/exams/sc-900/"],
+         ["Parcours d'apprentissage SC-900","https://learn.microsoft.com/fr-fr/training/paths/describe-concepts-of-security-compliance-identity/"]],
+  focus:["Pièges : Sentinel = SIEM (pas un outil d'identité)","Entra ID P2 requis pour PIM et Protection des identités","Purview = conformité et données ; Defender = menaces et sécurité"],
+  extra:"Objectif : 80 % ou plus avant de passer l'examen.",timed:true}
+];
+
 window.QDATA = {};
 window.QDATA[1] = [
   {t:"Responsabilité partagée",q:"Dans le modèle de responsabilité partagée, quelle responsabilité incombe TOUJOURS au client, quel que soit le modèle de service cloud ?",o:["La gestion de l'infrastructure physique","La sécurité des données et des identités","La maintenance des hyperviseurs","La gestion des mises à jour du système d'exploitation hôte"],a:[1],e:["Quelle que soit la couche de service (IaaS, PaaS, SaaS), la responsabilité de la protection des données et de la gestion des identités reste toujours du côté du client."]},

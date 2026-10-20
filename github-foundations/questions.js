@@ -2,6 +2,69 @@
 // Source : docs.github.com, gh.io/foundations-study-guide
 // 350 questions · 7 jours × 50 questions · 5 modules × 10 questions
 window.QKEY = "ghf.v1";
+
+// ── Métadonnées examen ──────────────────────────────────────────────────────
+window.QUIZ_META={
+  exam:"GitHub Foundations GH-900",
+  rules:[
+    ["75 q · 120 min","format QCM, drag-and-drop, mise en correspondance"],
+    ["Pass (seuil variable)","score de réussite GitHub"],
+    ["0 pénalité","ne jamais laisser vide"],
+    ["D1 › D5 › D2 › D3 › D4","25-30 · 20-25 · 15-20 · 10-15 · 10-15 %"]
+  ]
+};
+
+// ── Plan de révision 7 jours ────────────────────────────────────────────────
+const _GGH="https://docs.github.com/fr/";
+window.QUIZ_PLAN=[
+ {d:1,theme:"Git Basics, Branches et GitHub Core",dom:["D1 · 25-30 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Git : init, clone, add, commit, log, status, diff, stash, branch, checkout/switch","Branches : créer, fusionner (merge), rebase, conflits","GitHub : repos, Issues, Pull Requests — flux de travail de base"],
+  links:[["Git — Documentation officielle","https://git-scm.com/docs"],
+         ["GitHub Flow","https://docs.github.com/fr/get-started/quickstart/github-flow"],
+         ["Branches Git","https://docs.github.com/fr/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches"]],
+  focus:["HEAD = pointeur vers le commit courant (detached HEAD si pointe sur un SHA)","git fetch ≠ git pull (fetch = récupère sans fusionner)","Branch protection rules = exiger des reviews et checks CI avant le merge"]},
+ {d:2,theme:"Repositories, Collaboration et GitHub Flow",dom:["D1 · 25-30 %","D2 · 15-20 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Repositories : visibilité (public/privé/interne), fork, template, archiver","GitHub Flow : branche → commits → PR → review → merge → déploiement","Issues : labels, milestones, assignees, closing keywords, Projects"],
+  links:[["Dépôts GitHub","https://docs.github.com/fr/repositories"],
+         ["Pull Requests","https://docs.github.com/fr/pull-requests/collaborating-with-pull-requests"],
+         ["GitHub Issues","https://docs.github.com/fr/issues/tracking-your-work-with-issues/about-issues"]],
+  focus:["Fork = copie indépendante dans ton compte ; clone = copie locale","PR = mécanisme de review et de merge de code (code review workflow)","Closing keywords dans un commit/PR : 'Fixes #123' → ferme l'issue automatiquement au merge"]},
+ {d:3,theme:"GitHub Actions, Pages, Packages et Codespaces",dom:["D3 · 10-15 %","D4 · 10-15 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["GitHub Actions : workflows YAML (.github/workflows/), déclencheurs, jobs, steps, runners","GitHub Pages : hébergement statique depuis un repo (branche ou /docs)","GitHub Packages : registre d'artefacts (npm, Docker, Maven…) ; Codespaces : dev environment cloud"],
+  links:[["GitHub Actions","https://docs.github.com/fr/actions"],
+         ["GitHub Pages","https://docs.github.com/fr/pages"],
+         ["GitHub Packages","https://docs.github.com/fr/packages"],
+         ["GitHub Codespaces","https://docs.github.com/fr/codespaces"]],
+  focus:["Workflow = fichier YAML décrivant l'automatisation CI/CD","Runner = machine exécutant les jobs (hébergés par GitHub ou self-hosted)","Codespaces = environnement de dev VSCode dans le cloud, basé sur Dev Containers"]},
+ {d:4,theme:"Projects, Permissions et Administration",dom:["D2 · 15-20 %","D5 · 20-25 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["GitHub Projects (v2) : boards, vues (table, board, roadmap), champs personnalisés","Permissions : Owner, Admin, Write, Triage, Read — Organizations et Teams","Sécurité : Dependabot, Secret scanning, Code scanning, CODEOWNERS"],
+  links:[["GitHub Projects","https://docs.github.com/fr/issues/planning-and-tracking-with-projects"],
+         ["Rôles dans les organisations","https://docs.github.com/fr/organizations/managing-peoples-access-to-your-organization-with-roles"],
+         ["Dependabot","https://docs.github.com/fr/code-security/dependabot"],
+         ["Analyse des secrets","https://docs.github.com/fr/code-security/secret-scanning"]],
+  focus:["CODEOWNERS = liste les propriétaires de parties du code → review automatique requise","Dependabot alerts = vulnérabilités dans les dépendances ; Dependabot PRs = mise à jour auto","Secret scanning = détection de secrets exposés (clés API, tokens) dans les repos"]},
+ {d:5,theme:"Branches avancées, Releases, Recherche et CLI",dom:["D1 · 25-30 %","D5 · 20-25 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Stratégies de branches : Gitflow, GitHub Flow, Trunk Based Development","Releases et Tags : créer un tag annoté, publier une Release, assets","GitHub Search et CLI gh : chercher du code, des issues, des repos"],
+  links:[["GitHub Releases","https://docs.github.com/fr/repositories/releasing-projects-on-github/managing-releases-in-a-repository"],
+         ["GitHub CLI","https://cli.github.com/manual/"],
+         ["Recherche sur GitHub","https://docs.github.com/fr/search-github"],
+         ["Gitflow vs GitHub Flow","https://docs.github.com/fr/get-started/quickstart/github-flow"]],
+  focus:["Tag annoté = objet Git avec message et auteur ; tag léger = simple alias","Release = package téléchargeable avec changelog (basée sur un tag)","gh CLI = interface ligne de commande officielle GitHub (gh pr create, gh issue list…)"]},
+ {d:6,theme:"Open Source, Communauté et GitHub Actions avancé",dom:["D4 · 10-15 %","D3 · 10-15 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Open Source : LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md","Communauté GitHub : Discussions, Sponsors, GitHub Education","Actions avancé : secrets, environnements, réutilisation de workflows, artefacts"],
+  links:[["Contribuer à l'open source","https://docs.github.com/fr/get-started/exploring-projects-on-github/contributing-to-a-project"],
+         ["Sécurité du dépôt","https://docs.github.com/fr/code-security/getting-started/securing-your-repository"],
+         ["Réutiliser des workflows","https://docs.github.com/fr/actions/using-workflows/reusing-workflows"]],
+  focus:["LICENSE = obligatoire pour que le code soit légalement open source","CODEOWNERS dans .github/, docs/ ou racine du projet","Secrets GitHub Actions = variables chiffrées injectées dans les workflows"]},
+ {d:7,theme:"Révision finale et examen blanc",dom:["D1","D2","D3","D4","D5","pondéré"],time:"120 min chrono + 1 h révision",
+  read:["Révision : git merge vs rebase — avantages et inconvénients","Révision : GitHub vs Git — ce que GitHub ajoute à Git"],
+  links:[["Examen GitHub Foundations — Page officielle","https://examregistration.github.com/overview"],
+         ["GitHub Skills — Parcours pratiques","https://skills.github.com/"],
+         ["Documentation GitHub","https://docs.github.com/fr/"]],
+  focus:["GitHub = hébergement + collaboration (Issues, PRs) ; Git = système de contrôle de version","Actions = CI/CD natif GitHub ; Pages = hébergement statique ; Packages = registre artefacts","Dependabot + Secret scanning + Code scanning = trio de sécurité GitHub"],
+  extra:"Objectif : 80 % ou plus avant de passer l'examen.",timed:true}
+];
+
 window.QDATA = window.QDATA || {};
 
 // ─── JOUR 1 : Git & GitHub basics (domaine 1 : 25-30 %) ───────────────────

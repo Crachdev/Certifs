@@ -1,6 +1,75 @@
 // Questions AWS CLF-C02 — 350 questions, 7 jours x 50
 // Format: window.QDATA[jour] = [{t, q, o, a, e}, ...]
 
+window.QKEY="clf7.v2";
+
+// ── Métadonnées examen ──────────────────────────────────────────────────────
+window.QUIZ_META={
+  exam:"AWS Cloud Practitioner CLF-C02",
+  fiche:"https://claude.ai/code/artifact/9dda6fd5-2f57-473f-b38f-f1fbf7b0899d",
+  rules:[
+    ["65 q · 90 min","dont 15 non notées"],
+    ["700 / 1000","score de réussite"],
+    ["0 pénalité","ne jamais laisser vide"],
+    ["D3 › D2 › D1 › D4","34 · 30 · 24 · 12 %"]
+  ]
+};
+
+// ── Plan de révision 7 jours ────────────────────────────────────────────────
+const _G="https://docs.aws.amazon.com/fr_fr/aws-certification/latest/cloud-practitioner-02/";
+window.QUIZ_PLAN=[
+ {d:1,theme:"Infrastructure mondiale, calcul et conteneurs",dom:["D3 · 34 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Fiche : Infrastructure mondiale","Fiche : Calcul (EC2, Lambda, Beanstalk, Auto Scaling, ELB)","Fiche : Conteneurs"],
+  links:[["Guide officiel domaine 3 — AWS",_G+"cloud-practitioner-02-domain3.html"],
+         ["Régions et zones de disponibilité","https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html"],
+         ["Amazon EC2","https://docs.aws.amazon.com/ec2/index.html"],
+         ["AWS Lambda","https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"]],
+  focus:["Région, AZ, edge location : qui contient quoi","Familles EC2 (C, R, I, G)","Auto Scaling = élasticité, ELB = répartition"]},
+ {d:2,theme:"Stockage, bases de données et migration",dom:["D3 · 34 %","D1 · 24 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Fiche : Stockage (S3, EBS, EFS, FSx, Storage Gateway, Backup)","Fiche : Bases de données","Fiche : Migration & transfert"],
+  links:[["Services au programme",_G+"clf-02-in-scope-services.html"],
+         ["Amazon S3 — Documentation","https://docs.aws.amazon.com/s3/index.html"],
+         ["Amazon RDS","https://docs.aws.amazon.com/rds/index.html"],
+         ["AWS Database Migration Service","https://docs.aws.amazon.com/dms/latest/userguide/Welcome.html"]],
+  focus:["Les 7 classes S3 et leurs délais","Multi-AZ (disponibilité) vs Read Replica (performance)","DMS + SCT, Snowball"]},
+ {d:3,theme:"Réseau, IA/ML, analytique et services annexes",dom:["D3 · 34 %"],time:"≈ 1 h 15 lecture + 1 h 15 quiz",
+  read:["Fiche : Réseau & diffusion de contenu","Fiche : IA/ML & analytique","Fiche : Autres services au programme"],
+  links:[["Guide officiel domaine 3 — AWS",_G+"cloud-practitioner-02-domain3.html"],
+         ["Amazon VPC","https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"],
+         ["Amazon CloudFront","https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html"],
+         ["AWS AI & ML Services","https://aws.amazon.com/fr/machine-learning/"]],
+  focus:["Security group (stateful) vs NACL (stateless, peut refuser)","VPN vs Direct Connect, CloudFront vs Global Accelerator","Un verbe par service d'IA ; SQS vs SNS"]},
+ {d:4,theme:"Responsabilité partagée, IAM et services de sécurité",dom:["D2 · 30 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Fiche : Responsabilité partagée","Fiche : IAM & identités","Fiche : Sécurité & conformité"],
+  links:[["Guide officiel domaine 2 — AWS",_G+"cloud-practitioner-02-domain2.html"],
+         ["Modèle de responsabilité partagée","https://aws.amazon.com/fr/compliance/shared-responsibility-model/"],
+         ["AWS Identity and Access Management","https://docs.aws.amazon.com/iam/index.html"],
+         ["AWS Security Services","https://aws.amazon.com/fr/products/security/"]],
+  focus:["EC2 vs RDS vs Lambda : qui corrige quoi","Tâches réservées au root","GuardDuty vs Inspector vs Macie, KMS vs CloudHSM"]},
+ {d:5,theme:"Gouvernance, conformité et concepts cloud",dom:["D2 · 30 %","D1 · 24 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Fiche : Monitoring, audit & gouvernance","Fiche : Concepts cloud (6 avantages, Well-Architected, CAF, 7 R, économie)"],
+  links:[["Guide officiel domaine 1 — AWS",_G+"cloud-practitioner-02-domain1.html"],
+         ["AWS Well-Architected Framework","https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"],
+         ["AWS Cloud Adoption Framework","https://aws.amazon.com/fr/cloud-adoption-framework/"],
+         ["Amazon CloudWatch","https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"]],
+  focus:["CloudTrail = qui · CloudWatch = comment · Config = quoi","Les 6 piliers et leurs mots-clés","Les 7 R de la migration"],
+  extra:"Ce soir : un test blanc complet sur MeasureUp ou Tutorials Dojo pour mesurer ton niveau réel."},
+ {d:6,theme:"Tarification, gestion des coûts et support",dom:["D4 · 12 %"],time:"≈ 45 min lecture + 1 h 15 quiz",
+  read:["Fiche : Tarification","Fiche : Gestion des coûts & facturation","Fiche : Support & ressources","Fiche : Écarts examen vs réalité 2026"],
+  links:[["Guide officiel domaine 4 — AWS",_G+"cloud-practitioner-02-domain4.html"],
+         ["AWS Pricing Calculator","https://calculator.aws/pricing/2/home"],
+         ["AWS Cost Explorer","https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html"],
+         ["AWS Support Plans","https://aws.amazon.com/fr/premiumsupport/plans/"]],
+  focus:["Spot, réservées, Savings Plans, hôtes dédiés","Budgets (alerte) vs Cost Explorer (analyse) vs Pricing Calculator (avant)","Plans de support version examen : 1 h, 30 min, 15 min, TAM"],
+  extra:"Rejoue tes erreurs des jours 1 à 5 dans l'onglet « Mes erreurs »."},
+ {d:7,theme:"Examen blanc et révision finale",dom:["D1","D2","D3","D4","pondéré"],time:"70 min chrono + 1 h révision",
+  read:["Fiche : Mots-clés examen → service","Fiche : Pièges classiques"],
+  links:[["Format de l'examen CLF-C02",_G+"cloud-practitioner-02.html"],
+         ["Guides d'examen AWS Certification","https://aws.amazon.com/fr/certification/certified-cloud-practitioner/"]],
+  focus:["Examen blanc de 50 questions en 70 minutes","Rejouer toutes les erreurs restantes","Relire les deux tableaux de la fiche la veille au soir"],
+  extra:"Objectif : 80 % ou plus avant de réserver ou de passer l'examen.",timed:true}
+];
+
 window.QDATA={};
 window.QDATA = window.QDATA || {};
 window.QDATA[1] = [

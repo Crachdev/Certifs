@@ -1,4 +1,62 @@
 window.QKEY = "ai900.v1";
+
+// ── Métadonnées examen ──────────────────────────────────────────────────────
+window.QUIZ_META={
+  exam:"Microsoft Azure AI Fundamentals AI-900",
+  rules:[
+    ["60 q · 45 min","format QCM et drag-and-drop"],
+    ["700 / 1000","score de réussite"],
+    ["0 pénalité","ne jamais laisser vide"],
+    ["D1 › D4 › D2 › D3 › D5","24 · 21 · 18 · 18 · 19 %"]
+  ]
+};
+
+// ── Plan de révision 7 jours ────────────────────────────────────────────────
+window.QUIZ_PLAN=[
+ {d:1,theme:"Fondamentaux IA, ML et Azure AI Services",dom:["D1 · 24 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Concepts IA : définition, sous-domaines (ML, DL, NLP, CV)","Types d'apprentissage ML : supervisé, non supervisé, renforcement","Azure AI Services : présentation et catalogue"],
+  links:[["Parcours IA Azure — Microsoft Learn","https://learn.microsoft.com/fr-fr/training/paths/get-started-with-artificial-intelligence-on-azure/"],
+         ["Concepts fondamentaux de l'IA","https://learn.microsoft.com/fr-fr/azure/ai-services/what-are-ai-services"],
+         ["Azure Machine Learning","https://learn.microsoft.com/fr-fr/azure/machine-learning/overview-what-is-azure-machine-learning"]],
+  focus:["IA ⊃ ML ⊃ Deep Learning","Supervisé = labels connus, non supervisé = clustering","Azure AI Services = APIs prêtes à l'emploi (Vision, Speech, Language, Decision)"]},
+ {d:2,theme:"Computer Vision avec Azure",dom:["D2 · 18 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Azure AI Vision : analyse d'images, OCR, description","Custom Vision : entraînement de modèles images personnalisés","Azure AI Face : détection et analyse faciale"],
+  links:[["Azure AI Vision","https://learn.microsoft.com/fr-fr/azure/ai-services/computer-vision/overview"],
+         ["Custom Vision","https://learn.microsoft.com/fr-fr/azure/ai-services/Custom-Vision-Service/overview"],
+         ["Azure AI Face","https://learn.microsoft.com/fr-fr/azure/ai-services/computer-vision/overview-identity"]],
+  focus:["Vision = analyse générique ; Custom Vision = classification personnalisée","OCR → Document Intelligence pour documents structurés","Face : détection (coordonnées) vs reconnaissance (identité)"]},
+ {d:3,theme:"Traitement du langage naturel (NLP)",dom:["D3 · 18 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Azure AI Language : analyse de sentiment, extraction d'entités, résumé","Azure AI Speech : STT, TTS, traduction vocale","Azure AI Translator : traduction textuelle"],
+  links:[["Azure AI Language","https://learn.microsoft.com/fr-fr/azure/ai-services/language-service/overview"],
+         ["Azure AI Speech","https://learn.microsoft.com/fr-fr/azure/ai-services/speech-service/overview"],
+         ["Azure AI Translator","https://learn.microsoft.com/fr-fr/azure/ai-services/translator/overview"]],
+  focus:["Sentiment = positif/négatif/neutre ; entités nommées = personnes, lieux, dates","STT (Speech-to-Text) vs TTS (Text-to-Speech)","CLU (Conversational Language Understanding) pour les chatbots"]},
+ {d:4,theme:"IA Générative et Azure OpenAI Service",dom:["D4 · 21 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Modèles génératifs : LLM, GPT, DALL-E","Azure OpenAI Service : déploiement GPT/DALL-E","Prompt Engineering : contexte, exemples, instructions"],
+  links:[["Azure OpenAI Service","https://learn.microsoft.com/fr-fr/azure/ai-services/openai/overview"],
+         ["Introduction à l'IA générative","https://learn.microsoft.com/fr-fr/training/modules/fundamentals-generative-ai/"],
+         ["Responsible AI for Generative AI","https://learn.microsoft.com/fr-fr/azure/ai-services/openai/concepts/safety-system-message-templates"]],
+  focus:["LLM = grand modèle de langage entraîné sur corpus massif","Azure OpenAI ≠ openai.com : déploiement géré, données dans ton tenant","Copilot = IA intégrée aux apps M365, GitHub, etc."]},
+ {d:5,theme:"Azure Machine Learning",dom:["D1 · 24 %","D2 · 18 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Azure ML Studio : Designer, AutoML, pipelines","Entraînement, évaluation et déploiement de modèles","MLOps : CI/CD pour le ML, monitoring des modèles"],
+  links:[["Azure Machine Learning Studio","https://learn.microsoft.com/fr-fr/azure/machine-learning/overview-what-is-azure-machine-learning"],
+         ["AutoML dans Azure ML","https://learn.microsoft.com/fr-fr/azure/machine-learning/concept-automated-ml"],
+         ["Designer Azure ML","https://learn.microsoft.com/fr-fr/azure/machine-learning/concept-designer"]],
+  focus:["Designer = pipeline visuel drag & drop (no code)","AutoML = essaie automatiquement de nombreux algorithmes","Endpoint de déploiement : temps réel vs batch"]},
+ {d:6,theme:"IA Conversationnelle et IA Responsable",dom:["D3 · 18 %","D5 · 19 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Azure AI Bot Service et CLU pour les bots","Azure AI Content Safety","Principes IA responsable Microsoft : équité, fiabilité, confidentialité, inclusion, transparence, responsabilité"],
+  links:[["Azure AI Bot Service","https://learn.microsoft.com/fr-fr/azure/bot-service/bot-service-overview"],
+         ["IA Responsable — Microsoft","https://learn.microsoft.com/fr-fr/azure/machine-learning/concept-responsible-ai"],
+         ["Azure AI Content Safety","https://learn.microsoft.com/fr-fr/azure/ai-services/content-safety/overview"]],
+  focus:["Bot = CLU (intentions/entités) + dialogue management + canaux","6 principes Microsoft : équité, fiabilité, confidentialité, inclusion, transparence, responsabilité","Content Safety : modération texte et image (4 catégories : hate, violence, self-harm, sexual)"]},
+ {d:7,theme:"Révision finale et examen blanc",dom:["D1","D2","D3","D4","D5","pondéré"],time:"45 min chrono + 1 h révision",
+  read:["Révision : tableau services Azure AI par domaine","Révision : pièges classiques AI-900"],
+  links:[["Examen AI-900 — Page officielle","https://learn.microsoft.com/fr-fr/credentials/certifications/exams/ai-900/"],
+         ["Parcours de formation AI-900","https://learn.microsoft.com/fr-fr/training/paths/get-started-with-artificial-intelligence-on-azure/"]],
+  focus:["Chaque service → son domaine et son cas d'usage","Différencier Azure AI Services (API) vs Azure ML (entraînement custom)","IA Responsable : mémoriser les 6 principes Microsoft"],
+  extra:"Objectif : 80 % ou plus avant de passer l'examen.",timed:true}
+];
+
 window.QDATA = window.QDATA || {};
 
 // ─── JOUR 1 : Fondamentaux IA, ML et services Azure AI ───

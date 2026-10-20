@@ -1,4 +1,63 @@
 window.QKEY = "ms900.v1";
+
+// ── Métadonnées examen ──────────────────────────────────────────────────────
+window.QUIZ_META={
+  exam:"Microsoft 365 Fundamentals MS-900",
+  rules:[
+    ["60 q · 60 min","format QCM et cas pratiques"],
+    ["700 / 1000","score de réussite"],
+    ["0 pénalité","ne jamais laisser vide"],
+    ["D2 › D3 › D1 › D4","35 · 30 · 20 · 15 %"]
+  ]
+};
+
+// ── Plan de révision 7 jours ────────────────────────────────────────────────
+const _GMS="https://learn.microsoft.com/fr-fr/microsoft-365/";
+window.QUIZ_PLAN=[
+ {d:1,theme:"Microsoft 365 Core — Productivité et collaboration",dom:["D1 · 20 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Applications Microsoft 365 : Word, Excel, PowerPoint, Outlook, Teams, OneNote","Collaboration : co-authoring, SharePoint Online, OneDrive for Business","Microsoft 365 Copilot : IA générative intégrée (Word, Excel, Teams, Outlook)"],
+  links:[["Vue d'ensemble Microsoft 365","https://learn.microsoft.com/fr-fr/microsoft-365/admin/admin-overview/what-is-microsoft-365"],
+         ["Collaboration Microsoft 365","https://learn.microsoft.com/fr-fr/microsoft-365/solutions/collaboration-governance-overview"],
+         ["Microsoft 365 Copilot","https://learn.microsoft.com/fr-fr/copilot/microsoft-365/microsoft-365-copilot-overview"]],
+  focus:["Co-authoring = édition simultanée en temps réel dans Word/Excel/PPT","SharePoint = intranet + stockage d'équipe ; OneDrive = stockage personnel","Copilot M365 = GPT-4 + Microsoft Graph (vos données) → résumés, rédaction, analyse"]},
+ {d:2,theme:"SharePoint Online, OneDrive et Exchange Online",dom:["D2 · 35 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["SharePoint Online : sites d'équipe, sites de communication, bibliothèques de documents","OneDrive for Business : stockage personnel 1 TB, synchronisation, partage","Exchange Online : messagerie, calendrier, contacts, boîtes aux lettres partagées"],
+  links:[["SharePoint Online","https://learn.microsoft.com/fr-fr/sharepoint/introduction"],
+         ["OneDrive for Business","https://learn.microsoft.com/fr-fr/onedrive/onedrive"],
+         ["Exchange Online","https://learn.microsoft.com/fr-fr/exchange/exchange-online"]],
+  focus:["SharePoint = collaboration d'équipe + intranet ; OneDrive = personnel","Exchange Online = service email cloud (pas besoin de serveur Exchange on-prem)","Boîtes aux lettres partagées, ressources salle, groupes Microsoft 365"]},
+ {d:3,theme:"Microsoft Defender pour M365 et Microsoft Purview",dom:["D3 · 30 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Microsoft Defender for Office 365 : anti-phishing, pièces jointes sûres, liens sûres","Microsoft Purview (M365) : étiquettes de sensibilité, DLP, Compliance Manager","Gestion de la conformité : eDiscovery, journaux d'audit, rétention"],
+  links:[["Microsoft Defender for Office 365","https://learn.microsoft.com/fr-fr/defender-office-365/mdo-about"],
+         ["Microsoft Purview dans M365","https://learn.microsoft.com/fr-fr/purview/purview"],
+         ["DLP Microsoft 365","https://learn.microsoft.com/fr-fr/purview/dlp-learn-about-dlp"]],
+  focus:["Safe Links = réécriture des URLs + vérification en temps réel au clic","Étiquettes de sensibilité = classification + protection automatique des fichiers","DLP = empêcher le partage non autorisé de données sensibles (numéros CB, IBAN…)"]},
+ {d:4,theme:"Microsoft Entra ID, MFA et PIM dans M365",dom:["D3 · 30 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Entra ID dans M365 : synchronisation Entra Connect, identités hybrides","MFA et Passwordless : Authenticator App, FIDO2, Windows Hello","Accès conditionnel et Privileged Identity Management (PIM)"],
+  links:[["Microsoft Entra ID et M365","https://learn.microsoft.com/fr-fr/entra/fundamentals/whatis"],
+         ["Accès conditionnel","https://learn.microsoft.com/fr-fr/entra/identity/conditional-access/overview"],
+         ["Privileged Identity Management","https://learn.microsoft.com/fr-fr/entra/id-governance/privileged-identity-management/pim-configure"]],
+  focus:["Entra Connect = synchronise les identités AD on-prem vers Entra ID (cloud)","MFA activée par défaut (Security Defaults) dans les nouveaux tenants M365","PIM = accès JIT aux rôles admins → pas d'accès permanent"]},
+ {d:5,theme:"Microsoft Intune, MDM et Autopilot",dom:["D2 · 35 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Microsoft Intune : MDM (Mobile Device Management) et MAM (Mobile Application Management)","Windows Autopilot : provisioning zéro-touch des appareils Windows","Politiques de conformité des appareils et accès conditionnel basé sur l'appareil"],
+  links:[["Microsoft Intune","https://learn.microsoft.com/fr-fr/mem/intune/fundamentals/what-is-intune"],
+         ["Windows Autopilot","https://learn.microsoft.com/fr-fr/autopilot/windows-autopilot"],
+         ["Microsoft Endpoint Manager","https://learn.microsoft.com/fr-fr/mem/endpoint-manager-overview"]],
+  focus:["MDM = gérer l'appareil entier (effacement à distance, politiques) → appareils propriété de l'entreprise","MAM = gérer uniquement les apps (données d'entreprise) → BYOD","Autopilot = l'appareil s'inscrit automatiquement dans Intune à l'allumage"]},
+ {d:6,theme:"Plans de licence, rapports et administration M365",dom:["D4 · 15 %","D1 · 20 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Licences M365 : Business Basic/Standard/Premium, E3, E5, Frontline F1/F3","Centre d'administration M365 : gestion des utilisateurs, licences, rapports d'utilisation","Power Platform dans M365 : Power Apps, Power Automate, Power BI"],
+  links:[["Comparer les offres Microsoft 365","https://www.microsoft.com/fr-fr/microsoft-365/business/compare-all-plans"],
+         ["Centre d'administration Microsoft 365","https://learn.microsoft.com/fr-fr/microsoft-365/admin/admin-overview/admin-center-overview"],
+         ["Power Platform","https://learn.microsoft.com/fr-fr/power-platform/"]],
+  focus:["E5 = sécurité maximale (Defender, Purview avancé, Entra P2, Power BI Pro)","Business plans = max 300 utilisateurs ; Enterprise E3/E5 = illimité","Rapports d'utilisation = voir l'adoption par service dans le centre d'administration"]},
+ {d:7,theme:"Révision finale et examen blanc",dom:["D1","D2","D3","D4","pondéré"],time:"60 min chrono + 1 h révision",
+  read:["Révision : SharePoint vs OneDrive vs Teams — quel stockage pour quoi","Révision : Defender for Office 365 Plan 1 vs Plan 2"],
+  links:[["Examen MS-900 — Page officielle","https://learn.microsoft.com/fr-fr/credentials/certifications/exams/ms-900/"],
+         ["Parcours d'apprentissage MS-900","https://learn.microsoft.com/fr-fr/training/paths/m365-fundamentals/"]],
+  focus:["Pièges : Intune MDM ≠ MAM (l'un gère l'appareil, l'autre l'application)","Exchange Online ≠ Outlook (Outlook = client ; Exchange = service email cloud)","M365 Business Premium = la seule licence Business avec Intune + Defender inclus"],
+  extra:"Objectif : 80 % ou plus avant de passer l'examen.",timed:true}
+];
+
 window.QDATA = window.QDATA || {};
 
 // Jour 1 — Microsoft 365 Core Productivity (50 questions)

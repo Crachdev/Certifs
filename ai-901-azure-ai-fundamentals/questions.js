@@ -1,7 +1,66 @@
-// AI-901 : Azure AI Fundamentals
+// AI-901 : Azure AI Fundamentals (version 2025+, Azure AI Foundry)
 // 7 jours × 5 modules × 10 questions = 350 questions
 // Source : documentation officielle Microsoft (learn.microsoft.com)
 // Toutes les questions sont originales
+
+window.QKEY = window.QKEY || "ai901.v1";
+
+// ── Métadonnées examen ──────────────────────────────────────────────────────
+window.QUIZ_META={
+  exam:"Microsoft Azure AI Fundamentals AI-900 (volet Foundry/GenAI)",
+  rules:[
+    ["60 q · 45 min","format QCM et drag-and-drop"],
+    ["700 / 1000","score de réussite"],
+    ["0 pénalité","ne jamais laisser vide"],
+    ["D4 › D2 › D5 › D1 › D3","26 · 22 · 20 · 18 · 14 %"]
+  ]
+};
+
+// ── Plan de révision 7 jours ────────────────────────────────────────────────
+window.QUIZ_PLAN=[
+ {d:1,theme:"Charges de travail IA et IA générative",dom:["D1 · 18 %","D2 · 22 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Types de charges de travail IA : vision, NLP, génératif, agentique","IA générative : LLM, tokenisation, embeddings, génération de texte/images","Capacités multimodales et IA agentique"],
+  links:[["Charges de travail IA — Microsoft Learn","https://learn.microsoft.com/fr-fr/training/modules/get-started-ai-fundamentals/"],
+         ["Introduction à l'IA générative","https://learn.microsoft.com/fr-fr/training/modules/fundamentals-generative-ai/"],
+         ["Azure AI Foundry","https://learn.microsoft.com/fr-fr/azure/ai-foundry/what-is-ai-foundry"]],
+  focus:["Différencier IA discriminative (classification) vs générative (création)","LLM : tokenisation → embeddings → génération token par token","Agentique = LLM + outils + mémoire + planification"]},
+ {d:2,theme:"Azure AI Foundry, Prompt Engineering et modèles",dom:["D2 · 22 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Azure AI Foundry : portail, hubs, projets et catalogue de modèles","Prompt Engineering : zero-shot, few-shot, chain-of-thought, system prompt","Agents dans Azure AI Foundry : tools, function calling"],
+  links:[["Azure AI Foundry — Documentation","https://learn.microsoft.com/fr-fr/azure/ai-foundry/"],
+         ["Prompt Engineering","https://learn.microsoft.com/fr-fr/azure/ai-services/openai/concepts/prompt-engineering"],
+         ["Azure AI Foundry Agents","https://learn.microsoft.com/fr-fr/azure/ai-foundry/agents/overview"]],
+  focus:["Hub = ressource partagée (connexions, compute) ; Projet = espace de travail","System prompt = personnalité + contraintes du modèle","Function calling : le modèle choisit quand appeler une API externe"]},
+ {d:3,theme:"Traitement de contenu multimodal et Document Intelligence",dom:["D3 · 14 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Azure AI Content Understanding : analyse vidéo, audio, documents","Azure Document Intelligence : extraction de formulaires, OCR structuré","Génération d'images avec DALL-E 3 et GPT-4o multimodal"],
+  links:[["Azure AI Document Intelligence","https://learn.microsoft.com/fr-fr/azure/ai-services/document-intelligence/overview"],
+         ["Azure AI Content Understanding","https://learn.microsoft.com/fr-fr/azure/ai-services/content-understanding/overview"],
+         ["Azure OpenAI DALL-E","https://learn.microsoft.com/fr-fr/azure/ai-services/openai/dall-e-quickstart"]],
+  focus:["Document Intelligence = OCR + extraction champs structurés (formulaires, factures)","Content Understanding = analyse vidéo/audio segment par segment","DALL-E 3 intégré à Azure OpenAI : prompt image → génération"]},
+ {d:4,theme:"IA Responsable et sécurité du contenu",dom:["D4 · 26 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["6 principes IA responsable Microsoft","Azure AI Content Safety : catégories, seuils, filtres","Gouvernance IA : évaluation, métriques de sécurité, red-teaming"],
+  links:[["IA Responsable Microsoft","https://learn.microsoft.com/fr-fr/azure/machine-learning/concept-responsible-ai"],
+         ["Azure AI Content Safety","https://learn.microsoft.com/fr-fr/azure/ai-services/content-safety/overview"],
+         ["Évaluation des modèles dans Foundry","https://learn.microsoft.com/fr-fr/azure/ai-foundry/how-to/evaluate-generative-ai-app"]],
+  focus:["6 principes : équité, fiabilité, confidentialité, inclusion, transparence, responsabilité","Content Safety : hate, violence, self-harm, sexual (4 catégories, niveaux 0-6)","Groundedness = réponse ancrée dans le contexte fourni, pas hallucinée"]},
+ {d:5,theme:"Déploiement, paramètres des modèles et Azure AI Search",dom:["D5 · 20 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Déploiement de modèles : serverless (pay-per-token) vs provisioned","Paramètres de génération : température, top_p, max_tokens, stop sequences","Azure AI Search : index vectoriel, RAG avec Foundry"],
+  links:[["Déploiements dans Azure AI Foundry","https://learn.microsoft.com/fr-fr/azure/ai-foundry/how-to/deploy-models-overview"],
+         ["Paramètres de complétion — Azure OpenAI","https://learn.microsoft.com/fr-fr/azure/ai-services/openai/reference"],
+         ["Azure AI Search","https://learn.microsoft.com/fr-fr/azure/search/search-what-is-azure-search"]],
+  focus:["Température élevée = plus créatif/aléatoire ; faible = déterministe","Serverless = idéal POC, facturation à l'appel ; provisioned = volume prévisible","RAG : index vectoriel (embeddings) + recherche sémantique → contexte injecté"]},
+ {d:6,theme:"Intégration, orchestration et MLOps IA",dom:["D2 · 22 %","D5 · 20 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  read:["Orchestration multi-agents : Semantic Kernel, LangChain sur Azure","Sécurité réseau : Private Endpoint, VNET pour AI Foundry","Azure AI Foundry avancé : évaluations, traces, monitoring"],
+  links:[["Semantic Kernel","https://learn.microsoft.com/fr-fr/semantic-kernel/overview/"],
+         ["Sécurité réseau Azure AI","https://learn.microsoft.com/fr-fr/azure/ai-foundry/how-to/configure-private-link"],
+         ["Tracing dans Azure AI Foundry","https://learn.microsoft.com/fr-fr/azure/ai-foundry/how-to/develop/trace-local-sdk"]],
+  focus:["Semantic Kernel : framework orchestration IA (plugins, planification automatique)","Private Endpoint : trafic AI Foundry dans le réseau privé, pas sur internet","Traces : débogage des chaînes d'appels LLM (inputs/outputs intermédiaires)"]},
+ {d:7,theme:"Révision finale et examen blanc",dom:["D1","D2","D3","D4","D5","pondéré"],time:"45 min chrono + 1 h révision",
+  read:["Révision : tableau Azure AI Foundry vs AI Services vs Azure ML","Révision : pièges classiques volet GenAI/Foundry"],
+  links:[["Examen AI-900 — Page officielle","https://learn.microsoft.com/fr-fr/credentials/certifications/exams/ai-900/"],
+         ["Azure AI Foundry — Vue d'ensemble","https://learn.microsoft.com/fr-fr/azure/ai-foundry/what-is-ai-foundry"]],
+  focus:["AI Foundry = plateforme de développement IA GenAI (hubs, projets, catalogue)","Content Safety dans TOUS les déploiements responsables","Évaluation = groundedness, coherence, relevance, fluency"],
+  extra:"Objectif : 80 % ou plus avant de passer l'examen.",timed:true}
+];
 
 window.QDATA = window.QDATA || {};
 
