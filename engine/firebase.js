@@ -69,17 +69,19 @@
   }
 
   // ── logError ─────────────────────────────────────────────────────────────
-  window.logError = function (cert, day, idx, theme, question) {
+  window.logError = function (cert, day, idx, theme, question, pseudo) {
     whenReady(async () => {
       if (!_db) return;
       const id = docId(cert, day, idx);
       const ref = _db.collection("errors").doc(id);
       try {
         const snap = await ref.get();
+        const userField = pseudo ? { user: String(pseudo).slice(0, 30) } : {};
         if (snap.exists) {
           await ref.update({
             attempts:  firebase.firestore.FieldValue.increment(1),
-            lastFail:  firebase.firestore.FieldValue.serverTimestamp()
+            lastFail:  firebase.firestore.FieldValue.serverTimestamp(),
+            ...userField
           });
         } else {
           await ref.set({
@@ -90,7 +92,8 @@
             lastFail:  firebase.firestore.FieldValue.serverTimestamp(),
             firstFail: firebase.firestore.FieldValue.serverTimestamp(),
             successes: 0,
-            lastPass:  null
+            lastPass:  null,
+            ...userField
           });
         }
       } catch (e) {
@@ -100,7 +103,7 @@
   };
 
   // ── logSuccess ───────────────────────────────────────────────────────────
-  window.logSuccess = function (cert, day, idx) {
+  window.logSuccess = function (cert, day, idx, pseudo) {
     whenReady(async () => {
       if (!_db) return;
       const id = docId(cert, day, idx);
@@ -108,9 +111,11 @@
       try {
         const snap = await ref.get();
         if (!snap.exists) return;
+        const userField = pseudo ? { user: String(pseudo).slice(0, 30) } : {};
         await ref.update({
           successes: firebase.firestore.FieldValue.increment(1),
-          lastPass:  firebase.firestore.FieldValue.serverTimestamp()
+          lastPass:  firebase.firestore.FieldValue.serverTimestamp(),
+          ...userField
         });
       } catch (e) {
         console.warn("[certifs] logSuccess échoué :", e.message);

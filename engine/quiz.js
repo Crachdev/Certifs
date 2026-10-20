@@ -41,10 +41,36 @@ const MOD_SIZE=10; // questions par module
 const MODS_PER_DAY=5; // 5 modules × 10 q = 50 q/jour
 
 const KEY=window.QKEY||"clf7.v2";
+const PSEUDO_KEY="certifs.pseudo"; // clé stable partagée entre toutes les certifications
 let store={};
 try{store=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){store={}}
 store.r=store.r||{}; // results: "day-idx" -> 1 correct / 0 wrong
 store.free=store.free||{}; // free training config persistence
+
+// Pseudo : chargé depuis la clé partagée ou depuis store (rétrocompat)
+function getPseudo(){try{return localStorage.getItem(PSEUDO_KEY)||""}catch(e){return""}}
+function setPseudo(p){try{localStorage.setItem(PSEUDO_KEY,p)}catch(e){}}
+
+/* ── SVG cercle de progression ─────────────────────────────
+   pct : 0–100   size : taille px (défaut 52)
+   color : CSS var string ex: "var(--ok)"                    */
+function svgCircle(pct,size,color){
+  size=size||52;
+  const r=size/2-4,c=size/2;
+  const circ=2*Math.PI*r;
+  const dash=Math.max(0,Math.min(pct,100))/100*circ;
+  const col=pct>=80?"var(--ok)":pct>=50?"var(--accent)":"var(--ko)";
+  const trackCol="var(--line)";
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block;flex-shrink:0" aria-hidden="true">
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${trackCol}" stroke-width="4"/>
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color||col}" stroke-width="4"
+      stroke-dasharray="${dash.toFixed(2)} ${circ.toFixed(2)}"
+      stroke-linecap="round"
+      transform="rotate(-90 ${c} ${c})"/>
+    <text x="${c}" y="${c}" text-anchor="middle" dominant-baseline="central"
+      style="font-size:${size<48?".65rem":".7rem"};font-family:var(--f-ui);fill:var(--fg);font-weight:600">${pct}%</text>
+  </svg>`;
+}
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
 const Q=(d,i)=>window.QDATA[d][i];
@@ -68,11 +94,58 @@ function header(){
   document.getElementById("sRate").textContent=keys.length?Math.round(ok/keys.length*100)+" %":"–";
   const n=errors().length,b=document.getElementById("errBadge");
   b.hidden=!n;b.textContent=n;
+  // Afficher le pseudo dans l'en-tête si disponible
+  const pseudo=getPseudo();
+  const pEl=document.getElementById("userPseudo");
+  if(pEl){pEl.textContent=pseudo||"";pEl.hidden=!pseudo;}
 }
 function dayStats(d){
   const n=window.QDATA[d].length;let done=0,ok=0;
   for(let i=0;i<n;i++){const v=store.r[d+"-"+i];if(v!==undefined){done++;if(v===1)ok++}}
   return{n,done,ok}
+}
+
+/* ── MODAL PSEUDO ──────────────────────────────────────────
+   Affiché une seule fois au premier lancement (pseudo absent).
+   L'utilisateur peut passer ou saisir un prénom.             */
+function showPseudoModal(){
+  if(document.getElementById("pseudoModal"))return; // déjà affiché
+  const modal=document.createElement("div");
+  modal.id="pseudoModal";
+  modal.style.cssText="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px";
+  modal.innerHTML=`<div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+    <h2 style="margin:0 0 6px;font-size:1.15rem">Qui fait ce quiz ?</h2>
+    <p style="margin:0 0 16px;font-size:.88rem;color:var(--muted)">Entre un prénom ou pseudo pour suivre ta progression sur tous tes appareils. Tu peux toujours le modifier dans le pied de page.</p>
+    <input id="pseudoInput" type="text" placeholder="Ton prénom ou pseudo" autocomplete="off" maxlength="30"
+      style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font-size:1rem;font-family:var(--f-body);outline:none;margin-bottom:12px">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button id="pseudoSkip" class="btn ghost" style="padding:8px 14px;font-size:.88rem">Passer</button>
+      <button id="pseudoSave" class="btn" style="padding:8px 16px;font-size:.88rem">Confirmer</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+
+  const input=document.getElementById("pseudoInput");
+  input.focus();
+
+  function savePseudo(){
+    const val=(input.value||"").trim().slice(0,30);
+    if(val){setPseudo(val);}
+    else{setPseudo("Anonyme");}
+    modal.remove();
+    header(); // mettre à jour l'affichage du pseudo
+  }
+  function skipPseudo(){
+    setPseudo("Anonyme");
+    modal.remove();
+    header();
+  }
+
+  document.getElementById("pseudoSave").onclick=savePseudo;
+  document.getElementById("pseudoSkip").onclick=skipPseudo;
+  input.addEventListener("keydown",e=>{if(e.key==="Enter")savePseudo();if(e.key==="Escape")skipPseudo();});
+  // Clic sur le fond ferme aussi
+  modal.addEventListener("click",e=>{if(e.target===modal)skipPseudo();});
 }
 
 let tab="plan",session=null,timerId=null;
@@ -85,6 +158,9 @@ document.getElementById("tabPlan").onclick=()=>setTab("plan");
 document.getElementById("tabQuiz").onclick=()=>setTab("quiz");
 document.getElementById("tabFree").onclick=()=>setTab("free");
 document.getElementById("tabErr").onclick=()=>setTab("err");
+
+// Demander le pseudo au premier lancement (léger délai pour le rendu initial)
+if(!getPseudo()){setTimeout(showPseudoModal,400);}
 
 function render(){
   header();
@@ -128,12 +204,13 @@ function planHTML(){
       <div><h3>À retenir</h3><ul>${p.focus.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div></div>
       ${p.extra?`<div style="font-size:.88rem"><b>+</b> ${esc(p.extra)}</div>`:""}
       <div class="dayfoot">
-        <div class="prog"><div class="moddots">${dots}</div><div class="bar" style="max-width:160px"><i style="width:${pct}%"></i></div><span class="num" style="font-size:.8rem">${s.done}/${s.n}${s.done?` · ${Math.round(s.ok/s.done*100)} %`:""}</span></div>
+        <div class="prog"><div class="moddots">${dots}</div>${svgCircle(pct,52)}<span class="num" style="font-size:.8rem;margin-left:6px">${s.done}/${s.n}${s.done?` · ${Math.round(s.ok/s.done*100)} %`:""}</span></div>
         <div class="row" style="gap:6px">${modBtns}<button class="btn ghost" data-start="${p.d}" style="padding:6px 10px;font-size:.82rem">Tout J${p.d}</button></div>
       </div>
     </div></li>`;
   }).join("")}</ol>
-  <p class="note">Ta progression est enregistrée dans ce navigateur uniquement. Les questions sont originales, écrites à partir du guide d'examen officiel CLF-C02 ; elles ne reproduisent pas de questions d'examen réelles.</p>`;
+  <p class="note">Ta progression est enregistrée dans ce navigateur uniquement. Les questions sont originales, écrites à partir du guide d'examen officiel CLF-C02 ; elles ne reproduisent pas de questions d'examen réelles.</p>
+  <p class="note" style="margin-top:6px">Connecté en tant que : <b id="pseudoDisplay" style="color:var(--accent)">${esc(getPseudo()||"Anonyme")}</b> — <button id="changePseudo" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:inherit;padding:0;text-decoration:underline">Changer</button></p>`;
 }
 
 /* ── QUIZ PICK ─────────────────────────────────────────── */
@@ -329,7 +406,7 @@ function qHTML(){
   const liveBadge=session.isLive?`<span class="chip" style="background:var(--ok-soft);color:var(--ok);font-size:.7rem">Session libre</span>`:"";
   return `<div class="qhead">${liveBadge}<span class="eyebrow">${esc(session.label)} · ${esc(q.t)}</span>
     <span class="num" style="font-size:.85rem;color:var(--muted)">${session.idx+1} / ${session.items.length} · ${session.score} juste${session.score>1?"s":""}${session.end?` · <span id="timer" class="timer">${fmt(session.end-Date.now())}</span>`:""}</span></div>
-  <div class="bar" style="max-width:none;margin-bottom:14px"><i style="width:${session.idx/session.items.length*100}%"></i></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">${svgCircle(Math.round(session.idx/session.items.length*100),40,"var(--accent)")}<div class="bar" style="flex:1;margin:0"><i style="width:${session.idx/session.items.length*100}%"></i></div></div>
   <div class="qcard"><p class="qtext">${esc(q.q.replace(/ \(2 réponses\)/,""))}</p>${multi?`<div class="multi">Choisis ${need} réponses</div>`:""}
   <div class="opts">${opts}</div>
   ${session.checked?`<div class="verdict ${ok?"ok":"ko"}">${ok?"Bonne réponse.":"Raté. Relis l'explication de chaque option."}</div>`:""}
@@ -393,10 +470,11 @@ function bind(){
       const wasWrong=store.r[it.d+"-"+it.i]===0;
       store.r[it.d+"-"+it.i]=ok?1:0;save();
       // Firebase tracking (multi-appareils)
+      const pseudo=getPseudo();
       if(!ok && typeof window.logError==="function"){
-        window.logError(KEY,it.d,it.i,q.t,q.q);
+        window.logError(KEY,it.d,it.i,q.t,q.q,pseudo);
       } else if(ok && wasWrong && typeof window.logSuccess==="function"){
-        window.logSuccess(KEY,it.d,it.i);
+        window.logSuccess(KEY,it.d,it.i,pseudo);
       }
     }
     render();
@@ -413,6 +491,13 @@ function bind(){
   if(qt)qt.onclick=()=>{session.done=true;clearInterval(timerId);render()};
   // Home
   document.querySelectorAll("[data-home]").forEach(h=>h.onclick=()=>{session=null;setTab("plan")});
+  // Changer de pseudo
+  const cp=document.getElementById("changePseudo");
+  if(cp)cp.onclick=()=>{
+    const cur=getPseudo();
+    const nv=(prompt("Entrez votre prénom ou pseudo :",cur)||"").trim().slice(0,30);
+    if(nv){setPseudo(nv);render();}
+  };
   // Back to free config
   const bf=document.querySelector("[data-backfree]");
   if(bf)bf.onclick=()=>{session=null;setTab("free")};
