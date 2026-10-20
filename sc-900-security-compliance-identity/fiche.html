@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fiche SC-900</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{--paper:#f4f6f8;--sheet:#fff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;--accent:#1a5c9a;--accent-soft:#ddeeff;--ok:#1d7a4f;--ok-soft:#e3f3ea;--warn:#8a5a00;--warn-soft:#fef3d0;--f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--f-body:"Public Sans","Segoe UI",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0b0f14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#60aaee;--accent-soft:#0a1e33;--ok:#5ccf95;--ok-soft:#163327;--warn:#f5c843;--warn-soft:#2a2005;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0b0f14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#60aaee;--accent-soft:#0a1e33;--ok:#5ccf95;--ok-soft:#163327;--warn:#f5c843;--warn-soft:#2a2005;color-scheme:dark}
+*{box-sizing:border-box}body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--sheet);border-right:1px solid var(--line);padding:20px 0}
+.sidebar-head{padding:0 16px 12px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.sidebar-head .cert{font:500 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.sidebar-head .title{font:700 .95rem var(--f-display);margin-top:2px}
+.toc{list-style:none;margin:0;padding:0}
+.toc a{display:block;padding:6px 16px;font-size:.82rem;color:var(--muted);text-decoration:none;border-left:2px solid transparent;transition:color .15s,border-color .15s;line-height:1.3}
+.toc a:hover,.toc a.active{color:var(--ink);border-left-color:var(--accent)}
+.toc a.active{color:var(--accent);font-weight:600}
+main{padding:32px 40px 80px;max-width:860px}
+h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.2}
+h2{font-size:1.4rem;font-weight:700}h3{font-size:1.05rem;font-weight:600}
+section{scroll-margin-top:24px;margin-bottom:48px}
+.section-header{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--line)}
+.section-num{font:700 .72rem var(--f-mono);letter-spacing:.08em;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px}
+.hero{background:linear-gradient(135deg,#1a5c9a 0%,#0d3870 100%);color:#fff;padding:40px;border-radius:16px;margin-bottom:40px}
+.hero .cert-label{font:500 .72rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.hero h1{font-size:2rem;margin:8px 0 4px}
+.hero .sub{opacity:.85;font-size:.95rem}
+.hero-meta{display:flex;flex-wrap:wrap;gap:16px;margin-top:20px}
+.hero-meta div{background:rgba(255,255,255,.12);padding:8px 14px;border-radius:8px}
+.hero-meta b{display:block;font:700 1.1rem var(--f-mono)}
+.hero-meta span{font-size:.72rem;opacity:.8;text-transform:uppercase;letter-spacing:.05em}
+.back-link{color:rgba(255,255,255,.75);font-size:.82rem;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:12px}
+.back-link:hover{color:#fff}
+.exam-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:32px}
+.exam-cell{background:var(--sheet);padding:14px 16px}
+.exam-cell .pct{font:700 1.6rem var(--f-display);color:var(--accent)}
+.exam-cell .dom{font-size:.82rem;color:var(--muted);margin-top:2px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.card h3{font-size:.9rem;margin-bottom:8px}
+.card ul{margin:0;padding-left:1.1em}.card li{margin:3px 0;font-size:.88rem}
+.check-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.check-list li{display:flex;gap:8px;align-items:flex-start;font-size:.9rem}
+.check-list li::before{content:"✓";color:var(--ok);font-weight:700;flex-shrink:0;margin-top:1px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tag{font:500 .72rem var(--f-mono);padding:3px 9px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.callout{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0;padding:12px 14px;margin:12px 0;font-size:.9rem}
+.callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+.kv{display:grid;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.kv-row{display:grid;grid-template-columns:200px 1fr;border-bottom:1px solid var(--line)}
+.kv-row:last-child{border-bottom:0}
+.kv-row dt,.kv-row dd{margin:0;padding:9px 12px;font-size:.88rem}
+.kv-row dt{background:var(--paper);font-weight:600;border-right:1px solid var(--line)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.compare-box{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px}
+.compare-box h3{font-size:.85rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.compare-box ul{margin:0;padding-left:1.1em}.compare-box li{margin:4px 0;font-size:.88rem}
+.table-wrap{overflow-x:auto;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{background:var(--paper);font-weight:600;text-align:left;padding:8px 12px;border-bottom:2px solid var(--line)}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.domain-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:6px;padding:4px 10px;font-size:.8rem;color:var(--accent);font-weight:600;margin-bottom:12px}
+footer{border-top:1px solid var(--line);padding:24px 40px;font-size:.8rem;color:var(--muted);background:var(--sheet)}
+footer a{color:var(--accent);text-decoration:none}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.sidebar{display:none}main{padding:20px 16px 60px}.compare{grid-template-columns:1fr}.exam-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.hero{padding:24px}.hero h1{font-size:1.5rem}.exam-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-head">
+    <div class="cert">SC-900</div>
+    <div class="title">Security, Compliance &amp; Identity</div>
+  </div>
+  <ul class="toc">
+    <li><a href="#s1">1. Concepts de sécurité</a></li>
+    <li><a href="#s2">2. Identité &amp; accès</a></li>
+    <li><a href="#s3">3. Microsoft Entra ID</a></li>
+    <li><a href="#s4">4. Entra — Authentification</a></li>
+    <li><a href="#s5">5. Entra — Gouvernance</a></li>
+    <li><a href="#s6">6. Microsoft Defender</a></li>
+    <li><a href="#s7">7. Sentinel &amp; SIEM</a></li>
+    <li><a href="#s8">8. Protection données</a></li>
+    <li><a href="#s9">9. Microsoft Purview</a></li>
+    <li><a href="#s10">10. Conformité &amp; normes</a></li>
+    <li><a href="#s11">11. Service Trust Portal</a></li>
+    <li><a href="#s12">12. Pièges fréquents</a></li>
+  </ul>
+</aside>
+<div>
+<main>
+<div class="hero">
+  <a href="../sc-900-security-compliance-identity/index.html" class="back-link">← Retour au quiz</a>
+  <div class="cert-label">Microsoft Security · SC-900</div>
+  <h1>Security, Compliance &amp; Identity</h1>
+  <div class="sub">Fiche de révision complète — 7 jours · 350 questions</div>
+  <div class="hero-meta">
+    <div><b>700</b><span>Score requis</span></div>
+    <div><b>60 min</b><span>Durée exam</span></div>
+    <div><b>40–60</b><span>Questions</span></div>
+    <div><b>4 domaines</b><span>Compétences</span></div>
+  </div>
+</div>
+
+<div class="exam-grid">
+  <div class="exam-cell"><div class="pct">10–15%</div><div class="dom">Concepts de sécurité, conformité et identité</div></div>
+  <div class="exam-cell"><div class="pct">25–30%</div><div class="dom">Capacités Microsoft Entra</div></div>
+  <div class="exam-cell"><div class="pct">35–40%</div><div class="dom">Solutions de sécurité Microsoft</div></div>
+  <div class="exam-cell"><div class="pct">20–25%</div><div class="dom">Solutions de conformité Microsoft</div></div>
+</div>
+
+<section id="s1">
+<div class="section-header"><span class="section-num">01</span><h2>Concepts de sécurité</h2></div>
+<div class="domain-badge">Domaine 1 · 10–15%</div>
+
+<div class="compare">
+  <div class="compare-box">
+    <h3>Triade CIA</h3>
+    <ul>
+      <li><strong>Confidentialité</strong> — seules les personnes autorisées accèdent aux données</li>
+      <li><strong>Intégrité</strong> — données exactes et non altérées</li>
+      <li><strong>Disponibilité</strong> — systèmes accessibles quand nécessaire</li>
+    </ul>
+  </div>
+  <div class="compare-box">
+    <h3>Modèles de sécurité</h3>
+    <ul>
+      <li><strong>Zero Trust</strong> — ne jamais faire confiance, toujours vérifier</li>
+      <li><strong>Défense en profondeur</strong> — couches de sécurité multiples</li>
+      <li><strong>Moindre privilège</strong> — accès minimum nécessaire</li>
+    </ul>
+  </div>
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Authentification (AuthN)</dt><dd>Prouver <em>qui vous êtes</em> — vérification d'identité</dd></div>
+  <div class="kv-row"><dt>Autorisation (AuthZ)</dt><dd>Prouver <em>ce que vous pouvez faire</em> — vérification des droits</dd></div>
+  <div class="kv-row"><dt>Chiffrement symétrique</dt><dd>Même clé pour chiffrer/déchiffrer — rapide (AES)</dd></div>
+  <div class="kv-row"><dt>Chiffrement asymétrique</dt><dd>Clé publique/privée — sécurisé (RSA, TLS)</dd></div>
+  <div class="kv-row"><dt>Hachage</dt><dd>Fonction unidirectionnelle — intégrité des données (SHA-256)</dd></div>
+</div>
+
+<div class="cards">
+  <div class="card"><h3>Zero Trust — Piliers</h3><ul><li>Vérifier explicitement (toujours)</li><li>Moindre privilège</li><li>Supposer une violation</li></ul></div>
+  <div class="card"><h3>Types de menaces</h3><ul><li>Phishing / Spear phishing</li><li>Ransomware / Malware</li><li>Attaque DDoS</li><li>Insider threat</li></ul></div>
+  <div class="card"><h3>SIEM / SOAR</h3><ul><li>SIEM = collecte + analyse logs</li><li>SOAR = automatisation réponse</li><li>XDR = détection étendue</li></ul></div>
+</div>
+</section>
+
+<section id="s2">
+<div class="section-header"><span class="section-num">02</span><h2>Identité et gestion des accès</h2></div>
+<div class="domain-badge">Domaine 2 · 25–30%</div>
+
+<div class="callout">
+<strong>L'identité est le nouveau périmètre de sécurité</strong> dans le cloud. Avec le modèle Zero Trust, l'identité vérifiée remplace le périmètre réseau traditionnel.
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Identité fédérée</dt><dd>SSO entre organisations — trust entre fournisseurs d'identité (ex : SAML, OIDC)</dd></div>
+  <div class="kv-row"><dt>MFA (Authentification multifacteur)</dt><dd>Quelque chose que vous savez + avez + êtes</dd></div>
+  <div class="kv-row"><dt>SSO (Single Sign-On)</dt><dd>Une seule connexion pour plusieurs applications</dd></div>
+  <div class="kv-row"><dt>Passwordless</dt><dd>Windows Hello, FIDO2, Microsoft Authenticator (sans mot de passe)</dd></div>
+  <div class="kv-row"><dt>Conditional Access</dt><dd>Politiques : si (user+device+location) alors (allow/block/MFA)</dd></div>
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Type</th><th>Description</th><th>Exemple</th></tr></thead>
+  <tbody>
+    <tr><td>Facteur de connaissance</td><td>Ce que vous savez</td><td>Mot de passe, PIN</td></tr>
+    <tr><td>Facteur de possession</td><td>Ce que vous avez</td><td>Téléphone, clé FIDO2</td></tr>
+    <tr><td>Facteur d'inhérence</td><td>Ce que vous êtes</td><td>Empreinte, Face ID</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<section id="s3">
+<div class="section-header"><span class="section-num">03</span><h2>Microsoft Entra ID</h2></div>
+<div class="domain-badge">Domaine 2 · 25–30%</div>
+
+<p>Microsoft Entra ID (anciennement Azure Active Directory) est le service cloud d'identité et d'accès de Microsoft.</p>
+
+<div class="kv">
+  <div class="kv-row"><dt>Tenant (Locataire)</dt><dd>Instance dédiée Entra ID pour une organisation</dd></div>
+  <div class="kv-row"><dt>Objets Entra</dt><dd>Users, Groupes, Devices, Applications, Service Principals</dd></div>
+  <div class="kv-row"><dt>Editions</dt><dd>Free · P1 (Conditional Access) · P2 (PIM, Identity Protection)</dd></div>
+  <div class="kv-row"><dt>Hybrid Identity</dt><dd>Entra Connect synchronise AD on-prem → Entra ID cloud</dd></div>
+  <div class="kv-row"><dt>External Identities</dt><dd>B2B (partenaires) + B2C (clients) dans Entra</dd></div>
+  <div class="kv-row"><dt>RBAC</dt><dd>Role-Based Access Control — rôles intégrés Azure (Owner, Contributor, Reader)</dd></div>
+</div>
+
+<div class="compare">
+  <div class="compare-box">
+    <h3>Active Directory (on-prem)</h3>
+    <ul>
+      <li>Domaine Windows local</li>
+      <li>Protocoles : Kerberos, LDAP</li>
+      <li>GPO, OU, Domain Controllers</li>
+      <li>Géré par l'entreprise</li>
+    </ul>
+  </div>
+  <div class="compare-box">
+    <h3>Entra ID (cloud)</h3>
+    <ul>
+      <li>Service cloud Microsoft</li>
+      <li>Protocoles : OAuth 2.0, OIDC, SAML</li>
+      <li>Conditional Access, PIM, MFA</li>
+      <li>Géré par Microsoft (SaaS)</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="s4">
+<div class="section-header"><span class="section-num">04</span><h2>Authentification Entra</h2></div>
+
+<div class="cards">
+  <div class="card"><h3>Conditional Access</h3><ul><li>Signal : user, device, location, app, risk</li><li>Décision : allow, block, require MFA</li><li>Requiert Entra P1 minimum</li></ul></div>
+  <div class="card"><h3>Identity Protection</h3><ul><li>Risk policies (sign-in risk, user risk)</li><li>Détection d'anomalies automatique</li><li>Requiert Entra P2</li></ul></div>
+  <div class="card"><h3>PIM (Privileged Identity Management)</h3><ul><li>Accès privilégiés juste-à-temps (JIT)</li><li>Activation temporaire de rôles</li><li>Requiert Entra P2</li></ul></div>
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt>SSPR (Self-Service Password Reset)</dt><dd>Réinitialisation autonome sans IT — inclut Entra P1/P2</dd></div>
+  <div class="kv-row"><dt>Microsoft Authenticator</dt><dd>MFA push, TOTP, passwordless — app mobile Microsoft</dd></div>
+  <div class="kv-row"><dt>FIDO2</dt><dd>Clés de sécurité physiques (YubiKey) — plus haut niveau de sécurité passwordless</dd></div>
+  <div class="kv-row"><dt>Windows Hello for Business</dt><dd>Biométrie/PIN lié au device pour remplacer le mot de passe</dd></div>
+</div>
+</section>
+
+<section id="s5">
+<div class="section-header"><span class="section-num">05</span><h2>Gouvernance des identités</h2></div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Access Reviews</dt><dd>Révisions périodiques des accès — qui doit encore avoir accès ?</dd></div>
+  <div class="kv-row"><dt>Entitlement Management</dt><dd>Packages d'accès — demande, approbation, expiration automatique</dd></div>
+  <div class="kv-row"><dt>Lifecycle Workflows</dt><dd>Automatise onboarding/offboarding des employés</dd></div>
+  <div class="kv-row"><dt>Terms of Use</dt><dd>Conditions d'utilisation acceptées avant accès à une app</dd></div>
+</div>
+
+<div class="callout ok">
+<strong>PIM en pratique :</strong> Un admin active son rôle Global Admin pour 2h → effectue la tâche → le rôle expire automatiquement. Tout est audité. Réduit la surface d'attaque permanente.
+</div>
+
+<div class="cards">
+  <div class="card"><h3>Entra Permissions Management</h3><ul><li>CIEM : Cloud Infrastructure Entitlement</li><li>Détecte sur-provisionnement AWS/Azure/GCP</li><li>Rightsizing des permissions</li></ul></div>
+  <div class="card"><h3>Entra Verified ID</h3><ul><li>Identité décentralisée (DID)</li><li>Credentials vérifiables W3C</li><li>Contrôle utilisateur de ses données</li></ul></div>
+</div>
+</section>
+
+<section id="s6">
+<div class="section-header"><span class="section-num">06</span><h2>Microsoft Defender</h2></div>
+<div class="domain-badge">Domaine 3 · 35–40%</div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Produit</th><th>Protège</th><th>Usage principal</th></tr></thead>
+  <tbody>
+    <tr><td>Defender for Endpoint</td><td>Postes / Serveurs</td><td>EDR, détection menaces avancées</td></tr>
+    <tr><td>Defender for Identity</td><td>Active Directory on-prem</td><td>Détecte attaques AD (Pass-the-Hash…)</td></tr>
+    <tr><td>Defender for Office 365</td><td>Email / Collaboration</td><td>Anti-phishing, Safe Links, Safe Attachments</td></tr>
+    <tr><td>Defender for Cloud Apps</td><td>SaaS / Shadow IT</td><td>CASB — visibilité + contrôle apps cloud</td></tr>
+    <tr><td>Defender for Cloud</td><td>Azure / Multi-cloud</td><td>CSPM + CWPP, score sécurité</td></tr>
+    <tr><td>Defender XDR</td><td>Cross-produits</td><td>Corrélation incidentes, investigation unifiée</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout">
+<strong>Microsoft Defender XDR :</strong> Corrèle automatiquement les alertes de Defender Endpoint + Identity + Office 365 + Cloud Apps en un seul incident. Réduit le bruit et accélère la réponse.
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Secure Score (Defender for Cloud)</dt><dd>% de recommandations de sécurité implémentées — plus c'est haut, mieux c'est</dd></div>
+  <div class="kv-row"><dt>CSPM</dt><dd>Cloud Security Posture Management — évalue la configuration sécurité</dd></div>
+  <div class="kv-row"><dt>CWPP</dt><dd>Cloud Workload Protection Platform — protège VMs, containers, serverless</dd></div>
+  <div class="kv-row"><dt>CASB</dt><dd>Cloud Access Security Broker — Defender for Cloud Apps surveille les SaaS</dd></div>
+</div>
+</section>
+
+<section id="s7">
+<div class="section-header"><span class="section-num">07</span><h2>Microsoft Sentinel — SIEM &amp; SOAR</h2></div>
+<div class="domain-badge">Domaine 3 · 35–40%</div>
+
+<p>Microsoft Sentinel est un SIEM cloud-natif et une plateforme SOAR basée sur Azure Log Analytics.</p>
+
+<div class="cards">
+  <div class="card"><h3>Collecte de données</h3><ul><li>Connecteurs natifs Microsoft</li><li>Connecteurs partenaires (CEF/Syslog)</li><li>API REST custom</li><li>Azure Monitor / Log Analytics</li></ul></div>
+  <div class="card"><h3>Détection</h3><ul><li>Règles analytiques (KQL)</li><li>Threat Intelligence intégrée</li><li>Anomalies comportementales (UEBA)</li><li>Fusion ML pour incidents complexes</li></ul></div>
+  <div class="card"><h3>Réponse (SOAR)</h3><ul><li>Playbooks = Azure Logic Apps</li><li>Automatisation des réponses</li><li>Tickets, notifications, blocage IP</li><li>Orchestration multi-outils</li></ul></div>
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Workbooks</dt><dd>Tableaux de bord visuels interactifs pour les données Sentinel</dd></div>
+  <div class="kv-row"><dt>KQL (Kusto Query Language)</dt><dd>Langage de requête pour analyser les logs dans Sentinel / Log Analytics</dd></div>
+  <div class="kv-row"><dt>UEBA</dt><dd>User Entity Behavioral Analytics — détecte comportements anormaux</dd></div>
+  <div class="kv-row"><dt>Threat Intelligence</dt><dd>IOCs, feeds TAXII/STIX intégrés pour enrichir les alertes</dd></div>
+</div>
+</section>
+
+<section id="s8">
+<div class="section-header"><span class="section-num">08</span><h2>Protection des données</h2></div>
+<div class="domain-badge">Domaine 4 · 20–25%</div>
+
+<div class="compare">
+  <div class="compare-box">
+    <h3>Chiffrement au repos</h3>
+    <ul>
+      <li>Azure Storage Service Encryption</li>
+      <li>Transparent Data Encryption (SQL)</li>
+      <li>Disk Encryption (BitLocker/DM-Crypt)</li>
+      <li>Clés gérées Microsoft ou client (CMK)</li>
+    </ul>
+  </div>
+  <div class="compare-box">
+    <h3>Chiffrement en transit</h3>
+    <ul>
+      <li>TLS 1.2+ pour toutes les communications</li>
+      <li>HTTPS obligatoire</li>
+      <li>VPN / ExpressRoute</li>
+      <li>Perfect Forward Secrecy</li>
+    </ul>
+  </div>
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Azure Key Vault</dt><dd>Stockage sécurisé de secrets, clés, certificats. HSM disponible.</dd></div>
+  <div class="kv-row"><dt>Customer-Managed Keys (CMK)</dt><dd>L'organisation contrôle ses propres clés de chiffrement dans Key Vault</dd></div>
+  <div class="kv-row"><dt>Double Key Encryption</dt><dd>Microsoft + client key → Microsoft ne peut jamais déchiffrer seul (M365)</dd></div>
+  <div class="kv-row"><dt>Azure Confidential Computing</dt><dd>TEE (Trusted Execution Environment) — données chiffrées même pendant le traitement</dd></div>
+</div>
+</section>
+
+<section id="s9">
+<div class="section-header"><span class="section-num">09</span><h2>Microsoft Purview</h2></div>
+<div class="domain-badge">Domaine 4 · 20–25%</div>
+
+<p>Microsoft Purview est la suite de conformité et gouvernance des données Microsoft (anciennement Microsoft 365 Compliance + Azure Purview).</p>
+
+<div class="kv">
+  <div class="kv-row"><dt>Sensitivity Labels</dt><dd>Étiquettes de classification (Public, Confidential…) — chiffrement + marquage</dd></div>
+  <div class="kv-row"><dt>DLP (Data Loss Prevention)</dt><dd>Empêche partage accidentel de données sensibles (email, Teams, SharePoint)</dd></div>
+  <div class="kv-row"><dt>Information Protection</dt><dd>Classifie, étiquète et protège les données où qu'elles soient</dd></div>
+  <div class="kv-row"><dt>Insider Risk Management</dt><dd>Détecte comportements à risque internes (fuites, fraude)</dd></div>
+  <div class="kv-row"><dt>Communication Compliance</dt><dd>Surveille communications pour violations politiques (financier, harcèlement)</dd></div>
+  <div class="kv-row"><dt>eDiscovery</dt><dd>Recherche légale et collecte de preuves numériques</dd></div>
+  <div class="kv-row"><dt>Audit (Standard &amp; Premium)</dt><dd>Journaux d'audit 90j (standard) ou 1 an (premium) pour investigation</dd></div>
+  <div class="kv-row"><dt>Data Map / Catalog</dt><dd>Inventaire et classification automatique des données multi-cloud</dd></div>
+</div>
+
+<div class="callout">
+<strong>Retention Labels vs Sensitivity Labels :</strong> Retention = contrôle durée de vie (garder/supprimer). Sensitivity = contrôle accès et protection (chiffrement, marquage).
+</div>
+</section>
+
+<section id="s10">
+<div class="section-header"><span class="section-num">10</span><h2>Conformité et normes</h2></div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Norme / Réglementation</th><th>Domaine</th><th>Exige</th></tr></thead>
+  <tbody>
+    <tr><td>RGPD / GDPR</td><td>UE — Protection données personnelles</td><td>Consentement, droits individus, notification violation 72h</td></tr>
+    <tr><td>ISO 27001</td><td>International — SMSI</td><td>Système de management de la sécurité de l'information</td></tr>
+    <tr><td>SOC 1 / SOC 2</td><td>US — Audit financier / sécurité</td><td>Contrôles internes, disponibilité, confidentialité</td></tr>
+    <tr><td>PCI DSS</td><td>Paiement par carte</td><td>Protection des données de carte bancaire</td></tr>
+    <tr><td>HIPAA</td><td>US — Santé</td><td>Protection des données de santé (PHI)</td></tr>
+    <tr><td>NIST CSF</td><td>US — Cybersécurité</td><td>Framework : Identifier, Protéger, Détecter, Répondre, Récupérer</td></tr>
+    <tr><td>CSA STAR</td><td>Cloud Security</td><td>Évaluation sécurité spécifique cloud providers</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout ok">
+<strong>Microsoft Compliance Manager :</strong> Outil dans Purview qui évalue la posture de conformité par rapport aux réglementations (GDPR, ISO…) et donne un score de conformité.
+</div>
+</section>
+
+<section id="s11">
+<div class="section-header"><span class="section-num">11</span><h2>Service Trust Portal</h2></div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Service Trust Portal</dt><dd>trust.microsoft.com — rapports d'audit, certifications, documentation conformité Microsoft</dd></div>
+  <div class="kv-row"><dt>Privacy Center</dt><dd>Engagements de confidentialité Microsoft, RGPD, DPA</dd></div>
+  <div class="kv-row"><dt>Compliance Manager</dt><dd>Dans Purview — score de conformité personnalisé par réglementation</dd></div>
+  <div class="kv-row"><dt>Microsoft Priva</dt><dd>Gestion de la confidentialité et des risques privacy dans M365</dd></div>
+</div>
+
+<div class="cards">
+  <div class="card"><h3>Responsabilité partagée</h3><ul><li>IaaS : Microsoft = infra physique</li><li>PaaS : Microsoft + client partagent</li><li>SaaS : Microsoft gère tout (sauf données)</li><li>On-prem : client responsable de tout</li></ul></div>
+  <div class="card"><h3>Documents disponibles STP</h3><ul><li>Rapports SOC 1/2/3</li><li>Certifications ISO/IEC 27001</li><li>Rapports PCI DSS</li><li>Data Protection Addendum (DPA)</li></ul></div>
+</div>
+</section>
+
+<section id="s12">
+<div class="section-header"><span class="section-num">12</span><h2>Pièges fréquents à l'examen</h2></div>
+
+<div class="callout warn">
+<strong>Entra ID ≠ Active Directory on-prem :</strong> Entra ID = cloud, OAuth/OIDC/SAML. AD = local, Kerberos/LDAP. Entra Connect synchronise entre les deux mais ce sont des services distincts.
+</div>
+
+<div class="check-list">
+  <li>MFA requiert Entra Free, Conditional Access requiert Entra P1 ou P2</li>
+  <li>PIM (juste-à-temps) et Identity Protection requièrent Entra P2</li>
+  <li>Defender for Cloud ≠ Defender XDR — Cloud = posture Azure, XDR = investigation incidents</li>
+  <li>Sentinel = SIEM cloud-natif Microsoft basé sur Azure Log Analytics</li>
+  <li>Playbooks Sentinel = Azure Logic Apps (orchestration no-code)</li>
+  <li>Sensitivity Labels = protection contenu · Retention Labels = durée de vie</li>
+  <li>DLP empêche le partage non autorisé de données sensibles (pas un outil de chiffrement)</li>
+  <li>CASB = Cloud Access Security Broker = Defender for Cloud Apps</li>
+  <li>Zero Trust = "Never trust, always verify" + moindre privilège + supposer violation</li>
+  <li>AuthN = authentification (qui) · AuthZ = autorisation (quoi)</li>
+  <li>Key Vault stocke secrets, clés ET certificats</li>
+  <li>Compliance Manager = score conformité personnalisé · Service Trust Portal = preuves publiques Microsoft</li>
+</div>
+
+<div class="callout ok">
+<strong>Mnémotechnique CIA :</strong> <em>C</em>onfidentialité · <em>I</em>ntégrité · <em>D</em>isponibilité (<em>A</em>vailability). Triade fondamentale de la sécurité de l'information.
+</div>
+</section>
+</main>
+<footer>Fiche de révision SC-900 · Auteur : RB · Repo : <a href="https://github.com/Crachdev/certifs">Crachdev/certifs</a></footer>
+</div>
+</div>
+<script>
+const links = document.querySelectorAll('.toc a');
+const sections = document.querySelectorAll('section[id]');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      links.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector('.toc a[href="#'+e.target.id+'"]');
+      if(a) a.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

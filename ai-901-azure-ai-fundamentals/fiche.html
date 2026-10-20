@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fiche AI-901</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{--paper:#f4f6f8;--sheet:#fff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;--accent:#7b2d8b;--accent-soft:#f3e8ff;--ok:#1d7a4f;--ok-soft:#e3f3ea;--warn:#8a5a00;--warn-soft:#fef3d0;--f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--f-body:"Public Sans","Segoe UI",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0f0a14;--sheet:#1a1025;--ink:#e8e0f0;--muted:#9485a8;--line:#2e2040;--accent:#c084fc;--accent-soft:#1e1030;--ok:#5ccf95;--ok-soft:#163327;--warn:#f5c843;--warn-soft:#2a2005;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0f0a14;--sheet:#1a1025;--ink:#e8e0f0;--muted:#9485a8;--line:#2e2040;--accent:#c084fc;--accent-soft:#1e1030;--ok:#5ccf95;--ok-soft:#163327;--warn:#f5c843;--warn-soft:#2a2005;color-scheme:dark}
+*{box-sizing:border-box}body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--sheet);border-right:1px solid var(--line);padding:20px 0}
+.sidebar-head{padding:0 16px 12px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.sidebar-head .cert{font:500 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.sidebar-head .title{font:700 .95rem var(--f-display);margin-top:2px}
+.toc{list-style:none;margin:0;padding:0}
+.toc a{display:block;padding:6px 16px;font-size:.82rem;color:var(--muted);text-decoration:none;border-left:2px solid transparent;transition:color .15s,border-color .15s;line-height:1.3}
+.toc a:hover,.toc a.active{color:var(--ink);border-left-color:var(--accent)}
+.toc a.active{color:var(--accent);font-weight:600}
+main{padding:32px 40px 80px;max-width:860px}
+h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.2}
+h2{font-size:1.4rem;font-weight:700}h3{font-size:1.05rem;font-weight:600}
+section{scroll-margin-top:24px;margin-bottom:48px}
+.section-header{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--line)}
+.section-num{font:700 .72rem var(--f-mono);letter-spacing:.08em;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px}
+.hero{background:linear-gradient(135deg,var(--accent) 0%,#4a1060 100%);color:#fff;padding:40px;border-radius:16px;margin-bottom:40px}
+.hero .cert-label{font:500 .72rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.hero h1{font-size:2rem;margin:8px 0 4px}
+.hero .sub{opacity:.85;font-size:.95rem}
+.hero-meta{display:flex;flex-wrap:wrap;gap:16px;margin-top:20px}
+.hero-meta div{background:rgba(255,255,255,.12);padding:8px 14px;border-radius:8px}
+.hero-meta b{display:block;font:700 1.1rem var(--f-mono)}
+.hero-meta span{font-size:.72rem;opacity:.8;text-transform:uppercase;letter-spacing:.05em}
+.back-link{color:rgba(255,255,255,.75);font-size:.82rem;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:12px}
+.back-link:hover{color:#fff}
+.exam-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:32px}
+.exam-cell{background:var(--sheet);padding:14px 16px}
+.exam-cell .pct{font:700 1.6rem var(--f-display);color:var(--accent)}
+.exam-cell .dom{font-size:.82rem;color:var(--muted);margin-top:2px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.card h3{font-size:.9rem;margin-bottom:8px}
+.card ul{margin:0;padding-left:1.1em}.card li{margin:3px 0;font-size:.88rem}
+.check-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.check-list li{display:flex;gap:8px;align-items:flex-start;font-size:.9rem}
+.check-list li::before{content:"✓";color:var(--ok);font-weight:700;flex-shrink:0;margin-top:1px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tag{font:500 .72rem var(--f-mono);padding:3px 9px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.callout{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0;padding:12px 14px;margin:12px 0;font-size:.9rem}
+.callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+.kv{display:grid;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.kv-row{display:grid;grid-template-columns:180px 1fr;border-bottom:1px solid var(--line)}
+.kv-row:last-child{border-bottom:0}
+.kv-row dt,.kv-row dd{margin:0;padding:9px 12px;font-size:.88rem}
+.kv-row dt{background:var(--paper);font-weight:600;border-right:1px solid var(--line)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.compare-box{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px}
+.compare-box h3{font-size:.85rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.compare-box ul{margin:0;padding-left:1.1em}.compare-box li{margin:4px 0;font-size:.88rem}
+.table-wrap{overflow-x:auto;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{background:var(--paper);font-weight:600;text-align:left;padding:8px 12px;border-bottom:2px solid var(--line)}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.domain-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:6px;padding:4px 10px;font-size:.8rem;color:var(--accent);font-weight:600;margin-bottom:12px}
+footer{border-top:1px solid var(--line);padding:24px 40px;font-size:.8rem;color:var(--muted);background:var(--sheet)}
+footer a{color:var(--accent);text-decoration:none}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.sidebar{display:none}main{padding:20px 16px 60px}.compare{grid-template-columns:1fr}.exam-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.hero{padding:24px}.hero h1{font-size:1.5rem}.exam-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-head">
+    <div class="cert">AI-901</div>
+    <div class="title">Azure AI Fundamentals</div>
+  </div>
+  <ul class="toc">
+    <li><a href="#s1">1. Workloads IA</a></li>
+    <li><a href="#s2">2. Machine Learning</a></li>
+    <li><a href="#s3">3. Computer Vision</a></li>
+    <li><a href="#s4">4. NLP</a></li>
+    <li><a href="#s5">5. IA générative</a></li>
+    <li><a href="#s6">6. Azure AI Services</a></li>
+    <li><a href="#s7">7. Azure ML Studio</a></li>
+    <li><a href="#s8">8. Azure OpenAI</a></li>
+    <li><a href="#s9">9. Responsible AI</a></li>
+    <li><a href="#s10">10. Prompt Engineering</a></li>
+    <li><a href="#s11">11. RAG & Copilots</a></li>
+    <li><a href="#s12">12. Pièges fréquents</a></li>
+  </ul>
+</aside>
+<div>
+<main>
+<div class="hero">
+  <a href="../ai-901-azure-ai-fundamentals/index.html" class="back-link">← Retour au quiz</a>
+  <div class="cert-label">Microsoft Azure · AI-901</div>
+  <h1>Azure AI Fundamentals</h1>
+  <div class="sub">Fiche de révision complète — 7 jours · 350 questions</div>
+  <div class="hero-meta">
+    <div><b>700</b><span>Score requis</span></div>
+    <div><b>45 min</b><span>Durée exam</span></div>
+    <div><b>40–60</b><span>Questions</span></div>
+    <div><b>4 domaines</b><span>Compétences</span></div>
+  </div>
+</div>
+
+<div class="exam-grid">
+  <div class="exam-cell"><div class="pct">15–20%</div><div class="dom">Workloads &amp; concepts IA</div></div>
+  <div class="exam-cell"><div class="pct">20–25%</div><div class="dom">Machine Learning fondamental</div></div>
+  <div class="exam-cell"><div class="pct">15–20%</div><div class="dom">Computer Vision &amp; NLP</div></div>
+  <div class="exam-cell"><div class="pct">35–40%</div><div class="dom">IA générative &amp; Azure AI</div></div>
+</div>
+
+<section id="s1">
+<div class="section-header"><span class="section-num">01</span><h2>Workloads et concepts IA</h2></div>
+<div class="domain-badge">Domaine 1 · 15–20%</div>
+<p>L'IA englobe des sous-disciplines complémentaires. Comprendre leurs différences est fondamental pour l'examen.</p>
+<div class="cards">
+  <div class="card"><h3>Intelligence Artificielle</h3><ul><li>Simuler l'intelligence humaine</li><li>Prendre des décisions automatiques</li><li>Englobe ML, vision, NLP</li></ul></div>
+  <div class="card"><h3>Machine Learning</h3><ul><li>Apprendre à partir de données</li><li>Amélioration continue avec l'expérience</li><li>Sous-ensemble de l'IA</li></ul></div>
+  <div class="card"><h3>Deep Learning</h3><ul><li>Réseaux de neurones profonds</li><li>Nécessite gros volumes de données</li><li>Excellents en vision/NLP</li></ul></div>
+</div>
+<div class="callout">
+<strong>Types de workloads IA :</strong> Prédiction/Régression · Classification · Clustering · Détection d'anomalies · Computer Vision · NLP · IA générative
+</div>
+</section>
+
+<section id="s2">
+<div class="section-header"><span class="section-num">02</span><h2>Machine Learning fondamental</h2></div>
+<div class="domain-badge">Domaine 2 · 20–25%</div>
+
+<div class="compare">
+  <div class="compare-box">
+    <h3>Apprentissage supervisé</h3>
+    <ul>
+      <li>Données <strong>étiquetées</strong></li>
+      <li>Classification (labels discrets)</li>
+      <li>Régression (valeurs continues)</li>
+      <li>Ex : spam filter, prédiction prix</li>
+    </ul>
+  </div>
+  <div class="compare-box">
+    <h3>Apprentissage non supervisé</h3>
+    <ul>
+      <li>Données <strong>non étiquetées</strong></li>
+      <li>Clustering (regroupement)</li>
+      <li>Réduction de dimensionnalité</li>
+      <li>Ex : segmentation clients</li>
+    </ul>
+  </div>
+</div>
+
+<div class="compare">
+  <div class="compare-box">
+    <h3>Apprentissage par renforcement</h3>
+    <ul>
+      <li>Agent · Environnement · Récompense</li>
+      <li>Apprend par essai/erreur</li>
+      <li>Ex : jeux, robotique</li>
+    </ul>
+  </div>
+  <div class="compare-box">
+    <h3>Transfer Learning</h3>
+    <ul>
+      <li>Réutilise un modèle pré-entraîné</li>
+      <li>Fine-tuning sur nouvelles données</li>
+      <li>Réduit temps et coût d'entraînement</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Métriques d'évaluation</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Métrique</th><th>Usage</th><th>Formule / Note</th></tr></thead>
+  <tbody>
+    <tr><td>Accuracy</td><td>Classification</td><td>Correct / Total</td></tr>
+    <tr><td>Precision</td><td>Classification</td><td>TP / (TP + FP)</td></tr>
+    <tr><td>Recall</td><td>Classification</td><td>TP / (TP + FN)</td></tr>
+    <tr><td>F1 Score</td><td>Équilibre P/R</td><td>2 × (P × R) / (P + R)</td></tr>
+    <tr><td>AUC-ROC</td><td>Classification binaire</td><td>0.5 = aléatoire, 1.0 = parfait</td></tr>
+    <tr><td>MAE / RMSE</td><td>Régression</td><td>Erreur absolue / quadratique</td></tr>
+    <tr><td>R²</td><td>Régression</td><td>Variance expliquée (0–1)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout warn">
+<strong>Surapprentissage (Overfitting) :</strong> Le modèle performe sur le train mais pas sur le test. Solution : régularisation, dropout, plus de données, validation croisée.
+</div>
+</section>
+
+<section id="s3">
+<div class="section-header"><span class="section-num">03</span><h2>Computer Vision</h2></div>
+<div class="domain-badge">Domaine 3 · 15–20%</div>
+
+<div class="tags">
+  <span class="tag">Classification d'images</span>
+  <span class="tag">Détection d'objets</span>
+  <span class="tag">Segmentation sémantique</span>
+  <span class="tag">OCR</span>
+  <span class="tag">Analyse faciale</span>
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Azure AI Vision</dt><dd>Analyse, description, tags, couleurs, catégories dans les images</dd></div>
+  <div class="kv-row"><dt>Custom Vision</dt><dd>Entraîner des modèles de classification/détection personnalisés</dd></div>
+  <div class="kv-row"><dt>Face API</dt><dd>Détection, vérification, identification de visages</dd></div>
+  <div class="kv-row"><dt>Azure AI Document Intelligence</dt><dd>Extraction de données depuis documents (anciennement Form Recognizer)</dd></div>
+  <div class="kv-row"><dt>Video Indexer</dt><dd>Analyse vidéo : transcription, detection visages, sujets</dd></div>
+</div>
+
+<div class="callout">
+<strong>Custom Vision :</strong> Nécessite minimum 15 images par tag pour l'entraînement. Deux projets : Classification (une image = un label) et Détection d'objets (bounding boxes).
+</div>
+</section>
+
+<section id="s4">
+<div class="section-header"><span class="section-num">04</span><h2>Traitement du Langage Naturel (NLP)</h2></div>
+<div class="domain-badge">Domaine 3 · 15–20%</div>
+
+<div class="cards">
+  <div class="card"><h3>Azure AI Language</h3><ul><li>Analyse de sentiment</li><li>Extraction d'entités (NER)</li><li>Détection de langue</li><li>Résumé automatique</li><li>Question answering</li></ul></div>
+  <div class="card"><h3>Azure AI Translator</h3><ul><li>Traduction texte 100+ langues</li><li>Translitération</li><li>Détection de langue</li><li>Dictionnaire bilingue</li></ul></div>
+  <div class="card"><h3>Azure AI Speech</h3><ul><li>Speech-to-Text (STT)</li><li>Text-to-Speech (TTS)</li><li>Speaker recognition</li><li>Real-time transcription</li></ul></div>
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt>CLU (Conversational Language Understanding)</dt><dd>Intentions + entités pour bots (remplace LUIS)</dd></div>
+  <div class="kv-row"><dt>Custom Question Answering</dt><dd>Base de connaissances FAQ en langage naturel</dd></div>
+  <div class="kv-row"><dt>Analyse de sentiment</dt><dd>Score positif/négatif/neutre par phrase et document</dd></div>
+  <div class="kv-row"><dt>NER (Named Entity Recognition)</dt><dd>Personnes, lieux, organisations, dates dans le texte</dd></div>
+</div>
+</section>
+
+<section id="s5">
+<div class="section-header"><span class="section-num">05</span><h2>IA Générative</h2></div>
+<div class="domain-badge">Domaine 4 · 35–40%</div>
+
+<p>L'IA générative crée du nouveau contenu (texte, images, code, audio). Elle repose sur des <strong>Large Language Models (LLMs)</strong>.</p>
+
+<div class="cards">
+  <div class="card"><h3>LLMs — Bases</h3><ul><li>Transformer architecture</li><li>Pré-entraînés sur vastes corpus</li><li>Prédiction du token suivant</li><li>Température = créativité</li></ul></div>
+  <div class="card"><h3>Types de contenu généré</h3><ul><li>Texte (GPT-4, GPT-4o)</li><li>Images (DALL-E 3)</li><li>Code (GPT-4, Codex)</li><li>Audio / Vidéo</li></ul></div>
+  <div class="card"><h3>Tokens</h3><ul><li>Unité de traitement LLM</li><li>≈ ¾ d'un mot anglais</li><li>Limite de contexte = fenêtre tokens</li><li>Coût API basé sur tokens</li></ul></div>
+</div>
+
+<div class="callout ok">
+<strong>Embeddings :</strong> Représentation vectorielle numérique du texte qui capture le sens sémantique. Permettent la recherche de similarité et le RAG.
+</div>
+</section>
+
+<section id="s6">
+<div class="section-header"><span class="section-num">06</span><h2>Azure AI Services</h2></div>
+<div class="domain-badge">Domaine 4 · 35–40%</div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Service</th><th>Catégorie</th><th>Cas d'usage principal</th></tr></thead>
+  <tbody>
+    <tr><td>Azure AI Vision</td><td>Vision</td><td>Analyse et description d'images</td></tr>
+    <tr><td>Custom Vision</td><td>Vision</td><td>Classification/détection personnalisée</td></tr>
+    <tr><td>Face API</td><td>Vision</td><td>Reconnaissance faciale</td></tr>
+    <tr><td>Document Intelligence</td><td>Vision/Docs</td><td>Extraction de formulaires et documents</td></tr>
+    <tr><td>Azure AI Language</td><td>NLP</td><td>Sentiment, NER, résumé</td></tr>
+    <tr><td>Translator</td><td>NLP</td><td>Traduction multi-langues</td></tr>
+    <tr><td>Azure AI Speech</td><td>Audio</td><td>STT, TTS, traduction vocale</td></tr>
+    <tr><td>Azure OpenAI</td><td>Générative</td><td>GPT-4, DALL-E, embeddings</td></tr>
+    <tr><td>Azure AI Search</td><td>Recherche</td><td>Recherche cognitive + vecteurs</td></tr>
+    <tr><td>Bot Service</td><td>Conversation</td><td>Chatbots multi-canaux</td></tr>
+    <tr><td>Content Safety</td><td>Modération</td><td>Détection contenu nuisible</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout">
+<strong>Azure AI Foundry (anciennement Azure AI Studio) :</strong> Hub unifié pour explorer, déployer et gérer les modèles IA. Inclut un catalogue de modèles, playground, fine-tuning et déploiement d'endpoints.
+</div>
+</section>
+
+<section id="s7">
+<div class="section-header"><span class="section-num">07</span><h2>Azure Machine Learning Studio</h2></div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Automated ML (AutoML)</dt><dd>Teste automatiquement algorithmes + hyperparamètres → meilleur modèle</dd></div>
+  <div class="kv-row"><dt>Designer</dt><dd>Interface glisser-déposer pour pipelines ML visuels</dd></div>
+  <div class="kv-row"><dt>Notebooks</dt><dd>Jupyter intégré pour code Python/R personnalisé</dd></div>
+  <div class="kv-row"><dt>Compute Clusters</dt><dd>Clusters élastiques pour entraînement distribué</dd></div>
+  <div class="kv-row"><dt>Compute Instances</dt><dd>VM dédiées pour développement et tests</dd></div>
+  <div class="kv-row"><dt>Managed Endpoints</dt><dd>Déploiement en ligne (temps réel) ou batch</dd></div>
+  <div class="kv-row"><dt>MLflow</dt><dd>Suivi des expériences, métriques, artefacts</dd></div>
+  <div class="kv-row"><dt>Responsible AI Dashboard</dt><dd>Fairness, explicabilité, erreurs de modèle</dd></div>
+</div>
+
+<div class="compare">
+  <div class="compare-box">
+    <h3>Déploiement en ligne</h3>
+    <ul>
+      <li>Prédictions en temps réel</li>
+      <li>REST API endpoint</li>
+      <li>Latence faible requise</li>
+      <li>Ex : recommandations live</li>
+    </ul>
+  </div>
+  <div class="compare-box">
+    <h3>Déploiement batch</h3>
+    <ul>
+      <li>Grands volumes de données</li>
+      <li>Traitement asynchrone planifié</li>
+      <li>Coût réduit (pas de serveur permanent)</li>
+      <li>Ex : scoring nocturne</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="s8">
+<div class="section-header"><span class="section-num">08</span><h2>Azure OpenAI Service</h2></div>
+<div class="domain-badge">Domaine 4 · 35–40%</div>
+
+<div class="cards">
+  <div class="card"><h3>Modèles disponibles</h3><ul><li>GPT-4 / GPT-4o (texte)</li><li>GPT-4 Vision (images + texte)</li><li>DALL-E 3 (génération d'images)</li><li>text-embedding-ada-002</li><li>Whisper (transcription)</li></ul></div>
+  <div class="card"><h3>API Chat Completions</h3><ul><li>Messages : system / user / assistant</li><li>Temperature (0=déterministe)</li><li>Max tokens</li><li>Top-p, frequency/presence penalty</li></ul></div>
+  <div class="card"><h3>Fine-tuning</h3><ul><li>Adapte GPT à un style/domaine</li><li>Données : JSONL (prompt/completion)</li><li>Réduit le prompt engineering</li><li>Modèle déployé = endpoint privé</li></ul></div>
+</div>
+
+<div class="callout">
+<strong>Déploiement :</strong> Azure OpenAI n'est pas automatiquement disponible — il faut demander l'accès. Les modèles sont déployés dans une ressource Azure OpenAI, pas directement via l'API OpenAI publique.
+</div>
+</section>
+
+<section id="s9">
+<div class="section-header"><span class="section-num">09</span><h2>Responsible AI</h2></div>
+
+<p>Microsoft définit <strong>6 principes</strong> pour une IA responsable :</p>
+
+<div class="check-list">
+  <li><strong>Fairness (Équité) :</strong> Les systèmes IA doivent traiter tous les groupes équitablement, sans discrimination.</li>
+  <li><strong>Reliability &amp; Safety (Fiabilité) :</strong> Fonctionnement sûr et fiable dans toutes les conditions.</li>
+  <li><strong>Privacy &amp; Security (Confidentialité) :</strong> Protection des données personnelles et sécurité des systèmes.</li>
+  <li><strong>Inclusiveness (Inclusivité) :</strong> L'IA doit bénéficier à tous et ne laisser personne de côté.</li>
+  <li><strong>Transparency (Transparence) :</strong> Compréhension du fonctionnement des systèmes IA.</li>
+  <li><strong>Accountability (Responsabilité) :</strong> Les personnes et organisations sont responsables des systèmes IA.</li>
+</div>
+
+<div class="callout warn">
+<strong>Biais IA :</strong> Les modèles peuvent hériter des biais présents dans les données d'entraînement. Tools Azure : Fairlearn, Responsible AI Dashboard, Azure AI Content Safety.
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Azure AI Content Safety</dt><dd>Filtre contenu nuisible : violence, haine, autoagression, contenu sexuel</dd></div>
+  <div class="kv-row"><dt>Interpretability</dt><dd>SHAP values, LIME → comprendre pourquoi un modèle fait une prédiction</dd></div>
+  <div class="kv-row"><dt>Differential Privacy</dt><dd>Ajoute du bruit statistique pour protéger les données individuelles</dd></div>
+</div>
+</section>
+
+<section id="s10">
+<div class="section-header"><span class="section-num">10</span><h2>Prompt Engineering</h2></div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Technique</th><th>Description</th><th>Exemple</th></tr></thead>
+  <tbody>
+    <tr><td>Zero-shot</td><td>Aucun exemple fourni</td><td>"Traduis en anglais : Bonjour"</td></tr>
+    <tr><td>One-shot</td><td>Un exemple dans le prompt</td><td>"France → Paris. Japon → ?"</td></tr>
+    <tr><td>Few-shot</td><td>Plusieurs exemples</td><td>2–10 exemples input/output</td></tr>
+    <tr><td>Chain-of-Thought</td><td>"Réfléchis étape par étape"</td><td>Raisonnement mathématique</td></tr>
+    <tr><td>System prompt</td><td>Rôle et comportement du modèle</td><td>"Tu es un assistant médical…"</td></tr>
+    <tr><td>Grounding</td><td>Ancrer le modèle dans des faits</td><td>Fournir un document de référence</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout">
+<strong>Hallucination :</strong> Le modèle génère des informations fausses mais convaincantes. Solution : RAG, grounding avec sources vérifiées, temperature basse.
+</div>
+</section>
+
+<section id="s11">
+<div class="section-header"><span class="section-num">11</span><h2>RAG et Copilots</h2></div>
+
+<div class="kv">
+  <div class="kv-row"><dt>RAG (Retrieval-Augmented Generation)</dt><dd>Combine recherche documentaire + LLM → réponses fondées sur des sources réelles</dd></div>
+  <div class="kv-row"><dt>Azure AI Search</dt><dd>Indexation vectorielle + sémantique pour le RAG. Connecte documents → LLM</dd></div>
+  <div class="kv-row"><dt>Azure AI Foundry</dt><dd>Hub pour créer des applications IA de bout en bout (anciennement Azure AI Studio)</dd></div>
+  <div class="kv-row"><dt>Microsoft Copilot Studio</dt><dd>Créer des copilotes personnalisés sans code (ancien Power Virtual Agents)</dd></div>
+  <div class="kv-row"><dt>Semantic Kernel</dt><dd>SDK open-source pour orchestration d'agents IA (C#, Python, Java)</dd></div>
+</div>
+
+<div class="cards">
+  <div class="card"><h3>Architecture RAG</h3><ul><li>1. Indexer documents → vecteurs</li><li>2. Question utilisateur → embedding</li><li>3. Recherche similarité (cosine)</li><li>4. Top-K docs → contexte LLM</li><li>5. LLM génère réponse grounded</li></ul></div>
+  <div class="card"><h3>Copilot Extensions</h3><ul><li>Microsoft 365 Copilot</li><li>GitHub Copilot</li><li>Power Platform Copilot</li><li>Azure Copilot</li><li>Extensions plugins/connectors</li></ul></div>
+</div>
+</section>
+
+<section id="s12">
+<div class="section-header"><span class="section-num">12</span><h2>Pièges fréquents à l'examen</h2></div>
+
+<div class="callout warn">
+<strong>Azure AI Foundry vs Azure ML Studio :</strong> AI Foundry = modèles génératifs, LLMs, Azure OpenAI. Azure ML Studio = ML classique, AutoML, Designer, entraînement de modèles custom.
+</div>
+
+<div class="check-list">
+  <li>CLU remplace LUIS pour la compréhension du langage conversationnel</li>
+  <li>Document Intelligence = Form Recognizer (renommé)</li>
+  <li>Custom Vision nécessite min. 15 images par classe</li>
+  <li>Responsible AI = 6 principes (pas 5, pas 7)</li>
+  <li>Temperature 0 = déterministe, temperature 1+ = créatif</li>
+  <li>Fine-tuning ≠ RAG : fine-tuning modifie les poids, RAG ajoute du contexte au runtime</li>
+  <li>Embeddings = vecteurs numériques de sens sémantique</li>
+  <li>Overfitting : bonne perf train, mauvaise perf test → régulariser</li>
+  <li>Underfitting : mauvaise perf partout → modèle trop simple</li>
+  <li>Azure OpenAI nécessite une approbation d'accès (pas ouvert par défaut)</li>
+</div>
+
+<div class="callout ok">
+<strong>Mnémotechnique Responsible AI :</strong> <em>F-R-P-I-T-A</em> → Fairness · Reliability · Privacy · Inclusiveness · Transparency · Accountability
+</div>
+</section>
+</main>
+<footer>Fiche de révision AI-901 · Auteur : RB · Repo : <a href="https://github.com/Crachdev/certifs">Crachdev/certifs</a></footer>
+</div>
+</div>
+<script>
+const links = document.querySelectorAll('.toc a');
+const sections = document.querySelectorAll('section[id]');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      links.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector('.toc a[href="#'+e.target.id+'"]');
+      if(a) a.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
