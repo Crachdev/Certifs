@@ -63,10 +63,17 @@ function header(){
   document.getElementById("sRate").textContent=keys.length?Math.round(ok/keys.length*100)+" %":"–";
   const n=errors().length,b=document.getElementById("errBadge");
   b.hidden=!n;b.textContent=n;
-  // Afficher le pseudo dans l'en-tête si disponible
+  // Afficher le pseudo dans l'en-tête
   const pseudo=getPseudo();
   const pEl=document.getElementById("userPseudo");
-  if(pEl){pEl.textContent=pseudo||"";pEl.hidden=!pseudo;}
+  if(pEl){
+    if(pseudo){
+      pEl.innerHTML=`👤 <b>${esc(pseudo)}</b> <button onclick="document.getElementById('changePseudo')&&document.getElementById('changePseudo').click()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:inherit;padding:0 0 0 4px;text-decoration:underline;vertical-align:baseline">Changer</button>`;
+      pEl.hidden=false;
+    } else {
+      pEl.hidden=true;
+    }
+  }
 }
 function dayStats(d){
   const n=window.QDATA[d].length;let done=0,ok=0;
