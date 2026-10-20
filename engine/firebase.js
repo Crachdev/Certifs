@@ -1,170 +1,153 @@
-// firebase.js — Tracking des erreurs multi-appareils
-// Chargé après firebase-config.js dans chaque page quiz
+// firebase.js — Tracking des erreurs multi-appareils (Firebase compat mode)
+// Chargé après firebase-config.js dans chaque page quiz.
+// Utilise les scripts compat (pas d'import() dynamique → compatible GitHub Pages CSP)
 
 (function () {
   "use strict";
 
-  // ── Constantes ──────────────────────────────────────────────────────────
-  const FB_CDN = "https://www.gstatic.com/firebasejs/10.12.2/";
+  const COMPAT_BASE = "https://www.gstatic.com/firebasejs/10.12.2/";
 
-  // ── Init async ──────────────────────────────────────────────────────────
   let _db = null;
   let _ready = false;
-  let _queue = []; // appels en attente pendant l'init
-
-  async function initFirebase() {
-    try {
-      const { initializeApp, getApps } =
-        await import(FB_CDN + "firebase-app.js");
-      const { getFirestore, collection, doc, setDoc, getDocs,
-              query, orderBy, serverTimestamp } =
-        await import(FB_CDN + "firebase-firestore.js");
-
-      // Évite double-init si le module est chargé plusieurs fois
-      const app = getApps().length
-        ? getApps()[0]
-        : initializeApp(window.FIREBASE_CONFIG);
-
-      _db = getFirestore(app);
-      _ready = true;
-
-      // Injecter les fonctions Firestore dans le scope du module
-      window._FS = {
-        db: _db,
-        collection, doc, setDoc, getDocs, query, orderBy, serverTimestamp
-      };
-
-      // Vider la file d'attente
-      _queue.forEach(fn => fn());
-      _queue = [];
-    } catch (e) {
-      console.warn("[certifs] Firebase non disponible :", e.message);
-    }
-  }
+  let _queue = [];
 
   function whenReady(fn) {
     if (_ready) fn();
     else _queue.push(fn);
   }
 
-  // ── Structure Firestore ──────────────────────────────────────────────────
+  function flushQueue() {
+    _queue.forEach(fn => { try { fn(); } catch(e){} });
+    _queue = [];
+  }
+
+  // ── Chargement des scripts Firebase compat via <script> tags ─────────────
+  // GitHub Pages autorise gstatic.com via script src (pas via import())
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      // Éviter le double chargement
+      if (document.querySelector('script[src="' + src + '"]')) { resolve(); return; }
+      const s = document.createElement("script");
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  async function initFirebase() {
+    if (!window.FIREBASE_CONFIG) {
+      console.warn("[certifs] FIREBASE_CONFIG absent — tracking désactivé");
+      return;
+    }
+    try {
+      // Charger Firebase App + Firestore en mode compat (SDK v9 compat layer)
+      await loadScript(COMPAT_BASE + "firebase-app-compat.js");
+      await loadScript(COMPAT_BASE + "firebase-firestore-compat.js");
+
+      // Éviter la double initialisation
+      if (!firebase.apps.length) {
+        firebase.initializeApp(window.FIREBASE_CONFIG);
+      }
+
+      _db = firebase.firestore();
+      _ready = true;
+      flushQueue();
+    } catch (e) {
+      console.warn("[certifs] Firebase init échoué :", e.message);
+    }
+  }
+
+  // ── Structure Firestore ───────────────────────────────────────────────────
   // Collection : errors
-  // Document   : "<cert>__<day>-<idx>"  (ex: "clf7.v2__3-12")
-  // Champs     :
-  //   cert     : string  — clé de la cert (window.QKEY)
-  //   day      : number
-  //   idx      : number
-  //   theme    : string
-  //   question : string (premiers 120 chars)
-  //   attempts : number — nb total de tentatives ratées
-  //   lastFail : Timestamp
-  //   firstFail: Timestamp
-  //   successes: number — nb de fois réussi après avoir été raté
-  //   lastPass : Timestamp | null
+  // Document   : "<cert>__<day>-<idx>"  (ex: "ai901__3-12")
+  // Champs : cert, day, idx, theme, question, attempts, lastFail, firstFail,
+  //          successes, lastPass
 
   function docId(cert, day, idx) {
     return cert.replace(/[^a-z0-9_]/gi, "_") + "__" + day + "-" + idx;
   }
 
-  // ── logError(cert, day, idx, theme, question) ────────────────────────────
-  // Appelé chaque fois qu'une réponse est fausse (hors session libre)
+  // ── logError ─────────────────────────────────────────────────────────────
   window.logError = function (cert, day, idx, theme, question) {
     whenReady(async () => {
       if (!_db) return;
-      const { db, collection, doc, setDoc, getDocs, query,
-              serverTimestamp } = window._FS;
       const id = docId(cert, day, idx);
-      const ref = doc(collection(db, "errors"), id);
-
-      // Lire le doc existant pour incrémenter
-      let existing = null;
+      const ref = _db.collection("errors").doc(id);
       try {
-        const snap = await getDocs(
-          query(collection(db, "errors"))
-        );
-        snap.forEach(d => { if (d.id === id) existing = d.data(); });
-      } catch (_) {}
-
-      const now = serverTimestamp();
-      const data = existing
-        ? {
-            attempts:  (existing.attempts  || 0) + 1,
-            lastFail:  now,
-            firstFail: existing.firstFail || now,
-            successes: existing.successes  || 0,
-            lastPass:  existing.lastPass   || null,
-            // on ne remet pas à jour les champs stables
-          }
-        : {
+        const snap = await ref.get();
+        if (snap.exists) {
+          await ref.update({
+            attempts:  firebase.firestore.FieldValue.increment(1),
+            lastFail:  firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } else {
+          await ref.set({
             cert, day, idx,
             theme,
             question: String(question).slice(0, 120),
             attempts:  1,
-            lastFail:  now,
-            firstFail: now,
+            lastFail:  firebase.firestore.FieldValue.serverTimestamp(),
+            firstFail: firebase.firestore.FieldValue.serverTimestamp(),
             successes: 0,
-            lastPass:  null,
-          };
-
-      try {
-        await setDoc(ref, data, { merge: true });
+            lastPass:  null
+          });
+        }
       } catch (e) {
         console.warn("[certifs] logError échoué :", e.message);
       }
     });
   };
 
-  // ── logSuccess(cert, day, idx) ───────────────────────────────────────────
-  // Appelé quand une question précédemment ratée est réussie
+  // ── logSuccess ───────────────────────────────────────────────────────────
   window.logSuccess = function (cert, day, idx) {
     whenReady(async () => {
       if (!_db) return;
-      const { db, collection, doc, setDoc, getDocs, query,
-              serverTimestamp } = window._FS;
       const id = docId(cert, day, idx);
-      const ref = doc(collection(db, "errors"), id);
-
-      // Vérifier que le doc existe (on ne crée rien pour une réussite pure)
-      let exists = false;
+      const ref = _db.collection("errors").doc(id);
       try {
-        const snap = await getDocs(query(collection(db, "errors")));
-        snap.forEach(d => { if (d.id === id) exists = true; });
-      } catch (_) {}
-
-      if (!exists) return;
-
-      try {
-        await setDoc(ref, {
-          successes: (window._FS._cache?.[id]?.successes || 0) + 1,
-          lastPass:  serverTimestamp()
-        }, { merge: true });
+        const snap = await ref.get();
+        if (!snap.exists) return;
+        await ref.update({
+          successes: firebase.firestore.FieldValue.increment(1),
+          lastPass:  firebase.firestore.FieldValue.serverTimestamp()
+        });
       } catch (e) {
         console.warn("[certifs] logSuccess échoué :", e.message);
       }
     });
   };
 
-  // ── getErrors(cert) → Promise<Array> ────────────────────────────────────
-  // Retourne tous les docs d'erreurs pour une cert donnée,
-  // triés par nombre d'échecs décroissant
+  // ── getErrors ────────────────────────────────────────────────────────────
   window.getErrors = async function (cert) {
     if (!_ready || !_db) return [];
     try {
-      const { db, collection, getDocs, query } = window._FS;
-      const snap = await getDocs(query(collection(db, "errors")));
-      const rows = [];
-      snap.forEach(d => {
-        const data = d.data();
-        if (data.cert === cert) rows.push({ id: d.id, ...data });
-      });
-      rows.sort((a, b) => (b.attempts || 0) - (a.attempts || 0));
-      return rows;
+      const snap = await _db.collection("errors")
+        .where("cert", "==", cert)
+        .orderBy("attempts", "desc")
+        .get();
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
     } catch (e) {
-      console.warn("[certifs] getErrors échoué :", e.message);
-      return [];
+      // Fallback sans index (orderBy peut nécessiter un index Firestore)
+      try {
+        const snap2 = await _db.collection("errors")
+          .where("cert", "==", cert)
+          .get();
+        const rows = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
+        rows.sort((a, b) => (b.attempts || 0) - (a.attempts || 0));
+        return rows;
+      } catch(e2) {
+        console.warn("[certifs] getErrors échoué :", e2.message);
+        return [];
+      }
     }
   };
 
-  // ── Lancer l'init ────────────────────────────────────────────────────────
-  initFirebase();
+  // ── Lancer l'init au chargement du DOM ───────────────────────────────────
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFirebase);
+  } else {
+    initFirebase();
+  }
+
 })();
