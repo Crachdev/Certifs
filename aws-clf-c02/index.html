@@ -36,7 +36,7 @@ header.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-con
 nav.tabs{display:flex;gap:4px;margin:16px 0 20px;border-bottom:1px solid var(--line);overflow-x:auto}
 nav.tabs button{background:none;border:0;padding:10px 14px;color:var(--muted);font-weight:600;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
 nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
-.tab-fiche{margin-left:auto;padding:10px 14px;color:var(--accent);font-weight:600;font-size:.88rem;text-decoration:none;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-1px;display:flex;align-items:center}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}.home-link:hover{opacity:1;color:var(--accent)}.tab-fiche{margin-left:auto;padding:10px 14px;color:var(--accent);font-weight:600;font-size:.88rem;text-decoration:none;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-1px;display:flex;align-items:center}
 .badge{display:inline-block;min-width:1.5em;padding:0 .4em;margin-left:4px;border-radius:9px;background:var(--ko-soft);color:var(--ko);font:500 .72rem/1.5 var(--f-mono)}
 
 .intro{color:var(--muted);max-width:65ch;margin:0 0 20px}
@@ -136,6 +136,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(-
 </style>
 
 <div class="wrap">
+  <a href="https://crachdev.github.io/Certifs/" class="home-link">← Toutes les certifications</a>
   <header class="top">
     <div>
       <div class="eyebrow">AWS Certified Cloud Practitioner · CLF-C02</div>
@@ -162,5 +163,6 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(-
 <script src="../engine/firebase-config.js"></script>
 <script src="../engine/firebase.js"></script>
 <script src="../engine/quiz.js"></script>
+<script src="../engine/translate.js"></script>
 </body>
 </html>

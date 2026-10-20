@@ -299,7 +299,7 @@ function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor
 function start(items,label,timed,isLive){
   // isLive = free session (don't persist results)
   session={
-    items:items.map(([d,i])=>({d,i,order:shuffle(Q(d,i).o.map((_,k)=>k))})),
+    items:shuffle(items).map(([d,i])=>({d,i,order:shuffle(Q(d,i).o.map((_,k)=>k))})),
     idx:0,sel:[],checked:false,score:0,missed:[],label,done:false,
     end:timed?Date.now()+70*60*1000:null,
     isLive:!!isLive
