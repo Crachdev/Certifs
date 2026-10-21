@@ -123,6 +123,42 @@
     });
   };
 
+  // ── saveProgression ──────────────────────────────────────────────────────
+  // Sauvegarde store.r dans Firestore
+  // Collection : progression
+  // Document   : "<pseudo>__<cert>"  (ex: "RB__az802.v1")
+  window.saveProgression = function (cert, pseudo, results) {
+    whenReady(async () => {
+      if (!_db || !pseudo || pseudo === "Anonyme") return;
+      const docId = String(pseudo).slice(0, 30).replace(/[^a-z0-9_-]/gi, "_") + "__" + cert;
+      try {
+        await _db.collection("progression").doc(docId).set({
+          cert,
+          pseudo: String(pseudo).slice(0, 30),
+          results, // objet { "1-0": 1, "1-1": 0, … }
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: false });
+      } catch (e) {
+        console.warn("[certifs] saveProgression échoué :", e.message);
+      }
+    });
+  };
+
+  // ── loadProgression ──────────────────────────────────────────────────────
+  // Retourne store.r depuis Firestore (ou null si absent)
+  window.loadProgression = async function (cert, pseudo) {
+    if (!_ready || !_db || !pseudo || pseudo === "Anonyme") return null;
+    const docId = String(pseudo).slice(0, 30).replace(/[^a-z0-9_-]/gi, "_") + "__" + cert;
+    try {
+      const snap = await _db.collection("progression").doc(docId).get();
+      if (snap.exists) return snap.data().results || null;
+      return null;
+    } catch (e) {
+      console.warn("[certifs] loadProgression échoué :", e.message);
+      return null;
+    }
+  };
+
   // ── getErrors ────────────────────────────────────────────────────────────
   window.getErrors = async function (cert) {
     if (!_ready || !_db) return [];

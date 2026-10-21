@@ -41,7 +41,40 @@ function svgCircle(pct,size,color){
   </svg>`;
 }
 
-function save(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}
+  // Sync Firestore (best-effort, silencieux)
+  const pseudo=getPseudo();
+  if(typeof window.saveProgression==="function"&&pseudo&&pseudo!=="Anonyme"){
+    window.saveProgression(KEY,pseudo,store.r);
+  }
+}
+
+// ── Chargement de la progression Firestore au démarrage ────────────────────
+// Si Firestore contient plus de réponses que le localStorage, on remplace.
+async function syncFromFirestore(){
+  const pseudo=getPseudo();
+  if(!pseudo||pseudo==="Anonyme")return;
+  if(typeof window.loadProgression!=="function")return;
+  try{
+    const remoteR=await window.loadProgression(KEY,pseudo);
+    if(!remoteR)return;
+    const localCount=Object.keys(store.r).length;
+    const remoteCount=Object.keys(remoteR).length;
+    if(remoteCount>localCount){
+      store.r=remoteR;
+      try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}
+      render(); // rafraîchir l'affichage avec la progression importée
+    }
+  }catch(e){}
+}
+
+// Attendre que Firebase soit prêt avant de syncer (max 5 secondes)
+(function waitForFirebase(attempts){
+  if(typeof window.loadProgression==="function"){syncFromFirestore();return;}
+  if(attempts>10)return;
+  setTimeout(()=>waitForFirebase(attempts+1),500);
+})(0);
 const Q=(d,i)=>window.QDATA[d][i];
 const total=()=>Object.values(window.QDATA).reduce((s,a)=>s+a.length,0);
 const errors=()=>Object.keys(store.r).filter(k=>store.r[k]===0).map(k=>k.split("-").map(Number));
@@ -183,7 +216,7 @@ function planHTML(){
       </div>
     </div></li>`;
   }).join("")}</ol>
-  <p class="note">Ta progression est enregistrée dans ce navigateur uniquement. Les questions sont originales, écrites à partir de la documentation officielle${examInfo?" ("+examInfo+")":""}.</p>
+  <p class="note">Ta progression est synchronisée sur tous tes appareils via Firestore (si tu es connecté avec un pseudo). Les questions sont originales, écrites à partir de la documentation officielle${examInfo?" ("+examInfo+")":""}.</p>
   <p class="note" style="margin-top:6px">Connecté en tant que : <b id="pseudoDisplay" style="color:var(--accent)">${esc(getPseudo()||"Anonyme")}</b> — <button id="changePseudo" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:inherit;padding:0;text-decoration:underline">Changer</button></p>`;
 }
 
