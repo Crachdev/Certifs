@@ -123,6 +123,27 @@
     });
   };
 
+  // ── logSession ───────────────────────────────────────────────────────────
+  // Enregistre une connexion dans Firestore
+  // Collection : sessions
+  // Document   : auto-id
+  // Champs : pseudo, cert, connectedAt, ua (navigateur)
+  window.logSession = function (cert, pseudo) {
+    whenReady(async () => {
+      if (!_db || !pseudo || pseudo === "Anonyme") return;
+      try {
+        await _db.collection("sessions").add({
+          cert,
+          pseudo: String(pseudo).slice(0, 30),
+          connectedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          ua: navigator.userAgent.slice(0, 120)
+        });
+      } catch (e) {
+        console.warn("[certifs] logSession échoué :", e.message);
+      }
+    });
+  };
+
   // ── saveProgression ──────────────────────────────────────────────────────
   // Sauvegarde store.r dans Firestore
   // Collection : progression

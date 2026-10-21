@@ -3,137 +3,326 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Certifs — Quiz &amp; Fiches de révision</title>
+<title>Admin — Certifs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-:root{--paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;--accent:#1a5c9a;--accent-soft:#ddeeff;--f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--f-body:"Public Sans","Segoe UI",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0b0f14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#60aaee;--accent-soft:#0a1e33;color-scheme:dark}}
-:root[data-theme="dark"]{--paper:#0b0f14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#60aaee;--accent-soft:#0a1e33;color-scheme:dark}
-*{box-sizing:border-box}body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--f-body);margin:0}
-.wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
-h1,h2{font-family:var(--f-display);margin:0;line-height:1.15}
-h1{font-size:2rem;font-weight:700}
-.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.hero{padding-bottom:32px;border-bottom:2px solid var(--ink);margin-bottom:40px}
-.hero p{color:var(--muted);margin:10px 0 0;max-width:55ch}
-.section-title{font:700 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:40px}
-.cert-card{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;transition:box-shadow .15s,border-color .15s}
-.cert-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(0,0,0,.08)}
-.card-stripe{height:5px}
-.card-body{padding:16px 18px;flex:1;display:flex;flex-direction:column;gap:8px}
-.card-badge{font:500 .68rem var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
-.card-title{font:700 1rem var(--f-display);line-height:1.25}
-.card-desc{font-size:.82rem;color:var(--muted);flex:1}
-.card-foot{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;border-top:1px solid var(--line);font-size:.78rem;color:var(--muted)}
-.card-foot .pill{background:var(--accent-soft);color:var(--accent);font:500 .68rem var(--f-mono);padding:2px 8px;border-radius:4px}
-footer{border-top:1px solid var(--line);padding-top:24px;font-size:.8rem;color:var(--muted)}
-footer a{color:var(--accent);text-decoration:none}
+:root{--paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;--accent:#1a5c9a;--accent-soft:#ddeeff;--ok:#1a7f4e;--ok-soft:#d4f0e2;--ko:#c0392b;--ko-soft:#fde8e6;--f-display:"Bricolage Grotesque",system-ui,sans-serif;--f-body:"Public Sans","Segoe UI",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,monospace}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0b0f14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#60aaee;--accent-soft:#0a1e33;--ok:#3db87a;--ok-soft:#0d2e1f;--ko:#e05c4b;--ko-soft:#2e100d;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0b0f14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#60aaee;--accent-soft:#0a1e33;--ok:#3db87a;--ok-soft:#0d2e1f;--ko:#e05c4b;--ko-soft:#2e100d;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--f-body);margin:0}
+.wrap{max-width:960px;margin:0 auto;padding:40px 16px 80px}
+h1{font:700 1.8rem var(--f-display);margin:0 0 4px}
+.eyebrow{font:500 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hero{padding-bottom:24px;border-bottom:2px solid var(--ink);margin-bottom:32px}
+
+/* LOGIN */
+#loginBox{max-width:360px;margin:80px auto;background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:32px 28px}
+#loginBox h2{font:700 1.1rem var(--f-display);margin:0 0 6px}
+#loginBox p{font-size:.88rem;color:var(--muted);margin:0 0 20px}
+#loginBox input{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font-size:1rem;font-family:var(--f-body);outline:none;margin-bottom:12px}
+#loginBox input:focus{border-color:var(--accent)}
+#loginErr{color:var(--ko);font-size:.85rem;margin-bottom:8px;display:none}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:28px;border-bottom:2px solid var(--line);padding-bottom:0}
+.tab{padding:8px 16px;border:none;background:none;font:600 .85rem var(--f-body);color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:4px 4px 0 0;transition:color .15s,border-color .15s}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:hover{color:var(--ink)}
+
+/* STATS GRID */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:28px}
+.stat{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.stat .val{font:700 1.6rem var(--f-mono);color:var(--accent)}
+.stat .lbl{font-size:.75rem;color:var(--muted);margin-top:2px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead tr{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+th{text-align:left;padding:0 8px 10px 0;border-bottom:2px solid var(--line)}
+td{padding:9px 8px 9px 0;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font:500 .7rem var(--f-mono)}
+.badge.ok{background:var(--ok-soft);color:var(--ok)}
+.badge.ko{background:var(--ko-soft);color:var(--ko)}
+.badge.info{background:var(--accent-soft);color:var(--accent)}
+
+/* PROGRESS BAR */
+.pbar{display:flex;gap:2px;align-items:center;margin-top:4px}
+.pbar-track{flex:1;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
+.pbar-fill{height:100%;border-radius:3px;background:var(--accent)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;background:var(--accent);color:#fff;font:600 .88rem var(--f-body);cursor:pointer;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn.danger{background:var(--ko)}
+
+/* MISC */
+.loading{color:var(--muted);font-size:.88rem;padding:24px 0}
+.empty{color:var(--muted);font-size:.88rem;padding:24px 0;text-align:center}
+.ua{font:500 .72rem var(--f-mono);color:var(--muted);word-break:break-all}
+.num{font-family:var(--f-mono)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="hero">
-    <div class="eyebrow">Crachdev / certifs</div>
-    <h1>Quiz &amp; Fiches de révision</h1>
-    <p>Préparez vos certifications cloud avec des questions originales issues des documentations officielles.</p>
-  </div>
 
-  <div class="section-title">Microsoft Windows Server</div>
-  <div class="grid">
-    <a href="az-802-windows-server/index.html" class="cert-card">
-      <div class="card-stripe" style="background:#0078d4"></div>
-      <div class="card-body">
-        <div class="card-badge">Microsoft · AZ-802</div>
-        <div class="card-title">Windows Server Hybrid Administrator</div>
-        <div class="card-desc">Active Directory, Hyper-V, Azure Arc, clustering et sécurité Windows Server.</div>
-      </div>
-      <div class="card-foot"><span>750 questions · 15 jours</span><span class="pill">Quiz</span></div>
-    </a>
-  </div>
-
-  <div class="section-title">Microsoft Azure</div>
-  <div class="grid">
-    <a href="az-900-azure-fundamentals/index.html" class="cert-card">
-      <div class="card-stripe" style="background:#0078d4"></div>
-      <div class="card-body">
-        <div class="card-badge">Microsoft Azure · AZ-900</div>
-        <div class="card-title">Azure Fundamentals</div>
-        <div class="card-desc">Concepts cloud, services Azure, sécurité, conformité et gouvernance.</div>
-      </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
-    </a>
-    <a href="ai-901-azure-ai-fundamentals/index.html" class="cert-card">
-      <div class="card-stripe" style="background:#7b2d8b"></div>
-      <div class="card-body">
-        <div class="card-badge">Microsoft Azure · AI-901</div>
-        <div class="card-title">Azure AI Fundamentals</div>
-        <div class="card-desc">IA générative, ML, Computer Vision, NLP, Azure OpenAI et Responsible AI.</div>
-      </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
-    </a>
-    <a href="sc-900-security-compliance-identity/index.html" class="cert-card">
-      <div class="card-stripe" style="background:#1a5c9a"></div>
-      <div class="card-body">
-        <div class="card-badge">Microsoft Security · SC-900</div>
-        <div class="card-title">Security, Compliance &amp; Identity</div>
-        <div class="card-desc">Zero Trust, Entra ID, Defender, Sentinel, Purview et conformité cloud.</div>
-      </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
-    </a>
-  </div>
-
-  <div class="section-title">Amazon Web Services</div>
-  <div class="grid">
-    <a href="aws-clf-c02/index.html" class="cert-card">
-      <div class="card-stripe" style="background:#ff9900"></div>
-      <div class="card-body">
-        <div class="card-badge">Amazon Web Services · CLF-C02</div>
-        <div class="card-title">AWS Cloud Practitioner</div>
-        <div class="card-desc">Concepts cloud, services AWS fondamentaux, facturation et sécurité.</div>
-      </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
-    </a>
-    <a href="aws-ai-practitioner/index.html" class="cert-card">
-      <div class="card-stripe" style="background:#e07b00"></div>
-      <div class="card-body">
-        <div class="card-badge">Amazon Web Services · AI Practitioner</div>
-        <div class="card-title">AWS AI Practitioner</div>
-        <div class="card-desc">IA/ML sur AWS, SageMaker, Bedrock, Rekognition et services IA AWS.</div>
-      </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
-    </a>
-  </div>
-
-  <div class="section-title">Google Cloud</div>
-  <div class="grid">
-    <a href="google-cloud-digital-leader/index.html" class="cert-card">
-      <div class="card-stripe" style="background:#4285f4"></div>
-      <div class="card-body">
-        <div class="card-badge">Google Cloud · Digital Leader</div>
-        <div class="card-title">Cloud Digital Leader</div>
-        <div class="card-desc">Transformation numérique, produits Google Cloud et modèles de déploiement.</div>
-      </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
-    </a>
-  </div>
-
-  <div class="section-title">Développement &amp; DevOps</div>
-  <div class="grid">
-    <a href="github-foundations/index.html" class="cert-card">
-      <div class="card-stripe" style="background:#24292f"></div>
-      <div class="card-body">
-        <div class="card-badge">GitHub · Foundations</div>
-        <div class="card-title">GitHub Foundations</div>
-        <div class="card-desc">Git, repositories, collaboration, Actions, Packages et sécurité GitHub.</div>
-      </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
-    </a>
-  </div>
-
-  <footer>Repo : <a href="https://github.com/Crachdev/certifs">Crachdev/certifs</a> · Questions originales issues des documentations officielles</footer>
+<!-- LOGIN -->
+<div id="loginBox">
+  <h2>Administration</h2>
+  <p>Accès réservé — entre le mot de passe admin.</p>
+  <div id="loginErr">Mot de passe incorrect.</div>
+  <input type="password" id="pwInput" placeholder="Mot de passe" autocomplete="current-password">
+  <button class="btn" id="loginBtn" style="width:100%">Accéder</button>
 </div>
+
+<!-- ADMIN (caché jusqu'au login) -->
+<div id="adminApp" hidden>
+  <div class="wrap">
+    <div class="hero">
+      <div class="eyebrow">Crachdev / certifs</div>
+      <h1>Administration</h1>
+    </div>
+
+    <div class="stats" id="statCards">
+      <div class="stat"><div class="val" id="sSessions">–</div><div class="lbl">Sessions totales</div></div>
+      <div class="stat"><div class="val" id="sUsers">–</div><div class="lbl">Utilisateurs distincts</div></div>
+      <div class="stat"><div class="val" id="sCerts">–</div><div class="lbl">Certifications actives</div></div>
+      <div class="stat"><div class="val" id="sErrors">–</div><div class="lbl">Erreurs enregistrées</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab" id="tabSessions" aria-selected="true">Connexions</button>
+      <button class="tab" id="tabUsers" aria-selected="false">Utilisateurs</button>
+      <button class="tab" id="tabErrors" aria-selected="false">Erreurs</button>
+    </div>
+
+    <div id="adminView"><div class="loading">Chargement…</div></div>
+  </div>
+</div>
+
+<!-- Firebase config + SDK -->
+<script src="../engine/firebase-config.js"></script>
+<script>
+// ── MOT DE PASSE ADMIN ────────────────────────────────────────────────────
+// Change cette valeur pour modifier le mot de passe
+const ADMIN_PASSWORD = "certifs2026";
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+const COMPAT_BASE = "https://www.gstatic.com/firebasejs/10.12.2/";
+let db = null;
+let currentTab = "sessions";
+
+function loadScript(src){
+  return new Promise((res,rej)=>{
+    if(document.querySelector('script[src="'+src+'"]')){res();return;}
+    const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function initFirebase(){
+  if(!window.FIREBASE_CONFIG) return;
+  await loadScript(COMPAT_BASE+"firebase-app-compat.js");
+  await loadScript(COMPAT_BASE+"firebase-firestore-compat.js");
+  if(!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
+  db = firebase.firestore();
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────
+document.getElementById("loginBtn").onclick = login;
+document.getElementById("pwInput").addEventListener("keydown", e=>{ if(e.key==="Enter") login(); });
+
+async function login(){
+  const pw = document.getElementById("pwInput").value;
+  if(pw !== ADMIN_PASSWORD){
+    document.getElementById("loginErr").style.display = "block";
+    return;
+  }
+  document.getElementById("loginBox").hidden = true;
+  document.getElementById("adminApp").hidden = false;
+  await initFirebase();
+  bindTabs();
+  loadTab("sessions");
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────
+function bindTabs(){
+  document.getElementById("tabSessions").onclick = ()=>setTab("sessions");
+  document.getElementById("tabUsers").onclick    = ()=>setTab("users");
+  document.getElementById("tabErrors").onclick   = ()=>setTab("errors");
+}
+function setTab(t){
+  currentTab=t;
+  ["sessions","users","errors"].forEach(k=>{
+    document.getElementById("tab"+k.charAt(0).toUpperCase()+k.slice(1))
+      .setAttribute("aria-selected", k===t);
+  });
+  loadTab(t);
+}
+
+// ── CHARGEMENT DES DONNÉES ────────────────────────────────────────────────
+async function loadTab(t){
+  const v = document.getElementById("adminView");
+  v.innerHTML = '<div class="loading">Chargement…</div>';
+  if(!db){ v.innerHTML='<div class="empty">Firebase non connecté.</div>'; return; }
+
+  if(t==="sessions") await renderSessions(v);
+  else if(t==="users") await renderUsers(v);
+  else if(t==="errors") await renderErrors(v);
+}
+
+// ── CONNEXIONS ────────────────────────────────────────────────────────────
+async function renderSessions(v){
+  try{
+    const snap = await db.collection("sessions").orderBy("connectedAt","desc").limit(200).get();
+    const rows = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+    // Stats globales
+    const users = new Set(rows.map(r=>r.pseudo)).size;
+    const certs = new Set(rows.map(r=>r.cert)).size;
+    document.getElementById("sSessions").textContent = rows.length;
+    document.getElementById("sUsers").textContent = users;
+    document.getElementById("sCerts").textContent = certs;
+
+    // Erreurs count
+    db.collection("errors").get().then(s=>{
+      document.getElementById("sErrors").textContent = s.size;
+    }).catch(()=>{});
+
+    if(!rows.length){ v.innerHTML='<div class="empty">Aucune session enregistrée.</div>'; return; }
+
+    const tbody = rows.map(r=>`<tr>
+      <td class="num">${fmtDate(r.connectedAt)}</td>
+      <td><span class="badge info">${esc(r.pseudo||"–")}</span></td>
+      <td><span class="badge ok">${esc(r.cert||"–")}</span></td>
+      <td><div class="ua">${esc(parseUA(r.ua||""))}</div></td>
+    </tr>`).join("");
+
+    v.innerHTML=`
+      <div class="row"><span style="color:var(--muted);font-size:.85rem">${rows.length} connexion${rows.length>1?"s":""} (200 dernières)</span></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Date</th><th>Pseudo</th><th>Certification</th><th>Navigateur</th></tr></thead>
+        <tbody>${tbody}</tbody>
+      </table></div>`;
+  }catch(e){
+    v.innerHTML=`<div class="empty">Erreur : ${e.message}</div>`;
+  }
+}
+
+// ── UTILISATEURS ──────────────────────────────────────────────────────────
+async function renderUsers(v){
+  try{
+    const [sessSnap, progSnap] = await Promise.all([
+      db.collection("sessions").orderBy("connectedAt","desc").limit(500).get(),
+      db.collection("progression").get()
+    ]);
+
+    const sessions = sessSnap.docs.map(d=>d.data());
+    const progMap = {};
+    progSnap.docs.forEach(d=>{ progMap[d.id] = d.data(); });
+
+    // Regrouper par pseudo
+    const byUser = {};
+    sessions.forEach(s=>{
+      const p = s.pseudo||"Anonyme";
+      if(!byUser[p]) byUser[p]={pseudo:p,sessions:[],certs:new Set()};
+      byUser[p].sessions.push(s);
+      byUser[p].certs.add(s.cert);
+    });
+
+    const users = Object.values(byUser).sort((a,b)=>b.sessions.length-a.sessions.length);
+    if(!users.length){ v.innerHTML='<div class="empty">Aucun utilisateur.</div>'; return; }
+
+    const tbody = users.map(u=>{
+      const last = u.sessions[0];
+      // Progression pour cet utilisateur
+      const progEntries = Object.entries(progMap)
+        .filter(([k])=>k.startsWith(u.pseudo.replace(/[^a-z0-9_-]/gi,"_")+"__"))
+        .map(([k,v])=>{
+          const cert = k.split("__").slice(1).join("__");
+          const results = v.results||{};
+          const done = Object.keys(results).length;
+          const ok = Object.values(results).filter(x=>x===1).length;
+          const pct = done ? Math.round(ok/done*100) : 0;
+          return `<div style="font-size:.78rem;margin-top:3px"><span class="badge info" style="font-size:.65rem">${esc(cert)}</span> ${done} q · ${pct}%
+            <div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:${pct}%"></div></div></div></div>`;
+        }).join("");
+
+      return `<tr>
+        <td><b>${esc(u.pseudo)}</b></td>
+        <td class="num">${u.sessions.length}</td>
+        <td>${Array.from(u.certs).map(c=>`<span class="badge ok" style="font-size:.68rem;margin-right:3px">${esc(c)}</span>`).join("")}</td>
+        <td>${fmtDate(last.connectedAt)}</td>
+        <td>${progEntries||'<span style="color:var(--muted);font-size:.78rem">–</span>'}</td>
+      </tr>`;
+    }).join("");
+
+    v.innerHTML=`
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Pseudo</th><th>Connexions</th><th>Certifs</th><th>Dernière connexion</th><th>Progression</th></tr></thead>
+        <tbody>${tbody}</tbody>
+      </table></div>`;
+  }catch(e){
+    v.innerHTML=`<div class="empty">Erreur : ${e.message}</div>`;
+  }
+}
+
+// ── ERREURS ───────────────────────────────────────────────────────────────
+async function renderErrors(v){
+  try{
+    const snap = await db.collection("errors").orderBy("attempts","desc").limit(100).get();
+    const rows = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(!rows.length){ v.innerHTML='<div class="empty">Aucune erreur enregistrée.</div>'; return; }
+
+    const tbody = rows.map(r=>{
+      const total=(r.attempts||0)+(r.successes||0);
+      const pct=total?Math.round((r.successes||0)/total*100):0;
+      return `<tr>
+        <td style="max-width:280px;font-size:.83rem">${esc(r.question||"–")}${(r.question||"").length>=120?"…":""}</td>
+        <td><span class="badge info" style="font-size:.68rem">${esc(r.cert||"–")}</span></td>
+        <td style="font-size:.78rem;color:var(--muted)">${esc(r.theme||"–")}</td>
+        <td class="num">${r.attempts||0}</td>
+        <td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:${pct}%;background:${pct>=80?"var(--ok)":pct>=50?"var(--accent)":"var(--ko)"}"></div></div></div><span style="font-size:.7rem;color:var(--muted)">${pct}%</span></td>
+        <td style="font-size:.78rem;color:var(--muted)">${esc(r.user||"–")}</td>
+      </tr>`;
+    }).join("");
+
+    v.innerHTML=`
+      <div class="row"><span style="color:var(--muted);font-size:.85rem">${rows.length} erreur${rows.length>1?"s":""} (triées par nombre d'échecs)</span></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Question</th><th>Cert</th><th>Thème</th><th>Échecs</th><th>Réussite</th><th>Utilisateur</th></tr></thead>
+        <tbody>${tbody}</tbody>
+      </table></div>`;
+  }catch(e){
+    v.innerHTML=`<div class="empty">Erreur : ${e.message}</div>`;
+  }
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function fmtDate(ts){
+  if(!ts)return"–";
+  try{
+    const d=ts.toDate?ts.toDate():new Date(ts.seconds*1000);
+    return d.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"2-digit"})
+      +" "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  }catch(e){return"–"}
+}
+
+function parseUA(ua){
+  if(!ua)return"–";
+  if(/iPhone|iPad/.test(ua))return"iOS · "+((/Safari\//.test(ua)&&!/Chrome/.test(ua))?"Safari":"Chrome");
+  if(/Android/.test(ua))return"Android · "+((/Chrome\//.test(ua))?"Chrome":"Autre");
+  if(/Windows/.test(ua))return"Windows · "+((/Edg\//.test(ua))?"Edge":/Chrome\//.test(ua)?"Chrome":/Firefox\//.test(ua)?"Firefox":"Autre");
+  if(/Mac OS X/.test(ua))return"macOS · "+((/Edg\//.test(ua))?"Edge":/Chrome\//.test(ua)?"Chrome":/Safari\//.test(ua)&&!/Chrome/.test(ua)?"Safari":/Firefox\//.test(ua)?"Firefox":"Autre");
+  if(/Linux/.test(ua))return"Linux · "+((/Chrome\//.test(ua))?"Chrome":/Firefox\//.test(ua)?"Firefox":"Autre");
+  return ua.slice(0,60);
+}
+</script>
 </body>
 </html>

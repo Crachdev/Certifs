@@ -142,7 +142,9 @@ function showPseudoModal(){
     if(val){setPseudo(val);}
     else{setPseudo("Anonyme");}
     modal.remove();
-    header(); // mettre à jour l'affichage du pseudo
+    header();
+    // Logger la connexion
+    if(typeof window.logSession==="function") window.logSession(KEY,getPseudo());
   }
   function skipPseudo(){
     setPseudo("Anonyme");
@@ -170,6 +172,14 @@ document.getElementById("tabErr").onclick=()=>setTab("err");
 
 // Demander le pseudo au premier lancement (léger délai pour le rendu initial)
 if(!getPseudo()){setTimeout(showPseudoModal,400);}
+else{
+  // Pseudo déjà connu : logger la connexion dès que Firebase est prêt
+  (function waitLogSession(attempts){
+    if(typeof window.logSession==="function"){window.logSession(KEY,getPseudo());return;}
+    if(attempts>10)return;
+    setTimeout(()=>waitLogSession(attempts+1),500);
+  })(0);
+}
 
 function render(){
   header();
