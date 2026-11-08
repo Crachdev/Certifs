@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1a5c9a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>Certifs — Quiz &amp; Fiches de révision</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,6 +51,16 @@ footer a{color:var(--accent);text-decoration:none}
 /* FEATURE 1 : Bouton thème */
 .theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
 .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* PWA : Bouton installation */
+.install-btn{background:var(--accent);border:none;border-radius:6px;padding:6px 12px;color:#fff;cursor:pointer;font:600 .82rem var(--f-body);display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;white-space:nowrap}
+.install-btn:hover{opacity:.85}
+.install-btn[hidden]{display:none!important}
+/* iOS install tooltip */
+.ios-hint{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:14px 18px;max-width:320px;width:calc(100% - 32px);box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:999;font-size:.85rem;line-height:1.5;color:var(--ink)}
+.ios-hint strong{display:block;margin-bottom:4px;font-size:.9rem}
+.ios-hint .ios-close{position:absolute;top:10px;right:12px;background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--muted);padding:0}
+.ios-hint .ios-steps{margin:8px 0 0;padding-left:1.2em;color:var(--muted)}
+.ios-hint .ios-steps li{margin:3px 0}
 /* ── FEATURE 12 : Widget notifications ─────────── */
 .notif-widget{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:32px}
 .notif-header{display:flex;align-items:center;gap:10px;padding:14px 18px;user-select:none}
@@ -102,8 +119,22 @@ footer a{color:var(--accent);text-decoration:none}
       <h1>Quiz &amp; Fiches de révision</h1>
       <p>Préparez vos certifications cloud avec des questions originales issues des documentations officielles.</p>
     </div>
-    <!-- FEATURE 1 : Bouton thème -->
-    <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    <!-- FEATURE 1 : Bouton thème + bouton install PWA -->
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="install-btn" id="pwaInstall" hidden>📲 Installer l'app</button>
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+  <!-- iOS install hint (caché par défaut) -->
+  <div class="ios-hint" id="iosHint" hidden>
+    <button class="ios-close" id="iosHintClose" aria-label="Fermer">✕</button>
+    <strong>📲 Ajouter à l'écran d'accueil</strong>
+    Sur iPhone / iPad, Safari ne propose pas de bouton automatique.
+    <ol class="ios-steps">
+      <li>Appuie sur <strong>⬆ Partager</strong> dans la barre Safari</li>
+      <li>Fais défiler et sélectionne <strong>« Sur l'écran d'accueil »</strong></li>
+      <li>Confirme avec <strong>Ajouter</strong></li>
+    </ol>
   </div>
 
   <!-- FEATURE 12 : Widget rappels quotidiens -->
@@ -248,6 +279,72 @@ footer a{color:var(--accent);text-decoration:none}
 
   <footer>Repo : <a href="https://github.com/Crachdev/certifs">Crachdev/certifs</a> · Questions originales issues des documentations officielles</footer>
 </div>
+
+<!-- PWA : Service Worker + bouton installation -->
+<script>
+(function(){
+  // ── Enregistrement SW ──
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("/Certifs/sw.js", {scope:"/Certifs/"})
+        .catch(function(){/* silencieux si offline ou HTTPS manquant */});
+    });
+  }
+
+  // ── Détection iOS ──
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isInStandalone = window.matchMedia("(display-mode: standalone)").matches
+    || navigator.standalone === true;
+
+  // ── Bouton Android/desktop : beforeinstallprompt ──
+  let deferredPrompt = null;
+  const installBtn = document.getElementById("pwaInstall");
+  const iosHint    = document.getElementById("iosHint");
+  const iosClose   = document.getElementById("iosHintClose");
+
+  window.addEventListener("beforeinstallprompt", function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    if(installBtn) installBtn.hidden = false;
+  });
+
+  if(installBtn){
+    installBtn.addEventListener("click", function(){
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(result){
+        deferredPrompt = null;
+        if(result.outcome === "accepted"){
+          installBtn.hidden = true;
+        }
+      });
+    });
+  }
+
+  // Cacher le bouton une fois l'app installée
+  window.addEventListener("appinstalled", function(){
+    if(installBtn) installBtn.hidden = true;
+    deferredPrompt = null;
+  });
+
+  // ── Bouton iOS : affiche le tooltip si pas encore en PWA ──
+  if(isIos && !isInStandalone){
+    // Afficher le bouton iOS (réutilise le même bouton, change le comportement)
+    if(installBtn){
+      installBtn.hidden = false;
+      installBtn.addEventListener("click", function(){
+        if(iosHint) iosHint.hidden = false;
+      });
+    }
+  }
+
+  if(iosClose && iosHint){
+    iosClose.addEventListener("click", function(){
+      iosHint.hidden = true;
+    });
+  }
+})();
+</script>
 
 <!-- FEATURE 12 : Module notifications -->
 <script src="engine/notifications.js"></script>

@@ -6,3 +6,7 @@ Thumbs.db
 
 # Node (si jamais)
 node_modules/
+
+# Firebase (config privée — ne jamais committer)
+firebase-config.js
+*/firebase-config.js

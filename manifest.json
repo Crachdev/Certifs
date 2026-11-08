@@ -1,0 +1,42 @@
+{
+  "name": "Certifs — Quiz & Révision",
+  "short_name": "Certifs",
+  "description": "Préparez vos certifications cloud avec des questions originales issues des documentations officielles.",
+  "start_url": "/Certifs/",
+  "scope": "/Certifs/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f6f8",
+  "theme_color": "#1a5c9a",
+  "lang": "fr",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "AZ-900 Azure Fundamentals",
+      "short_name": "AZ-900",
+      "url": "/Certifs/az-900-azure-fundamentals/",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "AWS Cloud Practitioner",
+      "short_name": "CLF-C02",
+      "url": "/Certifs/aws-clf-c02/",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
