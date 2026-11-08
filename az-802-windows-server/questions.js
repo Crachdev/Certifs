@@ -1,6 +1,8 @@
 window.QKEY = "az802.v1";
 window.QUIZ_META = {
   exam: "Microsoft Certified: Windows Server Hybrid Administrator Associate AZ-802",
+  passScore:70,
+  examMins:120,
   rules: [
     ["700/1000", "Score requis"],
     ["120 min", "Durée"],

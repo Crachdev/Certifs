@@ -6,6 +6,8 @@ window.QKEY = "ghf.v1";
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={
   exam:"GitHub Foundations GH-900",
+  passScore:70,
+  examMins:120,
   rules:[
     ["75 q · 120 min","format QCM, drag-and-drop, mise en correspondance"],
     ["Pass (seuil variable)","score de réussite GitHub"],

@@ -3,6 +3,8 @@ window.QKEY = "aif.v1";
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={
   exam:"AWS AI Practitioner AIF-C01",
+  passScore:70,
+  examMins:90,
   rules:[
     ["85 q · 90 min","dont 15 non notées"],
     ["700 / 1000","score de réussite"],

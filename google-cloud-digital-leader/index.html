@@ -112,10 +112,38 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(-
 .moddot.done{background:var(--ok);border-color:var(--ok)}
 .moddot.partial{background:var(--accent);border-color:var(--accent)}
 .moddot.active{border:2px solid var(--accent);background:transparent}
-@media(max-width:560px){
+/* ── Responsive ─────────────────────────────────── */
+@media(max-width:640px){
+  .wrap{padding-block:14px 56px}
+  h1{font-size:1.35rem}
+  header.top{gap:8px 12px;padding-bottom:12px}
+  .stats{gap:12px}
+  .stat b{font-size:.95rem}
+  nav.tabs{gap:2px;margin:12px 0 16px}
+  nav.tabs button{padding:8px 10px;font-size:.82rem}
+  .tab-fiche{padding:8px 10px;font-size:.82rem}
+  .rules{grid-template-columns:repeat(2,1fr)}
   .cols{grid-template-columns:1fr}
   .day{grid-template-columns:1fr}
   .day .tag{flex-direction:row;justify-content:flex-start;gap:10px;border-right:0;border-bottom:1px dashed var(--line);padding:10px 16px}
+  .day .body{padding:12px 14px}
+  .dayfoot{gap:8px}
+  .bar{min-width:80px}
+  .modules{grid-template-columns:repeat(3,1fr);gap:6px}
+  .free-panel{padding:14px}
+  .free-row{flex-direction:column;align-items:flex-start;gap:6px}
+  .free-row label{min-width:unset}
+  .qcard{padding:14px}
+  .qtext{font-size:.97rem}
+  .opt{grid-template-columns:26px 1fr;gap:8px;padding:9px 10px}
+  .qnav{gap:8px}
+  .result{padding:16px}
+  .score{font-size:2.2rem}
+}
+@media(max-width:380px){
+  nav.tabs button{padding:7px 8px;font-size:.78rem}
+  .modules{grid-template-columns:repeat(2,1fr)}
+  .stats{gap:8px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -131,6 +159,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(-
     <div class="stats">
       <div class="stat"><b id="sDone" class="num">0/350</b><span>questions faites</span></div>
       <div class="stat"><b id="sRate" class="num">–</b><span>bonnes réponses</span></div>
+      <div class="stat" data-pass-stat hidden><b id="sPass" class="num">–</b><span>seuil examen</span></div>
       <div id="userPseudo" hidden style="font-size:.78rem;color:var(--muted);margin-top:2px;text-align:right;grid-column:1/-1"></div>
     </div>
   </header>

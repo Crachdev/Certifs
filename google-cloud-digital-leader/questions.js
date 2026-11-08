@@ -3,6 +3,8 @@ window.QKEY = "gcdl.v1";
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={
   exam:"Google Cloud Digital Leader CDL",
+  passScore:70,
+  examMins:90,
   rules:[
     ["60 q · 90 min","format QCM à choix unique"],
     ["700 / 1000","score de réussite (approximatif)"],

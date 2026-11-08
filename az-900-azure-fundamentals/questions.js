@@ -3,6 +3,8 @@ window.QKEY = "az900.v1";
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={
   exam:"Microsoft Azure Fundamentals AZ-900",
+  passScore:70,
+  examMins:65,
   rules:[
     ["60 q · 65 min","format QCM et drag-and-drop"],
     ["700 / 1000","score de réussite"],

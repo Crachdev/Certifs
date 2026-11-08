@@ -3,6 +3,8 @@ window.QKEY = "ai900.v1";
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={
   exam:"Microsoft Azure AI Fundamentals AI-900",
+  passScore:70,
+  examMins:65,
   rules:[
     ["60 q · 45 min","format QCM et drag-and-drop"],
     ["700 / 1000","score de réussite"],

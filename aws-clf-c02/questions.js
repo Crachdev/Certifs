@@ -6,6 +6,8 @@ window.QKEY="clf7.v2";
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={
   exam:"AWS Cloud Practitioner CLF-C02",
+  passScore:70,
+  examMins:90,
   fiche:"https://claude.ai/code/artifact/9dda6fd5-2f57-473f-b38f-f1fbf7b0899d",
   rules:[
     ["65 q · 90 min","dont 15 non notées"],

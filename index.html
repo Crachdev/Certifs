@@ -8,16 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-:root{--paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;--accent:#1a5c9a;--accent-soft:#ddeeff;--f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--f-body:"Public Sans","Segoe UI",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0b0f14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#60aaee;--accent-soft:#0a1e33;color-scheme:dark}}
-:root[data-theme="dark"]{--paper:#0b0f14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#60aaee;--accent-soft:#0a1e33;color-scheme:dark}
+:root{--paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;--accent:#1a5c9a;--accent-soft:#ddeeff;--ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;--f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--f-body:"Public Sans","Segoe UI",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0b0f14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#60aaee;--accent-soft:#0a1e33;--ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0b0f14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#60aaee;--accent-soft:#0a1e33;--ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;color-scheme:dark}
 *{box-sizing:border-box}body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--f-body);margin:0}
 .wrap{max-width:900px;margin:0 auto;padding:40px 16px 80px}
 h1,h2{font-family:var(--f-display);margin:0;line-height:1.15}
 h1{font-size:2rem;font-weight:700}
 .eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.hero{padding-bottom:32px;border-bottom:2px solid var(--ink);margin-bottom:40px}
-.hero p{color:var(--muted);margin:10px 0 0;max-width:55ch}
+.hero{padding-bottom:32px;border-bottom:2px solid var(--ink);margin-bottom:40px;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px}
+.hero-text p{color:var(--muted);margin:10px 0 0;max-width:55ch}
 .section-title{font:700 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 16px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:40px}
 .cert-card{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;transition:box-shadow .15s,border-color .15s}
@@ -27,113 +27,313 @@ h1{font-size:2rem;font-weight:700}
 .card-badge{font:500 .68rem var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .card-title{font:700 1rem var(--f-display);line-height:1.25}
 .card-desc{font-size:.82rem;color:var(--muted);flex:1}
+/* FEATURE 2 & 3 : Progress sur cartes */
+.card-progress{padding:8px 18px;border-top:1px solid var(--line)}
+.card-progress-bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.card-progress-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.card-progress-label{display:flex;justify-content:space-between;align-items:center;font:500 .68rem var(--f-mono);color:var(--muted)}
+.card-progress-label .pct{font-weight:700}
 .card-foot{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;border-top:1px solid var(--line);font-size:.78rem;color:var(--muted)}
 .card-foot .pill{background:var(--accent-soft);color:var(--accent);font:500 .68rem var(--f-mono);padding:2px 8px;border-radius:4px}
+/* FEATURE 3 : badge d'état */
+.card-foot .badge-state{font:600 .68rem var(--f-mono);padding:2px 8px;border-radius:4px}
+.badge-state.done{background:var(--ok-soft);color:var(--ok)}
+.badge-state.inprogress{background:var(--accent-soft);color:var(--accent)}
 footer{border-top:1px solid var(--line);padding-top:24px;font-size:.8rem;color:var(--muted)}
 footer a{color:var(--accent);text-decoration:none}
+/* FEATURE 1 : Bouton thème */
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* ── FEATURE 12 : Widget notifications ─────────── */
+.notif-widget{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:32px}
+.notif-header{display:flex;align-items:center;gap:10px;padding:14px 18px;user-select:none}
+.notif-icon{font-size:1.1rem;line-height:1}
+.notif-title{font:600 .88rem var(--f-body);flex:1}
+.notif-status{font:600 .68rem var(--f-mono);letter-spacing:.05em;padding:2px 8px;border-radius:4px}
+.notif-status.on{background:var(--ok-soft);color:var(--ok)}
+.notif-status.off{background:var(--line);color:var(--muted)}
+.notif-chevron{background:none;border:none;color:var(--muted);font-size:1rem;padding:0 2px;line-height:1;cursor:pointer}
+.notif-body{padding:0 18px 18px;display:grid;gap:12px}
+.notif-warn{font-size:.8rem;color:var(--ko);background:var(--ko-soft);border-radius:6px;padding:8px 10px;margin:0}
+.notif-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.notif-label{font:500 .82rem var(--f-body);color:var(--muted);min-width:160px}
+.notif-select{flex:1;min-width:180px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;background:var(--sheet);color:var(--ink);font-size:.85rem}
+.notif-time-wrap{display:flex;align-items:center;gap:4px}
+.notif-time-input{width:58px;padding:7px 8px;border:1px solid var(--line);border-radius:6px;font:500 1rem var(--f-mono);text-align:center;background:var(--sheet);color:var(--ink)}
+.notif-sep{font:700 1rem var(--f-mono);color:var(--muted)}
+.notif-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.btn-notif-save{border:1px solid var(--accent);background:var(--accent);color:var(--sheet);padding:8px 16px;border-radius:6px;font:600 .85rem var(--f-body);cursor:pointer;transition:opacity .15s}
+.btn-notif-save:hover:not([disabled]){opacity:.85}
+.btn-notif-save[disabled]{opacity:.4;cursor:not-allowed}
+.btn-notif-off{border:1px solid var(--line);background:transparent;color:var(--muted);padding:8px 16px;border-radius:6px;font:500 .82rem var(--f-body);cursor:pointer}
+.btn-notif-off:hover{border-color:var(--ko);color:var(--ko)}
+/* ── Responsive ─────────────────────────────────── */
+@media(max-width:640px){
+  .wrap{padding:24px 16px 60px}
+  h1{font-size:1.45rem}
+  .hero{padding-bottom:20px;margin-bottom:28px}
+  .hero-text p{font-size:.88rem}
+  .grid{grid-template-columns:1fr;gap:12px;margin-bottom:28px}
+  .section-title{margin:0 0 10px}
+  .card-body{padding:14px 14px;gap:6px}
+  .card-title{font-size:.95rem}
+  .card-foot{padding:8px 14px}
+  .card-progress{padding:6px 14px}
+  /* notif widget mobile */
+  .notif-header{padding:12px 14px}
+  .notif-body{padding:0 14px 14px}
+  .notif-label{min-width:unset;width:100%}
+  .notif-row{flex-direction:column;align-items:flex-start}
+  .notif-select{width:100%}
+}
+@media(min-width:641px) and (max-width:900px){
+  .wrap{padding:28px 20px 70px}
+  h1{font-size:1.7rem}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="hero">
-    <div class="eyebrow">Crachdev / certifs</div>
-    <h1>Quiz &amp; Fiches de révision</h1>
-    <p>Préparez vos certifications cloud avec des questions originales issues des documentations officielles.</p>
+    <div class="hero-text">
+      <div class="eyebrow">Crachdev / certifs</div>
+      <h1>Quiz &amp; Fiches de révision</h1>
+      <p>Préparez vos certifications cloud avec des questions originales issues des documentations officielles.</p>
+    </div>
+    <!-- FEATURE 1 : Bouton thème -->
+    <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
   </div>
+
+  <!-- FEATURE 12 : Widget rappels quotidiens -->
+  <div id="notifWidgetContainer"></div>
 
   <div class="section-title">Microsoft Windows Server</div>
   <div class="grid">
-    <a href="az-802-windows-server/index.html" class="cert-card">
-      <div class="card-stripe" style="background:#0078d4"></div>
+    <a href="az-802-windows-server/index.html" class="cert-card" data-qkey="az802.v1">
+      <div class="card-stripe" style="background:#2747c9"></div>
       <div class="card-body">
         <div class="card-badge">Microsoft · AZ-802</div>
         <div class="card-title">Windows Server Hybrid Administrator</div>
         <div class="card-desc">Active Directory, Hyper-V, Azure Arc, clustering et sécurité Windows Server.</div>
       </div>
-      <div class="card-foot"><span>750 questions · 15 jours</span><span class="pill">Quiz</span></div>
+      <div class="card-progress" id="prog-az802" hidden>
+        <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-az802" style="width:0%"></div></div>
+        <div class="card-progress-label"><span id="done-az802">0/750</span><span class="pct" id="pct-az802"></span></div>
+      </div>
+      <div class="card-foot"><span>750 questions · 15 jours</span><span class="pill" id="pill-az802">Quiz</span></div>
     </a>
   </div>
 
   <div class="section-title">Microsoft Azure</div>
   <div class="grid">
-    <a href="az-900-azure-fundamentals/index.html" class="cert-card">
+    <a href="az-900-azure-fundamentals/index.html" class="cert-card" data-qkey="az900.v1">
       <div class="card-stripe" style="background:#0078d4"></div>
       <div class="card-body">
         <div class="card-badge">Microsoft Azure · AZ-900</div>
         <div class="card-title">Azure Fundamentals</div>
         <div class="card-desc">Concepts cloud, services Azure, sécurité, conformité et gouvernance.</div>
       </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
+      <div class="card-progress" id="prog-az900" hidden>
+        <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-az900" style="width:0%"></div></div>
+        <div class="card-progress-label"><span id="done-az900">0/350</span><span class="pct" id="pct-az900"></span></div>
+      </div>
+      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill" id="pill-az900">Quiz</span></div>
     </a>
-    <a href="ai-901-azure-ai-fundamentals/index.html" class="cert-card">
+    <a href="ai-901-azure-ai-fundamentals/index.html" class="cert-card" data-qkey="ai901.v1">
       <div class="card-stripe" style="background:#7b2d8b"></div>
       <div class="card-body">
         <div class="card-badge">Microsoft Azure · AI-901</div>
         <div class="card-title">Azure AI Fundamentals</div>
         <div class="card-desc">IA générative, ML, Computer Vision, NLP, Azure OpenAI et Responsible AI.</div>
       </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
+      <div class="card-progress" id="prog-ai901" hidden>
+        <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-ai901" style="width:0%"></div></div>
+        <div class="card-progress-label"><span id="done-ai901">0/350</span><span class="pct" id="pct-ai901"></span></div>
+      </div>
+      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill" id="pill-ai901">Quiz</span></div>
     </a>
-    <a href="sc-900-security-compliance-identity/index.html" class="cert-card">
+    <a href="sc-900-security-compliance-identity/index.html" class="cert-card" data-qkey="sc900.v1">
       <div class="card-stripe" style="background:#1a5c9a"></div>
       <div class="card-body">
         <div class="card-badge">Microsoft Security · SC-900</div>
         <div class="card-title">Security, Compliance &amp; Identity</div>
         <div class="card-desc">Zero Trust, Entra ID, Defender, Sentinel, Purview et conformité cloud.</div>
       </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
+      <div class="card-progress" id="prog-sc900" hidden>
+        <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-sc900" style="width:0%"></div></div>
+        <div class="card-progress-label"><span id="done-sc900">0/350</span><span class="pct" id="pct-sc900"></span></div>
+      </div>
+      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill" id="pill-sc900">Quiz</span></div>
+    </a>
+    <a href="ms-900-microsoft-365/index.html" class="cert-card" data-qkey="ms900.v1">
+      <div class="card-stripe" style="background:#54b054"></div>
+      <div class="card-body">
+        <div class="card-badge">Microsoft 365 · MS-900</div>
+        <div class="card-title">Microsoft 365 Fundamentals</div>
+        <div class="card-desc">Services Microsoft 365, sécurité, conformité et administration cloud.</div>
+      </div>
+      <div class="card-progress" id="prog-ms900" hidden>
+        <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-ms900" style="width:0%"></div></div>
+        <div class="card-progress-label"><span id="done-ms900">0/350</span><span class="pct" id="pct-ms900"></span></div>
+      </div>
+      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill" id="pill-ms900">Quiz</span></div>
     </a>
   </div>
 
   <div class="section-title">Amazon Web Services</div>
   <div class="grid">
-    <a href="aws-clf-c02/index.html" class="cert-card">
+    <a href="aws-clf-c02/index.html" class="cert-card" data-qkey="clf7.v2">
       <div class="card-stripe" style="background:#ff9900"></div>
       <div class="card-body">
         <div class="card-badge">Amazon Web Services · CLF-C02</div>
         <div class="card-title">AWS Cloud Practitioner</div>
         <div class="card-desc">Concepts cloud, services AWS fondamentaux, facturation et sécurité.</div>
       </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
+      <div class="card-progress" id="prog-clf7" hidden>
+        <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-clf7" style="width:0%"></div></div>
+        <div class="card-progress-label"><span id="done-clf7">0/350</span><span class="pct" id="pct-clf7"></span></div>
+      </div>
+      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill" id="pill-clf7">Quiz</span></div>
     </a>
-    <a href="aws-ai-practitioner/index.html" class="cert-card">
+    <a href="aws-ai-practitioner/index.html" class="cert-card" data-qkey="aif.v1">
       <div class="card-stripe" style="background:#e07b00"></div>
       <div class="card-body">
         <div class="card-badge">Amazon Web Services · AI Practitioner</div>
         <div class="card-title">AWS AI Practitioner</div>
         <div class="card-desc">IA/ML sur AWS, SageMaker, Bedrock, Rekognition et services IA AWS.</div>
       </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
+      <div class="card-progress" id="prog-aif" hidden>
+        <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-aif" style="width:0%"></div></div>
+        <div class="card-progress-label"><span id="done-aif">0/350</span><span class="pct" id="pct-aif"></span></div>
+      </div>
+      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill" id="pill-aif">Quiz</span></div>
     </a>
   </div>
 
   <div class="section-title">Google Cloud</div>
   <div class="grid">
-    <a href="google-cloud-digital-leader/index.html" class="cert-card">
+    <a href="google-cloud-digital-leader/index.html" class="cert-card" data-qkey="gcdl.v1">
       <div class="card-stripe" style="background:#4285f4"></div>
       <div class="card-body">
         <div class="card-badge">Google Cloud · Digital Leader</div>
         <div class="card-title">Cloud Digital Leader</div>
         <div class="card-desc">Transformation numérique, produits Google Cloud et modèles de déploiement.</div>
       </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
+      <div class="card-progress" id="prog-gcdl" hidden>
+        <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-gcdl" style="width:0%"></div></div>
+        <div class="card-progress-label"><span id="done-gcdl">0/350</span><span class="pct" id="pct-gcdl"></span></div>
+      </div>
+      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill" id="pill-gcdl">Quiz</span></div>
     </a>
   </div>
 
   <div class="section-title">Développement &amp; DevOps</div>
   <div class="grid">
-    <a href="github-foundations/index.html" class="cert-card">
+    <a href="github-foundations/index.html" class="cert-card" data-qkey="ghf.v1">
       <div class="card-stripe" style="background:#24292f"></div>
       <div class="card-body">
         <div class="card-badge">GitHub · Foundations</div>
         <div class="card-title">GitHub Foundations</div>
         <div class="card-desc">Git, repositories, collaboration, Actions, Packages et sécurité GitHub.</div>
       </div>
-      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill">Quiz</span></div>
+      <div class="card-progress" id="prog-ghf" hidden>
+        <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-ghf" style="width:0%"></div></div>
+        <div class="card-progress-label"><span id="done-ghf">0/350</span><span class="pct" id="pct-ghf"></span></div>
+      </div>
+      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill" id="pill-ghf">Quiz</span></div>
     </a>
   </div>
 
   <footer>Repo : <a href="https://github.com/Crachdev/certifs">Crachdev/certifs</a> · Questions originales issues des documentations officielles</footer>
 </div>
+
+<!-- FEATURE 12 : Module notifications -->
+<script src="engine/notifications.js"></script>
+<script>
+// FEATURE 1 : Theme switcher
+const THEME_KEY="certifs.theme";
+function getTheme(){try{return localStorage.getItem(THEME_KEY)||""}catch(e){return""}}
+function setThemeStorage(t){try{localStorage.setItem(THEME_KEY,t)}catch(e){}}
+function applyTheme(t){
+  if(t==="dark")document.documentElement.setAttribute("data-theme","dark");
+  else if(t==="light")document.documentElement.setAttribute("data-theme","light");
+  else document.documentElement.removeAttribute("data-theme");
+  updateThemeBtn();
+}
+function updateThemeBtn(){
+  const btn=document.getElementById("themeToggle");if(!btn)return;
+  const cur=document.documentElement.getAttribute("data-theme")||"";
+  const isDark=cur==="dark"||(cur===""&&window.matchMedia("(prefers-color-scheme:dark)").matches);
+  btn.textContent=isDark?"☀️":"🌙";
+  btn.title=isDark?"Passer en mode clair":"Passer en mode sombre";
+}
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute("data-theme")||"";
+  const isDark=cur==="dark"||(cur===""&&window.matchMedia("(prefers-color-scheme:dark)").matches);
+  const next=isDark?"light":"dark";
+  setThemeStorage(next);applyTheme(next);
+}
+// Init thème
+const saved=getTheme();if(saved)applyTheme(saved);else updateThemeBtn();
+window.matchMedia("(prefers-color-scheme:dark)").addEventListener("change",updateThemeBtn);
+document.getElementById("themeToggle").onclick=toggleTheme;
+
+// FEATURE 2 & 3 : Progress bars per cert
+// total questions par cert (pour calcul couverture)
+const TOTALS={
+  "az802.v1":750,"az900.v1":350,"ai901.v1":350,"sc900.v1":350,
+  "ms900.v1":350,"clf7.v2":350,"aif.v1":350,"gcdl.v1":350,"ghf.v1":350
+};
+// ID short (même que data-qkey préfixe slug dans les IDs DOM)
+const KEY_SLUG={
+  "az802.v1":"az802","az900.v1":"az900","ai901.v1":"ai901","sc900.v1":"sc900",
+  "ms900.v1":"ms900","clf7.v2":"clf7","aif.v1":"aif","gcdl.v1":"gcdl","ghf.v1":"ghf"
+};
+
+document.querySelectorAll(".cert-card[data-qkey]").forEach(card=>{
+  const key=card.dataset.qkey;
+  const slug=KEY_SLUG[key];
+  if(!slug)return;
+  let store={r:{}};
+  try{const raw=localStorage.getItem(key);if(raw)store=JSON.parse(raw)||{r:{}};store.r=store.r||{};}catch(e){}
+  const results=store.r;
+  const keys=Object.keys(results);
+  if(!keys.length)return; // pas de progression : on n'affiche rien
+  const total=TOTALS[key]||350;
+  const done=keys.length;
+  const ok=keys.filter(k=>results[k]===1).length;
+  const pct=Math.round(done/total*100);
+  const rate=Math.round(ok/done*100);
+  // Barre de couverture
+  const progEl=document.getElementById("prog-"+slug);
+  const barEl=document.getElementById("bar-"+slug);
+  const doneEl=document.getElementById("done-"+slug);
+  const pctEl=document.getElementById("pct-"+slug);
+  if(progEl&&barEl&&doneEl&&pctEl){
+    progEl.hidden=false;
+    // Couleur selon réussite
+    const col=rate>=80?"var(--ok)":rate>=50?"var(--accent)":"var(--ko)";
+    barEl.style.width=pct+"%";
+    barEl.style.background=col;
+    doneEl.textContent=done+"/"+total+" faites";
+    pctEl.textContent=rate+" % réussite";
+    pctEl.style.color=col;
+  }
+  // FEATURE 3 : badge et bordure colorée selon état
+  const pillEl=document.getElementById("pill-"+slug);
+  if(pct>=100){
+    // Terminé
+    if(pillEl){pillEl.className="badge-state done";pillEl.textContent="✓ Terminé";}
+    card.style.borderColor="var(--ok)";
+    card.querySelector(".card-stripe")&&(card.querySelector(".card-stripe").style.height="8px");
+  } else if(done>0){
+    // En cours
+    if(pillEl){pillEl.className="badge-state inprogress";pillEl.textContent="En cours";}
+    card.style.borderColor="var(--accent)";
+  }
+});
+</script>
 </body>
 </html>

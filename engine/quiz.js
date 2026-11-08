@@ -11,6 +11,7 @@ const MODS_PER_DAY=5; // 5 modules × 10 q = 50 q/jour
 
 const KEY=window.QKEY||"clf7.v2";
 const PSEUDO_KEY="certifs.pseudo"; // clé stable partagée entre toutes les certifications
+const THEME_KEY="certifs.theme"; // clé stockage thème
 let store={};
 try{store=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){store={}}
 store.r=store.r||{}; // results: "day-idx" -> 1 correct / 0 wrong
@@ -19,6 +20,42 @@ store.free=store.free||{}; // free training config persistence
 // Pseudo : chargé depuis la clé partagée ou depuis store (rétrocompat)
 function getPseudo(){try{return localStorage.getItem(PSEUDO_KEY)||""}catch(e){return""}}
 function setPseudo(p){try{localStorage.setItem(PSEUDO_KEY,p)}catch(e){}}
+
+/* ── FEATURE 1 : THEME SWITCHER ─────────────────────────── */
+function getTheme(){try{return localStorage.getItem(THEME_KEY)||""}catch(e){return""}}
+function setThemeStorage(t){try{localStorage.setItem(THEME_KEY,t)}catch(e){}}
+
+function applyTheme(t){
+  if(t==="dark"){document.documentElement.setAttribute("data-theme","dark")}
+  else if(t==="light"){document.documentElement.setAttribute("data-theme","light")}
+  else{document.documentElement.removeAttribute("data-theme")}
+  updateThemeBtn();
+}
+
+function updateThemeBtn(){
+  const btn=document.getElementById("themeToggle");
+  if(!btn)return;
+  const cur=document.documentElement.getAttribute("data-theme")||"";
+  const isDark=cur==="dark"||(cur===""&&window.matchMedia("(prefers-color-scheme:dark)").matches);
+  btn.textContent=isDark?"☀️":"🌙";
+  btn.title=isDark?"Passer en mode clair":"Passer en mode sombre";
+}
+
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute("data-theme")||"";
+  const isDark=cur==="dark"||(cur===""&&window.matchMedia("(prefers-color-scheme:dark)").matches);
+  const next=isDark?"light":"dark";
+  setThemeStorage(next);
+  applyTheme(next);
+}
+
+// Appliquer le thème sauvegardé au chargement
+(function initTheme(){
+  const saved=getTheme();
+  if(saved)applyTheme(saved);
+  // Ecouter les changements système
+  window.matchMedia("(prefers-color-scheme:dark)").addEventListener("change",updateThemeBtn);
+})();
 
 /* ── SVG cercle de progression ─────────────────────────────
    pct : 0–100   size : taille px (défaut 52)
@@ -37,7 +74,7 @@ function svgCircle(pct,size,color){
       stroke-linecap="round"
       transform="rotate(-90 ${c} ${c})"/>
     <text x="${c}" y="${c}" text-anchor="middle" dominant-baseline="central"
-      style="font-size:${size<48?".65rem":".7rem"};font-family:var(--f-ui);fill:var(--fg);font-weight:600">${pct}%</text>
+      style="font-size:${size<48?".65rem":".7rem"};font-family:var(--f-ui);fill:var(--ink);font-weight:600">${pct}%</text>
   </svg>`;
 }
 
@@ -96,6 +133,14 @@ function header(){
   document.getElementById("sRate").textContent=keys.length?Math.round(ok/keys.length*100)+" %":"–";
   const n=errors().length,b=document.getElementById("errBadge");
   b.hidden=!n;b.textContent=n;
+
+  // FEATURE 5 : Score de passage dans header
+  const passEl=document.getElementById("sPass");
+  if(passEl&&META.passScore){
+    passEl.textContent=META.passScore+" %";
+    passEl.closest("[data-pass-stat]")&&(passEl.closest("[data-pass-stat]").hidden=false);
+  }
+
   // Afficher le pseudo dans l'en-tête
   const pseudo=getPseudo();
   const pEl=document.getElementById("userPseudo");
@@ -107,6 +152,9 @@ function header(){
       pEl.hidden=true;
     }
   }
+
+  // Theme button update
+  updateThemeBtn();
 }
 function dayStats(d){
   const n=window.QDATA[d].length;let done=0,ok=0;
@@ -122,11 +170,11 @@ function showPseudoModal(){
   const modal=document.createElement("div");
   modal.id="pseudoModal";
   modal.style.cssText="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px";
-  modal.innerHTML=`<div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+  modal.innerHTML=`<div style="background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.18)">
     <h2 style="margin:0 0 6px;font-size:1.15rem">Qui fait ce quiz ?</h2>
     <p style="margin:0 0 16px;font-size:.88rem;color:var(--muted)">Entre un prénom ou pseudo pour suivre ta progression sur tous tes appareils. Tu peux toujours le modifier dans le pied de page.</p>
     <input id="pseudoInput" type="text" placeholder="Ton prénom ou pseudo" autocomplete="off" maxlength="30"
-      style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font-size:1rem;font-family:var(--f-body);outline:none;margin-bottom:12px">
+      style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sheet);color:var(--ink);font-size:1rem;font-family:var(--f-body);outline:none;margin-bottom:12px">
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button id="pseudoSkip" class="btn ghost" style="padding:8px 14px;font-size:.88rem">Passer</button>
       <button id="pseudoSave" class="btn" style="padding:8px 16px;font-size:.88rem">Confirmer</button>
@@ -159,16 +207,102 @@ function showPseudoModal(){
   modal.addEventListener("click",e=>{if(e.target===modal)skipPseudo();});
 }
 
+/* ── FEATURE 11 : PANNEAU FICHE LATÉRALE ─────────────────── */
+function initFichePanel(){
+  if(!META.fiche)return; // pas de fiche
+  const existing=document.getElementById("fichePanel");
+  if(existing)return;
+
+  // Bouton flottant
+  const fab=document.createElement("button");
+  fab.id="ficheFab";
+  fab.title="Ouvrir la fiche de révision";
+  fab.innerHTML="📄";
+  fab.style.cssText=`position:fixed;bottom:80px;right:16px;z-index:8000;width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--sheet);border:none;font-size:1.2rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;transition:transform .15s`;
+  fab.onmouseenter=()=>fab.style.transform="scale(1.1)";
+  fab.onmouseleave=()=>fab.style.transform="scale(1)";
+  document.body.appendChild(fab);
+
+  // Panneau latéral
+  const panel=document.createElement("div");
+  panel.id="fichePanel";
+  panel.setAttribute("aria-hidden","true");
+  panel.style.cssText=`position:fixed;top:0;right:-420px;width:min(420px,95vw);height:100vh;z-index:9000;background:var(--sheet);border-left:1px solid var(--line);box-shadow:-4px 0 24px rgba(0,0,0,.15);transition:right .25s ease;display:flex;flex-direction:column;overflow:hidden`;
+  panel.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);flex-shrink:0">
+      <span style="font:700 1rem var(--f-display)">📄 Fiche de révision</span>
+      <div style="display:flex;gap:8px">
+        <a href="${META.fiche}" target="_blank" rel="noopener" style="font:500 .78rem var(--f-mono);color:var(--accent);text-decoration:none;padding:4px 8px;border:1px solid var(--accent);border-radius:4px">Ouvrir ↗</a>
+        <button id="fichePanelClose" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;padding:2px 6px;line-height:1" title="Fermer">✕</button>
+      </div>
+    </div>
+    <iframe src="${META.fiche}" style="flex:1;border:none;width:100%" title="Fiche de révision" loading="lazy"></iframe>`;
+  document.body.appendChild(panel);
+
+  // Overlay sombre
+  const overlay=document.createElement("div");
+  overlay.id="ficheOverlay";
+  overlay.style.cssText="position:fixed;inset:0;z-index:8999;background:rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .25s";
+  document.body.appendChild(overlay);
+
+  let open=false;
+  function openPanel(){
+    open=true;
+    panel.style.right="0";
+    panel.setAttribute("aria-hidden","false");
+    overlay.style.opacity="1";
+    overlay.style.pointerEvents="auto";
+    fab.innerHTML="✕";
+  }
+  function closePanel(){
+    open=false;
+    panel.style.right="-420px";
+    panel.setAttribute("aria-hidden","true");
+    overlay.style.opacity="0";
+    overlay.style.pointerEvents="none";
+    fab.innerHTML="📄";
+  }
+
+  fab.onclick=()=>open?closePanel():openPanel();
+  document.getElementById("fichePanelClose").onclick=closePanel;
+  overlay.onclick=closePanel;
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&open)closePanel();});
+}
+
 let tab="plan",session=null,timerId=null;
+
+/* ── FEATURE 4 : ANIMATION FADE ENTRE TABS ─────────────── */
 function setTab(t){
   tab=t;
   [["plan","tabPlan"],["quiz","tabQuiz"],["free","tabFree"],["err","tabErr"]].forEach(([k,id])=>document.getElementById(id).setAttribute("aria-selected",k===t));
-  render();
+  const v=document.getElementById("view");
+  v.style.opacity="0";
+  v.style.transition="opacity .1s";
+  setTimeout(()=>{
+    render();
+    v.style.opacity="1";
+  },100);
 }
 document.getElementById("tabPlan").onclick=()=>setTab("plan");
 document.getElementById("tabQuiz").onclick=()=>setTab("quiz");
 document.getElementById("tabFree").onclick=()=>setTab("free");
 document.getElementById("tabErr").onclick=()=>setTab("err");
+
+// Bouton theme switcher — injecté si pas encore présent dans le HTML
+(function injectThemeBtn(){
+  if(document.getElementById("themeToggle"))return;
+  const nav=document.querySelector("nav.tabs");
+  if(!nav)return;
+  const btn=document.createElement("button");
+  btn.id="themeToggle";
+  btn.title="Basculer le thème";
+  btn.style.cssText="background:none;border:0;padding:8px 10px;color:var(--muted);font-size:1rem;cursor:pointer;margin-left:auto;white-space:nowrap;flex-shrink:0";
+  btn.onclick=toggleTheme;
+  // Insérer avant le lien fiche si présent, sinon à la fin
+  const ficheLink=nav.querySelector(".tab-fiche");
+  if(ficheLink){nav.insertBefore(btn,ficheLink)}else{nav.appendChild(btn)}
+  updateThemeBtn();
+})();
 
 // Demander le pseudo au premier lancement (léger délai pour le rendu initial)
 if(!getPseudo()){setTimeout(showPseudoModal,400);}
@@ -180,6 +314,9 @@ else{
     setTimeout(()=>waitLogSession(attempts+1),500);
   })(0);
 }
+
+// Initialiser le panneau fiche
+setTimeout(initFichePanel,200);
 
 function render(){
   header();
@@ -255,17 +392,20 @@ function pickHTML(){
 /* ── FREE SESSION ──────────────────────────────────────── */
 function freeHTML(){
   const cfg=store.free;
-  const allDays=[1,2,3,4,5,6,7];
+  const allDays=PLAN.map(p=>p.d);
   const days=cfg.days||allDays;
   const n=cfg.n||30;
   const pool=buildFreePool(days);
+  const timedOn=cfg.timed||false;
+  const examMins=META.examMins||60;
+
   return `<div class="free-panel">
     <div class="eyebrow" style="margin-bottom:4px">Session d'entraînement libre</div>
     <h2>Configure ta session</h2>
     <div class="free-opts">
       <div class="free-row">
         <label>Nombre de questions</label>
-        <input type="number" id="freeN" value="${n}" min="5" max="350" step="5" style="width:80px">
+        <input type="number" id="freeN" value="${n}" min="5" max="${total()}" step="5" style="width:80px">
         <div class="preset-btns">
           <button data-preset="10">10</button>
           <button data-preset="20">20</button>
@@ -279,6 +419,14 @@ function freeHTML(){
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           ${allDays.map(d=>`<label style="display:flex;align-items:center;gap:4px;font-size:.85rem;cursor:pointer;font-weight:400;min-width:0"><input type="checkbox" id="fd${d}" ${days.includes(d)?"checked":""} data-fd="${d}" style="accent-color:var(--accent)"> J${d}</label>`).join("")}
         </div>
+      </div>
+      <!-- FEATURE 7 : Timer simulation examen -->
+      <div class="free-row">
+        <label>Mode simulation</label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:400;font-size:.88rem;cursor:pointer">
+          <input type="checkbox" id="freeTimed" ${timedOn?"checked":""} style="accent-color:var(--accent)">
+          Chrono ${examMins} min (comme l'examen)
+        </label>
       </div>
       <div class="free-row">
         <label>Pioche parmi</label>
@@ -311,14 +459,129 @@ function fmtDate(ts){
   }catch(e){return"–"}
 }
 
+/* ── FEATURE 8 : STATS PAR DOMAINE ──────────────────────── */
+function domainStatsHTML(){
+  // Grouper les résultats par jour (= domaine)
+  const byDay={};
+  Object.keys(store.r).forEach(k=>{
+    const[d]=k.split("-").map(Number);
+    if(!byDay[d])byDay[d]={done:0,ok:0,n:0};
+    byDay[d].done++;
+    if(store.r[k]===1)byDay[d].ok++;
+  });
+  // Ajouter le total de questions par jour
+  PLAN.forEach(p=>{
+    if(!byDay[p.d])byDay[p.d]={done:0,ok:0,n:window.QDATA[p.d].length};
+    else byDay[p.d].n=window.QDATA[p.d].length;
+  });
+
+  const rows=PLAN.map(p=>{
+    const s=byDay[p.d]||{done:0,ok:0,n:window.QDATA[p.d].length};
+    const pct=s.done?Math.round(s.ok/s.done*100):null;
+    const cover=Math.round(s.done/s.n*100);
+    const col=pct===null?"var(--muted)":pct>=80?"var(--ok)":pct>=50?"var(--accent)":"var(--ko)";
+    return `<tr>
+      <td style="padding:8px 6px 8px 0;border-bottom:1px solid var(--line)"><b>J${p.d}</b> <span style="font-size:.82rem;color:var(--muted)">${esc(p.theme)}</span></td>
+      <td style="padding:8px 6px;border-bottom:1px solid var(--line);text-align:center" class="num">${s.done}/${s.n}</td>
+      <td style="padding:8px 6px;border-bottom:1px solid var(--line)">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden"><div style="width:${cover}%;height:100%;background:var(--accent)"></div></div>
+          <span style="font-size:.78rem;color:var(--muted);white-space:nowrap">${cover} %</span>
+        </div>
+      </td>
+      <td style="padding:8px 0 8px 6px;border-bottom:1px solid var(--line);text-align:center;font-weight:700;font-family:var(--f-mono);color:${col}">${pct!==null?pct+" %":"–"}</td>
+    </tr>`;
+  }).join("");
+
+  return `<div style="margin-top:28px">
+    <h3 style="font-size:1rem;margin-bottom:12px">📊 Statistiques par domaine</h3>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.88rem">
+      <thead><tr style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">
+        <th style="text-align:left;padding-bottom:8px;border-bottom:2px solid var(--line)">Domaine</th>
+        <th style="padding:0 6px 8px;border-bottom:2px solid var(--line)" class="num">Faites</th>
+        <th style="padding:0 6px 8px;border-bottom:2px solid var(--line);min-width:120px">Couverture</th>
+        <th style="padding:0 0 8px 6px;border-bottom:2px solid var(--line)">Réussite</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    </div>
+  </div>`;
+}
+
+/* ── FEATURE 10 : EXPORT BILAN PDF ───────────────────────── */
+function exportPDF(){
+  const pseudo=getPseudo()||"Anonyme";
+  const now=new Date().toLocaleDateString("fr-FR");
+  const allKeys=Object.keys(store.r);
+  const allOk=allKeys.filter(k=>store.r[k]===1).length;
+  const globalPct=allKeys.length?Math.round(allOk/allKeys.length*100):0;
+  const totalQ=total();
+  const errList=errors();
+  const passScore=META.passScore||700;
+
+  const domRows=PLAN.map(p=>{
+    const s=dayStats(p.d);
+    const pct=s.done?Math.round(s.ok/s.done*100):null;
+    return `<tr>
+      <td style="padding:6px 10px 6px 0;border-bottom:1px solid #e0e0e0">J${p.d} — ${p.theme}</td>
+      <td style="padding:6px;border-bottom:1px solid #e0e0e0;text-align:center">${s.done}/${s.n}</td>
+      <td style="padding:6px;border-bottom:1px solid #e0e0e0;text-align:center">${Math.round(s.done/s.n*100)} %</td>
+      <td style="padding:6px 0 6px 10px;border-bottom:1px solid #e0e0e0;text-align:center;font-weight:700;color:${pct===null?"#999":pct>=80?"#1d7a4f":pct>=50?"#1a5c9a":"#b4372f"}">${pct!==null?pct+" %":"–"}</td>
+    </tr>`;
+  }).join("");
+
+  const errItems=errList.slice(0,30).map(([d,i])=>`<li style="margin:4px 0;font-size:11px">J${d} · ${Q(d,i).q}</li>`).join("");
+
+  const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8">
+  <title>Bilan — ${META.exam||"Certification"}</title>
+  <style>
+    *{box-sizing:border-box}body{font:13px/1.5 "Segoe UI",Arial,sans-serif;margin:0;padding:24px;color:#15202b;max-width:800px;margin:0 auto}
+    h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:20px 0 8px;border-bottom:2px solid #15202b;padding-bottom:4px}
+    .meta{font-size:11px;color:#666;margin-bottom:20px}
+    .big{font-size:48px;font-weight:700;line-height:1}
+    .ok{color:#1d7a4f}.warn{color:#c17600}.ko{color:#b4372f}
+    table{width:100%;border-collapse:collapse}th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#666;padding-bottom:6px;border-bottom:2px solid #15202b}
+    ul{margin:0;padding-left:1.2em}.note{font-size:11px;color:#666;margin-top:6px}
+    @media print{body{padding:12px}h2{page-break-after:avoid}}
+  </style></head><body>
+  <h1>${META.exam||"Certification"}</h1>
+  <div class="meta">Bilan de révision — ${pseudo} — ${now}</div>
+  <h2>Progression globale</h2>
+  <div class="big ${globalPct>=passScore/10?"ok":globalPct>=60?"warn":"ko"}">${globalPct} %</div>
+  <p>${allKeys.length} questions traitées sur ${totalQ} · ${allOk} correctes · ${errList.length} erreurs actives${META.passScore?` · Seuil examen : ${META.passScore} %`:""}</p>
+  <h2>Par domaine</h2>
+  <table><thead><tr><th>Domaine</th><th style="text-align:center">Faites</th><th style="text-align:center">Couverture</th><th style="text-align:center">Réussite</th></tr></thead><tbody>${domRows}</tbody></table>
+  ${errList.length?`<h2>Points faibles (${Math.min(errList.length,30)} sur ${errList.length})</h2><ul>${errItems}</ul>${errList.length>30?`<p class="note">… et ${errList.length-30} autres erreurs.</p>`:""}`:"<h2>Points faibles</h2><p>Aucune erreur active — excellent ! 🎉</p>"}
+  <p class="note" style="margin-top:24px">Rapport généré par certifs.crachdev · questions issues des documentations officielles uniquement</p>
+  </body></html>`;
+
+  const blob=new Blob([html],{type:"text/html;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download=`bilan-${(META.exam||"certif").replace(/[^a-z0-9]/gi,"-").toLowerCase()}-${now.replace(/\//g,"-")}.html`;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},1000);
+}
+
 function errHTML(){
   const e=errors();
   const baseHTML=e.length
     ?`<p class="intro">${e.length} question${e.length>1?"s":""} à revoir localement. Rejoue-les jusqu'à ce que la liste soit vide.</p>
-      <div class="row" style="margin-bottom:16px"><button class="btn" data-replay="all">Rejouer les ${e.length} erreurs</button></div>
+      <div class="row" style="margin-bottom:16px">
+        <button class="btn" data-replay="all">Rejouer les ${e.length} erreurs</button>
+        <!-- FEATURE 6 : Mode révision erreurs uniquement -->
+        <button class="btn ghost" data-replay-timed style="font-size:.85rem" title="Simuler l'examen sur tes erreurs uniquement">⏱ Mode examen</button>
+        <!-- FEATURE 10 : Export PDF -->
+        <button class="btn sec" id="exportPdfBtn" style="font-size:.85rem">⬇ Exporter le bilan</button>
+      </div>
       <ul class="missed">${e.slice(0,60).map(([d,i])=>`<li><span class="eyebrow">J${d} · ${esc(Q(d,i).t)}</span><br>${esc(Q(d,i).q)}</li>`).join("")}</ul>
       ${e.length>60?`<p class="note">… et ${e.length-60} autres.</p>`:""}`
-    :`<div class="empty"><h2 style="margin-bottom:6px">Aucune erreur en attente</h2>Les questions ratées apparaîtront ici. Une question réussie au rejeu sort de la liste.</div>`;
+    :`<div class="empty"><h2 style="margin-bottom:6px">Aucune erreur en attente</h2>Les questions ratées apparaîtront ici. Une question réussie au rejeu sort de la liste.</div>
+      <div style="margin-top:16px"><button class="btn sec" id="exportPdfBtn" style="font-size:.85rem">⬇ Exporter le bilan</button></div>`;
+
+  // FEATURE 8 : Stats par domaine dans onglet erreurs
+  const statsHTML=domainStatsHTML();
 
   // Section historique Firebase (chargée en async)
   const histId="fb-hist-"+Date.now();
@@ -370,7 +633,6 @@ function errHTML(){
       if(el)el.innerHTML=`<p style="font-size:.85rem;color:var(--muted)">Impossible de charger l'historique Firebase.</p>`;
     });
   } else {
-    // Firebase pas encore prêt, réessayer dans 2s
     setTimeout(()=>{
       const el=document.getElementById(histId);
       if(el&&typeof window.getErrors==="function"){
@@ -384,7 +646,7 @@ function errHTML(){
     },2000);
   }
 
-  return baseHTML+histHTML;
+  return baseHTML+statsHTML+histHTML;
 }
 
 /* ── SESSION ───────────────────────────────────────────── */
@@ -392,10 +654,11 @@ function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor
 
 function start(items,label,timed,isLive){
   // isLive = free session (don't persist results)
+  const examMins=META.examMins||70;
   session={
     items:shuffle(items).map(([d,i])=>({d,i,order:shuffle(Q(d,i).o.map((_,k)=>k))})),
     idx:0,sel:[],checked:false,score:0,missed:[],label,done:false,
-    end:timed?Date.now()+70*60*1000:null,
+    end:timed?Date.now()+examMins*60*1000:null,
     isLive:!!isLive
   };
   clearInterval(timerId);
@@ -421,7 +684,9 @@ function qHTML(){
     return `<button class="${cls}" data-opt="${k}" ${session.checked?"disabled":""}><span class="bub">${L[pos]}</span><span>${esc(q.o[k])}${session.checked?`<span class="why" style="display:block">${q.a.includes(k)?"✓ ":"✗ "}${esc(q.e[k])}</span>`:""}</span></button>`}).join("");
   const ok=session.checked&&isRight(q,session.sel);
   const liveBadge=session.isLive?`<span class="chip" style="background:var(--ok-soft);color:var(--ok);font-size:.7rem">Session libre</span>`:"";
-  return `<div class="qhead">${liveBadge}<span class="eyebrow">${esc(session.label)} · ${esc(q.t)}</span>
+  // FEATURE 5 : Score de passage
+  const passBadge=META.passScore?`<span class="chip" style="background:var(--accent-soft);color:var(--accent);font-size:.7rem">Seuil : ${META.passScore} %</span>`:"";
+  return `<div class="qhead">${liveBadge}${passBadge}<span class="eyebrow">${esc(session.label)} · ${esc(q.t)}</span>
     <span class="num" style="font-size:.85rem;color:var(--muted)">${session.idx+1} / ${session.items.length} · ${session.score} juste${session.score>1?"s":""}${session.end?` · <span id="timer" class="timer">${fmt(session.end-Date.now())}</span>`:""}</span></div>
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">${svgCircle(Math.round(session.idx/session.items.length*100),40,"var(--accent)")}<div class="bar" style="flex:1;margin:0"><i style="width:${session.idx/session.items.length*100}%"></i></div></div>
   <div class="qcard"><p class="qtext">${esc(q.q.replace(/ \(2 réponses\)/,""))}</p>${multi?`<div class="multi">Choisis ${need} réponses</div>`:""}
@@ -435,15 +700,73 @@ const isRight=(q,sel)=>sel.length===q.a.length&&sel.every(k=>q.a.includes(k));
 /* ── RESULT ────────────────────────────────────────────── */
 function resultHTML(){
   const n=session.items.length,answered=session.idx+(session.checked?1:0),pct=answered?Math.round(session.score/answered*100):0;
-  const msg=pct>=80?"Niveau examen atteint sur ce lot.":pct>=70?"Juste au-dessus de la barre. Rejoue tes erreurs.":"En dessous de l'objectif. Relis les sections de la fiche puis rejoue tes erreurs.";
+  const passScore=META.passScore||70;
+  const msg=pct>=passScore?"✅ Niveau examen atteint sur ce lot.":pct>=passScore-10?"⚠️ Juste au-dessus de la barre. Rejoue tes erreurs.":"❌ En dessous de l'objectif. Relis les sections de la fiche puis rejoue tes erreurs.";
   const liveNote=session.isLive?`<p style="font-size:.85rem;color:var(--muted)">Session libre — résultats <b>non comptabilisés</b> dans ta progression quotidienne.</p>`:"";
+  const passNote=META.passScore?`<p style="font-size:.82rem;color:var(--muted)">Seuil examen : <b>${META.passScore} %</b></p>`:"";
   return `<div class="result"><span class="eyebrow">${esc(session.label)} · terminé</span>
-   <div class="score num" style="color:${pct>=80?"var(--ok)":pct>=70?"var(--accent)":"var(--ko)"}">${pct} %</div>
+   <div class="score num" style="color:${pct>=passScore?"var(--ok)":pct>=passScore-10?"var(--accent)":"var(--ko)"}">${pct} %</div>
    <div>${session.score} bonnes réponses sur ${answered}${answered<n?` (${n-answered} non traitées)`:""}. ${msg}</div>
-   ${liveNote}
+   ${passNote}${liveNote}
    ${session.missed.length?`<h3 style="font-size:1rem">À revoir</h3><ul class="missed">${session.missed.map(([d,i])=>`<li>${esc(Q(d,i).q)}</li>`).join("")}</ul>`:""}
    <div class="row">${session.missed.length&&!session.isLive?`<button class="btn" data-replay="session">Rejouer ces ${session.missed.length} erreurs</button>`:""}<button class="btn ghost" data-home>Retour au plan</button>${tab==="free"?`<button class="btn sec" data-backfree>Nouvelle session libre</button>`:""}</div></div>`;
 }
+
+/* ── FEATURE 9 : RACCOURCIS CLAVIER ──────────────────────── */
+let _kbActive=true;
+document.addEventListener("keydown",function(e){
+  // Ne pas capturer si focus dans un input
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.isContentEditable)return;
+  if(!_kbActive)return;
+
+  // En session quiz
+  if(session&&!session.done&&!session.checked){
+    // 1-4 : sélectionner une option
+    const num=parseInt(e.key);
+    if(num>=1&&num<=4){
+      const opts=document.querySelectorAll("[data-opt]");
+      const opt=opts[num-1];
+      if(opt&&!opt.disabled)opt.click();
+      return;
+    }
+    // Entrée : valider si possible
+    if(e.key==="Enter"){
+      const checkBtn=document.querySelector("[data-check]");
+      if(checkBtn&&!checkBtn.disabled)checkBtn.click();
+      return;
+    }
+  }
+  if(session&&!session.done&&session.checked){
+    // Entrée ou → : question suivante
+    if(e.key==="Enter"||e.key==="ArrowRight"){
+      const nextBtn=document.querySelector("[data-next]");
+      if(nextBtn)nextBtn.click();
+      return;
+    }
+  }
+  // Navigation tabs (pas en session)
+  if(!session){
+    if(e.key==="ArrowLeft"||e.key==="ArrowRight"){
+      const tabs=["plan","quiz","free","err"];
+      const cur=tabs.indexOf(tab);
+      const dir=e.key==="ArrowRight"?1:-1;
+      const next=tabs[(cur+dir+tabs.length)%tabs.length];
+      setTab(next);
+      return;
+    }
+  }
+  // T : basculer thème
+  if(e.key.toLowerCase()==="t"&&!e.ctrlKey&&!e.metaKey){
+    toggleTheme();
+    return;
+  }
+  // F : ouvrir/fermer la fiche
+  if(e.key.toLowerCase()==="f"&&!e.ctrlKey&&!e.metaKey){
+    const fab=document.getElementById("ficheFab");
+    if(fab)fab.click();
+    return;
+  }
+});
 
 /* ── BIND ──────────────────────────────────────────────── */
 function bind(){
@@ -469,6 +792,12 @@ function bind(){
     const items=b.dataset.replay==="all"?shuffle(errors()):session.missed.slice();
     start(items,"Rejeu des erreurs");
   });
+  // FEATURE 6 : Mode examen sur erreurs uniquement
+  const replayTimed=document.querySelector("[data-replay-timed]");
+  if(replayTimed)replayTimed.onclick=()=>{
+    const items=shuffle(errors());
+    if(items.length)start(items,"Révision erreurs (mode examen)",true,true);
+  };
   // Options
   document.querySelectorAll("[data-opt]").forEach(b=>b.onclick=()=>{
     const k=+b.dataset.opt,q=Q(session.items[session.idx].d,session.items[session.idx].i);
@@ -527,14 +856,19 @@ function bind(){
   const bf=document.querySelector("[data-backfree]");
   if(bf)bf.onclick=()=>{session=null;setTab("free")};
 
+  // FEATURE 10 : Export PDF
+  const pdfBtn=document.getElementById("exportPdfBtn");
+  if(pdfBtn)pdfBtn.onclick=exportPDF;
+
   // FREE SESSION CONFIG
   const freeN=document.getElementById("freeN");
   if(freeN){
     function syncFree(){
       const days=[];
-      [1,2,3,4,5,6,7].forEach(d=>{const cb=document.getElementById("fd"+d);if(cb&&cb.checked)days.push(d)});
-      const n=Math.max(5,Math.min(350,parseInt(freeN.value)||30));
-      store.free={days,n};save();
+      PLAN.forEach(p=>{const cb=document.getElementById("fd"+p.d);if(cb&&cb.checked)days.push(p.d)});
+      const n=Math.max(5,Math.min(total(),parseInt(freeN.value)||30));
+      const timedCb=document.getElementById("freeTimed");
+      store.free={days,n,timed:timedCb?timedCb.checked:false};save();
       const pool=buildFreePool(days);
       const t=document.getElementById("freeTally");
       if(t)t.textContent=`${Math.min(n,pool.length)} / ${pool.length} questions disponibles`;
@@ -543,13 +877,45 @@ function bind(){
     }
     freeN.oninput=syncFree;
     document.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{freeN.value=b.dataset.preset;syncFree()});
-    [1,2,3,4,5,6,7].forEach(d=>{const cb=document.getElementById("fd"+d);if(cb)cb.onchange=syncFree});
+    PLAN.forEach(p=>{const cb=document.getElementById("fd"+p.d);if(cb)cb.onchange=syncFree});
+    const timedCb=document.getElementById("freeTimed");
+    if(timedCb)timedCb.onchange=syncFree;
     const fl=document.getElementById("freeLaunch");
     if(fl)fl.onclick=()=>{
-      const days=store.free.days||[1,2,3,4,5,6,7];
+      const days=store.free.days||PLAN.map(p=>p.d);
       const n=store.free.n||30;
+      const timed=store.free.timed||false;
       const pool=shuffle(buildFreePool(days)).slice(0,n);
-      start(pool,"Session libre ("+pool.length+" q)",false,true);
+      start(pool,"Session libre ("+pool.length+" q)",timed,true);
     };
   }
 }
+
+// Render initial
+render();
+
+// FEATURE 12 : Vérification rappel quotidien depuis une page certif
+(function(){
+  try{
+    const NOTIF_KEY="certifs.notif";
+    const NOTIF_FIRED="certifs.notif.fired";
+    function todayKey(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+    const raw=localStorage.getItem(NOTIF_KEY);
+    if(!raw) return;
+    const prefs=JSON.parse(raw)||{};
+    if(!prefs.enabled||!prefs.certKey) return;
+    if(prefs.certKey!==KEY) return; // uniquement si c'est la certif active
+    if(localStorage.getItem(NOTIF_FIRED)===todayKey()) return;
+    if(!("Notification" in window)||Notification.permission!=="granted") return;
+    const now=new Date();
+    if(now.getHours()!==prefs.hour||now.getMinutes()<prefs.minute) return;
+    // Marquer + envoyer
+    localStorage.setItem(NOTIF_FIRED,todayKey());
+    const n=new Notification("📚 Rappel révision — "+(META.title||KEY),{
+      body:"C'est l'heure de réviser ! Clique pour continuer →",
+      tag:"certifs-daily-"+KEY,
+      requireInteraction:false
+    });
+    n.onclick=function(){window.focus();n.close();};
+  }catch(e){}
+})();

@@ -3,6 +3,8 @@ window.QKEY = "ms900.v1";
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={
   exam:"Microsoft 365 Fundamentals MS-900",
+  passScore:70,
+  examMins:65,
   rules:[
     ["60 q · 60 min","format QCM et cas pratiques"],
     ["700 / 1000","score de réussite"],
