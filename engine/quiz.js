@@ -352,9 +352,15 @@ function planHTML(){
       const tip=ms.done?` · ${Math.round(ms.ok/ms.done*100)}%`:"";
       return `<button class="${cls}" data-mod="${p.d}-${m}" title="Module ${m+1} : q${m*MOD_SIZE+1}–${Math.min((m+1)*MOD_SIZE,s.n)}${tip}" style="padding:6px 10px;font-size:.82rem">${label}</button>`;
     }).join("");
+    const ficheBlock=p.sections&&p.sections.length&&META.fiche?`
+      <div class="fiche-day"><h3>📖 Fiche du jour</h3><ul class="fiche-list">${p.sections.map(sec=>{
+        const lsKey=`certifs.read.${QKEY}.${p.d}.${sec.id}`;
+        let checked=false;try{checked=!!localStorage.getItem(lsKey);}catch(e){}
+        return `<li><label><input type="checkbox" class="fiche-cb" data-key="${lsKey}"${checked?" checked":""}> <a href="${META.fiche}#${sec.id}" target="_blank" rel="noopener">${esc(sec.titre)}</a></label></li>`;
+      }).join("")}</ul></div>`:"";
     return `<li class="day"><div class="tag"><span>Jour</span><b>${p.d}</b></div><div class="body">
       <div><h2>${esc(p.theme)}</h2><div class="chips" style="margin-top:6px">${p.dom.map(x=>`<span class="chip">${x}</span>`).join("")}<span class="chip" style="background:transparent;color:var(--muted)">${p.time}</span></div></div>
-      <div class="cols"><div><h3>À lire</h3><ul>${p.read.map(r=>`<li>${esc(r)}</li>`).join("")}${p.links.map(l=>`<li><a href="${l[1]}" target="_blank" rel="noopener">${esc(l[0])}</a></li>`).join("")}</ul></div>
+      ${ficheBlock}<div class="cols"><div><h3>À lire</h3><ul>${p.read.map(r=>`<li>${esc(r)}</li>`).join("")}${p.links.map(l=>`<li><a href="${l[1]}" target="_blank" rel="noopener">${esc(l[0])}</a></li>`).join("")}</ul></div>
       <div><h3>À retenir</h3><ul>${p.focus.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div></div>
       ${p.extra?`<div style="font-size:.88rem"><b>+</b> ${esc(p.extra)}</div>`:""}
       <div class="dayfoot">
@@ -770,6 +776,10 @@ document.addEventListener("keydown",function(e){
 
 /* ── BIND ──────────────────────────────────────────────── */
 function bind(){
+  // Plan tab: fiche section checkboxes
+  document.querySelectorAll(".fiche-cb").forEach(cb=>cb.onchange=()=>{
+    try{if(cb.checked)localStorage.setItem(cb.dataset.key,"1");else localStorage.removeItem(cb.dataset.key);}catch(e){}
+  });
   // Plan tab: start full day
   document.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>{
     const d=+b.dataset.start,p=PLAN[d-1];
