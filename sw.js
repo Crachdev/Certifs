@@ -4,7 +4,7 @@
  * Permet l'installation PWA + notifications push (Feature 12).
  */
 
-const CACHE_NAME = "certifs-v13";
+const CACHE_NAME = "certifs-v14";
 
 // Assets à précacher au premier install (shell complet)
 const PRECACHE = [
@@ -58,7 +58,11 @@ const PRECACHE = [
   // AWS SAA-C03
   "/Certifs/aws-saa-c03/index.html",
   "/Certifs/aws-saa-c03/questions.js",
-  "/Certifs/aws-saa-c03/fiche.html"
+  "/Certifs/aws-saa-c03/fiche.html",
+  // AWS Security Specialty
+  "/Certifs/aws-security-specialty/index.html",
+  "/Certifs/aws-security-specialty/questions.js",
+  "/Certifs/aws-security-specialty/fiche.html"
 ];
 
 /* ── Install ── */
