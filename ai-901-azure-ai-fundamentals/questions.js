@@ -3,7 +3,7 @@
 // Source : documentation officielle Microsoft (learn.microsoft.com)
 // Toutes les questions sont originales
 
-window.QKEY = window.QKEY || "ai901.v1";
+window.QKEY = "ai901.v1";
 
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={

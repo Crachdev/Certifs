@@ -1,6 +1,6 @@
 // SC-900 Security, Compliance & Identity — 350 questions (7 days × 50)
 
-window.QKEY = window.QKEY || "sc900.v1";
+window.QKEY = "sc900.v1";
 
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={
