@@ -388,34 +388,8 @@ footer a{color:var(--accent);text-decoration:none}
 
 <!-- FEATURE 12 : Module notifications -->
 <script src="engine/notifications.js"></script>
+<script src="engine/theme.js"></script>
 <script>
-// FEATURE 1 : Theme switcher
-const THEME_KEY="certifs.theme";
-function getTheme(){try{return localStorage.getItem(THEME_KEY)||""}catch(e){return""}}
-function setThemeStorage(t){try{localStorage.setItem(THEME_KEY,t)}catch(e){}}
-function applyTheme(t){
-  if(t==="dark")document.documentElement.setAttribute("data-theme","dark");
-  else if(t==="light")document.documentElement.setAttribute("data-theme","light");
-  else document.documentElement.removeAttribute("data-theme");
-  updateThemeBtn();
-}
-function updateThemeBtn(){
-  const btn=document.getElementById("themeToggle");if(!btn)return;
-  const cur=document.documentElement.getAttribute("data-theme")||"";
-  const isDark=cur==="dark"||(cur===""&&window.matchMedia("(prefers-color-scheme:dark)").matches);
-  btn.textContent=isDark?"☀️":"🌙";
-  btn.title=isDark?"Passer en mode clair":"Passer en mode sombre";
-}
-function toggleTheme(){
-  const cur=document.documentElement.getAttribute("data-theme")||"";
-  const isDark=cur==="dark"||(cur===""&&window.matchMedia("(prefers-color-scheme:dark)").matches);
-  const next=isDark?"light":"dark";
-  setThemeStorage(next);applyTheme(next);
-}
-// Init thème
-const saved=getTheme();if(saved)applyTheme(saved);else updateThemeBtn();
-window.matchMedia("(prefers-color-scheme:dark)").addEventListener("change",updateThemeBtn);
-document.getElementById("themeToggle").onclick=toggleTheme;
 
 // FEATURE 2 & 3 : Progress bars per cert
 // total questions par cert (pour calcul couverture)

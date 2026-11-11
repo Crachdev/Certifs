@@ -21,41 +21,9 @@ store.free=store.free||{}; // free training config persistence
 function getPseudo(){try{return localStorage.getItem(PSEUDO_KEY)||""}catch(e){return""}}
 function setPseudo(p){try{localStorage.setItem(PSEUDO_KEY,p)}catch(e){}}
 
-/* ── FEATURE 1 : THEME SWITCHER ─────────────────────────── */
-function getTheme(){try{return localStorage.getItem(THEME_KEY)||""}catch(e){return""}}
-function setThemeStorage(t){try{localStorage.setItem(THEME_KEY,t)}catch(e){}}
-
-function applyTheme(t){
-  if(t==="dark"){document.documentElement.setAttribute("data-theme","dark")}
-  else if(t==="light"){document.documentElement.setAttribute("data-theme","light")}
-  else{document.documentElement.removeAttribute("data-theme")}
-  updateThemeBtn();
-}
-
-function updateThemeBtn(){
-  const btn=document.getElementById("themeToggle");
-  if(!btn)return;
-  const cur=document.documentElement.getAttribute("data-theme")||"";
-  const isDark=cur==="dark"||(cur===""&&window.matchMedia("(prefers-color-scheme:dark)").matches);
-  btn.textContent=isDark?"☀️":"🌙";
-  btn.title=isDark?"Passer en mode clair":"Passer en mode sombre";
-}
-
-function toggleTheme(){
-  const cur=document.documentElement.getAttribute("data-theme")||"";
-  const isDark=cur==="dark"||(cur===""&&window.matchMedia("(prefers-color-scheme:dark)").matches);
-  const next=isDark?"light":"dark";
-  setThemeStorage(next);
-  applyTheme(next);
-}
-
-// Appliquer le thème sauvegardé au chargement
-(function initTheme(){
-  const saved=getTheme();
-  if(saved)applyTheme(saved);
-  // Ecouter les changements système
-  window.matchMedia("(prefers-color-scheme:dark)").addEventListener("change",updateThemeBtn);
-})();
+/* ── FEATURE 1 : THEME SWITCHER — voir engine/theme.js ───── */
+// getTheme, setThemeStorage, applyTheme, updateThemeBtn, toggleTheme
+// définis dans engine/theme.js, chargé avant quiz.js dans chaque certif/index.html
 
 /* ── SVG cercle de progression ─────────────────────────────
    pct : 0–100   size : taille px (défaut 52)
