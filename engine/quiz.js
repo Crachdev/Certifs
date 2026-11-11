@@ -112,7 +112,7 @@ async function syncFromFirestore(){
   if(attempts>10)return;
   setTimeout(()=>waitForFirebase(attempts+1),500);
 })(0);
-const Q=(d,i)=>window.QDATA[d][i];
+const Q=(d,i)=>{const r=window.QDATA[d][i];if(r&&r.opts&&!r.o){r.o=r.opts;r.a=r.ans;r.e={};r.o.forEach((_,k)=>{r.e[k]=r.why||"";});r.t=r.t||"";}return r;};
 const total=()=>Object.values(window.QDATA).reduce((s,a)=>s+a.length,0);
 const errors=()=>Object.keys(store.r).filter(k=>store.r[k]===0).map(k=>k.split("-").map(Number));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -339,7 +339,9 @@ function planHTML(){
   const examInfo=META.exam||"";
   const ficheLink=META.fiche?`<a href="${META.fiche}" target="_blank" rel="noopener">ta fiche de révision</a>`:"la fiche de révision";
   const rulesHTML=META.rules?META.rules.map(r=>`<div><b class="num">${r[0]}</b><span>${r[1]}</span></div>`).join(""):`<div><b class="num">–</b><span>voir plan ci-dessous</span></div>`;
-  return `<p class="intro">Une semaine, un bloc de domaine par jour, pondéré comme l'examen. Chaque jour est découpé en <b>5 modules de 10 questions</b>. Lis ${ficheLink}, puis fais les modules un par un.</p>
+  const nbJours=PLAN.length;
+  const dureeLabel=nbJours===7?"Une semaine":nbJours===14?"Deux semaines":nbJours===15?"Quinze jours":nbJours===30?"Trente jours":`${nbJours} jours`;
+  return `<p class="intro">${dureeLabel}, un bloc de domaine par jour, pondéré comme l'examen. Chaque jour est découpé en <b>5 modules de 10 questions</b>. Lis ${ficheLink}, puis fais les modules un par un.</p>
   <div class="rules">${rulesHTML}</div>
   <ol class="days">${PLAN.map(p=>{
     const s=dayStats(p.d),pct=Math.round(s.done/s.n*100);
@@ -359,9 +361,9 @@ function planHTML(){
         return `<li><label><input type="checkbox" class="fiche-cb" data-key="${lsKey}"${checked?" checked":""}> <a href="${META.fiche}#${sec.id}" target="_blank" rel="noopener">${esc(sec.titre)}</a></label></li>`;
       }).join("")}</ul></div>`:"";
     return `<li class="day"><div class="tag"><span>Jour</span><b>${p.d}</b></div><div class="body">
-      <div><h2>${esc(p.theme)}</h2><div class="chips" style="margin-top:6px">${p.dom.map(x=>`<span class="chip">${x}</span>`).join("")}<span class="chip" style="background:transparent;color:var(--muted)">${p.time}</span></div></div>
-      ${ficheBlock}<div class="cols"><div><h3>À lire</h3><ul>${p.read.map(r=>`<li>${esc(r)}</li>`).join("")}${p.links.map(l=>`<li><a href="${l[1]}" target="_blank" rel="noopener">${esc(l[0])}</a></li>`).join("")}</ul></div>
-      <div><h3>À retenir</h3><ul>${p.focus.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div></div>
+      <div><h2>${esc(p.theme)}</h2><div class="chips" style="margin-top:6px">${(p.dom||[]).map(x=>`<span class="chip">${x}</span>`).join("")}${p.time?`<span class="chip" style="background:transparent;color:var(--muted)">${p.time}</span>`:""}</div></div>
+      ${ficheBlock}<div class="cols"><div><h3>À lire</h3><ul>${(p.read||p.topics||[]).map(r=>`<li>${esc(r)}</li>`).join("")}${(p.links||[]).map(l=>Array.isArray(l)?`<li><a href="${l[1]}" target="_blank" rel="noopener">${esc(l[0])}</a></li>`:`<li><a href="${l.u}" target="_blank" rel="noopener">${esc(l.l)}</a></li>`).join("")}</ul></div>
+      <div><h3>À retenir</h3><ul>${(p.focus||[]).map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div></div>
       ${p.extra?`<div style="font-size:.88rem"><b>+</b> ${esc(p.extra)}</div>`:""}
       <div class="dayfoot">
         <div class="prog"><div class="moddots">${dots}</div>${svgCircle(pct,52)}<span class="num" style="font-size:.8rem;margin-left:6px">${s.done}/${s.n}${s.done?` · ${Math.round(s.ok/s.done*100)} %`:""}</span></div>

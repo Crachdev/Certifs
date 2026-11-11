@@ -3,6 +3,7 @@ window.QUIZ_META = {
   exam: "Microsoft Certified: Windows Server Hybrid Administrator Associate AZ-802",
   passScore:70,
   examMins:120,
+  fiche:"fiche.html",
   rules: [
     ["700/1000", "Score requis"],
     ["120 min", "Durée"],
@@ -11,21 +12,95 @@ window.QUIZ_META = {
   ]
 };
 window.QUIZ_PLAN = [
-  { day:1, theme:"AD DS — Contrôleurs de domaine & RODC", topics:["Déployer un DC supplémentaire","RODC : installation et gestion","Transfert et saisie FSMO","DNS intégré AD","Dépromotion propre d'un DC"], links:[{l:"Déployer AD DS",u:"https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-"},{l:"RODC",u:"https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/deploy/rodc/read-only-domain-controllers"}] },
-  { day:2, theme:"AD DS — Sites, réplication & forêts", topics:["Sites et sous-réseaux AD","Liens de sites et planification de réplication","Forêts et domaines enfants","Approbations externes et cross-forest","Résolution de problèmes de réplication"], links:[{l:"Sites AD DS",u:"https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/plan/understanding-active-directory-site-topology"},{l:"Approbations",u:"https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/plan/forest-design-models"}] },
-  { day:3, theme:"AD DS — GPO, utilisateurs & comptes de service", topics:["Créer et lier des GPO","Filtrage et WMI","Comptes de service gérés (gMSA / sMSA)","Stratégies de mot de passe affinées (PSO)","Audit et délégation"], links:[{l:"Stratégie de groupe",u:"https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/manage/component-updates/group-policy-changes"},{l:"gMSA",u:"https://learn.microsoft.com/fr-fr/windows-server/security/group-managed-service-accounts/getting-started-with-group-managed-service-accounts"}] },
-  { day:4, theme:"Hyper-V & VMs locales", topics:["Installation et configuration de Hyper-V","Checkpoints standard et de production","Réplication Hyper-V","Virtual Switch (interne / externe / privé)","Live Migration et Storage Migration"], links:[{l:"Hyper-V",u:"https://learn.microsoft.com/fr-fr/windows-server/virtualization/hyper-v/hyper-v-technology-overview"},{l:"Réplication Hyper-V",u:"https://learn.microsoft.com/fr-fr/windows-server/virtualization/hyper-v/manage/about-hyper-v-replica"}] },
-  { day:5, theme:"VMs Azure — JIT, Bastion, Scale Sets & HA", topics:["Accès JIT Defender for Cloud","Azure Bastion (Basic vs Standard)","Virtual Machine Scale Sets","Availability Sets et Zones","Azure Site Recovery pour VMs"], links:[{l:"Accès JIT",u:"https://learn.microsoft.com/fr-fr/azure/defender-for-cloud/just-in-time-access-usage"},{l:"Azure Bastion",u:"https://learn.microsoft.com/fr-fr/azure/bastion/bastion-overview"}] },
-  { day:6, theme:"Réseau — DNS/DNSSEC & DHCP HA", topics:["Zones DNS : primaire, secondaire, stub","DNSSEC : signature et validation","Stratégies DNS","DHCP haute disponibilité et basculement","Superétendues et options DHCP"], links:[{l:"DNS Windows Server",u:"https://learn.microsoft.com/fr-fr/windows-server/networking/dns/dns-top"},{l:"DHCP HA",u:"https://learn.microsoft.com/fr-fr/windows-server/networking/technologies/dhcp/dhcp-top"}] },
-  { day:7, theme:"Azure Files, File Sync & DFS", topics:["Partages Azure Files (SMB / NFS)","Azure File Sync : point de terminaison, cloud tiering","DFS Namespaces","DFS Replication (DFSR)","Migration vers Azure Files"], links:[{l:"Azure Files",u:"https://learn.microsoft.com/fr-fr/azure/storage/files/storage-files-introduction"},{l:"Azure File Sync",u:"https://learn.microsoft.com/fr-fr/azure/storage/file-sync/file-sync-introduction"}] },
-  { day:8, theme:"Stockage Windows Server — BitLocker, iSCSI & S2D", topics:["BitLocker sur volumes et démarrage","iSCSI : initiateur et cible","Espaces de stockage directs (S2D)","SMB QUIC","Déduplication des données"], links:[{l:"BitLocker",u:"https://learn.microsoft.com/fr-fr/windows/security/information-protection/bitlocker/bitlocker-overview"},{l:"Espaces de stockage directs",u:"https://learn.microsoft.com/fr-fr/windows-server/storage/storage-spaces/storage-spaces-direct-overview"}] },
-  { day:9, theme:"Sécurité OS — Credential Guard, LAPS & Defender", topics:["Windows Defender Credential Guard","LAPS (Local Administrator Password Solution)","Windows Defender Antivirus en Server Core","AppLocker et WDAC","Chiffrement réseau SMB"], links:[{l:"Credential Guard",u:"https://learn.microsoft.com/fr-fr/windows/security/identity-protection/credential-guard/credential-guard"},{l:"LAPS",u:"https://learn.microsoft.com/fr-fr/windows-server/identity/laps/laps-overview"}] },
-  { day:10, theme:"Sécurité AD DS — Entra Password Protection & délégation", topics:["Entra ID Password Protection on-premises","Délégation de contrôle dans AD","Silos d'authentification (Authentication Policy Silos)","Comptes protégés (Protected Users)","Kerberos Armoring (FAST)"], links:[{l:"Entra Password Protection",u:"https://learn.microsoft.com/fr-fr/entra/identity/authentication/concept-password-ban-bad-on-premises"},{l:"Protected Users",u:"https://learn.microsoft.com/fr-fr/windows-server/security/credentials-protection-and-management/protected-users-security-group"}] },
-  { day:11, theme:"Gestion hybride — Azure Arc & WAC", topics:["Intégrer un serveur à Azure Arc","Windows Admin Center (WAC) — déploiement","WAC — extensions et gestion distante","Azure Monitor Agent via Arc","Politiques Azure sur serveurs Arc"], links:[{l:"Azure Arc pour serveurs",u:"https://learn.microsoft.com/fr-fr/azure/azure-arc/servers/overview"},{l:"Windows Admin Center",u:"https://learn.microsoft.com/fr-fr/windows-server/manage/windows-admin-center/overview"}] },
-  { day:12, theme:"Gestion hybride — Automation, extensions & mises à jour", topics:["Azure Automation : Runbooks et DSC","Update Manager (Azure)","Extensions VM Azure (Custom Script, DSC)","Azure Policy Guest Configuration","PowerShell Remoting via HTTPS"], links:[{l:"Azure Automation",u:"https://learn.microsoft.com/fr-fr/azure/automation/automation-intro"},{l:"Azure Update Manager",u:"https://learn.microsoft.com/fr-fr/azure/update-manager/overview"}] },
-  { day:13, theme:"Surveillance — Performance Monitor & Azure Monitor", topics:["Compteurs Performance Monitor","Data Collector Sets","Azure Monitor : agents et espaces de travail","Log Analytics : requêtes KQL de base","Alertes et groupes d'actions"], links:[{l:"Azure Monitor",u:"https://learn.microsoft.com/fr-fr/azure/azure-monitor/overview"},{l:"Performance Monitor",u:"https://learn.microsoft.com/fr-fr/windows-server/administration/windows-commands/perfmon"}] },
-  { day:14, theme:"Dépannage Windows Server — réseau, stockage & update", topics:["Dépannage réseau (netsh, Test-NetConnection)","Dépannage DHCP et DNS","Dépannage des espaces de stockage","Dépannage Windows Update / WSUS","Journaux d'événements et Reliability Monitor"], links:[{l:"Dépannage réseau",u:"https://learn.microsoft.com/fr-fr/windows-server/networking/windows-server-supported-networking-scenarios"},{l:"Outils de diagnostic",u:"https://learn.microsoft.com/fr-fr/windows-server/administration/windows-commands/windows-commands"}] },
-  { day:15, theme:"Dépannage AD DS — réplication, Kerberos & récupération", topics:["repadmin et dcdiag","Résolution des erreurs de réplication USN et Lingering Objects","Dépannage Kerberos (événements 4768, 4769)","Récupération d'une forêt AD","Sauvegarde d'état système (Windows Server Backup)"], links:[{l:"Dépannage AD DS",u:"https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/manage/ad-ds-troubleshooting"},{l:"Récupération forêt AD",u:"https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/manage/ad-forest-recovery-guide"}] }
+  { d:1, theme:"AD DS — Contrôleurs de domaine & RODC", dom:["Identité · 25 %"], time:"≈ 2 h",
+    read:["Déployer un DC supplémentaire","RODC : installation et gestion","Transfert et saisie FSMO","DNS intégré AD","Dépromotion propre d'un DC"],
+    links:[["Déployer AD DS","https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-"],["RODC","https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/deploy/rodc/read-only-domain-controllers"]],
+    focus:["Install-ADDSDomainController vs Add-WindowsFeature","FSMO : 5 rôles, 2 forêt + 3 domaine","Seize ≠ Transfer : ne jamais remettre l'ancien DC en ligne","RODC : lecture seule, PRP, délégation locale"],
+    sections:[{id:"s1",titre:"Déployer AD DS & DC supplémentaire"},{id:"s2",titre:"RODC : installation, PRP & délégation"},{id:"s3",titre:"Rôles FSMO : transfert & saisie"}] },
+
+  { d:2, theme:"AD DS — Sites, réplication & forêts", dom:["Identité · 25 %"], time:"≈ 2 h",
+    read:["Sites et sous-réseaux AD","Liens de sites et planification de réplication","Forêts et domaines enfants","Approbations externes et cross-forest","Résolution de problèmes de réplication"],
+    links:[["Sites AD DS","https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/plan/understanding-active-directory-site-topology"],["Approbations","https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/plan/forest-design-models"]],
+    focus:["KCC génère automatiquement la topologie","Coût lien de site : valeur relative, bas = préféré","Forest trust : bidirectionnel & transitif","USN : compteur de changements par DC"],
+    sections:[{id:"s1",titre:"Sites, sous-réseaux & liens de sites"},{id:"s2",titre:"Réplication : KCC, ISTG, USN"},{id:"s3",titre:"Forêts, approbations & résolution de problèmes"}] },
+
+  { d:3, theme:"AD DS — GPO, utilisateurs & comptes de service", dom:["Identité · 25 %"], time:"≈ 2 h",
+    read:["Créer et lier des GPO","Filtrage et WMI","Comptes de service gérés (gMSA / sMSA)","Stratégies de mot de passe affinées (PSO)","Audit et délégation"],
+    links:[["Stratégie de groupe","https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/manage/component-updates/group-policy-changes"],["gMSA","https://learn.microsoft.com/fr-fr/windows-server/security/group-managed-service-accounts/getting-started-with-group-managed-service-accounts"]],
+    focus:["GPO : ordre LSDOU, filtrage sécurité vs WMI","gMSA nécessite niveau fonctionnel WS2012","PSO via objets PSO (Fine-Grained Password Policy)","Délégation : droits spécifiques sur OU"],
+    sections:[{id:"s1",titre:"GPO : création, liaison & filtrage"},{id:"s2",titre:"Comptes de service gérés (gMSA / sMSA)"},{id:"s3",titre:"PSO, audit & délégation AD"}] },
+
+  { d:4, theme:"Hyper-V & VMs locales", dom:["Virtualisation · 20 %"], time:"≈ 2 h",
+    read:["Installation et configuration de Hyper-V","Checkpoints standard et de production","Réplication Hyper-V","Virtual Switch (interne / externe / privé)","Live Migration et Storage Migration"],
+    links:[["Hyper-V","https://learn.microsoft.com/fr-fr/windows-server/virtualization/hyper-v/hyper-v-technology-overview"],["Réplication Hyper-V","https://learn.microsoft.com/fr-fr/windows-server/virtualization/hyper-v/manage/about-hyper-v-replica"]],
+    focus:["vSwitch : externe=réseau physique, interne=hôte+VMs, privé=VMs seules","Checkpoint prod = VSS, standard = état mémoire","Live Migration : VM en cours d'exécution, Storage Migration : VHD","Réplication Hyper-V ≠ Azure Site Recovery"],
+    sections:[{id:"s1",titre:"Installation Hyper-V & commutateurs virtuels"},{id:"s2",titre:"Checkpoints & réplication Hyper-V"},{id:"s3",titre:"Live Migration & Storage Migration"}] },
+
+  { d:5, theme:"VMs Azure — JIT, Bastion, Scale Sets & HA", dom:["Azure IaaS · 20 %"], time:"≈ 2 h",
+    read:["Accès JIT Defender for Cloud","Azure Bastion (Basic vs Standard)","Virtual Machine Scale Sets","Availability Sets et Zones","Azure Site Recovery pour VMs"],
+    links:[["Accès JIT","https://learn.microsoft.com/fr-fr/azure/defender-for-cloud/just-in-time-access-usage"],["Azure Bastion","https://learn.microsoft.com/fr-fr/azure/bastion/bastion-overview"]],
+    focus:["JIT : verrouille NSG, ouvre port à la demande","Bastion : RDP/SSH via HTTPS sans IP publique","VMSS : scale-out automatique","Availability Zone > Availability Set pour SLA"],
+    sections:[{id:"s1",titre:"JIT & Azure Bastion"},{id:"s2",titre:"VMSS, Availability Sets & Zones"},{id:"s3",titre:"Azure Site Recovery pour VMs"}] },
+
+  { d:6, theme:"Réseau — DNS/DNSSEC & DHCP HA", dom:["Réseau · 15 %"], time:"≈ 2 h",
+    read:["Zones DNS : primaire, secondaire, stub","DNSSEC : signature et validation","Stratégies DNS","DHCP haute disponibilité et basculement","Superétendues et options DHCP"],
+    links:[["DNS Windows Server","https://learn.microsoft.com/fr-fr/windows-server/networking/dns/dns-top"],["DHCP HA","https://learn.microsoft.com/fr-fr/windows-server/networking/technologies/dhcp/dhcp-top"]],
+    focus:["Zone AD-intégrée : mises à jour sécurisées uniquement","DNSSEC : RRSIG, DNSKEY, NSEC","DHCP failover : load sharing ou hot standby","Superétendue = plusieurs étendues logiques"],
+    sections:[{id:"s1",titre:"Zones DNS & mises à jour dynamiques"},{id:"s2",titre:"DNSSEC & stratégies DNS"},{id:"s3",titre:"DHCP HA & basculement"}] },
+
+  { d:7, theme:"Azure Files, File Sync & DFS", dom:["Stockage · 15 %"], time:"≈ 2 h",
+    read:["Partages Azure Files (SMB / NFS)","Azure File Sync : point de terminaison, cloud tiering","DFS Namespaces","DFS Replication (DFSR)","Migration vers Azure Files"],
+    links:[["Azure Files","https://learn.microsoft.com/fr-fr/azure/storage/files/storage-files-introduction"],["Azure File Sync","https://learn.microsoft.com/fr-fr/azure/storage/file-sync/file-sync-introduction"]],
+    focus:["Azure File Sync : agent sur serveur, cloud endpoint = partage Azure","Cloud tiering : fichiers froids restent dans cloud","DFS Namespace ≠ DFS Replication","DFSR remplace FRS pour SYSVOL"],
+    sections:[{id:"s1",titre:"Azure Files : partages SMB & NFS"},{id:"s2",titre:"Azure File Sync & cloud tiering"},{id:"s3",titre:"DFS Namespaces & DFSR"}] },
+
+  { d:8, theme:"Stockage Windows Server — BitLocker, iSCSI & S2D", dom:["Stockage · 15 %"], time:"≈ 2 h",
+    read:["BitLocker sur volumes et démarrage","iSCSI : initiateur et cible","Espaces de stockage directs (S2D)","SMB QUIC","Déduplication des données"],
+    links:[["BitLocker","https://learn.microsoft.com/fr-fr/windows/security/information-protection/bitlocker/bitlocker-overview"],["Espaces de stockage directs","https://learn.microsoft.com/fr-fr/windows-server/storage/storage-spaces/storage-spaces-direct-overview"]],
+    focus:["BitLocker : TPM pour démarrage transparent","iSCSI : initiateur (client) se connecte à cible (serveur)","S2D : stockage hyper-convergé, nécessite WS Datacenter","SMB QUIC : SMB over HTTPS port 443"],
+    sections:[{id:"s1",titre:"BitLocker & chiffrement de volumes"},{id:"s2",titre:"iSCSI & espaces de stockage directs (S2D)"},{id:"s3",titre:"SMB QUIC & déduplication"}] },
+
+  { d:9, theme:"Sécurité OS — Credential Guard, LAPS & Defender", dom:["Sécurité · 15 %"], time:"≈ 2 h",
+    read:["Windows Defender Credential Guard","LAPS (Local Administrator Password Solution)","Windows Defender Antivirus en Server Core","AppLocker et WDAC","Chiffrement réseau SMB"],
+    links:[["Credential Guard","https://learn.microsoft.com/fr-fr/windows/security/identity-protection/credential-guard/credential-guard"],["LAPS","https://learn.microsoft.com/fr-fr/windows-server/identity/laps/laps-overview"]],
+    focus:["Credential Guard : isole LSA dans VM sécurisée (VBS)","LAPS : rotation automatique mdp admin local","WDAC > AppLocker : basé sur politique CI","Chiffrement SMB : nécessite SMB 3.0+"],
+    sections:[{id:"s1",titre:"Credential Guard & VBS"},{id:"s2",titre:"LAPS & gestion des comptes locaux"},{id:"s3",titre:"AppLocker, WDAC & chiffrement SMB"}] },
+
+  { d:10, theme:"Sécurité AD DS — Entra Password Protection & délégation", dom:["Sécurité · 15 %"], time:"≈ 2 h",
+    read:["Entra ID Password Protection on-premises","Délégation de contrôle dans AD","Silos d'authentification (Authentication Policy Silos)","Comptes protégés (Protected Users)","Kerberos Armoring (FAST)"],
+    links:[["Entra Password Protection","https://learn.microsoft.com/fr-fr/entra/identity/authentication/concept-password-ban-bad-on-premises"],["Protected Users","https://learn.microsoft.com/fr-fr/windows-server/security/credentials-protection-and-management/protected-users-security-group"]],
+    focus:["Entra Password Protection : agent DC + proxy, liste noire mots de passe","Protected Users : interdit NTLM, DES, RC4, délégation Kerberos","Authentication Policy Silos : restreint connexion à certains hôtes","FAST : armure Kerberos, nécessite WS2012"],
+    sections:[{id:"s1",titre:"Entra Password Protection on-premises"},{id:"s2",titre:"Protected Users & Authentication Policy Silos"},{id:"s3",titre:"Délégation AD & Kerberos Armoring"}] },
+
+  { d:11, theme:"Gestion hybride — Azure Arc & WAC", dom:["Hybride · 20 %"], time:"≈ 2 h",
+    read:["Intégrer un serveur à Azure Arc","Windows Admin Center (WAC) — déploiement","WAC — extensions et gestion distante","Azure Monitor Agent via Arc","Politiques Azure sur serveurs Arc"],
+    links:[["Azure Arc pour serveurs","https://learn.microsoft.com/fr-fr/azure/azure-arc/servers/overview"],["Windows Admin Center","https://learn.microsoft.com/fr-fr/windows-server/manage/windows-admin-center/overview"]],
+    focus:["Arc : agent Connected Machine, projette serveur dans Azure","WAC : portail web HTTPS, remplace RSAT pour WS","Azure Policy via Arc : Guest Configuration","Azure Monitor Agent remplace MMA/OMS"],
+    sections:[{id:"s1",titre:"Azure Arc : intégration de serveurs"},{id:"s2",titre:"Windows Admin Center (WAC)"},{id:"s3",titre:"Azure Monitor Agent & Azure Policy via Arc"}] },
+
+  { d:12, theme:"Gestion hybride — Automation, extensions & mises à jour", dom:["Hybride · 20 %"], time:"≈ 2 h",
+    read:["Azure Automation : Runbooks et DSC","Update Manager (Azure)","Extensions VM Azure (Custom Script, DSC)","Azure Policy Guest Configuration","PowerShell Remoting via HTTPS"],
+    links:[["Azure Automation","https://learn.microsoft.com/fr-fr/azure/automation/automation-intro"],["Azure Update Manager","https://learn.microsoft.com/fr-fr/azure/update-manager/overview"]],
+    focus:["Azure Automation DSC : configuration d'état souhaité","Update Manager : remplace Update Management (Automation)","Custom Script Extension : script post-déploiement","PS Remoting HTTPS : port 5986, certificat requis"],
+    sections:[{id:"s1",titre:"Azure Automation : Runbooks & DSC"},{id:"s2",titre:"Azure Update Manager & extensions VM"},{id:"s3",titre:"Guest Configuration & PowerShell Remoting"}] },
+
+  { d:13, theme:"Surveillance — Performance Monitor & Azure Monitor", dom:["Surveillance · 10 %"], time:"≈ 2 h",
+    read:["Compteurs Performance Monitor","Data Collector Sets","Azure Monitor : agents et espaces de travail","Log Analytics : requêtes KQL de base","Alertes et groupes d'actions"],
+    links:[["Azure Monitor","https://learn.microsoft.com/fr-fr/azure/azure-monitor/overview"],["Performance Monitor","https://learn.microsoft.com/fr-fr/windows-server/administration/windows-commands/perfmon"]],
+    focus:["Data Collector Set : groupe de compteurs planifié","Log Analytics Workspace : référentiel central de logs","KQL : project, where, summarize, render","Groupes d'actions : email, webhook, ITSM"],
+    sections:[{id:"s1",titre:"Performance Monitor & Data Collector Sets"},{id:"s2",titre:"Azure Monitor & Log Analytics"},{id:"s3",titre:"Alertes, KQL & groupes d'actions"}] },
+
+  { d:14, theme:"Dépannage Windows Server — réseau, stockage & update", dom:["Dépannage · 15 %"], time:"≈ 2 h",
+    read:["Dépannage réseau (netsh, Test-NetConnection)","Dépannage DHCP et DNS","Dépannage des espaces de stockage","Dépannage Windows Update / WSUS","Journaux d'événements et Reliability Monitor"],
+    links:[["Dépannage réseau","https://learn.microsoft.com/fr-fr/windows-server/networking/windows-server-supported-networking-scenarios"],["Outils de diagnostic","https://learn.microsoft.com/fr-fr/windows-server/administration/windows-commands/windows-commands"]],
+    focus:["Test-NetConnection : remplace ping+telnet","ipconfig /flushdns + dnscmd /clearcache","Reliability Monitor : historique stabilité","WSUS : approuver manuellement les mises à jour"],
+    sections:[{id:"s1",titre:"Dépannage réseau & DNS/DHCP"},{id:"s2",titre:"Dépannage stockage & espaces de stockage"},{id:"s3",titre:"Windows Update, WSUS & journaux d'événements"}] },
+
+  { d:15, theme:"Dépannage AD DS — réplication, Kerberos & récupération", dom:["Dépannage · 15 %"], time:"≈ 2 h",
+    read:["repadmin et dcdiag","Résolution des erreurs de réplication USN et Lingering Objects","Dépannage Kerberos (événements 4768, 4769)","Récupération d'une forêt AD","Sauvegarde d'état système (Windows Server Backup)"],
+    links:[["Dépannage AD DS","https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/manage/ad-ds-troubleshooting"],["Récupération forêt AD","https://learn.microsoft.com/fr-fr/windows-server/identity/ad-ds/manage/ad-forest-recovery-guide"]],
+    focus:["repadmin /showrepl : état réplication entrante","dcdiag /test:Replications : vérifie réplication récente","Lingering Objects : objets fantômes sur DCs isolés","Récupération forêt : restaurer PDC Emulator en premier"],
+    sections:[{id:"s1",titre:"repadmin, dcdiag & erreurs de réplication"},{id:"s2",titre:"Dépannage Kerberos & événements d'authentification"},{id:"s3",titre:"Récupération forêt AD & sauvegarde état système"}] }
 ];
 window.QDATA = {};
 

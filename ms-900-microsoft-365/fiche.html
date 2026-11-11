@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fiche MS-900 — Microsoft 365 Fundamentals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f0f4f8;
+  --sheet:#ffffff;
+  --ink:#0a1628;
+  --muted:#4a5568;
+  --line:#c8d8ea;
+  --accent:#0078d4;
+  --accent2:#50e6ff;
+  --accent-soft:#e3f2fd;
+  --tag-bg:#e3f2fd;
+  --tag-fg:#0063b1;
+  --warn:#d83b01;
+  --warn-soft:#fde7e9;
+  --ok:#107c10;
+  --ok-soft:#dff6dd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a1628;
+  --sheet:#0f2040;
+  --ink:#e8f0fe;
+  --muted:#8fa3bf;
+  --line:#1e3a5f;
+  --accent:#50e6ff;
+  --accent2:#0078d4;
+  --accent-soft:#0f2040;
+  --tag-bg:#0f2a4a;
+  --tag-fg:#50e6ff;
+  --warn:#ff8c69;
+  --warn-soft:#3a1a0f;
+  --ok:#6ccb6e;
+  --ok-soft:#0a2a0a;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a1628;
+  --sheet:#0f2040;
+  --ink:#e8f0fe;
+  --muted:#8fa3bf;
+  --line:#1e3a5f;
+  --accent:#50e6ff;
+  --accent2:#0078d4;
+  --accent-soft:#0f2040;
+  --tag-bg:#0f2a4a;
+  --tag-fg:#50e6ff;
+  --warn:#ff8c69;
+  --warn-soft:#3a1a0f;
+  --ok:#6ccb6e;
+  --ok-soft:#0a2a0a;
+  color-scheme:dark
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);}
+
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+
+.sidebar{background:var(--sheet);border-right:1px solid var(--line);padding:24px 0 40px;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;}
+@media(max-width:860px){.sidebar{display:none}}
+.sidebar-head{padding:0 18px 16px;border-bottom:1px solid var(--line);margin-bottom:12px;}
+.sidebar-head .cert-label{font:500 .68rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;}
+.sidebar-head h2{font:700 .95rem var(--f-display);color:var(--ink);line-height:1.2;}
+.toc-list{list-style:none}
+.toc-list li a{display:block;padding:5px 18px;font-size:.8rem;color:var(--muted);text-decoration:none;border-left:3px solid transparent;transition:border-color .15s,color .15s;}
+.toc-list li a:hover{color:var(--accent);border-left-color:var(--accent-soft)}
+.toc-list li a.active{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.toc-num{font:500 .65rem var(--f-mono);color:var(--accent);margin-right:5px;opacity:.7;}
+
+.main{max-width:860px;padding:40px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px));}
+
+.hero{background:linear-gradient(135deg,#0078d4 0%,#004e8c 100%);color:#fff;border-radius:12px;padding:32px 28px;margin-bottom:36px;position:relative;overflow:hidden;}
+.hero::after{content:"";position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(255,255,255,.06);border-radius:50%;pointer-events:none;}
+.hero .eyebrow{font:500 .7rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:8px;}
+.hero h1{font:700 2rem var(--f-display);line-height:1.15;text-wrap:balance;margin-bottom:12px;}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.85rem;color:rgba(255,255,255,.85)}
+.hero-meta span::before{content:"• ";opacity:.5}
+.hero-meta span:first-child::before{content:""}
+.back-link{display:inline-flex;align-items:center;gap:6px;font:500 .8rem var(--f-mono);color:rgba(255,255,255,.8);text-decoration:none;margin-bottom:14px;}
+.back-link:hover{color:#fff}
+
+.exam-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:36px;}
+.exam-cell{background:var(--sheet);padding:14px 16px;}
+.exam-cell .label{font:500 .68rem var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.exam-cell .val{font:600 .95rem var(--f-display)}
+.exam-cell .val.accent{color:var(--accent)}
+
+section{margin-bottom:44px;scroll-margin-top:24px}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--accent);}
+.section-num{font:500 .7rem var(--f-mono);background:var(--accent);color:#fff;padding:2px 7px;border-radius:4px;letter-spacing:.05em;}
+.section-header h2{font:700 1.15rem var(--f-display);color:var(--ink);}
+
+.domain-badge{display:inline-flex;align-items:center;gap:6px;font:500 .72rem var(--f-mono);background:var(--tag-bg);color:var(--tag-fg);padding:3px 10px;border-radius:20px;margin-bottom:12px;}
+
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+thead th{background:var(--accent);color:#fff;padding:8px 12px;text-align:left;font:600 .78rem var(--f-mono);letter-spacing:.04em;text-transform:uppercase;}
+tbody tr:nth-child(even){background:var(--accent-soft)}
+tbody td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:hover{background:var(--accent-soft)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px 16px;}
+.card h3{font:600 .85rem var(--f-display);color:var(--accent);margin-bottom:6px;}
+.card ul{list-style:none;font-size:.85rem}
+.card ul li{padding:2px 0;border-bottom:1px solid var(--line)}
+.card ul li:last-child{border:0}
+.card ul li::before{content:"›";color:var(--accent);margin-right:6px;font-weight:700}
+
+.check-list{list-style:none;display:grid;gap:6px;margin:8px 0}
+.check-list li{display:grid;grid-template-columns:20px 1fr;gap:6px;font-size:.88rem;align-items:start;}
+.check-list li::before{content:"✦";color:var(--accent);font-size:.75rem;margin-top:2px;}
+
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tag{font:500 .7rem var(--f-mono);background:var(--tag-bg);color:var(--tag-fg);padding:2px 8px;border-radius:4px;}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+
+.callout{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:.875rem;}
+.callout.warn{background:var(--warn-soft);border-left-color:var(--warn);}
+.callout strong{display:block;margin-bottom:4px;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+
+.kv{display:grid;gap:8px;margin:8px 0}
+.kv-row{display:grid;grid-template-columns:160px 1fr;gap:8px;font-size:.875rem;align-items:start;}
+.kv-row .k{font:600 .78rem var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding-top:2px;}
+@media(max-width:500px){.kv-row{grid-template-columns:1fr}}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+@media(max-width:560px){.compare{grid-template-columns:1fr}}
+.compare-box{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px;}
+.compare-box h4{font:600 .82rem var(--f-display);color:var(--accent);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line);}
+
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font:400 .78rem var(--f-mono);color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;}
+footer a{color:var(--accent);text-decoration:none}
+
+mark{background:rgba(0,120,212,.15);color:inherit;border-radius:2px;padding:0 2px}
+code{font-family:var(--f-mono);font-size:.85em;background:var(--accent-soft);color:var(--tag-fg);padding:1px 5px;border-radius:3px;}
+p{margin:8px 0;font-size:.9rem;line-height:1.6}
+h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar" aria-label="Table des matières">
+  <div class="sidebar-head">
+    <div class="cert-label">MS-900</div>
+    <h2>Microsoft 365 Fundamentals</h2>
+  </div>
+  <ul class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>L'examen</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Applications M365 &amp; Copilot</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>SharePoint &amp; OneDrive</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Exchange Online</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Defender for Office 365</a></li>
+    <li><a href="#s6"><span class="toc-num">06</span>Microsoft Purview</a></li>
+    <li><a href="#s7"><span class="toc-num">07</span>Entra ID &amp; MFA</a></li>
+    <li><a href="#s8"><span class="toc-num">08</span>Intune &amp; Autopilot</a></li>
+    <li><a href="#s9"><span class="toc-num">09</span>Licences &amp; Administration</a></li>
+    <li><a href="#s10"><span class="toc-num">10</span>Pièges classiques</a></li>
+  </ul>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <a href="../ms-900-microsoft-365/index.html" class="back-link">← Retour au quiz</a>
+    <div class="eyebrow">Microsoft Certification · MS-900</div>
+    <h1>Microsoft 365 Fundamentals</h1>
+    <div class="hero-meta">
+      <span>Score minimal : 700/1000</span>
+      <span>60 questions</span>
+      <span>65 minutes</span>
+      <span>Niveau Fondamentaux</span>
+    </div>
+  </div>
+
+  <!-- EXAM OVERVIEW -->
+  <div class="exam-grid">
+    <div class="exam-cell">
+      <div class="label">D1 · 20 %</div>
+      <div class="val">Productivité &amp; Collaboration</div>
+    </div>
+    <div class="exam-cell">
+      <div class="label">D2 · 35 %</div>
+      <div class="val">Endpoints &amp; Apps</div>
+    </div>
+    <div class="exam-cell">
+      <div class="label">D3 · 30 %</div>
+      <div class="val">Sécurité &amp; Conformité</div>
+    </div>
+    <div class="exam-cell">
+      <div class="label">D4 · 15 %</div>
+      <div class="val">Licences &amp; Support</div>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <section id="s1">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>L'examen MS-900</h2>
+    </div>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Code</span><span>MS-900</span></div>
+      <div class="kv-row"><span class="k">Score requis</span><span>700 / 1000</span></div>
+      <div class="kv-row"><span class="k">Durée</span><span>65 minutes</span></div>
+      <div class="kv-row"><span class="k">Questions</span><span>~60 (QCM, drag-and-drop, cas pratiques)</span></div>
+      <div class="kv-row"><span class="k">Niveau</span><span>Fondamentaux — aucun prérequis technique obligatoire</span></div>
+      <div class="kv-row"><span class="k">Domaines clés</span><span>D2 Endpoints (35%) › D3 Sécurité (30%) › D1 Productivité (20%) › D4 Licences (15%)</span></div>
+    </div>
+    <div class="callout">
+      <strong>Stratégie examen</strong>
+      Priorité à D2 (35%) et D3 (30%). Mémoriser les différences clés : SharePoint vs OneDrive, MDM vs MAM, Defender Plan 1 vs Plan 2, et les inclusions de chaque licence.
+    </div>
+  </section>
+
+  <!-- S2 -->
+  <section id="s2">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>Applications M365 &amp; Copilot</h2>
+    </div>
+    <div class="domain-badge">D1 · 20 %</div>
+    <div class="cards">
+      <div class="card">
+        <h3>Applications Office incluses</h3>
+        <ul>
+          <li>Word — traitement de texte + co-authoring</li>
+          <li>Excel — tableur + Power Query + AutoML</li>
+          <li>PowerPoint — présentations + Designer IA</li>
+          <li>Outlook — email + calendrier + Viva Insights</li>
+          <li>Teams — chat + réunions + canaux</li>
+          <li>OneNote — notes libres + OCR</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Outils de collaboration</h3>
+        <ul>
+          <li>Microsoft Loop — composants portables entre apps</li>
+          <li>Microsoft Lists — suivi de données structurées</li>
+          <li>Microsoft Planner — Kanban d'équipe</li>
+          <li>Microsoft To Do — tâches personnelles</li>
+          <li>Microsoft Forms — sondages et quiz</li>
+          <li>Microsoft Whiteboard — brainstorming visuel</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Viva — Expérience employé</h3>
+        <ul>
+          <li>Viva Connections — intranet dans Teams</li>
+          <li>Viva Learning — formations intégrées</li>
+          <li>Viva Insights — productivité personnelle</li>
+          <li>Viva Topics — base de connaissances IA</li>
+          <li>Viva Engage — réseau social (ex-Yammer)</li>
+          <li>Viva Goals — OKR d'équipe</li>
+        </ul>
+      </div>
+    </div>
+    <h3>Microsoft 365 Copilot</h3>
+    <div class="callout">
+      <strong>Fonctionnement</strong>
+      GPT-4 + Microsoft Graph (vos emails, fichiers, calendriers) + Applications M365 → réponses personnalisées basées sur VOS données
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Application</th><th>Ce que Copilot fait</th></tr></thead>
+        <tbody>
+          <tr><td>Teams</td><td>Résume les réunions manquées, liste les action items</td></tr>
+          <tr><td>Outlook</td><td>Résume les threads d'emails, rédige des réponses</td></tr>
+          <tr><td>Word</td><td>Rédige des brouillons, reformule, résume</td></tr>
+          <tr><td>Excel</td><td>Analyse des données, crée formules et graphiques</td></tr>
+          <tr><td>PowerPoint</td><td>Crée une présentation depuis un prompt ou document</td></tr>
+          <tr><td>Business Chat</td><td>Interface unifiée — requêtes sur toutes vos données M365</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Licence requise : <mark>Microsoft 365 Copilot add-on ($30/user/mois)</mark> sur une licence M365 existante</p>
+  </section>
+
+  <!-- S3 -->
+  <section id="s3">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>SharePoint Online &amp; OneDrive for Business</h2>
+    </div>
+    <div class="domain-badge">D2 · 35 %</div>
+    <div class="compare">
+      <div class="compare-box">
+        <h4>SharePoint Online</h4>
+        <ul class="check-list">
+          <li>Stockage d'équipe / organisation</li>
+          <li>Intranet (sites de communication)</li>
+          <li>Bibliothèques de documents partagées</li>
+          <li>Lié aux Microsoft 365 Groups et Teams</li>
+          <li>Sites d'équipe + sites hub</li>
+          <li>Quota : 1 TB + 10 GB / licence</li>
+        </ul>
+      </div>
+      <div class="compare-box">
+        <h4>OneDrive for Business</h4>
+        <ul class="check-list">
+          <li>Stockage personnel (par utilisateur)</li>
+          <li>Synchronisation locale sur PC/Mac</li>
+          <li>Partage avec collègues ou externe</li>
+          <li>Quota : 1 TB par utilisateur</li>
+          <li>Accès depuis mobile et web</li>
+          <li>Enregistrements Teams réunions individuelles</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout warn">
+      <strong>Piège examen</strong>
+      SharePoint = collaboration d'équipe. OneDrive = personnel. Teams = canal de communication (les fichiers Teams sont stockés dans SharePoint).
+    </div>
+    <h3>Permissions SharePoint</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Niveau</th><th>Droits</th></tr></thead>
+        <tbody>
+          <tr><td>Full Control</td><td>Tout faire (admin du site)</td></tr>
+          <tr><td>Design</td><td>Créer des pages et listes</td></tr>
+          <tr><td>Edit</td><td>Ajouter, modifier, supprimer (membres)</td></tr>
+          <tr><td>Contribute</td><td>Ajouter et modifier (sans supprimer)</td></tr>
+          <tr><td>Read</td><td>Lire et télécharger</td></tr>
+          <tr><td>View Only</td><td>Lire sans télécharger</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- S4 -->
+  <section id="s4">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>Exchange Online</h2>
+    </div>
+    <div class="domain-badge">D2 · 35 %</div>
+    <div class="callout">
+      <strong>Définition</strong>
+      Exchange Online = service email cloud (hébergé par Microsoft). Outlook = client qui se connecte à Exchange. Pas besoin de serveur Exchange on-premises.
+    </div>
+    <div class="cards">
+      <div class="card">
+        <h3>Boîtes aux lettres</h3>
+        <ul>
+          <li>Boîte utilisateur (par personne)</li>
+          <li>Boîte partagée (ex: support@)</li>
+          <li>Boîte ressource (salle, équipement)</li>
+          <li>Boîte de groupe M365</li>
+          <li>Archivage en ligne (In-Place Archive)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Fonctionnalités clés</h3>
+        <ul>
+          <li>Calendrier partagé + salle de conf</li>
+          <li>Carnet d'adresses global (GAL)</li>
+          <li>Règles de transport (mail flow rules)</li>
+          <li>Journalisation (compliance)</li>
+          <li>Rétention et eDiscovery</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Groupes dans Exchange</h3>
+        <ul>
+          <li>Liste de distribution (email uniquement)</li>
+          <li>Groupe M365 (email + SharePoint + Teams)</li>
+          <li>Groupe de sécurité (permissions)</li>
+          <li>Groupe dynamique (règles automatiques)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- S5 -->
+  <section id="s5">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>Microsoft Defender for Office 365</h2>
+    </div>
+    <div class="domain-badge">D3 · 30 %</div>
+    <div class="compare">
+      <div class="compare-box">
+        <h4>Plan 1 (Business Premium inclus)</h4>
+        <ul class="check-list">
+          <li>Safe Links — réécriture URLs + vérification au clic</li>
+          <li>Safe Attachments — sandbox des pièces jointes</li>
+          <li>Anti-phishing — détection IA</li>
+          <li>Anti-spam amélioré</li>
+          <li>Real-time detections (rapport basique)</li>
+        </ul>
+      </div>
+      <div class="compare-box">
+        <h4>Plan 2 (E5 ou add-on)</h4>
+        <ul class="check-list">
+          <li>Tout le Plan 1 +</li>
+          <li>Threat Explorer (investigation avancée)</li>
+          <li>Attack Simulator (simulations de phishing)</li>
+          <li>Automated Investigation &amp; Response (AIR)</li>
+          <li>Microsoft Secure Score</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>Safe Links en détail</strong>
+      À la réception : l'URL est réécrite (wrapped) → au clic en temps réel : vérification contre la liste des sites malveillants → si dangereux : page d'avertissement.
+    </div>
+    <div class="callout">
+      <strong>Safe Attachments en détail</strong>
+      La pièce jointe est ouverte dans un sandbox (environnement isolé) → si comportement malveillant détecté → pièce jointe bloquée ou remplacée. Délai possible.
+    </div>
+  </section>
+
+  <!-- S6 -->
+  <section id="s6">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2>Microsoft Purview</h2>
+    </div>
+    <div class="domain-badge">D3 · 30 %</div>
+    <div class="cards">
+      <div class="card">
+        <h3>Sensitivity Labels</h3>
+        <ul>
+          <li>Classification : Public, Interne, Confidentiel, Top Secret</li>
+          <li>Protection : chiffrement, watermark, restrictions</li>
+          <li>Application manuelle ou automatique (auto-labeling)</li>
+          <li>Inclus dans Office + Outlook + Teams + SharePoint</li>
+          <li>E3 = labels manuels · E5 = auto-labeling</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>DLP — Data Loss Prevention</h3>
+        <ul>
+          <li>Empêcher le partage de données sensibles</li>
+          <li>Détecte : numéros CB, IBAN, numéros de sécurité sociale</li>
+          <li>Couvre : Exchange, SharePoint, OneDrive, Teams</li>
+          <li>Actions : bloquer, avertir, demander justification</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Conformité &amp; Gouvernance</h3>
+        <ul>
+          <li>eDiscovery : recherche et collecte de preuves</li>
+          <li>Journaux d'audit : qui a fait quoi, quand</li>
+          <li>Rétention : conserver ou supprimer après X ans</li>
+          <li>Compliance Manager : score de conformité RGPD</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>Rétention vs Suppression</strong>
+      Politique de rétention = conserver les données pendant X ans pour des raisons légales. Ce n'est PAS un backup. Les données supprimées par un utilisateur sont conservées mais cachées.
+    </div>
+  </section>
+
+  <!-- S7 -->
+  <section id="s7">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2>Microsoft Entra ID, MFA &amp; PIM</h2>
+    </div>
+    <div class="domain-badge">D3 · 30 %</div>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Entra ID</span><span>Annuaire d'identités cloud (ex-Azure AD) — gère tous les comptes M365</span></div>
+      <div class="kv-row"><span class="k">Entra Connect</span><span>Synchronise Active Directory on-premises → Entra ID (cloud)</span></div>
+      <div class="kv-row"><span class="k">SSO</span><span>Un seul login pour toutes les applications M365 et SaaS</span></div>
+      <div class="kv-row"><span class="k">MFA</span><span>2ème facteur : Authenticator App, SMS, appel, FIDO2, Windows Hello</span></div>
+      <div class="kv-row"><span class="k">Security Defaults</span><span>MFA activée par défaut dans les nouveaux tenants M365</span></div>
+      <div class="kv-row"><span class="k">Conditional Access</span><span>Accorder ou bloquer l'accès selon : localisation, appareil, risque (Entra P1/P2)</span></div>
+      <div class="kv-row"><span class="k">PIM</span><span>Accès JIT (Just-In-Time) aux rôles admin → pas d'accès permanent (Entra P2)</span></div>
+    </div>
+    <h3>Méthodes d'authentification</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Méthode</th><th>Type</th><th>Niveau sécurité</th></tr></thead>
+        <tbody>
+          <tr><td>Mot de passe seul</td><td>Quelque chose que vous savez</td><td>Faible</td></tr>
+          <tr><td>SMS / Appel</td><td>Quelque chose que vous avez</td><td>Moyen</td></tr>
+          <tr><td>Microsoft Authenticator</td><td>Push notification</td><td>Bon</td></tr>
+          <tr><td>FIDO2 (clé physique)</td><td>Quelque chose que vous possédez</td><td>Très élevé</td></tr>
+          <tr><td>Windows Hello for Business</td><td>Biométrie / PIN</td><td>Très élevé</td></tr>
+          <tr><td>Certificate-based</td><td>Certificat PKI</td><td>Très élevé</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- S8 -->
+  <section id="s8">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2>Microsoft Intune &amp; Windows Autopilot</h2>
+    </div>
+    <div class="domain-badge">D2 · 35 %</div>
+    <div class="compare">
+      <div class="compare-box">
+        <h4>MDM — Mobile Device Management</h4>
+        <ul class="check-list">
+          <li>Gère l'appareil entier</li>
+          <li>Effacement à distance (remote wipe)</li>
+          <li>Politiques de sécurité sur l'appareil</li>
+          <li>Inventaire matériel et logiciel</li>
+          <li>Appareils propriété de l'entreprise (COBO)</li>
+        </ul>
+      </div>
+      <div class="compare-box">
+        <h4>MAM — Mobile Application Management</h4>
+        <ul class="check-list">
+          <li>Gère uniquement les apps M365</li>
+          <li>Protège les données d'entreprise dans les apps</li>
+          <li>Effacement sélectif (données corp uniquement)</li>
+          <li>Pas de contrôle sur l'appareil personnel</li>
+          <li>BYOD friendly — appareils personnels</li>
+        </ul>
+      </div>
+    </div>
+    <h3>Windows Autopilot</h3>
+    <div class="callout">
+      <strong>Principe</strong>
+      L'appareil Windows est livré directement à l'employé → premier allumage → connexion au compte M365 → Autopilot configure automatiquement l'appareil (apps, politiques, domaine) → zéro intervention IT.
+    </div>
+    <ul class="check-list">
+      <li>L'OEM enregistre les appareils dans le tenant Autopilot</li>
+      <li>Ou l'IT importe les numéros de série manuellement</li>
+      <li>Profil Autopilot = définit la configuration cible</li>
+      <li>OOBE (Out-Of-Box Experience) personnalisé</li>
+      <li>Inclus avec Microsoft 365 Business Premium / E3 / E5</li>
+    </ul>
+  </section>
+
+  <!-- S9 -->
+  <section id="s9">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <h2>Licences &amp; Administration M365</h2>
+    </div>
+    <div class="domain-badge">D1 · 20 % — D4 · 15 %</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Licence</th><th>Utilisateurs max</th><th>Apps desktop</th><th>Intune MDM</th><th>Defender P1</th><th>Entra P1</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Business Basic</strong></td><td>300</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+          <tr><td><strong>Business Standard</strong></td><td>300</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+          <tr><td><strong>Business Premium</strong></td><td>300</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+          <tr><td><strong>E3</strong></td><td>Illimité</td><td>✅</td><td>✅</td><td>❌</td><td>✅</td></tr>
+          <tr><td><strong>E5</strong></td><td>Illimité</td><td>✅</td><td>✅</td><td>✅ (P2)</td><td>✅ (P2)</td></tr>
+          <tr><td><strong>F1 / F3</strong></td><td>Illimité</td><td>❌/✅</td><td>F3 ✅</td><td>F3 ✅</td><td>❌</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn">
+      <strong>À mémoriser</strong>
+      Business Premium = seule licence Business avec Intune + Defender Plan 1 + Entra P1 → la plus complète pour les PME.
+    </div>
+    <h3>Centre d'administration M365</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">admin.microsoft.com</span><span>Portail principal — utilisateurs, licences, groupes, rapports</span></div>
+      <div class="kv-row"><span class="k">Rapports d'utilisation</span><span>Adoption par service (Teams, SharePoint, Exchange) → utilisateurs actifs</span></div>
+      <div class="kv-row"><span class="k">Message Center</span><span>Annonces des changements à venir (nouvelles fonctionnalités, dépréciations)</span></div>
+      <div class="kv-row"><span class="k">Service Health</span><span>État en temps réel de chaque service M365</span></div>
+      <div class="kv-row"><span class="k">SLA</span><span>99,9% de disponibilité garantie par service</span></div>
+    </div>
+    <h3>Power Platform dans M365</h3>
+    <div class="cards">
+      <div class="card">
+        <h3>Power Apps</h3>
+        <ul>
+          <li>Créer des apps sans code</li>
+          <li>Canvas apps (design libre)</li>
+          <li>Model-driven (depuis données)</li>
+          <li>Connecteurs M365 inclus</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Power Automate</h3>
+        <ul>
+          <li>Automatisation de workflows</li>
+          <li>400+ connecteurs (M365, Salesforce…)</li>
+          <li>Automated / Scheduled / Instant</li>
+          <li>Approbations intégrées</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Power BI</h3>
+        <ul>
+          <li>Tableaux de bord et rapports</li>
+          <li>Connexion à toutes les sources de données</li>
+          <li>Partage et collaboration</li>
+          <li>Power BI Pro inclus dans E5</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- S10 -->
+  <section id="s10">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <h2>Pièges classiques MS-900</h2>
+    </div>
+    <div class="callout warn">
+      <strong>Distinctions critiques à l'examen</strong>
+    </div>
+    <ul class="check-list">
+      <li><strong>SharePoint</strong> = stockage d'équipe/intranet · <strong>OneDrive</strong> = stockage personnel · <strong>Teams</strong> = canal de collaboration (fichiers → SharePoint)</li>
+      <li><strong>Intune MDM</strong> = gère l'appareil entier (effacement complet) · <strong>MAM</strong> = gère uniquement les apps (effacement sélectif) → BYOD</li>
+      <li><strong>Exchange Online</strong> = service email cloud · <strong>Outlook</strong> = client qui se connecte à Exchange</li>
+      <li><strong>Business Premium</strong> = seule licence Business (≤300 users) avec Intune + Defender Plan 1</li>
+      <li><strong>Defender Plan 1</strong> (Safe Links + Safe Attachments) · <strong>Plan 2</strong> (+ Attack Simulator + AIR + Threat Explorer)</li>
+      <li><strong>Sensitivity Labels</strong> = classification/protection · <strong>DLP</strong> = empêcher le partage non autorisé → deux outils complémentaires</li>
+      <li><strong>Entra Connect</strong> = synchronise AD on-prem → cloud (pas l'inverse)</li>
+      <li><strong>PIM</strong> = accès JIT aux rôles admins (élévation temporaire, pas d'accès permanent)</li>
+      <li><strong>Security Defaults</strong> = MFA activée par défaut dans les nouveaux tenants · <strong>Conditional Access</strong> = règles granulaires (Entra P1 requis)</li>
+      <li><strong>Autopilot</strong> = provisioning zéro-touch ; l'IT ne touche pas l'appareil · configure depuis le cloud via Intune</li>
+    </ul>
+
+    <footer>
+      <span>MS-900 — Microsoft 365 Fundamentals</span>
+      <a href="https://learn.microsoft.com/fr-fr/credentials/certifications/exams/ms-900/" target="_blank" rel="noopener">Page officielle Microsoft Learn ↗</a>
+    </footer>
+  </section>
+
+</main>
+</div>
+
+<script>
+// Highlight active TOC link on scroll
+const sections=document.querySelectorAll("section[id]");
+const links=document.querySelectorAll(".toc-list a");
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      links.forEach(l=>l.classList.toggle("active",l.getAttribute("href")==="#"+e.target.id));
+    }
+  });
+},{rootMargin:"-20% 0px -70% 0px"});
+sections.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
