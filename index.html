@@ -50,6 +50,11 @@ h1{font-size:2rem;font-weight:700}
 .cert-card--soon{opacity:.6;cursor:default;pointer-events:none}
 .cert-card--soon:hover{border-color:var(--line);box-shadow:none}
 .pill--soon{background:var(--line);color:var(--muted)}
+/* Cartes "Retirée" */
+.cert-card--retired{opacity:.7}
+.cert-card--retired .card-stripe{filter:grayscale(.6)}
+.pill--retired{background:var(--ko-soft);color:var(--ko);font:500 .68rem var(--f-mono);padding:2px 8px;border-radius:4px}
+.card-badge--retired{text-decoration:line-through;opacity:.6}
 footer{border-top:1px solid var(--line);padding-top:24px;font-size:.8rem;color:var(--muted)}
 footer a{color:var(--accent);text-decoration:none}
 /* FEATURE 1 : Bouton thème */
@@ -188,6 +193,19 @@ footer a{color:var(--accent);text-decoration:none}
         <div class="card-progress-label"><span id="done-ai901">0/350</span><span class="pct" id="pct-ai901"></span></div>
       </div>
       <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill" id="pill-ai901">Quiz</span></div>
+    </a>
+    <a href="ai-900-azure-ai-fundamentals/index.html" class="cert-card cert-card--retired" data-qkey="ai900.v1">
+      <div class="card-stripe" style="background:#7b2d8b"></div>
+      <div class="card-body">
+        <div class="card-badge card-badge--retired">Microsoft Azure · AI-900</div>
+        <div class="card-title">Azure AI Fundamentals <span style="font-size:.72rem;font-weight:400;color:var(--ko);font-family:var(--f-mono)">(retirée)</span></div>
+        <div class="card-desc">Ancienne version — remplacée par AI-901. Contenu disponible pour révision.</div>
+      </div>
+      <div class="card-progress" id="prog-ai900" hidden>
+        <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-ai900" style="width:0%"></div></div>
+        <div class="card-progress-label"><span id="done-ai900">0/350</span><span class="pct" id="pct-ai900"></span></div>
+      </div>
+      <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill pill--retired">⚠ Retirée</span></div>
     </a>
     <a href="sc-900-security-compliance-identity/index.html" class="cert-card" data-qkey="sc900.v1">
       <div class="card-stripe" style="background:#1a5c9a"></div>
@@ -402,12 +420,12 @@ document.getElementById("themeToggle").onclick=toggleTheme;
 // FEATURE 2 & 3 : Progress bars per cert
 // total questions par cert (pour calcul couverture)
 const TOTALS={
-  "az802.v1":750,"az900.v1":350,"ai901.v1":350,"sc900.v1":350,
+  "az802.v1":750,"az900.v1":350,"ai901.v1":350,"ai900.v1":350,"sc900.v1":350,
   "ms900.v1":350,"clf7.v2":350,"aif.v1":350,"gcdl.v1":350,"ghf.v1":350
 };
 // ID short (même que data-qkey préfixe slug dans les IDs DOM)
 const KEY_SLUG={
-  "az802.v1":"az802","az900.v1":"az900","ai901.v1":"ai901","sc900.v1":"sc900",
+  "az802.v1":"az802","az900.v1":"az900","ai901.v1":"ai901","ai900.v1":"ai900","sc900.v1":"sc900",
   "ms900.v1":"ms900","clf7.v2":"clf7","aif.v1":"aif","gcdl.v1":"gcdl","ghf.v1":"ghf"
 };
 
