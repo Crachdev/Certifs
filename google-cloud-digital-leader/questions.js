@@ -2,6 +2,7 @@ window.QKEY = "gcdl.v1";
 
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={
+  fiche:"fiche.html",
   exam:"Google Cloud Digital Leader CDL",
   passScore:70,
   examMins:90,
@@ -17,12 +18,14 @@ window.QUIZ_META={
 const _GGCP="https://cloud.google.com/docs/";
 window.QUIZ_PLAN=[
  {d:1,theme:"Fondamentaux cloud et organisation GCP",dom:["D1 · 17 %","D2 · 20 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  sections:[{id:"s2",titre:"🌐 Transformation digitale avec Google Cloud"},{id:"s7",titre:"⚙️ Opérations cloud & Gestion des coûts"}],
   read:["Cloud computing : avantages (élasticité, pay-as-you-go, CapEx → OpEx)","Modèles cloud : public, privé, hybride, multi-cloud","Organisation GCP : Org → Dossiers → Projets → Ressources ; Régions et Zones"],
   links:[["Fondamentaux du cloud","https://cloud.google.com/learn/what-is-cloud-computing"],
          ["Hiérarchie des ressources GCP","https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy"],
          ["Régions et zones GCP","https://cloud.google.com/about/locations"]],
   focus:["Projet = unité de facturation et de gestion des APIs dans GCP","Zone = datacenter isolé dans une région ; déployer multi-zone = HA","gcloud CLI = outil principal pour interagir avec GCP en ligne de commande"]},
  {d:2,theme:"Compute, Storage, VPC et App Engine",dom:["D2 · 20 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  sections:[{id:"s5",titre:"🏗 Moderniser l'infrastructure et les applications"},{id:"s8",titre:"🛠 Produits GCP clés"}],
   read:["Compute : Compute Engine (VMs), GKE (Kubernetes), Cloud Run (serverless containers), App Engine (PaaS)","Storage : Cloud Storage (objets), Persistent Disk, Filestore","VPC : Virtual Private Cloud, règles de pare-feu, sous-réseaux"],
   links:[["Compute Engine","https://cloud.google.com/compute/docs"],
          ["Google Kubernetes Engine","https://cloud.google.com/kubernetes-engine/docs"],
@@ -30,6 +33,7 @@ window.QUIZ_PLAN=[
          ["VPC","https://cloud.google.com/vpc/docs/overview"]],
   focus:["App Engine Standard = PaaS serverless ; Flexible = conteneurs sur VMs gérées","Cloud Run = conteneurs serverless (scale to zero, paiement à la requête)","Cloud Storage classes : Standard, Nearline (1 mois), Coldline (3 mois), Archive (1 an)"]},
  {d:3,theme:"BigQuery, Dataflow, Pub/Sub — données et analytics",dom:["D3 · 20 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  sections:[{id:"s3",titre:"📊 Transformation Data avec Google Cloud"}],
   read:["BigQuery : entrepôt de données serverless (OLAP, SQL standard, pétaoctets)","Dataflow : pipeline ETL/ELT temps réel et batch (basé sur Apache Beam)","Pub/Sub : messagerie asynchrone pub/subscribe pour découpler les services"],
   links:[["BigQuery","https://cloud.google.com/bigquery/docs/introduction"],
          ["Cloud Dataflow","https://cloud.google.com/dataflow/docs/overview"],
@@ -37,6 +41,7 @@ window.QUIZ_PLAN=[
          ["Looker Studio","https://cloud.google.com/looker-studio"]],
   focus:["BigQuery = serverless (pas de serveurs à gérer), facturation par octet scanné ou slot","Dataflow = pipeline de données unifiée (streaming ET batch)","Pub/Sub = file de messages asynchrone (découplage producteur/consommateur)"]},
  {d:4,theme:"Vertex AI, AutoML, Gemini et MLOps",dom:["D4 · 20 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  sections:[{id:"s4",titre:"🤖 Intelligence Artificielle avec Google Cloud"}],
   read:["Vertex AI : plateforme ML unifiée (entraînement, déploiement, monitoring)","AutoML : entraîner des modèles personnalisés sans coder","Gemini (Duet AI) : modèle de fondation Google, multimodal — intégré dans GCP","MLOps : Vertex AI Pipelines, Model Registry, Explainable AI"],
   links:[["Vertex AI","https://cloud.google.com/vertex-ai/docs/start/introduction-unified-platform"],
          ["AutoML","https://cloud.google.com/automl/docs"],
@@ -44,6 +49,7 @@ window.QUIZ_PLAN=[
          ["Explainable AI","https://cloud.google.com/explainable-ai/docs/overview"]],
   focus:["Vertex AI = hub central ML (remplace les anciens services ML séparés de GCP)","AutoML Vision/NLP/Tables = modèles custom sans expertise ML","Gemini = modèle multimodal Google (texte, image, code) intégré à GCP"]},
  {d:5,theme:"IAM, Cloud Armor, KMS et sécurité",dom:["D5 · 23 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  sections:[{id:"s6",titre:"🔒 Confiance et Sécurité avec Google Cloud"}],
   read:["IAM GCP : Rôles (primitifs, prédéfinis, personnalisés), Politiques, Comptes de service","Cloud Armor : protection WAF et DDoS pour les applications web","KMS (Key Management Service) : clés de chiffrement gérées par Google ou le client (CMEK)"],
   links:[["IAM GCP — Vue d'ensemble","https://cloud.google.com/iam/docs/overview"],
          ["Cloud Armor","https://cloud.google.com/armor/docs/cloud-armor-overview"],
@@ -51,6 +57,7 @@ window.QUIZ_PLAN=[
          ["Sécurité GCP","https://cloud.google.com/security/overview/whitepaper"]],
   focus:["Rôles IAM : Primitifs (Owner/Editor/Viewer), Prédéfinis (granulaires), Personnalisés","Compte de service = identité pour les applications (pas les humains)","CMEK = Customer-Managed Encryption Keys → contrôle client des clés de chiffrement"]},
  {d:6,theme:"Google Workspace — productivité et collaboration",dom:["D2 · 20 %"],time:"≈ 1 h lecture + 1 h 15 quiz",
+  sections:[{id:"s2",titre:"🌐 Transformation digitale avec Google Cloud"},{id:"s7",titre:"⚙️ Opérations cloud & Gestion des coûts"}],
   read:["Google Workspace : Gmail, Drive, Docs, Sheets, Slides, Meet, Chat, Forms","Édition collaborative en temps réel, partage de fichiers, Google Sites","Administration Workspace : Console Admin, politiques, journaux d'audit"],
   links:[["Google Workspace","https://workspace.google.com/learn-more/what_is_google_workspace.html"],
          ["Google Drive","https://workspace.google.com/products/drive/"],
@@ -58,6 +65,7 @@ window.QUIZ_PLAN=[
          ["Gemini dans Google Workspace","https://workspace.google.com/products/gemini/"]],
   focus:["Google Workspace = suite de productivité cloud (concurrent direct M365)","Drive = stockage + co-édition en temps réel","Gemini dans Workspace = IA dans Gmail, Docs, Sheets, Meet (résumés, rédaction)"]},
  {d:7,theme:"Transformation digitale et examen blanc",dom:["D1","D2","D3","D4","D5","pondéré"],time:"90 min chrono + 1 h révision",
+  sections:[{id:"s9",titre:"🔑 Mots-clés examen → Service GCP"},{id:"s10",titre:"⚠️ Pièges classiques"},{id:"s1",titre:"🎯 L'examen GCDL"}],
   read:["Transformation digitale : modernisation, agilité, innovation avec GCP","Cas d'usage : migration vers GCP, adoption IA/ML, analytics"],
   links:[["Examen Cloud Digital Leader — Page officielle","https://cloud.google.com/learn/certification/cloud-digital-leader"],
          ["Parcours de préparation CDL","https://cloud.google.com/learn/certification/cloud-digital-leader-study-guide"]],
