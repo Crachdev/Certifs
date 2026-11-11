@@ -4,9 +4,9 @@
  * Permet l'installation PWA + notifications push (Feature 12).
  */
 
-const CACHE_NAME = "certifs-v11";
+const CACHE_NAME = "certifs-v12";
 
-// Assets à précacher au premier install (shell minimal)
+// Assets à précacher au premier install (shell complet)
 const PRECACHE = [
   "/Certifs/",
   "/Certifs/index.html",
@@ -14,7 +14,47 @@ const PRECACHE = [
   "/Certifs/engine/notifications.js",
   "/Certifs/icons/icon-192.png",
   "/Certifs/icons/icon-512.png",
-  "/Certifs/manifest.json"
+  "/Certifs/manifest.json",
+  // AI-900 (retirée)
+  "/Certifs/ai-900-azure-ai-fundamentals/index.html",
+  "/Certifs/ai-900-azure-ai-fundamentals/questions.js",
+  "/Certifs/ai-900-azure-ai-fundamentals/fiche.html",
+  // AI-901
+  "/Certifs/ai-901-azure-ai-fundamentals/index.html",
+  "/Certifs/ai-901-azure-ai-fundamentals/questions.js",
+  "/Certifs/ai-901-azure-ai-fundamentals/fiche.html",
+  // AWS AI Practitioner
+  "/Certifs/aws-ai-practitioner/index.html",
+  "/Certifs/aws-ai-practitioner/questions.js",
+  "/Certifs/aws-ai-practitioner/fiche.html",
+  // AWS CLF-C02
+  "/Certifs/aws-clf-c02/index.html",
+  "/Certifs/aws-clf-c02/questions.js",
+  "/Certifs/aws-clf-c02/fiche.html",
+  // AZ-802
+  "/Certifs/az-802-windows-server/index.html",
+  "/Certifs/az-802-windows-server/questions.js",
+  "/Certifs/az-802-windows-server/fiche.html",
+  // AZ-900
+  "/Certifs/az-900-azure-fundamentals/index.html",
+  "/Certifs/az-900-azure-fundamentals/questions.js",
+  "/Certifs/az-900-azure-fundamentals/fiche.html",
+  // GitHub Foundations
+  "/Certifs/github-foundations/index.html",
+  "/Certifs/github-foundations/questions.js",
+  "/Certifs/github-foundations/fiche.html",
+  // Google Cloud Digital Leader
+  "/Certifs/google-cloud-digital-leader/index.html",
+  "/Certifs/google-cloud-digital-leader/questions.js",
+  "/Certifs/google-cloud-digital-leader/fiche.html",
+  // MS-900
+  "/Certifs/ms-900-microsoft-365/index.html",
+  "/Certifs/ms-900-microsoft-365/questions.js",
+  "/Certifs/ms-900-microsoft-365/fiche.html",
+  // SC-900
+  "/Certifs/sc-900-security-compliance-identity/index.html",
+  "/Certifs/sc-900-security-compliance-identity/questions.js",
+  "/Certifs/sc-900-security-compliance-identity/fiche.html"
 ];
 
 /* ── Install ── */
