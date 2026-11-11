@@ -46,6 +46,10 @@ h1{font-size:2rem;font-weight:700}
 .card-foot .badge-state{font:600 .68rem var(--f-mono);padding:2px 8px;border-radius:4px}
 .badge-state.done{background:var(--ok-soft);color:var(--ok)}
 .badge-state.inprogress{background:var(--accent-soft);color:var(--accent)}
+/* Cartes "À venir" */
+.cert-card--soon{opacity:.6;cursor:default;pointer-events:none}
+.cert-card--soon:hover{border-color:var(--line);box-shadow:none}
+.pill--soon{background:var(--line);color:var(--muted)}
 footer{border-top:1px solid var(--line);padding-top:24px;font-size:.8rem;color:var(--muted)}
 footer a{color:var(--accent);text-decoration:none}
 /* FEATURE 1 : Bouton thème */
@@ -241,6 +245,24 @@ footer a{color:var(--accent);text-decoration:none}
       </div>
       <div class="card-foot"><span>350 questions · 7 jours</span><span class="pill" id="pill-aif">Quiz</span></div>
     </a>
+    <div class="cert-card cert-card--soon">
+      <div class="card-stripe" style="background:#c7a04a"></div>
+      <div class="card-body">
+        <div class="card-badge">Amazon Web Services · SAA-C03</div>
+        <div class="card-title">AWS Solutions Architect – Associate</div>
+        <div class="card-desc">Architecture hautement disponible, services AWS avancés, coûts et sécurité à l'échelle.</div>
+      </div>
+      <div class="card-foot"><span>À venir</span><span class="pill pill--soon">🔜 Bientôt</span></div>
+    </div>
+    <div class="cert-card cert-card--soon">
+      <div class="card-stripe" style="background:#8b1a1a"></div>
+      <div class="card-body">
+        <div class="card-badge">Amazon Web Services · SCS-C02</div>
+        <div class="card-title">AWS Certified Security – Specialty</div>
+        <div class="card-desc">IAM avancé, chiffrement, détection des menaces, réponse aux incidents et conformité AWS.</div>
+      </div>
+      <div class="card-foot"><span>À venir</span><span class="pill pill--soon">🔜 Bientôt</span></div>
+    </div>
   </div>
 
   <div class="section-title">Google Cloud</div>
