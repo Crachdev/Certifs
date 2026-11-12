@@ -191,7 +191,15 @@ h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
       <div class="kv-row"><span class="k">Underfitting</span><span>Modèle trop simple, ne capture pas les patterns. Solution : modèle plus complexe, plus de features.</span></div>
       <div class="kv-row"><span class="k">Biais / Variance</span><span>Biais élevé = underfitting. Variance élevée = overfitting. Trouver le bon équilibre (bias-variance tradeoff).</span></div>
       <div class="kv-row"><span class="k">Train / Validation / Test</span><span>Split classique : 70% train, 15% validation (tuning), 15% test (évaluation finale).</span></div>
-      <div class="kv-row"><span class="k">MLOps</span><span>DevOps pour le ML : automatiser l'entraînement, le déploiement, la surveillance des modèles.</span></div>
+      <div class="kv-row"><span class="k">MLOps</span><span>DevOps pour le ML : expérimentation, processus reproductibles, mise à l'échelle, surveillance des modèles, réentraînement. Gestion de la dette technique.</span></div>
+      <div class="kv-row"><span class="k">IA agentique</span><span>Systèmes d'IA qui planifient et agissent de manière autonome. Multi-agents, orchestration de flux de travail, gestion de la mémoire, utilisation d'outils. MCP (Model Context Protocol) = protocole pour connecter les agents à des systèmes externes.</span></div>
+    </div>
+    <h3>Types d'inférence</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Temps réel</span><span>Réponse immédiate, faible latence. Ex : chatbot, recommandation live.</span></div>
+      <div class="kv-row"><span class="k">Par lots (batch)</span><span>Traitement différé de grandes quantités. Ex : analyse nocturne de logs.</span></div>
+      <div class="kv-row"><span class="k">Asynchrone</span><span>L'appelant n'attend pas la réponse. Ex : génération de rapport en arrière-plan.</span></div>
+      <div class="kv-row"><span class="k">Serverless</span><span>Inférence sans gestion d'instances, facturation à l'appel. Ex : Bedrock API.</span></div>
     </div>
     <h3>Types de données ML</h3>
     <div class="tags">
@@ -233,6 +241,11 @@ h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
       <strong>💡 Service clé AIF-C01</strong>
       Amazon Bedrock = API unifiée pour accéder à des FMs via AWS sans gérer d'infrastructure. Modèles disponibles : Anthropic Claude, Meta Llama, Mistral, Amazon Titan, Stability AI, Cohere. Fonctionnalités : Knowledge Bases (RAG), Agents, Guardrails, Model Evaluation, Prompt Flows.
     </div>
+    <h3>Cycle de vie d'un FM</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Étapes</span><span>Sélection des données → Sélection du modèle → Pré-entraînement → Peaufinage (fine-tuning) → Évaluation → Déploiement → Feedbacks → Réentraînement.</span></div>
+      <div class="kv-row"><span class="k">Tarification par token</span><span>Coût calculé en tokens (input + output). Plus la fenêtre de contexte est grande, plus c'est coûteux. Mise en cache des invites (prompt caching) réduit les coûts sur les prompts répétitifs.</span></div>
+    </div>
     <h3>Amazon SageMaker JumpStart</h3>
     <div class="callout">Hub de modèles pré-entraînés déployables en 1 clic. FMs open-source : Llama, Mistral. Différent de Bedrock : JumpStart déploie dans votre compte (contrôle total), Bedrock est serverless (API managée).</div>
     <h3>Prompt Engineering</h3>
@@ -245,14 +258,35 @@ h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
           <tr><td><strong>Chain-of-thought (CoT)</strong></td><td>Demander au modèle de "penser étape par étape". Améliore le raisonnement.</td></tr>
           <tr><td><strong>System prompt</strong></td><td>Instructions permanentes données au modèle (persona, règles, format).</td></tr>
           <tr><td><strong>Prompt template</strong></td><td>Structure réutilisable avec des variables. Utilisé dans Bedrock Prompt Flows.</td></tr>
+          <tr><td><strong>Invites négatives</strong></td><td>Indiquer ce que le modèle NE doit PAS faire ou inclure. Réduit les sorties indésirables.</td></tr>
         </tbody>
       </table>
     </div>
+    <h3>Risques du prompt engineering</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Risque</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Injection</strong></td><td>Input malveillant pour contourner les instructions du système.</td></tr>
+          <tr><td><strong>Empoisonnement</strong></td><td>Contaminer les données d'entraînement/contexte pour manipuler les sorties.</td></tr>
+          <tr><td><strong>Détournement</strong></td><td>Faire exécuter des actions non prévues par le concepteur.</td></tr>
+          <tr><td><strong>Débridage (jailbreak)</strong></td><td>Contourner les garde-fous de sécurité du modèle.</td></tr>
+          <tr><td><strong>Exposition</strong></td><td>Fuite d'informations sensibles contenues dans le prompt système.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout"><strong>💡 Bedrock Prompt Management</strong> — Service pour versionner, gérer et optimiser les invites. Permet de tester, comparer et déployer des versions de prompts en production.</div>
   </section>
 
   <section id="s4">
     <div class="section-header"><span class="section-num">04</span><h2>Applications des Foundation Models</h2></div>
     <div class="domain-badge">🔧 Domain 3 · 28%</div>
+    <h3>Critères de sélection d'un FM</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Critères techniques</span><span>Coût, latence, modalité (texte/image/audio), taille du contexte (input/output), capacités multilingues, complexité du modèle.</span></div>
+      <div class="kv-row"><span class="k">Critères business</span><span>Conformité réglementaire, personnalisation possible, mise en cache des invites (prompt caching), disponibilité régionale.</span></div>
+      <div class="kv-row"><span class="k">Approches de personnalisation</span><span>Du moins au plus coûteux : RAG (données externes) → Apprentissage en contexte (few-shot) → Fine-tuning → Pré-entraînement continu → Distillation (compresser un grand modèle vers un plus petit).</span></div>
+    </div>
     <h3>RAG — Retrieval Augmented Generation</h3>
     <div class="kv">
       <div class="kv-row"><span class="k">Définition</span><span>Augmenter le LLM avec des données externes récupérées en temps réel. Évite l'hallucination et le knowledge cutoff.</span></div>
@@ -277,6 +311,7 @@ h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
       <div class="card"><h3>ROUGE</h3><ul><li>Recall-Oriented Understudy for Gisting Evaluation</li><li>Compare résumés générés vs référence</li><li>ROUGE-N : chevauchement n-grammes</li></ul></div>
       <div class="card"><h3>BLEU</h3><ul><li>Bilingual Evaluation Understudy</li><li>Score de traduction automatique</li><li>Chevauchement avec traduction de référence</li></ul></div>
       <div class="card"><h3>BERTScore</h3><ul><li>Compare les embeddings BERT</li><li>Sémantique, pas juste mots-clés</li><li>Plus précis que ROUGE/BLEU</li></ul></div>
+      <div class="card"><h3>LLM-juge</h3><ul><li>Un LLM évalue les sorties d'un autre LLM</li><li>Évaluation humaine à l'échelle</li><li>Utilisé dans Bedrock Model Evaluation</li></ul></div>
     </div>
     <h3>Agents IA (Amazon Bedrock Agents)</h3>
     <div class="kv">
@@ -314,6 +349,12 @@ h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
     <div class="callout">Filtres de contenu pour les applications Bedrock : blocage de contenu nuisible, toxique, discriminatoire. Filtrage de contenu sensible (PII). Hallucination detection. Grounding check : vérifier que les réponses sont fondées sur les sources fournies.</div>
     <h3>Risques propriété intellectuelle</h3>
     <div class="callout warn"><strong>⚠️ Risques légaux</strong>Les FMs peuvent mémoriser et reproduire des données d'entraînement protégées par copyright. Utiliser des données d'entraînement licenciées. AWS indemnisation copyright disponible pour certains services Bedrock.</div>
+    <h3>Qualité des données d'entraînement</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Caractéristiques clés</span><span>Inclusivité, diversité, représentativité, équilibre des classes. Des données biaisées produisent des modèles biaisés.</span></div>
+      <div class="kv-row"><span class="k">Durabilité</span><span>Préférer des modèles plus petits et efficaces quand c'est possible. L'entraînement de grands modèles a un impact environnemental (consommation énergétique).</span></div>
+      <div class="kv-row"><span class="k">Design centré humain</span><span>Mécanismes de feedback utilisateurs, transparence des décisions IA, possibilité de contestation. L'humain doit pouvoir comprendre et corriger les décisions du modèle.</span></div>
+    </div>
   </section>
 
   <section id="s6">
@@ -345,6 +386,23 @@ h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
       <div class="kv-row"><span class="k">AWS AI Service Cards</span><span>Documentation des capacités, limites, biais et utilisations appropriées de chaque service IA AWS.</span></div>
       <div class="kv-row"><span class="k">SageMaker Model Cards</span><span>Fiche technique d'un modèle : objectif, métriques, biais, données d'entraînement. Standard de l'industrie.</span></div>
       <div class="kv-row"><span class="k">CloudTrail</span><span>Audit de tous les appels API vers Bedrock, SageMaker. Qui a appelé quoi, quand.</span></div>
+      <div class="kv-row"><span class="k">Amazon Macie</span><span>Détecte et protège les données sensibles et PII (Personally Identifiable Information) dans S3. Essentiel pour la conformité RGPD/HIPAA sur les datasets IA.</span></div>
+      <div class="kv-row"><span class="k">Bedrock AgentCore Identity</span><span>Gestion des identités et des permissions pour les agents Bedrock. Contrôle quel agent peut accéder à quels outils/ressources.</span></div>
+      <div class="kv-row"><span class="k">AWS Artifact</span><span>Portail libre-service pour accéder aux rapports de conformité AWS (SOC, PCI, ISO…). Utile pour prouver la conformité réglementaire.</span></div>
+      <div class="kv-row"><span class="k">AWS Trusted Advisor</span><span>Recommandations de bonnes pratiques : sécurité, performance, coûts, résilience. Vérifie que les ressources IA respectent les best practices AWS.</span></div>
+    </div>
+    <h3>Gouvernance des données IA</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Cycle de vie des données</span><span>Définir comment les données sont collectées, stockées, utilisées, archivées et supprimées. S3 Lifecycle Policies pour automatiser.</span></div>
+      <div class="kv-row"><span class="k">Résidence des données</span><span>Garantir que les données restent dans une région AWS spécifique (souveraineté des données). Important pour RGPD et réglementations locales.</span></div>
+      <div class="kv-row"><span class="k">Journalisation</span><span>Tracer tous les accès aux données IA : CloudTrail (API), CloudWatch Logs (application), S3 access logs.</span></div>
+      <div class="kv-row"><span class="k">Conservation</span><span>Définir des politiques de rétention des données d'entraînement, des logs d'inférence et des modèles.</span></div>
+    </div>
+    <h3>Ancrage et détection des hallucinations</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">Ancrage (Grounding)</span><span>Technique RAG pour ancrer les réponses du FM dans des sources vérifiables. Réduit les hallucinations en fournissant du contexte factuel.</span></div>
+      <div class="kv-row"><span class="k">Score de confiance</span><span>Métriques de confiance des réponses RAG : pertinence des sources, cohérence avec le contexte récupéré.</span></div>
+      <div class="kv-row"><span class="k">Détection des hallucinations</span><span>Méthodes : vérification des sources citées, LLM-juge (évaluation croisée), validation humaine, cohérence inter-requêtes.</span></div>
     </div>
   </section>
 
