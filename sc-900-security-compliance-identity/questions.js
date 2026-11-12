@@ -4,6 +4,8 @@ window.QKEY = "sc-900";
 
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={
+  title:"Security, Compliance & Identity Fundamentals",
+  code:"SC-900",
   fiche:"fiche.html",
   exam:"Microsoft Security, Compliance & Identity Fundamentals SC-900",
   passScore:70,
