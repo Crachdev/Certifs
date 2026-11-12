@@ -91,16 +91,17 @@ li{margin:3px 0}
 <div class="toc">
   <h4>Sommaire</h4>
   <ol>
-    <li><a href="#resilience">Architectures résilientes (J1–J8)</a></li>
-    <li><a href="#performance">Performances (J9–J16)</a></li>
-    <li><a href="#securite">Sécurité (J17–J24)</a></li>
-    <li><a href="#couts">Coût optimisé (J25–J30)</a></li>
+    <li><a href="#resilience">Architectures résilientes (D2 · 26%)</a></li>
+    <li><a href="#securite">Sécurité — D1 (30%)</a></li>
+    <li><a href="#conteneurs">Conteneurs &amp; Serverless</a></li>
+    <li><a href="#analytique">Analytique &amp; Data (D3)</a></li>
+    <li><a href="#couts">Coûts optimisés (D4 · 20%)</a></li>
     <li><a href="#ec2">EC2 — référence rapide</a></li>
     <li><a href="#vpc">VPC — référence rapide</a></li>
     <li><a href="#storage">Stockage — référence rapide</a></li>
     <li><a href="#databases">Bases de données — comparatif</a></li>
-    <li><a href="#integration">Intégration & messaging</a></li>
-    <li><a href="#antipatterns">Anti-patterns & pièges exam</a></li>
+    <li><a href="#integration">Intégration &amp; messaging</a></li>
+    <li><a href="#antipatterns">Anti-patterns &amp; pièges exam</a></li>
   </ol>
 </div>
 
@@ -630,6 +631,171 @@ li{margin:3px 0}
 </ul>
 </div>
 
+<!-- ═══════════════════════════════════════════════════
+     SÉCURITÉ — Domaine 1 complet (D1)
+     ═══════════════════════════════════════════════════ -->
+<h2 id="securite">Sécurité — Architectures sécurisées (D1 · 30%)</h2>
+<div class="section">
+
+<h3>Gouvernance multi-comptes</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">AWS Organizations</span><span>Regroupement hiérarchique de comptes AWS. Root → Organizational Units (OUs) → Comptes. Permet la facturation consolidée et l'application de politiques centralisées.</span></div>
+  <div class="kv-row"><span class="k">SCP (Service Control Policies)</span><span>Politiques de permission max appliquées à une OU ou un compte. Elles ne donnent pas de droits — elles limitent ce que les IAM policies peuvent accorder. SCP doit autoriser ET IAM doit autoriser = accès accordé.</span></div>
+  <div class="kv-row"><span class="k">AWS Control Tower</span><span>Service pour provisionner un landing zone multi-comptes sécurisé. Crée automatiquement des OUs, des guardrails (préventifs = SCP, détectifs = Config Rules), et un compte de logs centralisé. Idéal pour démarrer une organisation AWS.</span></div>
+  <div class="kv-row"><span class="k">AWS STS (AssumeRole)</span><span>Génère des credentials temporaires. Cross-account : rôle dans le compte cible → AssumeRole depuis le compte source. Durée 15 min à 12 h. Utilisé pour l'accès inter-comptes, les applications EC2, et la fédération d'identité.</span></div>
+</div>
+
+<h3>Authentification &amp; Fédération d'identité</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Amazon Cognito — User Pools</span><span>Annuaire d'utilisateurs géré (inscription, connexion, MFA, JWT tokens). Utilisé pour authentifier les utilisateurs d'applications web/mobile. Remplace la gestion custom des comptes utilisateurs.</span></div>
+  <div class="kv-row"><span class="k">Amazon Cognito — Identity Pools</span><span>Échange un token (Cognito, Google, Facebook, SAML…) contre des credentials AWS temporaires (via STS). Donne aux users d'appli un accès direct à S3, DynamoDB, etc. sans proxy backend.</span></div>
+  <div class="kv-row"><span class="k">IAM Identity Center (ex-SSO)</span><span>SSO centralisé pour tous les comptes AWS de l'organisation et les applis SAML 2.0. Se connecte à Active Directory ou à un IdP externe. Remplace la gestion de rôles cross-account manuels.</span></div>
+</div>
+<div class="callout warn">Cognito User Pools = authentification des UTILISATEURS. Cognito Identity Pools = autorisation d'accès aux RESSOURCES AWS. Les deux peuvent être chaînés.</div>
+
+<h3>Sécurité des workloads &amp; applications</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Amazon GuardDuty</span><span>Détection de menaces basée sur le ML. Analyse CloudTrail, VPC Flow Logs, DNS logs. Identifie : instances compromises, appels API suspects, communications C2, cryptomining. Activation en 1 clic, sans agent.</span></div>
+  <div class="kv-row"><span class="k">Amazon Macie</span><span>Découverte et protection des données sensibles (PII, credentials) dans S3. Utilise le ML pour classer automatiquement le contenu. Génère des findings pour les buckets non sécurisés ou contenant des données sensibles exposées.</span></div>
+  <div class="kv-row"><span class="k">AWS Shield Standard</span><span>Protection DDoS automatique et gratuite sur tous les services AWS (couches 3 et 4).</span></div>
+  <div class="kv-row"><span class="k">AWS Shield Advanced</span><span>Protection DDoS avancée (couche 7 aussi), avec réponse 24/7 par l'équipe SRT, remboursement des coûts de scaling liés à une attaque, et WAF inclus. ~3 000 $/mois.</span></div>
+  <div class="kv-row"><span class="k">AWS WAF</span><span>Firewall applicatif (couche 7). Règles sur IP, géolocalisation, rate limiting, injection SQL, XSS. S'intègre avec CloudFront, ALB, API Gateway. Web ACL = ensemble de règles. Managed Rules = règles AWS ou Marketplace.</span></div>
+  <div class="kv-row"><span class="k">AWS Secrets Manager</span><span>Stocke et fait tourner automatiquement les secrets (mots de passe RDS, clés API). Rotation built-in pour RDS/Aurora/Redshift. Référencer via ARN dans le code — jamais hardcoder.</span></div>
+  <div class="kv-row"><span class="k">ACM (AWS Certificate Manager)</span><span>Gestion gratuite des certificats TLS/SSL pour ALB, CloudFront, API Gateway. Renouvellement automatique. Les certificats ACM ne peuvent pas être exportés (pour EC2 direct → importer son propre certificat).</span></div>
+</div>
+
+<h3>Sécurité des données</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">AWS KMS</span><span>Chiffrement at-rest géré. Customer Master Keys (CMK) : AWS-managed (gratuit) ou Customer-managed (contrôle total, rotation manuelle ou annuelle). KMS est régional — les clés ne se répliquent pas automatiquement.</span></div>
+  <div class="kv-row"><span class="k">Chiffrement S3</span><span>SSE-S3 (clés AWS, défaut), SSE-KMS (audit trail CloudTrail, quota API), SSE-C (clé client, AWS ne stocke pas la clé), CSE (chiffrement avant envoi). Bucket Key réduit les appels KMS et les coûts.</span></div>
+  <div class="kv-row"><span class="k">VPC Endpoints</span><span>Interface Endpoint (PrivateLink) : accès privé à des services via ENI dans le VPC, facturation par heure + données. Gateway Endpoint : S3 et DynamoDB uniquement, gratuit, via table de routage. Préférer Gateway pour S3/DynamoDB.</span></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     CONTENEURS & SERVERLESS — Domaines 2 et 3
+     ═══════════════════════════════════════════════════ -->
+<h2 id="conteneurs">Conteneurs &amp; Serverless</h2>
+<div class="section">
+
+<h3>Amazon ECS (Elastic Container Service)</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Concepts clés</span><span>Task Definition (image + ressources CPU/RAM) → Task (instance en cours) → Service (maintient N tasks en vie avec ALB). Cluster = regroupement logique.</span></div>
+  <div class="kv-row"><span class="k">Launch types</span><span><strong>EC2</strong> : tu gères les instances sous-jacentes (patch, capacité). <strong>Fargate</strong> : serverless, AWS gère l'infra, tu définis seulement CPU/RAM par task. Fargate est plus simple et recommandé pour SAA.</span></div>
+  <div class="kv-row"><span class="k">IAM pour ECS</span><span>Task Role : permissions que le container a sur les ressources AWS (ex: S3, DynamoDB). Execution Role : permissions pour ECS de tirer l'image ECR et envoyer les logs CloudWatch.</span></div>
+</div>
+
+<h3>Amazon EKS (Elastic Kubernetes Service)</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Quand choisir EKS</span><span>Workloads Kubernetes existants à migrer, besoin d'un écosystème K8s (Helm, opérateurs), équipe avec expertise K8s. Plus complexe que ECS mais portable.</span></div>
+  <div class="kv-row"><span class="k">Modes</span><span>EC2 managed nodes, Fargate (node management zéro), ou AWS Outposts pour EKS on-premises.</span></div>
+</div>
+
+<h3>AWS Fargate</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Principe</span><span>Moteur serverless pour ECS et EKS. Zéro gestion de serveurs. Facturation à la seconde selon vCPU + RAM alloués. Chaque task a ses propres ressources réseau (ENI). Scaling via ECS Service Auto Scaling.</span></div>
+  <div class="kv-row"><span class="k">Cas d'usage SAA</span><span>Microservices, workers de traitement, APIs containerisées. Choisir Fargate si l'énoncé mentionne «sans gestion de serveurs» ou «serverless containers».</span></div>
+</div>
+
+<h3>AWS Transfer Family</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Définition</span><span>Service managé de transfert de fichiers vers/depuis S3 ou EFS via protocoles SFTP, FTPS, FTP, AS2. Remplace les serveurs FTP maison. Authentification via IAM, Cognito, ou annuaire AD/LDAP.</span></div>
+  <div class="kv-row"><span class="k">Cas d'usage SAA</span><span>Partenaires B2B qui envoient des fichiers via SFTP → stocker directement dans S3. Migration de workflows FTP existants sans changer le client.</span></div>
+</div>
+
+<h3>AWS X-Ray</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Définition</span><span>Service de tracing distribué. Suit les requêtes à travers Lambda, EC2, ECS, API Gateway, SQS. Génère une Service Map visuelle et identifie les goulots d'étranglement et les erreurs.</span></div>
+  <div class="kv-row"><span class="k">Concepts</span><span>Trace = requête de bout en bout. Segment = contribution d'un service. Subsegment = appel externe (DB, HTTP). Sampling = X-Ray ne trace pas 100% des requêtes par défaut (réducteur de coûts).</span></div>
+  <div class="kv-row"><span class="k">Cas d'usage SAA</span><span>Diagnostiquer latences dans une architecture microservices. Identifier quel service cause des erreurs 500. L'énoncé mentionne «observabilité», «tracing», «bottleneck» → penser X-Ray.</span></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     ANALYTIQUE & DATA — Domaine 3 (D3)
+     ═══════════════════════════════════════════════════ -->
+<h2 id="analytique">Analytique &amp; Data Ingestion (D3)</h2>
+<div class="section">
+
+<h3>Amazon Athena</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Définition</span><span>Moteur de requêtes SQL serverless sur S3. Pas d'infra à gérer, paiement par scan (5$/TB scanné). Supporte CSV, JSON, ORC, Parquet, Avro. Intégration native avec AWS Glue Data Catalog.</span></div>
+  <div class="kv-row"><span class="k">Optimisation coûts</span><span>Convertir en Parquet (format colonnaire) = 70-80% de réduction des coûts. Partitionner les données (ex: par date) = réduction du scan. Utiliser la compression (Snappy, GZIP).</span></div>
+  <div class="kv-row"><span class="k">Cas d'usage SAA</span><span>Analyser les logs S3 (CloudTrail, ALB), BI ad-hoc sur un data lake, remplacer un data warehouse pour des requêtes occasionnelles. Mot-clé : «interroger des données dans S3 sans infra».</span></div>
+</div>
+
+<h3>AWS Glue</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Définition</span><span>Service ETL (Extract, Transform, Load) serverless. Découvre automatiquement les schémas (Glue Crawlers → Data Catalog). Exécute des jobs de transformation en Spark/Python.</span></div>
+  <div class="kv-row"><span class="k">Glue Data Catalog</span><span>Référentiel central de métadonnées (tables, schémas). Partagé avec Athena, Redshift Spectrum, EMR. C'est le «catalogue» de votre data lake.</span></div>
+  <div class="kv-row"><span class="k">Cas d'usage SAA</span><span>Préparer des données brutes S3 pour Athena/Redshift. Convertir CSV → Parquet. Mots-clés : «ETL», «transformer», «cataloguer», «data lake».</span></div>
+</div>
+
+<h3>Amazon EMR (Elastic MapReduce)</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Définition</span><span>Cluster managé pour Big Data : Hadoop, Spark, Hive, HBase, Presto. Traitement distribué de très gros volumes. Stockage sur S3 (via EMRFS) ou HDFS sur instances EC2.</span></div>
+  <div class="kv-row"><span class="k">Cas d'usage SAA</span><span>Machine learning sur gros datasets, transformations Spark complexes, analyse de logs en temps réel. Choisir EMR si l'énoncé mentionne Spark/Hadoop/Hive ou «traitement de pétaoctets».</span></div>
+</div>
+
+<h3>AWS Lake Formation</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Définition</span><span>Orchestrateur pour construire, sécuriser et gérer un data lake sur S3. Automatise l'ingestion, le catalogage (via Glue), et la gestion des permissions d'accès aux données au niveau colonne/ligne.</span></div>
+  <div class="kv-row"><span class="k">Cas d'usage SAA</span><span>Gouvernance centralisée des accès à un data lake. Contrôle fin qui peut accéder à quelles colonnes dans Athena/Redshift. Mots-clés : «data lake», «gouvernance», «contrôle d'accès aux données».</span></div>
+</div>
+
+<h3>AWS DataSync</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">Définition</span><span>Service de transfert de données rapide et automatisé entre on-premises et AWS (S3, EFS, FSx). Installe un agent on-premises. Jusqu'à 10x plus rapide que les outils open source. Vérification d'intégrité automatique.</span></div>
+  <div class="kv-row"><span class="k">vs Storage Gateway</span><span>DataSync = migration/transfert de données one-shot ou récurrent. Storage Gateway = extension permanente du stockage on-premises vers AWS (accès continu). DataSync pour migrer; Storage Gateway pour hybride permanent.</span></div>
+</div>
+
+<h3>AWS Storage Gateway</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">File Gateway</span><span>Expose S3 comme un partage NFS/SMB. Les fichiers récents en cache local, les archives dans S3. Idéal pour remplacer un NAS on-premises ou pour archiver vers S3.</span></div>
+  <div class="kv-row"><span class="k">Volume Gateway</span><span>Expose des volumes iSCSI. Stored volumes : données primaires on-premises, snapshot dans S3. Cached volumes : données primaires dans S3, fréquemment accédées en cache local.</span></div>
+  <div class="kv-row"><span class="k">Tape Gateway (VTL)</span><span>Remplace les librairies de bandes physiques. Compatible avec les logiciels de sauvegarde existants (Veeam, Veritas). Stocke dans S3 Glacier.</span></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     OPTIMISATION COÛTS — Domaine 4 (D4) enrichissement
+     ═══════════════════════════════════════════════════ -->
+<h2 id="couts">Optimisation des coûts (D4 · 20%) — Compléments</h2>
+<div class="section">
+
+<h3>Cycle de vie S3 &amp; optimisation stockage</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">S3 Lifecycle Policies</span><span>Règles automatiques pour déplacer ou supprimer des objets. Transitions : Standard → Standard-IA (min 30 jours) → Glacier Instant Retrieval (min 90 jours) → Glacier Deep Archive. Expirations : suppression automatique après N jours.</span></div>
+  <div class="kv-row"><span class="k">S3 Intelligent-Tiering</span><span>Déplace automatiquement les objets entre tiers selon les patterns d'accès. Pas de frais de retrieval. Adapté quand les patterns d'accès sont inconnus ou changeants. Frais de monitoring (~0,0025$/1000 objets/mois).</span></div>
+  <div class="kv-row"><span class="k">S3 Requester Pays</span><span>Par défaut, le propriétaire du bucket paie le transfert. Avec Requester Pays activé, c'est celui qui télécharge qui paie le data transfer. Utile pour distribuer de gros datasets publics sans coût de bande passante.</span></div>
+</div>
+
+<h3>EC2 — Optimisation coûts avancée</h3>
+<div class="kv">
+  <div class="kv-row"><span class="k">EC2 Hibernation</span><span>Sauvegarde le contenu RAM sur EBS (racine chiffré obligatoire) et arrête l'instance. Au redémarrage, la RAM est restaurée — démarrage ultra-rapide. Limite : instance RAM max 150 GB, durée hibernation max 60 jours. Utile pour des workloads avec long temps de démarrage applicatif.</span></div>
+  <div class="kv-row"><span class="k">AWS Outposts</span><span>Rack AWS déployé dans votre datacenter. Mêmes services AWS, même API, même console. Latence ultra-faible ou contraintes de résidence des données imposant le on-premises. Facturation : frais fixes du rack + usage. Cas d'usage : manufactures, hôpitaux, traders HF.</span></div>
+  <div class="kv-row"><span class="k">EC2 Instance Connect / Session Manager</span><span>Accès SSH sans ouvrir le port 22 (SSM Session Manager). Éliminer les bastions = économie et sécurité améliorée.</span></div>
+</div>
+
+<h3>ALB vs NLB vs GLB — Guide de sélection</h3>
+<table>
+  <tr><th>Load Balancer</th><th>Couche OSI</th><th>Protocoles</th><th>Cas d'usage</th></tr>
+  <tr><td>ALB</td><td>L7</td><td>HTTP, HTTPS, WebSocket, gRPC</td><td>Routage URL/host, microservices, containers</td></tr>
+  <tr><td>NLB</td><td>L4</td><td>TCP, UDP, TLS</td><td>Performance extrême, IP statique, gaming, IoT</td></tr>
+  <tr><td>GLB</td><td>L3/L4</td><td>IP</td><td>Inspection traffic par appliances 3rd party (IDS/IPS, firewalls)</td></tr>
+</table>
+<div class="callout warn">NLB = seul LB avec IP statique (Elastic IP assignable). ALB = IP dynamique → ne jamais hardcoder l'IP d'un ALB.</div>
+
+<h3>Disaster Recovery — Stratégies (RPO/RTO)</h3>
+<table>
+  <tr><th>Stratégie</th><th>RTO</th><th>RPO</th><th>Coût</th><th>Description</th></tr>
+  <tr><td>Backup &amp; Restore</td><td>Heures</td><td>Heures</td><td>💰</td><td>Snapshots/backups dans une autre région, reconstruction manuelle</td></tr>
+  <tr><td>Pilot Light</td><td>10–30 min</td><td>Minutes</td><td>💰💰</td><td>DB répliquée active, serveurs éteints (prêts à démarrer)</td></tr>
+  <tr><td>Warm Standby</td><td>Minutes</td><td>Secondes</td><td>💰💰💰</td><td>Version réduite de l'env prod tourne en continu, scale-out rapide</td></tr>
+  <tr><td>Multi-Site / Active-Active</td><td>Secondes</td><td>Zéro</td><td>💰💰💰💰</td><td>Deux régions actives simultanément, Route 53 pondéré</td></tr>
+</table>
+</div>
+
 <h2 id="antipatterns">Anti-patterns & Pièges exam</h2>
 <div class="section">
 <div class="callout trap">NLB ne remplace pas ALB pour du HTTP avec routage. ALB ne donne pas d'IP statique.</div>
@@ -642,6 +808,14 @@ li{margin:3px 0}
 <div class="callout trap">Lambda dans un VPC privé a besoin d'un NAT Gateway pour accéder à Internet (y compris les API AWS publiques).</div>
 <div class="callout trap">EFS ne supporte que Linux (protocole NFS v4). Pour Windows avec accès partagé → FSx for Windows.</div>
 <div class="callout trap">Instance Store perdu à l'arrêt/terminate ET si l'hôte physique tombe. Jamais pour données persistantes.</div>
+<div class="callout trap">Cognito User Pools ≠ Identity Pools. User Pools = annuaire d'utilisateurs (JWT). Identity Pools = credentials AWS temporaires pour accéder à S3/DynamoDB directement. On les chaîne souvent mais ce sont deux services distincts.</div>
+<div class="callout trap">GuardDuty détecte les menaces existantes (ML sur logs). Macie détecte les données sensibles dans S3 (PII, credentials). Inspector analyse les vulnérabilités sur EC2/ECR. Ne pas les confondre à l'examen.</div>
+<div class="callout trap">Control Tower crée des guardrails PRÉVENTIFS (SCP = bloque l'action) et DÉTECTIFS (Config Rules = alerte après). Les SCP ne donnent jamais de permissions — elles limitent seulement.</div>
+<div class="callout trap">DataSync = transfert de données (migration). Storage Gateway = extension hybride permanente (accès continu au stockage cloud depuis on-premises). Question sur «migrer des fichiers vers S3» → DataSync. «Accéder à S3 comme un NAS» → File Gateway.</div>
+<div class="callout trap">Athena = SQL serverless sur S3 (paiement par scan). Reduire les coûts Athena → convertir en Parquet + partitionner. EMR = cluster Big Data Spark/Hadoop. Glue = ETL serverless. Lake Formation = gouvernance du data lake.</div>
+<div class="callout trap">EC2 Hibernation nécessite le volume racine EBS chiffré. L'instance RAM max est 150 GB. Durée max en hibernation : 60 jours. Ne pas confondre avec Stop (RAM perdue) ou Reboot (tout préservé, restart rapide).</div>
+<div class="callout trap">ACM gère les certificats pour ALB, CloudFront, API Gateway — renouvellement automatique. Les certificats ACM ne peuvent PAS être exportés pour être installés directement sur EC2. Pour EC2 → importer son propre certificat ou utiliser Let's Encrypt.</div>
+<div class="callout trap">NLB (Network Load Balancer) : seul LB avec IP statique / Elastic IP assignable. ALB et CLB ont des IPs dynamiques. Question sur «IP fixe pour whitelisting client» → NLB.</div>
 
 <h3>Tableau des seuils à retenir</h3>
 <table>
