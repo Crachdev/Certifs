@@ -101,7 +101,6 @@ window.QUIZ_PLAN = [
    ],
    focus:["Revoir les pièges section s11","GitHub Actions vs GitHub Apps vs GitHub CLI : distinctions","Issues vs Discussions vs PRs : choisir le bon outil","Branch protection vs CODEOWNERS : protection vs review"]}
 ];
-];
 
 window.QDATA = {};
 
