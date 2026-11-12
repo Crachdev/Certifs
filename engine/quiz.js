@@ -46,12 +46,17 @@ function svgCircle(pct,size,color){
   </svg>`;
 }
 
+const SYNC_KEY="certifs.sync."+KEY; // clé localStorage pour la date de dernière synchro
+
 function save(){
   try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}
   // Sync Firestore (best-effort, silencieux)
   const pseudo=getPseudo();
   if(typeof window.saveProgression==="function"&&pseudo&&pseudo!=="Anonyme"){
     window.saveProgression(KEY,pseudo,store.r);
+    // Enregistrer la date de synchro (tentative optimiste)
+    try{localStorage.setItem(SYNC_KEY,String(Date.now()))}catch(e){}
+    updateSyncBadge();
   }
 }
 
@@ -174,6 +179,7 @@ function showPseudoModal(){
     else{setPseudo("Anonyme");}
     modal.remove();
     header();
+    updateSyncBadge();
     // Logger la connexion
     if(typeof window.logSession==="function") window.logSession(KEY,getPseudo());
   }
@@ -252,6 +258,52 @@ function initFichePanel(){
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&open)closePanel();});
 }
 
+/* ── FEATURE : BADGE SYNC FIREBASE ───────────────────────────────────────
+   Petit indicateur fixe en bas de page :
+   🟢  Synchronisé  · il y a Xmin   (pseudo défini + Firebase prêt)
+   🔄  Synchronisation…              (Firebase pas encore prêt)
+   ⚫  Non synchronisé               (Anonyme ou pas de pseudo)       */
+
+let _syncBadgeEl=null;
+
+function fmtSyncAge(ts){
+  if(!ts)return"";
+  const diff=Math.floor((Date.now()-ts)/1000);
+  if(diff<5)return" · à l'instant";
+  if(diff<60)return" · il y a "+diff+" s";
+  const m=Math.floor(diff/60);
+  if(m<60)return" · il y a "+m+" min";
+  const h=Math.floor(m/60);
+  return" · il y a "+h+" h";
+}
+
+function updateSyncBadge(){
+  if(!_syncBadgeEl)return;
+  const pseudo=getPseudo();
+  if(!pseudo||pseudo==="Anonyme"){
+    _syncBadgeEl.innerHTML="<span style='opacity:.5'>⚫</span> Non synchronisé";
+    _syncBadgeEl.title="Entrez un pseudo pour activer la synchronisation Firebase";
+    return;
+  }
+  let lastTs=null;
+  try{const v=localStorage.getItem(SYNC_KEY);if(v)lastTs=Number(v);}catch(e){}
+  _syncBadgeEl.innerHTML="🟢 Synchronisé"+fmtSyncAge(lastTs);
+  _syncBadgeEl.title=lastTs?"Dernière synchro : "+new Date(lastTs).toLocaleTimeString("fr-FR"):"En attente de la première synchronisation";
+}
+
+function initSyncBadge(){
+  if(document.getElementById("syncBadge"))return;
+  const badge=document.createElement("div");
+  badge.id="syncBadge";
+  badge.style.cssText="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:7000;background:var(--sheet);border:1px solid var(--line);border-radius:20px;padding:5px 14px;font:500 .75rem var(--f-mono);color:var(--muted);box-shadow:0 1px 6px rgba(0,0,0,.12);pointer-events:none;white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis";
+  badge.setAttribute("aria-live","polite");
+  document.body.appendChild(badge);
+  _syncBadgeEl=badge;
+  updateSyncBadge();
+  // Rafraîchir l'âge toutes les 30 secondes
+  setInterval(updateSyncBadge,30000);
+}
+
 let tab="plan",session=null,timerId=null;
 
 /* ── FEATURE 4 : ANIMATION FADE ENTRE TABS ─────────────── */
@@ -300,6 +352,9 @@ else{
 
 // Initialiser le panneau fiche
 setTimeout(initFichePanel,200);
+
+// Initialiser le badge de synchronisation
+setTimeout(initSyncBadge,300);
 
 function render(){
   header();
@@ -845,7 +900,7 @@ function bind(){
   if(cp)cp.onclick=()=>{
     const cur=getPseudo();
     const nv=(prompt("Entrez votre prénom ou pseudo :",cur)||"").trim().slice(0,30);
-    if(nv){setPseudo(nv);render();}
+    if(nv){setPseudo(nv);render();updateSyncBadge();}
   };
   // Back to free config
   const bf=document.querySelector("[data-backfree]");

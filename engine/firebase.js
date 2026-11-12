@@ -123,21 +123,81 @@
     });
   };
 
+  // ── Utilitaire : parse le User-Agent ────────────────────────────────────
+  function parseDevice(ua) {
+    // OS
+    let os = "Unknown";
+    if (/Windows NT/.test(ua))         os = "Windows";
+    else if (/iPhone|iPad/.test(ua))   os = /iPhone/.test(ua) ? "iOS (iPhone)" : "iOS (iPad)";
+    else if (/Android/.test(ua))       os = "Android";
+    else if (/Macintosh|Mac OS X/.test(ua)) os = "macOS";
+    else if (/Linux/.test(ua))         os = "Linux";
+
+    // Type d'appareil
+    let type = "desktop";
+    if (/Mobi|Android|iPhone/.test(ua))          type = "mobile";
+    else if (/iPad|Tablet/.test(ua))             type = "tablet";
+
+    // Navigateur
+    let browser = "Unknown";
+    if (/Edg\//.test(ua))             browser = "Edge";
+    else if (/OPR\/|Opera/.test(ua))  browser = "Opera";
+    else if (/Firefox\//.test(ua))    browser = "Firefox";
+    else if (/Chrome\//.test(ua))     browser = "Chrome";
+    else if (/Safari\//.test(ua))     browser = "Safari";
+
+    // Marque (mobile)
+    let brand = null;
+    if (/iPhone|iPad/.test(ua))                                brand = "Apple";
+    else if (/Samsung/.test(ua))                               brand = "Samsung";
+    else if (/Huawei/.test(ua))                                brand = "Huawei";
+    else if (/Xiaomi|MIUI/.test(ua))                           brand = "Xiaomi";
+    else if (/Pixel/.test(ua))                                 brand = "Google";
+    else if (/OnePlus/.test(ua))                               brand = "OnePlus";
+    else if (/Macintosh|Mac OS X/.test(ua) && type === "desktop") brand = "Apple";
+
+    return { os, type, browser, ...(brand ? { brand } : {}) };
+  }
+
+  // ── Utilitaire : récupère l'IP publique (best-effort, timeout 3s) ────────
+  async function fetchIP() {
+    try {
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 3000);
+      const r = await fetch("https://api.ipify.org?format=json", { signal: ctrl.signal });
+      clearTimeout(tid);
+      if (!r.ok) return null;
+      const data = await r.json();
+      return data.ip || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   // ── logSession ───────────────────────────────────────────────────────────
   // Enregistre une connexion dans Firestore
   // Collection : sessions
   // Document   : auto-id
-  // Champs : pseudo, cert, connectedAt, ua (navigateur)
+  // Champs : pseudo, cert, connectedAt, ua, ip, os, type, browser, brand?
   window.logSession = function (cert, pseudo) {
     whenReady(async () => {
       if (!_db || !pseudo || pseudo === "Anonyme") return;
       try {
-        await _db.collection("sessions").add({
+        const ua = navigator.userAgent;
+        const device = parseDevice(ua);
+        const ip = await fetchIP(); // best-effort, peut être null
+        const doc = {
           cert,
-          pseudo: String(pseudo).slice(0, 30),
+          pseudo:      String(pseudo).slice(0, 30),
           connectedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          ua: navigator.userAgent.slice(0, 120)
-        });
+          ua:          ua.slice(0, 160),
+          os:          device.os,
+          deviceType:  device.type,
+          browser:     device.browser,
+        };
+        if (device.brand) doc.brand = device.brand;
+        if (ip)           doc.ip    = ip;
+        await _db.collection("sessions").add(doc);
       } catch (e) {
         console.warn("[certifs] logSession échoué :", e.message);
       }
