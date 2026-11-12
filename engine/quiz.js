@@ -2,7 +2,8 @@
 // Dépendances : window.QDATA, window.QKEY, window.QUIZ_PLAN, window.QUIZ_META
 
 // PLAN chargé depuis questions.js (window.QUIZ_PLAN), sinon tableau vide
-const PLAN=window.QUIZ_PLAN||[];
+// Normalisation : accepte {day,title,count} (nouveau) ou {d,theme,...} (ancien)
+const PLAN=(window.QUIZ_PLAN||[]).map(p=>p.d!==undefined?p:Object.assign({},p,{d:p.day,theme:p.title}));
 // Métadonnées examen chargées depuis questions.js (window.QUIZ_META), sinon valeurs vides
 const META=window.QUIZ_META||{};
 
