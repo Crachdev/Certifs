@@ -11,13 +11,85 @@ window.QUIZ_META = {
 };
 
 window.QUIZ_PLAN = [
-  { day:1, title:"J1 — Fondamentaux IA & ML", count:51 },
-  { day:2, title:"J2 — Computer Vision Azure", count:50 },
-  { day:3, title:"J3 — NLP & Language Azure", count:50 },
-  { day:4, title:"J4 — Generative AI & Azure OpenAI", count:50 },
-  { day:5, title:"J5 — Document Intelligence & Search", count:50 },
-  { day:6, title:"J6 — IA responsable & gouvernance", count:50 },
-  { day:7, title:"J7 — Révision générale", count:50 }
+  {d:1, theme:"Fondamentaux IA & Machine Learning", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s1",titre:"📋 L'examen AI-900"},
+     {id:"s2",titre:"🧠 Concepts IA & Machine Learning"}
+   ],
+   read:["Fiche : Hiérarchie IA → ML → Deep Learning","Fiche : Apprentissage supervisé / non supervisé / renforcement","Fiche : Métriques d'évaluation ML"],
+   links:[
+     ["Microsoft Learn : AI-900 — Concepts ML","https://learn.microsoft.com/fr-fr/training/paths/ai-900-describe-ai/"],
+     ["Documentation : Apprentissage automatique Azure","https://learn.microsoft.com/fr-fr/azure/machine-learning/overview-what-is-azure-machine-learning"]
+   ],
+   focus:["IA → ML → Deep Learning : hiérarchie et différences","Supervisé vs Non supervisé vs Renforcement : cas d'usage","Régression vs Classification vs Clustering","Precision, Recall, F1, AUC-ROC : savoir les interpréter"]},
+
+  {d:2, theme:"Azure AI Services & Computer Vision", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s3",titre:"🛠️ Azure AI Services — catalogue"},
+     {id:"s4",titre:"👁️ Computer Vision avec Azure"}
+   ],
+   read:["Fiche : Catalogue des services Azure AI","Fiche : Azure AI Vision, Custom Vision, Face API"],
+   links:[
+     ["Microsoft Learn : Computer Vision","https://learn.microsoft.com/fr-fr/training/paths/ai-900-describe-computer-vision/"],
+     ["Documentation : Azure AI Vision","https://learn.microsoft.com/fr-fr/azure/ai-services/computer-vision/overview"]
+   ],
+   focus:["Multi-service vs service unique : clé API partagée","Image Analysis : tags, objects, captions, OCR","Custom Vision : classification et détection d'objets personnalisés","Face API : détection vs reconnaissance (questions éthiques)"]},
+
+  {d:3, theme:"NLP — Language, Speech & Translator", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s5",titre:"📝 NLP — Language, Speech & Translator"}
+   ],
+   read:["Fiche : Azure AI Language — analyse de sentiments, NER, CLU","Fiche : Azure AI Speech — STT / TTS","Fiche : Azure AI Translator"],
+   links:[
+     ["Microsoft Learn : NLP avec Azure","https://learn.microsoft.com/fr-fr/training/paths/ai-900-describe-natural-language-processing/"],
+     ["Documentation : Azure AI Language","https://learn.microsoft.com/fr-fr/azure/ai-services/language-service/overview"]
+   ],
+   focus:["Analyse de sentiments vs extraction d'entités : cas d'usage","Speech-to-Text vs Text-to-Speech : direction de la conversion","CLU : intention + entités pour chatbots","Translator : traduction automatique neuronale"]},
+
+  {d:4, theme:"IA Générative & Azure OpenAI", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s6",titre:"🤖 IA Générative & Azure OpenAI Service"}
+   ],
+   read:["Fiche : LLM, tokens, temperature, top-p","Fiche : Azure OpenAI Service — déploiement et utilisation","Fiche : Prompt Engineering et DALL-E"],
+   links:[
+     ["Microsoft Learn : IA Générative","https://learn.microsoft.com/fr-fr/training/paths/ai-900-describe-generative-ai/"],
+     ["Documentation : Azure OpenAI Service","https://learn.microsoft.com/fr-fr/azure/ai-services/openai/overview"]
+   ],
+   focus:["LLM : fonctionnement par prédiction de tokens","GPT vs DALL-E vs Codex : chaque modèle pour son usage","Prompt Engineering : zero-shot, few-shot, system prompt","Azure OpenAI vs OpenAI API : même modèle, cadre entreprise"]},
+
+  {d:5, theme:"Document Intelligence, Machine Learning & IA Conversationnelle", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s7",titre:"📊 Azure Machine Learning"},
+     {id:"s8",titre:"💬 IA Conversationnelle"}
+   ],
+   read:["Fiche : Azure Machine Learning Studio — AutoML, Designer","Fiche : Azure Bot Service, QnA Maker, CLU"],
+   links:[
+     ["Documentation : Azure Machine Learning","https://learn.microsoft.com/fr-fr/azure/machine-learning/overview-what-is-azure-machine-learning"],
+     ["Documentation : Azure AI Document Intelligence","https://learn.microsoft.com/fr-fr/azure/ai-services/document-intelligence/overview"]
+   ],
+   focus:["AutoML : ML sans code","ML Designer : pipeline visuel drag-and-drop","Azure Bot Service : chatbot multi-canal","Question Answering vs CLU : statique vs conversationnel"]},
+
+  {d:6, theme:"IA Responsable — 6 Principes Microsoft", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s9",titre:"⚖️ IA Responsable — 6 Principes Microsoft"}
+   ],
+   read:["Fiche : Équité, Fiabilité, Confidentialité, Inclusivité, Transparence, Responsabilité","Fiche : Application pratique des principes"],
+   links:[
+     ["Microsoft Learn : IA Responsable","https://learn.microsoft.com/fr-fr/training/paths/ai-900-responsible-ai/"],
+     ["Microsoft : Principes IA Responsable","https://www.microsoft.com/fr-fr/ai/responsible-ai"]
+   ],
+   focus:["Mémoriser les 6 principes et leurs définitions exactes","Identifier le bon principe selon le scénario décrit","Équité ≠ égalité de résultats : équité d'accès et de traitement","Transparence : explicabilité des décisions IA"]},
+
+  {d:7, theme:"Révision générale & Pièges examen", time:"≈ 2 h révision + 1 h quiz",
+   sections:[
+     {id:"s10",titre:"⚠️ Pièges classiques & Nuances"}
+   ],
+   read:["Fiche : Pièges classiques de l'examen AI-900","Réviser tous les services Azure AI"],
+   links:[
+     ["Practice Assessment Microsoft Learn AI-900","https://learn.microsoft.com/fr-fr/certifications/exams/ai-900/practice/assessment?assessmentId=26"],
+     ["Microsoft Learn : Parcours complet AI-900","https://learn.microsoft.com/fr-fr/certifications/exams/ai-900"]
+   ],
+   focus:["Revoir les 6 principes IA responsable","Services ML : AML vs Cognitive Services vs Azure OpenAI","Confusion courante : Custom Vision vs Azure AI Vision","Questions scénarios : identifier le bon service Azure AI"]}
 ];
 
 window.QDATA = {};

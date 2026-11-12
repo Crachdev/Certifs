@@ -18,48 +18,87 @@ window.QUIZ_META = {
 };
 
 window.QUIZ_PLAN = [
-  {
-    d: 1,
-    theme: "IAM avancé & Organizations",
-    summary: "SCP, permissions boundaries, AssumeRole, ABAC, Identity Center",
-    objectives: ["Comprendre les 6 types de policies IAM", "Maîtriser les SCP et leur portée", "Configurer l'accès cross-account sécurisé"]
-  },
-  {
-    d: 2,
-    theme: "Détection des menaces — GuardDuty & Monitoring",
-    summary: "GuardDuty, Security Hub, CloudTrail avancé, Macie, Inspector",
-    objectives: ["Configurer GuardDuty multi-comptes", "Analyser les CloudTrail findings", "Corréler les alertes dans Security Hub"]
-  },
-  {
-    d: 3,
-    theme: "Sécurité de l'infrastructure",
-    summary: "WAF, Shield, Network Firewall, Firewall Manager, VPC avancé",
-    objectives: ["Déployer WAF avec règles managées", "Choisir entre Shield Standard et Advanced", "Architecturer un Network Firewall centralisé"]
-  },
-  {
-    d: 4,
-    theme: "KMS, CloudHSM & Chiffrement",
-    summary: "Types de clés, key policies, envelope encryption, CloudHSM",
-    objectives: ["Maîtriser les types de clés KMS", "Configurer les key policies cross-account", "Implémenter le chiffrement d'enveloppe"]
-  },
-  {
-    d: 5,
-    theme: "Protection des données & S3",
-    summary: "Chiffrement S3, Secrets Manager, ACM, Object Lock, Access Points",
-    objectives: ["Configurer SSE-KMS avec bucket policies", "Comparer Secrets Manager et Parameter Store", "Implémenter S3 Object Lock WORM"]
-  },
-  {
-    d: 6,
-    theme: "Réponse aux incidents & Forensics",
-    summary: "Workflow IR, isolation EC2, Athena, Detective, automatisation",
-    objectives: ["Isoler une instance compromise", "Investiguer avec CloudTrail + Athena", "Automatiser la réponse via EventBridge"]
-  },
-  {
-    d: 7,
-    theme: "DevSecOps & Gouvernance",
-    summary: "IAM Analyzer, IMDSv2, Config, Control Tower, Audit Manager",
-    objectives: ["Générer des policies least-privilege avec IAM Analyzer", "Forcer IMDSv2 contre SSRF", "Comprendre la gouvernance multi-comptes"]
-  }
+  {d:1, theme:"IAM avancé & Organizations", time:"≈ 1 h fiche + 1 h quiz",
+   sections:[
+     {id:"iam",titre:"🔐 IAM & Gestion des identités"}
+   ],
+   read:["Fiche : 6 types de policies IAM (identity, resource, permissions boundary, SCP, session, ACL)","Fiche : SCP — portée, Deny implicite, héritage dans les OUs","Fiche : AssumeRole cross-account, ABAC, AWS IAM Identity Center"],
+   links:[
+     ["Documentation : IAM Policies","https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html"],
+     ["Documentation : SCPs","https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"]
+   ],
+   focus:["Deny explicite > Allow explicite (toujours)","SCP : ne font que restreindre, ne donnent pas de droits","Permissions boundary : plafond des droits accordables par délégation","AssumeRole : Trust Policy (qui peut) + Permission Policy (quoi faire)"]},
+
+  {d:2, theme:"Détection des menaces — GuardDuty & Monitoring", time:"≈ 1 h fiche + 1 h quiz",
+   sections:[
+     {id:"detection",titre:"🔍 Détection des menaces & Monitoring"}
+   ],
+   read:["Fiche : GuardDuty — sources de données, findings, multi-compte","Fiche : Security Hub — CSPM, standards, findings","Fiche : CloudTrail avancé — event selectors, insights, Lake"],
+   links:[
+     ["Documentation : Amazon GuardDuty","https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html"],
+     ["Documentation : AWS Security Hub","https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html"]
+   ],
+   focus:["GuardDuty : ML sur VPC Flow Logs + DNS + CloudTrail + S3","Security Hub : agrège les findings de GuardDuty, Macie, Inspector...","Macie : données sensibles dans S3 (PII, etc.)","CloudTrail Insights : activité anormale d'API"]},
+
+  {d:3, theme:"Sécurité de l'infrastructure", time:"≈ 1 h fiche + 1 h quiz",
+   sections:[
+     {id:"infra",titre:"🏗️ Sécurité de l'infrastructure"},
+     {id:"network",titre:"🌐 Sécurité réseau avancée"}
+   ],
+   read:["Fiche : WAF — WebACL, règles managées AWS, rate limiting","Fiche : Shield Standard vs Advanced — DDoS Response Team","Fiche : Network Firewall — centralisé avec Transit Gateway","Fiche : Firewall Manager — règles WAF/SG à l'échelle org"],
+   links:[
+     ["Documentation : AWS WAF","https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html"],
+     ["Documentation : AWS Network Firewall","https://docs.aws.amazon.com/network-firewall/latest/developerguide/what-is-aws-network-firewall.html"]
+   ],
+   focus:["WAF : layer 7, SQL injection, XSS, rate limiting","Shield Advanced : DRT 24/7, cost protection DDos","Network Firewall vs Security Groups : stateful IPS vs stateful firewall","Firewall Manager : central security admin multi-account"]},
+
+  {d:4, theme:"KMS, CloudHSM & Chiffrement", time:"≈ 1 h fiche + 1 h quiz",
+   sections:[
+     {id:"kms",titre:"🔑 AWS KMS & Chiffrement avancé"}
+   ],
+   read:["Fiche : Types de clés KMS (AWS managed, Customer managed, External)","Fiche : Key policies — resource-based, cross-account","Fiche : Envelope encryption — Data Key, DEK wrapping","Fiche : CloudHSM — FIPS 140-2 Level 3, cluster"],
+   links:[
+     ["Documentation : AWS KMS","https://docs.aws.amazon.com/kms/latest/developerguide/overview.html"],
+     ["Documentation : CloudHSM","https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html"]
+   ],
+   focus:["Symmetric CMK vs Asymmetric CMK : cas d'usage","Key Policy : toujours nécessaire (IAM seul ne suffit pas)","Envelope encryption : chiffrer la DEK avec la CMK","CloudHSM vs KMS : dedicated hardware vs managed service"]},
+
+  {d:5, theme:"Protection des données & S3", time:"≈ 1 h fiche + 1 h quiz",
+   sections:[
+     {id:"data",titre:"💾 Protection des données"},
+     {id:"s3sec",titre:"🪣 Sécurité S3 avancée"}
+   ],
+   read:["Fiche : SSE-S3 vs SSE-KMS vs SSE-C vs CSE","Fiche : S3 Object Lock — WORM, Governance vs Compliance","Fiche : Secrets Manager — rotation automatique, intégration RDS","Fiche : ACM — TLS/SSL, renewal automatique"],
+   links:[
+     ["Documentation : S3 Object Lock","https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html"],
+     ["Documentation : Secrets Manager","https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"]
+   ],
+   focus:["SSE-KMS : audit dans CloudTrail, bucket policy enforcement","Object Lock Compliance : immuable même par root","Secrets Manager vs Parameter Store : rotation auto vs économique","VPC Gateway Endpoint S3 : trafic reste dans AWS"]},
+
+  {d:6, theme:"Réponse aux incidents & Forensics", time:"≈ 1 h fiche + 1 h quiz",
+   sections:[
+     {id:"incident",titre:"🚨 Réponse aux incidents"},
+     {id:"forensics",titre:"🔬 Forensics & Investigation"}
+   ],
+   read:["Fiche : Workflow IR sur AWS — Préparation, Détection, Containment, Eradication","Fiche : Isolation EC2 compromise — SG restrictif, snapshot EBS","Fiche : CloudTrail + S3 + Athena : investigation forensique","Fiche : Amazon Detective — analyse comportementale"],
+   links:[
+     ["AWS : Incident Response Guide","https://docs.aws.amazon.com/whitepapers/latest/aws-security-incident-response-guide/aws-security-incident-response-guide.html"],
+     ["Documentation : Amazon Detective","https://docs.aws.amazon.com/detective/latest/userguide/what-is-detective.html"]
+   ],
+   focus:["Isoler : SG qui deny tout trafic entrant/sortant","Snapshot EBS avant toute modification forensique","Athena : SQL sur CloudTrail logs dans S3","Detective : graphe comportemental basé sur GuardDuty + VPC Flow Logs"]},
+
+  {d:7, theme:"DevSecOps, Conformité & Gouvernance", time:"≈ 1 h fiche + 1 h quiz",
+   sections:[
+     {id:"devops",titre:"⚙️ DevSecOps & Automatisation"},
+     {id:"compliance",titre:"📋 Conformité & Gouvernance"},
+     {id:"divers",titre:"📊 Comparatifs clés & Anti-patterns"}
+   ],
+   read:["Fiche : IAM Access Analyzer — policies least-privilege","Fiche : Config Rules — conformité et remédiation auto","Fiche : Control Tower, Audit Manager, Artifact","Fiche : Anti-patterns et pièges classiques SCS-C02"],
+   links:[
+     ["Documentation : IAM Access Analyzer","https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html"],
+     ["AWS Certification : SCS-C02","https://aws.amazon.com/certification/certified-security-specialty/"]
+   ],
+   focus:["IAM Analyzer : identifier les accès publics ou cross-account","Config : évaluation continue de la conformité","Audit Manager : préparer les audits PCI-DSS, HIPAA, SOC2","Anti-patterns : section divers — revoir les confusions courantes"]}
 ];
 
 window.QDATA = window.QDATA || {};

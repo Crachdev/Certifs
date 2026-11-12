@@ -11,13 +11,91 @@ window.QUIZ_META = {
 };
 
 window.QUIZ_PLAN = [
-  { day:1, title:"J1 — Concepts cloud & Azure", count:50 },
-  { day:2, title:"J2 — Architecture & services Azure", count:50 },
-  { day:3, title:"J3 — Calcul & réseau", count:51 },
-  { day:4, title:"J4 — Stockage & bases de données", count:50 },
-  { day:5, title:"J5 — Identité, accès & sécurité", count:50 },
-  { day:6, title:"J6 — Gestion des coûts & gouvernance", count:50 },
-  { day:7, title:"J7 — Révision générale", count:49 }
+  {d:1, theme:"Concepts cloud fondamentaux", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s2",titre:"☁️ Concepts cloud fondamentaux"},
+     {id:"s3",titre:"🔒 Modèle de responsabilité partagée"},
+     {id:"s4",titre:"🏢 Modèles cloud (Public / Privé / Hybride)"},
+     {id:"s5",titre:"💰 Modèle de consommation & Serverless"},
+     {id:"s6",titre:"📦 IaaS / PaaS / SaaS"}
+   ],
+   read:["Fiche : Concepts cloud fondamentaux","Fiche : Modèles cloud & responsabilité partagée","Fiche : IaaS / PaaS / SaaS"],
+   links:[
+     ["Microsoft Learn : AZ-900 — Cloud Concepts","https://learn.microsoft.com/fr-fr/training/paths/az-900-describe-cloud-concepts/"],
+     ["Documentation : Modèles cloud Azure","https://learn.microsoft.com/fr-fr/azure/cloud-adoption-framework/strategy/cloud-models"]
+   ],
+   focus:["IaaS / PaaS / SaaS : qui gère quoi dans chaque modèle","Public vs Privé vs Hybride : cas d'usage de chacun","CapEx vs OpEx : comprendre le passage au cloud","Serverless ≠ sans serveur : vous ne gérez pas l'infra"]},
+
+  {d:2, theme:"Architecture Azure", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s7",titre:"🌍 Architecture Azure — Composants fondamentaux"},
+     {id:"s1",titre:"📋 L'examen AZ-900"}
+   ],
+   read:["Fiche : Architecture Azure (Régions, AZ, Paires de régions)","Fiche : Ressources et groupes de ressources"],
+   links:[
+     ["Microsoft Learn : Infrastructure Azure","https://learn.microsoft.com/fr-fr/training/paths/az-900-describe-azure-architecture-services/"],
+     ["Documentation : Régions et zones de disponibilité","https://learn.microsoft.com/fr-fr/azure/reliability/availability-zones-overview"]
+   ],
+   focus:["Région > Zone de disponibilité > Centre de données","Paires de régions : pour la réplication et la reprise après sinistre","Groupe de ressources : conteneur logique, pas géographique","Abonnement → Groupe d'administration → Tenant"]},
+
+  {d:3, theme:"Calcul & Réseau Azure", time:"≈ 1 h lecture + 1 h 15 quiz",
+   sections:[
+     {id:"s8",titre:"🖥️ Calcul & Réseau Azure"}
+   ],
+   read:["Fiche : Machines virtuelles, App Service, Conteneurs","Fiche : VNet, VPN Gateway, ExpressRoute"],
+   links:[
+     ["Microsoft Learn : Calcul Azure","https://learn.microsoft.com/fr-fr/training/paths/az-900-describe-azure-compute-networking-services/"],
+     ["Documentation : Azure Virtual Machines","https://learn.microsoft.com/fr-fr/azure/virtual-machines/overview"]
+   ],
+   focus:["VM vs App Service vs Azure Functions vs Container","VNet : réseau privé dans Azure","ExpressRoute : connexion privée (pas via internet) vers Azure","Azure Load Balancer vs Application Gateway vs Traffic Manager"]},
+
+  {d:4, theme:"Stockage Azure", time:"≈ 45 min lecture + 1 h quiz",
+   sections:[
+     {id:"s9",titre:"💾 Stockage Azure"}
+   ],
+   read:["Fiche : Types de stockage Azure","Fiche : Redondance et niveaux d'accès"],
+   links:[
+     ["Microsoft Learn : Stockage Azure","https://learn.microsoft.com/fr-fr/training/paths/az-900-describe-azure-storage-services/"],
+     ["Documentation : Vue d'ensemble du stockage Azure","https://learn.microsoft.com/fr-fr/azure/storage/common/storage-introduction"]
+   ],
+   focus:["Blob / File / Queue / Table / Disk : cas d'usage de chacun","LRS / ZRS / GRS / GZRS : niveaux de redondance","Niveaux d'accès Blob : Hot / Cool / Cold / Archive","Azure Migrate & Azure Data Box : migration de données"]},
+
+  {d:5, theme:"Identité, Accès & Sécurité", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s10",titre:"🔐 Identité, Accès & Sécurité"}
+   ],
+   read:["Fiche : Microsoft Entra ID (Azure AD)","Fiche : RBAC, Zero Trust, Microsoft Defender"],
+   links:[
+     ["Microsoft Learn : Identité et sécurité Azure","https://learn.microsoft.com/fr-fr/training/paths/az-900-describe-azure-identity-access-security/"],
+     ["Documentation : Microsoft Entra ID","https://learn.microsoft.com/fr-fr/entra/fundamentals/whatis"]
+   ],
+   focus:["Authentification vs Autorisation","RBAC : qui peut faire quoi sur quelles ressources","Zero Trust : vérifier toujours, ne jamais faire confiance","Microsoft Defender for Cloud vs Microsoft Sentinel vs Azure DDoS Protection"]},
+
+  {d:6, theme:"Coûts & Gouvernance", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s11",titre:"💲 Gestion des coûts Azure"},
+     {id:"s12",titre:"📏 Gouvernance & Conformité"},
+     {id:"s13",titre:"🚀 Déploiement & Gestion des ressources"},
+     {id:"s14",titre:"📊 Surveillance & Monitoring"}
+   ],
+   read:["Fiche : Coûts et facturation Azure","Fiche : Azure Policy, Blueprints, Management Groups","Fiche : ARM, Bicep, Azure Arc"],
+   links:[
+     ["Microsoft Learn : Gestion et gouvernance Azure","https://learn.microsoft.com/fr-fr/training/paths/az-900-describe-azure-management-governance/"],
+     ["Calculateur de prix Azure","https://azure.microsoft.com/fr-fr/pricing/calculator/"]
+   ],
+   focus:["Facteurs de coût : calcul, stockage, réseau (sortant)","Azure Cost Management : analyser et optimiser","Azure Policy vs RBAC : gouvernance vs accès","ARM Templates vs Bicep vs Terraform : IaC sur Azure"]},
+
+  {d:7, theme:"Révision générale & Pièges examen", time:"≈ 2 h révision + 1 h quiz",
+   sections:[
+     {id:"s15",titre:"🗝️ Mots-clés examen → Concept"},
+     {id:"s16",titre:"⚠️ Pièges classiques & Nuances examen"}
+   ],
+   read:["Fiche : Mots-clés et associations rapides","Fiche : Pièges classiques de l'examen AZ-900"],
+   links:[
+     ["Practice Assessment Microsoft Learn","https://learn.microsoft.com/fr-fr/certifications/exams/az-900/practice/assessment?assessmentId=23"],
+     ["Microsoft Learn : Parcours complet AZ-900","https://learn.microsoft.com/fr-fr/certifications/exams/az-900"]
+   ],
+   focus:["Revoir tous les mots-clés du tableau section s15","Identifier les services souvent confondus","Faire le practice assessment officiel Microsoft","Se concentrer sur les nuances PaaS/IaaS/SaaS dans les scénarios"]}
 ];
 
 window.QDATA = {};

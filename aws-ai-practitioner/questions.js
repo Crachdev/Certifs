@@ -10,13 +10,85 @@ window.QUIZ_META = {
 };
 
 window.QUIZ_PLAN = [
-  { day:1, title:"J1 — Fondamentaux IA/ML", count:50 },
-  { day:2, title:"J2 — Services AWS IA", count:50 },
-  { day:3, title:"J3 — Generative AI & LLM", count:50 },
-  { day:4, title:"J4 — Amazon Bedrock", count:50 },
-  { day:5, title:"J5 — MLOps & SageMaker", count:50 },
-  { day:6, title:"J6 — Sécurité, conformité & gouvernance IA", count:50 },
-  { day:7, title:"J7 — Révision générale", count:50 }
+  {d:1, theme:"Fondamentaux IA & Machine Learning", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s1",titre:"📋 L'examen AIF-C01"},
+     {id:"s2",titre:"🧠 Fondamentaux IA et ML"}
+   ],
+   read:["Fiche : Types d'apprentissage ML (supervisé, non supervisé, renforcement)","Fiche : Métriques d'évaluation (Precision, Recall, F1, AUC)","Fiche : Types de données ML"],
+   links:[
+     ["AWS Skill Builder : AI Practitioner","https://explore.skillbuilder.aws/learn/course/external/view/elearning/19554/exam-prep-standard-course-aws-certified-ai-practitioner-aif-c01"],
+     ["Documentation : ML Concepts AWS","https://docs.aws.amazon.com/whitepapers/latest/aws-overview/machine-learning.html"]
+   ],
+   focus:["Supervisé vs Non supervisé vs Renforcement : cas d'usage","Overfitting vs Underfitting : comment les détecter","Precision vs Recall : trade-off et contexte d'usage","Features, labels, training set, validation set, test set"]},
+
+  {d:2, theme:"IA Générative & Foundation Models", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s3",titre:"✨ Fondamentaux de l'IA Générative"}
+   ],
+   read:["Fiche : LLM, tokens, temperature, top-p, context window","Fiche : Foundation Models vs modèles classiques","Fiche : Prompt Engineering techniques"],
+   links:[
+     ["AWS : Introduction to Generative AI","https://aws.amazon.com/what-is/generative-ai/"],
+     ["Documentation : Amazon Bedrock","https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"]
+   ],
+   focus:["Foundation Model : pré-entraîné sur données massives","Hallucinations : les LLM génèrent parfois de fausses infos","RAG vs Fine-tuning : contexte dynamique vs entraînement","Temperature : 0 = déterministe, 1 = créatif"]},
+
+  {d:3, theme:"Applications FM & Amazon Bedrock", time:"≈ 1 h lecture + 1 h 15 quiz",
+   sections:[
+     {id:"s4",titre:"🚀 Applications des Foundation Models"},
+     {id:"s7",titre:"☁️ Services AWS IA / ML clés"}
+   ],
+   read:["Fiche : Amazon Bedrock — catalogue de modèles, Knowledge Bases, Agents","Fiche : SageMaker JumpStart, Canvas, Studio","Fiche : Services AWS IA : Rekognition, Comprehend, Transcribe, Polly, Translate"],
+   links:[
+     ["Documentation : Amazon Bedrock","https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"],
+     ["Documentation : Amazon SageMaker","https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html"]
+   ],
+   focus:["Bedrock : accès API à plusieurs FM sans gérer l'infra","Knowledge Bases Bedrock : RAG managé AWS","Bedrock Agents : agents IA avec tools AWS","SageMaker vs Bedrock : custom ML vs FM clé en main"]},
+
+  {d:4, theme:"Prompt Engineering & RAG", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s4",titre:"🚀 Applications des Foundation Models"}
+   ],
+   read:["Fiche : Prompt Engineering — zero-shot, few-shot, chain-of-thought","Fiche : RAG — Retrieval Augmented Generation","Fiche : Fine-tuning vs Prompt Engineering vs RAG"],
+   links:[
+     ["Documentation : Prompt Engineering Guide","https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html"],
+     ["Documentation : Knowledge Bases RAG","https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html"]
+   ],
+   focus:["Zero-shot : pas d'exemple","Few-shot : quelques exemples","Chain-of-thought : raisonnement étape par étape","RAG : récupérer docs pertinents → enrichir le prompt","Fine-tuning : adapter le modèle sur vos données"]},
+
+  {d:5, theme:"IA Responsable & Éthique", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s5",titre:"⚖️ Lignes directrices pour une IA responsable"}
+   ],
+   read:["Fiche : Dimensions IA responsable AWS (équité, explicabilité, robustesse...)","Fiche : Types de biais en ML","Fiche : AWS AI Service Cards et Responsible AI practices"],
+   links:[
+     ["AWS : Responsible AI","https://aws.amazon.com/fr/machine-learning/responsible-ai/"],
+     ["Documentation : SageMaker Clarify","https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-fairness-and-explainability.html"]
+   ],
+   focus:["Biais de sélection, confirmation, historique dans les données","SageMaker Clarify : détecter les biais dans les datasets","Équité, transparence, robustesse, confidentialité","AI Service Cards : documentation de l'utilisation responsable"]},
+
+  {d:6, theme:"Sécurité, Conformité & Gouvernance IA", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s6",titre:"🔒 Sécurité, conformité et gouvernance IA"}
+   ],
+   read:["Fiche : Bedrock Guardrails — filtrer le contenu","Fiche : IAM, chiffrement, VPC pour workloads IA","Fiche : Conformité AWS (SOC, ISO, HIPAA) pour IA"],
+   links:[
+     ["Documentation : Bedrock Guardrails","https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html"],
+     ["AWS : Compliance Programs","https://aws.amazon.com/compliance/programs/"]
+   ],
+   focus:["Bedrock Guardrails : topics indésirables, filtres de contenu","Shared Responsibility Model pour IA : AWS vs client","Chiffrement données d'entraînement at rest et in transit","AWS Artifact : rapports de conformité"]},
+
+  {d:7, theme:"Révision générale & Pièges examen", time:"≈ 2 h révision + 1 h quiz",
+   sections:[
+     {id:"s8",titre:"🗝️ Mots-clés examen → Service AWS"},
+     {id:"s9",titre:"⚠️ Pièges classiques"}
+   ],
+   read:["Fiche : Mots-clés et associations rapides","Fiche : Pièges classiques de l'examen AIF-C01"],
+   links:[
+     ["AWS Skill Builder : Practice Exam AIF-C01","https://explore.skillbuilder.aws/learn/course/external/view/elearning/19555/exam-prep-official-practice-question-set-aws-certified-ai-practitioner-aif-c01"],
+     ["AWS Certification : AIF-C01","https://aws.amazon.com/certification/certified-ai-practitioner/"]
+   ],
+   focus:["Revoir le tableau mots-clés → service AWS","Bedrock vs SageMaker vs AI Services : choisir le bon","RAG vs Fine-tuning : scénarios d'usage","Métriques ML : savoir choisir la bonne selon le problème"]}
 ];
 
 window.QDATA = {};

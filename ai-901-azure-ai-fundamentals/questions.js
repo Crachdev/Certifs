@@ -10,13 +10,87 @@ window.QUIZ_META = {
 };
 
 window.QUIZ_PLAN = [
-  { day:1, title:"J1 — Fondamentaux IA & ML", count:50 },
-  { day:2, title:"J2 — Azure AI Foundry & SDK", count:50 },
-  { day:3, title:"J3 — Content Understanding & Vision", count:50 },
-  { day:4, title:"J4 — Agents & IA agentique", count:50 },
-  { day:5, title:"J5 — IA générative & LLM", count:50 },
-  { day:6, title:"J6 — IA responsable & Production", count:50 },
-  { day:7, title:"J7 — Révision générale", count:50 }
+  {d:1, theme:"Fondamentaux IA & IA Responsable", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s1",titre:"⚖️ IA Responsable — 6 principes Microsoft"},
+     {id:"s3",titre:"🤖 Charges de travail IA (types d'IA)"}
+   ],
+   read:["Fiche : IA Responsable (Équité, Fiabilité, Confidentialité, Inclusivité, Transparence, Responsabilité)","Fiche : Charges de travail IA — vision, NLP, génératif, agentique"],
+   links:[
+     ["Microsoft Learn : AI-901 — IA Responsable","https://learn.microsoft.com/fr-fr/training/paths/ai-900-responsible-ai/"],
+     ["Documentation : Principes IA responsable Microsoft","https://www.microsoft.com/fr-fr/ai/responsible-ai"]
+   ],
+   focus:["Mémoriser les 6 principes IA responsable et leurs définitions","Distinguer vision, NLP, génératif et agentique","Identifier la bonne charge de travail selon le scénario"]},
+
+  {d:2, theme:"Modèles IA & Azure AI Foundry", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s2",titre:"🧠 Modèles IA — Composants & configurations"},
+     {id:"s4",titre:"🏭 Microsoft Foundry — Le portail"}
+   ],
+   read:["Fiche : LLM, tokens, temperature, top-p","Fiche : Azure AI Foundry — Catalogue de modèles, déploiements"],
+   links:[
+     ["Documentation : Azure AI Foundry","https://learn.microsoft.com/fr-fr/azure/ai-foundry/what-is-azure-ai-foundry"],
+     ["Microsoft Learn : Modèles génératifs","https://learn.microsoft.com/fr-fr/training/paths/ai-900-describe-generative-ai/"]
+   ],
+   focus:["Foundry Hub vs Project : hiérarchie et usage","Catalogue de modèles : choisir selon le cas d'usage","Paramètres temperature et top-p : effet sur la génération","Déploiement Managed Compute vs Serverless"]},
+
+  {d:3, theme:"Applications génératifs & Agents", time:"≈ 1 h lecture + 1 h 15 quiz",
+   sections:[
+     {id:"s5",titre:"🤖 Apps & agents génératifs avec Foundry"},
+     {id:"s6",titre:"💻 SDK Foundry — Applications Python légères"}
+   ],
+   read:["Fiche : RAG, Prompt Engineering, Fine-tuning","Fiche : SDK Azure AI Foundry — structure d'une app de chat"],
+   links:[
+     ["Documentation : Azure AI Agents","https://learn.microsoft.com/fr-fr/azure/ai-services/agents/overview"],
+     ["Documentation : Prompt Engineering","https://learn.microsoft.com/fr-fr/azure/ai-services/openai/concepts/prompt-engineering"]
+   ],
+   focus:["RAG vs Fine-tuning : quand utiliser chacun","Structure d'un agent : tools, memory, planning","Prompt système vs prompt utilisateur","SDK Python : ChatCompletionsClient vs AgentsClient"]},
+
+  {d:4, theme:"Texte, Parole & Vision", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s7",titre:"📝 Texte & parole avec Foundry"},
+     {id:"s8",titre:"👁️ Vision par ordinateur & génération d'images"}
+   ],
+   read:["Fiche : Azure AI Language, Speech, Translator","Fiche : Computer Vision, Custom Vision, Azure AI Vision"],
+   links:[
+     ["Documentation : Azure AI Language","https://learn.microsoft.com/fr-fr/azure/ai-services/language-service/overview"],
+     ["Documentation : Azure AI Vision","https://learn.microsoft.com/fr-fr/azure/ai-services/computer-vision/overview"]
+   ],
+   focus:["Speech-to-Text vs Text-to-Speech : sens de la conversion","Analyse de sentiments vs extraction d'entités nommées","Image Analysis vs Custom Vision vs Face API","DALL-E / image generation dans Foundry"]},
+
+  {d:5, theme:"Extraction d'informations & Content Understanding", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s9",titre:"📄 Extraction d'informations — Content Understanding"},
+     {id:"s10",titre:"✍️ Prompt Engineering"}
+   ],
+   read:["Fiche : Document Intelligence, Form Recognizer","Fiche : Techniques de Prompt Engineering (few-shot, chain-of-thought)"],
+   links:[
+     ["Documentation : Azure AI Document Intelligence","https://learn.microsoft.com/fr-fr/azure/ai-services/document-intelligence/overview"],
+     ["Documentation : Prompt Engineering guide","https://learn.microsoft.com/fr-fr/azure/ai-services/openai/concepts/prompt-engineering"]
+   ],
+   focus:["Document Intelligence vs Content Understanding : différences","Modèles prédéfinis vs modèles personnalisés","Techniques de prompting : zero-shot, few-shot, chain-of-thought","Grounding : ancrer les réponses dans des données réelles"]},
+
+  {d:6, theme:"RAG, Recherche vectorielle & Sécurité IA", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s11",titre:"🔍 RAG & Recherche vectorielle"}
+   ],
+   read:["Fiche : Azure AI Search, embeddings, vector search","Fiche : Content Safety, filtres de contenu Foundry"],
+   links:[
+     ["Documentation : Azure AI Search","https://learn.microsoft.com/fr-fr/azure/search/search-what-is-azure-search"],
+     ["Documentation : Azure AI Content Safety","https://learn.microsoft.com/fr-fr/azure/ai-services/content-safety/overview"]
+   ],
+   focus:["RAG : Retrieval → Augmentation → Generation","Embeddings : représentation vectorielle du texte","Azure AI Search : semantic ranking, vector search","Content Safety : modération de contenu généré par IA"]},
+
+  {d:7, theme:"Révision générale & Pièges examen", time:"≈ 2 h révision + 1 h quiz",
+   sections:[
+     {id:"s12",titre:"⚠️ Pièges fréquents & mémos examen"}
+   ],
+   read:["Fiche : Pièges classiques AI-901","Réviser toutes les sections de la fiche"],
+   links:[
+     ["Practice Assessment Microsoft Learn AI-901","https://learn.microsoft.com/fr-fr/certifications/exams/ai-900/practice/assessment?assessmentId=26"],
+     ["Microsoft Learn : Parcours complet AI-901","https://learn.microsoft.com/fr-fr/certifications/exams/ai-901"]
+   ],
+   focus:["Revoir les pièges fréquents section s12","IA Responsable : savoir citer les 6 principes dans l'ordre","Charges de travail IA : identifier la bonne selon le scénario","Foundry vs AI Services directs : choisir la bonne approche"]}
 ];
 
 window.QDATA = {};

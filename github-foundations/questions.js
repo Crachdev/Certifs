@@ -10,14 +10,97 @@ window.QUIZ_META = {
 };
 
 window.QUIZ_PLAN = [
-  { day:1, title:"J1 — Fondamentaux Git", count:50 },
-  { day:2, title:"J2 — GitHub Repositories", count:50 },
-  { day:3, title:"J3 — Collaboration & Pull Requests", count:50 },
-  { day:4, title:"J4 — GitHub Issues & Projects", count:50 },
-  { day:5, title:"J5 — GitHub Actions", count:50 },
-  { day:6, title:"J6 — Sécurité & Administration", count:50 },
-  { day:7, title:"J7 — GitHub Codespaces & Copilot", count:50 },
-  { day:8, title:"J8 — Révision générale", count:50 }
+  {d:1, theme:"Introduction à Git & GitHub", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s1",titre:"📋 L'examen GH-900"},
+     {id:"s2",titre:"🔧 Introduction à Git et GitHub"}
+   ],
+   read:["Fiche : Concepts Git (commit, branch, merge, rebase)","Fiche : Flux de travail Git — Feature Branch Workflow","Fiche : GitHub vs Git : ce que GitHub ajoute"],
+   links:[
+     ["GitHub Skills : Introduction to GitHub","https://skills.github.com/"],
+     ["Documentation : Git Handbook","https://docs.github.com/en/get-started/using-git/about-git"]
+   ],
+   focus:["commit, push, pull, fetch, merge, rebase : différences","Branches : créer, changer, fusionner","GitHub = Git + hébergement + collaboration + CI/CD","Clone vs Fork : contexte d'utilisation"]},
+
+  {d:2, theme:"Collaboration — Pull Requests & Issues", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s3",titre:"🤝 Fonctionnalités de collaboration"}
+   ],
+   read:["Fiche : Pull Requests — cycle de vie et bonnes pratiques","Fiche : Issues — labels, assignees, milestones","Fiche : GitHub Discussions vs Issues"],
+   links:[
+     ["Documentation : About Pull Requests","https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests"],
+     ["Documentation : About Issues","https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues"]
+   ],
+   focus:["PR : propose changements, review, approbation, merge","Issues : tracker le travail, bugs, features","Labels : organiser visuellement","Milestones : regrouper les issues par objectif","Draft PR vs PR ouverte : signalement d'état"]},
+
+  {d:3, theme:"GitHub Actions & CI/CD", time:"≈ 1 h lecture + 1 h 15 quiz",
+   sections:[
+     {id:"s4",titre:"⚙️ Développement moderne — GitHub Actions"}
+   ],
+   read:["Fiche : GitHub Actions — workflow, jobs, steps, actions","Fiche : Triggers : push, pull_request, schedule, workflow_dispatch","Fiche : GitHub Marketplace — actions réutilisables"],
+   links:[
+     ["Documentation : GitHub Actions","https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions"],
+     ["GitHub Marketplace : Actions","https://github.com/marketplace?type=actions"]
+   ],
+   focus:["Workflow YAML : on + jobs + steps","Runner : ubuntu-latest, windows-latest, macos-latest","Actions : checkout, setup-node, etc.","Secrets : variables chiffrées pour les workflows","CI : tests auto sur PR ; CD : déploiement auto"]},
+
+  {d:4, theme:"Gestion des dépôts & Projets", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s7",titre:"📁 Gestion des dépôts"},
+     {id:"s8",titre:"📊 Gestion de projet"}
+   ],
+   read:["Fiche : Repository — public, private, internal","Fiche : GitHub Projects — boards, vues, automatisation","Fiche : Wikis, README, .github/"],
+   links:[
+     ["Documentation : About Repositories","https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories"],
+     ["Documentation : GitHub Projects","https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects"]
+   ],
+   focus:["Repo public vs privé vs interne (org)","Branch protection rules : reviews requises, status checks","GitHub Projects vs classic Projects","CODEOWNERS : assignation automatique des reviewers"]},
+
+  {d:5, theme:"Sécurité, Administration & Open Source", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s5",titre:"🔒 Sécurité, confidentialité et administration"},
+     {id:"s6",titre:"🌍 Bénéfices de la communauté GitHub"}
+   ],
+   read:["Fiche : Dependabot, Code Scanning, Secret Scanning","Fiche : Organisations, équipes, rôles (Owner, Member...)","Fiche : Open Source — licenses, contributions, Fork"],
+   links:[
+     ["Documentation : About Security","https://docs.github.com/en/code-security/getting-started/github-security-features"],
+     ["Documentation : Organizations","https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/about-organizations"]
+   ],
+   focus:["Dependabot : mises à jour auto des dépendances","Code Scanning : analyse statique (CodeQL)","Secret Scanning : détecter les tokens exposés","Rôles org : Owner vs Member vs Outside Collaborator","Licences open source : MIT, Apache 2.0, GPL"]},
+
+  {d:6, theme:"GitHub Codespaces, Copilot & Commandes Git", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s9",titre:"💻 Commandes Git essentielles"}
+   ],
+   read:["Fiche : GitHub Codespaces — dev environment cloud","Fiche : GitHub Copilot — suggestions de code IA","Fiche : Commandes Git essentielles"],
+   links:[
+     ["Documentation : GitHub Codespaces","https://docs.github.com/en/codespaces/overview"],
+     ["Documentation : GitHub Copilot","https://docs.github.com/en/copilot/about-github-copilot/what-is-github-copilot"]
+   ],
+   focus:["Codespaces : IDE dans le navigateur, basé sur VS Code","Copilot : complétion de code IA dans l'éditeur","git add, commit, push, pull, fetch : workflow de base","git rebase vs git merge : linéaire vs non-linéaire"]},
+
+  {d:7, theme:"Mots-clés & Associations GitHub", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s10",titre:"🗝️ Mots-clés examen → Concept GitHub"}
+   ],
+   read:["Fiche : Mots-clés et associations rapides","Réviser les fonctionnalités clés par catégorie"],
+   links:[
+     ["GitHub Certification : Foundations","https://examregistration.github.com/overview"],
+     ["GitHub Learning Pathways","https://resources.github.com/learn/pathways/"]
+   ],
+   focus:["Revoir le tableau mots-clés → concept","Forking : contribution externe sans accès direct","GitHub Sponsors : financer les projets open source","GitHub Pages : hébergement statique gratuit"]},
+
+  {d:8, theme:"Révision générale & Pièges examen", time:"≈ 2 h révision + 1 h quiz",
+   sections:[
+     {id:"s11",titre:"⚠️ Pièges classiques"}
+   ],
+   read:["Fiche : Pièges classiques de l'examen GitHub Foundations","Réviser toutes les sections de la fiche"],
+   links:[
+     ["GitHub Foundations Practice Exam","https://ghcertified.com/practice_tests/foundations/"],
+     ["GitHub Certification Overview","https://examregistration.github.com/overview"]
+   ],
+   focus:["Revoir les pièges section s11","GitHub Actions vs GitHub Apps vs GitHub CLI : distinctions","Issues vs Discussions vs PRs : choisir le bon outil","Branch protection vs CODEOWNERS : protection vs review"]}
+];
 ];
 
 window.QDATA = {};

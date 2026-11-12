@@ -10,13 +10,85 @@ window.QUIZ_META = {
 };
 
 window.QUIZ_PLAN = [
-  { day:1, title:"J1 — Fondamentaux Cloud & GCP", count:51 },
-  { day:2, title:"J2 — Infrastructure & Compute", count:50 },
-  { day:3, title:"J3 — Stockage & Bases de données", count:50 },
-  { day:4, title:"J4 — Réseau & Sécurité", count:50 },
-  { day:5, title:"J5 — Big Data & Analytics", count:50 },
-  { day:6, title:"J6 — IA & Machine Learning", count:50 },
-  { day:7, title:"J7 — Révision générale", count:52 }
+  {d:1, theme:"Fondamentaux Cloud & Transformation digitale", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s1",titre:"📋 L'examen GCDL"},
+     {id:"s2",titre:"☁️ Transformation digitale avec Google Cloud"}
+   ],
+   read:["Fiche : Avantages du cloud (agilité, scalabilité, coûts)","Fiche : Modèles cloud (IaaS/PaaS/SaaS), CapEx vs OpEx","Fiche : Transformation digitale — 4 piliers Google Cloud"],
+   links:[
+     ["Google Cloud Skills Boost : Cloud Digital Leader","https://cloudskillsboost.google/paths/9"],
+     ["Documentation : Vue d'ensemble Google Cloud","https://cloud.google.com/docs/overview"]
+   ],
+   focus:["IaaS / PaaS / SaaS / FaaS : qui gère quoi","Public vs Privé vs Hybride vs Multi-cloud","Bénéfices cloud : TCO, élasticité, disponibilité mondiale","Transformation digitale : infrastructure, applications, data, personnes"]},
+
+  {d:2, theme:"Données & Analytics avec Google Cloud", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s3",titre:"📊 Transformation Data avec Google Cloud"}
+   ],
+   read:["Fiche : BigQuery, Dataflow, Pub/Sub, Dataproc","Fiche : Rôle des données et gouvernance","Fiche : Data lake vs Data warehouse vs Data lakehouse"],
+   links:[
+     ["Documentation : BigQuery","https://cloud.google.com/bigquery/docs/introduction"],
+     ["Documentation : Cloud Storage","https://cloud.google.com/storage/docs/introduction"]
+   ],
+   focus:["BigQuery : entrepôt de données serverless et analytics SQL","Pub/Sub : messagerie asynchrone pour streaming","Dataflow : ETL / ELT managed (Apache Beam)","Looker vs Looker Studio : BI enterprise vs dashboards gratuits"]},
+
+  {d:3, theme:"Intelligence Artificielle avec Google Cloud", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s4",titre:"🤖 Intelligence Artificielle avec Google Cloud"}
+   ],
+   read:["Fiche : Vertex AI, AutoML, Vision AI, Natural Language","Fiche : Gemini et IA générative sur Google Cloud","Fiche : ML pré-entraîné vs ML personnalisé"],
+   links:[
+     ["Documentation : Vertex AI","https://cloud.google.com/vertex-ai/docs/start/introduction-unified-platform"],
+     ["Google Cloud : IA et Machine Learning","https://cloud.google.com/products/ai"]
+   ],
+   focus:["Vertex AI : plateforme ML unifiée","AutoML : ML sans code pour les non-experts","Vision AI / Natural Language / Speech-to-Text : services pré-entraînés","Gemini sur GCP : intégration dans les produits Google Cloud"]},
+
+  {d:4, theme:"Infrastructure & Applications modernisées", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s5",titre:"🏗️ Moderniser l'infrastructure et les applications"}
+   ],
+   read:["Fiche : Compute Engine, GKE, Cloud Run, App Engine","Fiche : Stratégies de migration — les 6 R","Fiche : Conteneurs et Kubernetes sur GCP"],
+   links:[
+     ["Documentation : Compute Engine","https://cloud.google.com/compute/docs/overview"],
+     ["Documentation : Google Kubernetes Engine","https://cloud.google.com/kubernetes-engine/docs/concepts/kubernetes-engine-overview"]
+   ],
+   focus:["Compute Engine (IaaS) vs App Engine (PaaS) vs Cloud Run (serverless containers)","GKE : Kubernetes managé par Google","Les 6 R de migration : Retire, Retain, Rehost, Replatform, Refactor, Repurchase","Lift & Shift vs Rearchitecture : compromis vitesse vs bénéfice"]},
+
+  {d:5, theme:"Confiance, Sécurité & Coûts", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s6",titre:"🔒 Confiance et Sécurité avec Google Cloud"},
+     {id:"s7",titre:"💰 Opérations cloud & Gestion des coûts"}
+   ],
+   read:["Fiche : Modèle de responsabilité partagée GCP","Fiche : IAM, Cloud Armor, Chronicle SIEM","Fiche : Gestion des coûts : budgets, alertes, recommandations"],
+   links:[
+     ["Documentation : Cloud IAM","https://cloud.google.com/iam/docs/overview"],
+     ["Documentation : Google Cloud Armor","https://cloud.google.com/armor/docs/cloud-armor-overview"]
+   ],
+   focus:["Responsabilité partagée : Google vs client selon le modèle","IAM : principe du moindre privilège","Cloud Armor : protection DDoS et WAF","Committed use discounts vs Sustained use discounts"]},
+
+  {d:6, theme:"Produits GCP clés à connaître", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s8",titre:"🗂️ Produits GCP clés à connaître"},
+     {id:"s9",titre:"🗝️ Mots-clés examen → Service GCP"}
+   ],
+   read:["Fiche : Tableau récapitulatif des produits GCP","Fiche : Mots-clés et associations rapides"],
+   links:[
+     ["Google Cloud Products","https://cloud.google.com/products"],
+     ["Comparatif AWS / Azure / GCP","https://cloud.google.com/free/docs/aws-azure-gcp-service-comparison"]
+   ],
+   focus:["Cloud SQL vs Spanner vs BigQuery vs Firestore : choisir la bonne BD","Cloud Storage classes : Standard / Nearline / Coldline / Archive","Network : VPC, Cloud CDN, Cloud Load Balancing","Operations Suite : Cloud Monitoring, Cloud Logging, Cloud Trace"]},
+
+  {d:7, theme:"Révision générale & Pièges examen", time:"≈ 2 h révision + 1 h quiz",
+   sections:[
+     {id:"s10",titre:"⚠️ Pièges classiques"}
+   ],
+   read:["Fiche : Pièges classiques de l'examen GCDL","Réviser tous les produits et leurs cas d'usage"],
+   links:[
+     ["Google Cloud Certification : Cloud Digital Leader","https://cloud.google.com/learn/certification/cloud-digital-leader"],
+     ["Practice Questions GCDL","https://cloudskillsboost.google/course_templates/864"]
+   ],
+   focus:["Revoir les pièges classiques section s10","BigQuery vs Cloud SQL : OLAP vs OLTP","Pub/Sub vs Cloud Tasks : streaming vs queuing","Vertex AI vs AutoML vs AI APIs prédéfinies : niveau d'expertise requis"]}
 ];
 
 window.QDATA = {};

@@ -10,13 +10,86 @@ window.QUIZ_META = {
 };
 
 window.QUIZ_PLAN = [
-  { day:1, title:"J1 — Applications M365", count:50 },
-  { day:2, title:"J2 — Collaboration & Teams", count:50 },
-  { day:3, title:"J3 — Sécurité & Conformité", count:50 },
-  { day:4, title:"J4 — Identité & Accès", count:50 },
-  { day:5, title:"J5 — Gestion des appareils", count:50 },
-  { day:6, title:"J6 — Cloud & Services", count:50 },
-  { day:7, title:"J7 — Révision générale", count:50 }
+  {d:1, theme:"Applications M365 & Copilot", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s1",titre:"📋 L'examen MS-900"},
+     {id:"s2",titre:"📱 Applications M365 & Copilot"}
+   ],
+   read:["Fiche : Applications Office incluses dans M365","Fiche : Microsoft 365 Copilot — fonctionnalités et licences","Fiche : Outils de collaboration (Teams, Yammer, Viva)"],
+   links:[
+     ["Microsoft Learn : MS-900 — Applications M365","https://learn.microsoft.com/fr-fr/training/paths/ms-900-describe-microsoft-365-apps-and-services/"],
+     ["Documentation : Microsoft 365","https://learn.microsoft.com/fr-fr/microsoft-365/admin/admin-overview/admin-overview"]
+   ],
+   focus:["Différencier les apps M365 : Word, Excel, Teams, Planner, Viva","Microsoft 365 Copilot : prérequis de licence","Teams vs Yammer vs Viva Engage : cas d'usage","Microsoft 365 Apps for Business vs Enterprise"]},
+
+  {d:2, theme:"SharePoint Online & Exchange Online", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s3",titre:"🗂️ SharePoint Online & OneDrive for Business"},
+     {id:"s4",titre:"📧 Exchange Online"}
+   ],
+   read:["Fiche : SharePoint — sites, bibliothèques, permissions","Fiche : OneDrive — stockage personnel vs SharePoint","Fiche : Exchange Online — boîtes aux lettres, groupes, règles"],
+   links:[
+     ["Documentation : SharePoint Online","https://learn.microsoft.com/fr-fr/sharepoint/sharepoint-online"],
+     ["Documentation : Exchange Online","https://learn.microsoft.com/fr-fr/exchange/exchange-online"]
+   ],
+   focus:["OneDrive for Business vs SharePoint : personnel vs équipe","Permissions SharePoint : site → liste → élément","Exchange Online Plans : Plan 1 vs Plan 2","Boîtes aux lettres partagées vs groupes M365 vs listes de distribution"]},
+
+  {d:3, theme:"Sécurité — Defender & Purview", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s5",titre:"🛡️ Microsoft Defender for Office 365"},
+     {id:"s6",titre:"📋 Microsoft Purview"}
+   ],
+   read:["Fiche : Defender for Office 365 — anti-phishing, Safe Links, Safe Attachments","Fiche : Microsoft Purview — Sensitivity Labels, DLP, eDiscovery"],
+   links:[
+     ["Microsoft Learn : MS-900 — Sécurité M365","https://learn.microsoft.com/fr-fr/training/paths/ms-900-describe-m365-security/"],
+     ["Documentation : Microsoft Purview","https://learn.microsoft.com/fr-fr/purview/purview"]
+   ],
+   focus:["Defender for Office 365 Plan 1 vs Plan 2 : fonctionnalités","Safe Links vs Safe Attachments : comment ils protègent","Sensitivity Labels : classer et protéger les données","DLP : empêcher la fuite de données sensibles","Compliance Score vs Secure Score"]},
+
+  {d:4, theme:"Identité & Accès — Entra ID", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s7",titre:"🔐 Microsoft Entra ID, MFA & PIM"}
+   ],
+   read:["Fiche : Microsoft Entra ID (ancien Azure AD)","Fiche : MFA, Conditional Access, PIM","Fiche : SSO et identités hybrides"],
+   links:[
+     ["Microsoft Learn : MS-900 — Identité M365","https://learn.microsoft.com/fr-fr/training/paths/ms-900-describe-m365-identity/"],
+     ["Documentation : Microsoft Entra ID","https://learn.microsoft.com/fr-fr/entra/fundamentals/whatis"]
+   ],
+   focus:["Entra ID = Azure Active Directory (nouveau nom)","MFA : SMS vs Authenticator App vs clé hardware","Conditional Access : accès conditionnel par contexte","PIM : Just-In-Time pour les rôles privilegiés","SSO : une seule authentification pour toutes les apps"]},
+
+  {d:5, theme:"Gestion des appareils — Intune & Autopilot", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s8",titre:"📱 Microsoft Intune & Windows Autopilot"}
+   ],
+   read:["Fiche : Intune — MDM et MAM","Fiche : Windows Autopilot — déploiement zero-touch","Fiche : BYOD et politiques de conformité"],
+   links:[
+     ["Documentation : Microsoft Intune","https://learn.microsoft.com/fr-fr/mem/intune/fundamentals/what-is-intune"],
+     ["Documentation : Windows Autopilot","https://learn.microsoft.com/fr-fr/autopilot/windows-autopilot"]
+   ],
+   focus:["MDM (Mobile Device Management) vs MAM (Mobile App Management)","Intune : gérer appareils Windows, iOS, Android, macOS","Windows Autopilot : déploiement sans intervention IT","BYOD : gérer les apps sans contrôler l'appareil (MAM)"]},
+
+  {d:6, theme:"Licences, Administration & Services Cloud", time:"≈ 1 h lecture + 1 h quiz",
+   sections:[
+     {id:"s9",titre:"💰 Licences & Administration M365"},
+     {id:"s10",titre:"☁️ Services et infrastructure cloud M365"}
+   ],
+   read:["Fiche : Plans M365 Business vs Enterprise vs Education","Fiche : Centre d'administration M365","Fiche : Service Health, SLA, continuité de service"],
+   links:[
+     ["Comparatif plans Microsoft 365","https://www.microsoft.com/fr-fr/microsoft-365/business/compare-all-plans"],
+     ["Documentation : Centre d'administration M365","https://learn.microsoft.com/fr-fr/microsoft-365/admin/admin-overview/admin-center-overview"]
+   ],
+   focus:["M365 Business Basic vs Standard vs Premium : limites","Licences par utilisateur vs per-device","Centre d'administration : rôles d'admin et délégation","SLA Microsoft 365 : 99,9% disponibilité garantie"]},
+
+  {d:7, theme:"Révision générale & Pièges examen", time:"≈ 2 h révision + 1 h quiz",
+   sections:[
+     {id:"s10",titre:"⚠️ Récapitulatif & Pièges examen MS-900"}
+   ],
+   read:["Réviser la fiche complète MS-900","Revoir les tableaux de comparaison de produits"],
+   links:[
+     ["Practice Assessment Microsoft Learn MS-900","https://learn.microsoft.com/fr-fr/certifications/exams/ms-900/practice/assessment?assessmentId=50"],
+     ["Microsoft Learn : Parcours complet MS-900","https://learn.microsoft.com/fr-fr/certifications/exams/ms-900"]
+   ],
+   focus:["Defender for Office 365 vs Microsoft 365 Defender : périmètre","Entra ID Free vs P1 vs P2 : fonctionnalités supplémentaires","SharePoint vs OneDrive : collaboration vs stockage personnel","Intune MDM vs MAM : contrôle appareil vs contrôle app"]}
 ];
 
 window.QDATA = {};
