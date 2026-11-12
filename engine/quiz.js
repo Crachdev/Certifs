@@ -93,6 +93,12 @@ const Q=(d,i)=>{
     r.e={};r.o.forEach((_,k)=>{r.e[k]=r.exp||"";});
     r.t=r.t||"";
   }
+  // Format lettre: o déjà défini, a est une lettre ("A","B","C"...) → convertir en index
+  if(r.o&&typeof r.a==="string"&&r.a.length===1&&"ABCDE".includes(r.a)){
+    r.a=["ABCDE".indexOf(r.a)];
+    if(!r.e){r.e={};r.o.forEach((_,k)=>{r.e[k]=r.exp||"";});}
+    r.t=r.t||"";
+  }
   return r;
 };
 const total=()=>Object.values(window.QDATA).reduce((s,a)=>s+a.length,0);

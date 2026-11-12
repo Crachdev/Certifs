@@ -1,10 +1,13 @@
 window.QKEY = "aws-security-specialty";
 
 window.QUIZ_META = {
+  title: "AWS Security Specialty",
+  code: "SCS-C02",
   fiche: "fiche.html",
   exam: "AWS Security Specialty SCS-C02",
   passScore: 75,
   examMins: 170,
+  totalQ: 56,
   rules: [
     "65 questions QCM (choix unique ou multiple)",
     "Score minimum : 750/1000 (≈ 75%)",
