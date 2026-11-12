@@ -5,6 +5,8 @@ window.QKEY = "aws-clf-c02";
 
 // ── Métadonnées examen ──────────────────────────────────────────────────────
 window.QUIZ_META={
+  title:"AWS Cloud Practitioner",
+  code:"CLF-C02",
   exam:"AWS Cloud Practitioner CLF-C02",
   passScore:70,
   examMins:90,
