@@ -12,7 +12,6 @@ const MODS_PER_DAY=5; // 5 modules × 10 q = 50 q/jour
 
 const KEY=window.QKEY||"clf7.v2";
 const PSEUDO_KEY="certifs.pseudo"; // clé stable partagée entre toutes les certifications
-const THEME_KEY="certifs.theme"; // clé stockage thème
 let store={};
 try{store=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){store={}}
 store.r=store.r||{}; // results: "day-idx" -> 1 correct / 0 wrong
