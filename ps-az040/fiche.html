@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0066b8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche AZ-040 — PowerShell Administration</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E⚡%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#0066b8;--accent-soft:#ddeeff;
+  --ps:#012456;--ps-mid:#0066b8;--ps-light:#cce4ff;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#60aaee;--accent-soft:#0a1e33;
+  --ps:#1a3a6e;--ps-mid:#60aaee;--ps-light:#0a1e33;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#60aaee;--accent-soft:#0a1e33;
+  --ps:#1a3a6e;--ps-mid:#60aaee;--ps-light:#0a1e33;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.8rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+h4{font-size:.9rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--f-mono)}
+p{margin:6px 0 10px}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Header */
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.top-actions{display:flex;gap:8px;align-items:center}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PS Banner */
+.ps-banner{background:var(--ps);border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.ps-banner-left .label{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ps-banner-left h1{color:#fff;font-size:1.5rem}
+.ps-banner-left p{color:rgba(255,255,255,.7);font-size:.88rem;margin:4px 0 0}
+.ps-stats{display:flex;gap:16px;flex-wrap:wrap}
+.ps-stat{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;text-align:center;min-width:80px}
+.ps-stat b{display:block;font:700 1.3rem var(--f-mono);color:#fff}
+.ps-stat span{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em}
+
+/* Sommaire rapide */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:28px}
+.toc h4{margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;text-decoration:none;color:var(--ink);font-size:.85rem;transition:background .15s}
+.toc-item:hover{background:var(--accent-soft);color:var(--accent)}
+.toc-num{font:600 .7rem var(--f-mono);background:var(--ps-light);color:var(--ps-mid);padding:1px 6px;border-radius:3px;min-width:28px;text-align:center}
+
+/* Sections */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.section-header{background:var(--ps);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.section-num{font:700 .75rem var(--f-mono);background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:4px}
+.section-title-text{font:700 1rem var(--f-display);color:#fff;flex:1}
+.section-nb{font:500 .7rem var(--f-mono);color:rgba(255,255,255,.55)}
+.section-body{padding:20px}
+
+/* Blocs de contenu */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.concept-card{border:1px solid var(--line);border-radius:7px;padding:12px 14px}
+.concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
+.concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
+.concept-card ul li{margin:2px 0}
+
+/* Cmdlets */
+.cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+.cmdlet-table th{text-align:left;padding:7px 10px;background:var(--accent-soft);color:var(--accent);font:600 .72rem var(--f-mono);letter-spacing:.05em;border-bottom:2px solid var(--line)}
+.cmdlet-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmdlet-table tr:last-child td{border-bottom:0}
+.cmdlet-table td:first-child{font:500 .85rem var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmdlet-table td:last-child{color:var(--muted)}
+.cmdlet-table td:nth-child(2){color:var(--ink)}
+.cmdlet-table-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+
+/* Code blocks */
+.code-block{background:var(--ps);border-radius:7px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.code-block code{font:500 .85rem var(--f-mono);color:#cce4ff;white-space:pre;display:block;line-height:1.6}
+.code-block .comment{color:rgba(255,255,255,.4)}
+.code-block .keyword{color:#9cdcfe}
+.code-block .string{color:#ce9178}
+.code-block .cmdlet{color:#dcdcaa}
+.code-block .param{color:#9cdcfe}
+
+/* Astuce / Attention */
+.tip{background:var(--ok-soft);border-left:3px solid var(--ok);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.tip strong{color:var(--ok)}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.warn strong{color:var(--warn)}
+.info{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.info strong{color:var(--accent)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font:500 .72rem var(--f-mono);padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.admin{background:var(--ok-soft);color:var(--ok)}
+.tag.cloud{background:#e8f4fd;color:#005a9e}
+.tag.script{background:#f3e8ff;color:#6b21a8}
+
+/* Comparatif */
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.compare-table th{padding:7px 10px;text-align:left;border-bottom:2px solid var(--line);font:600 .72rem var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.compare-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table td:first-child{font:600 .85rem var(--f-mono);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  h1{font-size:1.3rem}
+  .ps-banner{padding:14px 16px}
+  .ps-banner-left h1{font-size:1.2rem}
+  .ps-stats{gap:8px}
+  .ps-stat{padding:8px 10px;min-width:64px}
+  .ps-stat b{font-size:1rem}
+  .concept-grid{grid-template-columns:1fr}
+  .toc-grid{grid-template-columns:1fr}
+  .section-body{padding:14px}
+  .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">Microsoft · AZ-040T00</div>
+      <h1>Fiche de révision — PowerShell Administration</h1>
+    </div>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="ps-banner">
+    <div class="ps-banner-left">
+      <div class="label">Formation · 5 jours · Avancé</div>
+      <h1>Automatiser l'administration avec PowerShell</h1>
+      <p>Windows Server · Azure · Microsoft 365 · Scripts · Remoting · Jobs</p>
+    </div>
+    <div class="ps-stats">
+      <div class="ps-stat"><b>11</b><span>Parcours</span></div>
+      <div class="ps-stat"><b>38</b><span>Modules</span></div>
+      <div class="ps-stat"><b>5j</b><span>Formation</span></div>
+    </div>
+  </div>
+
+  <!-- Sommaire -->
+  <div class="toc">
+    <h4>Sommaire — 11 parcours</h4>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">1</span>Démarrer avec PowerShell</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>Tâches d'administration système</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>Pipeline PowerShell</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">4</span>Fournisseurs et lecteurs PS</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">5</span>CIM et WMI</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">6</span>Variables, tableaux et hashtables</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Créer et modifier des scripts</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Administration distante</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Ressources cloud (Azure)</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span>Services Microsoft 365</a>
+      <a href="#s11" class="toc-item"><span class="toc-num">11</span>Jobs et tâches planifiées</a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 1 — Démarrer avec Windows PowerShell
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <span class="section-num">1</span>
+      <span class="section-title-text">Bien démarrer avec Windows PowerShell</span>
+      <span class="section-nb">3 modules</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag">Fondamentaux</span>
+        <span class="tag">Cmdlets</span>
+        <span class="tag">Aide</span>
+      </div>
+
+      <h3>Concepts fondamentaux</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Qu'est-ce que PowerShell ?</h4>
+          <ul>
+            <li>Shell en ligne de commande + langage de scripting</li>
+            <li>Basé sur .NET — tout est objet</li>
+            <li>Windows PowerShell 5.1 (intégré) vs PowerShell 7+ (cross-platform)</li>
+            <li>ISE (Windows) ou VS Code (recommandé)</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Structure d'une cmdlet</h4>
+          <ul>
+            <li>Format : <strong>Verbe-Nom</strong></li>
+            <li>Verbes approuvés : Get, Set, New, Remove, Start, Stop…</li>
+            <li>Exemple : <code>Get-Service</code>, <code>Set-Item</code></li>
+            <li>Paramètres : <code>-Name</code>, <code>-Path</code>…</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Système d'aide</h4>
+          <ul>
+            <li><code>Get-Help</code> — affiche l'aide d'une cmdlet</li>
+            <li><code>Update-Help</code> — met à jour les fichiers d'aide</li>
+            <li><code>-Full</code>, <code>-Examples</code>, <code>-Online</code></li>
+            <li><code>Get-Command</code> — découvrir des cmdlets</li>
+            <li><code>Get-Member</code> — propriétés/méthodes d'un objet</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Alias courants</h4>
+          <ul>
+            <li><code>ls</code> / <code>dir</code> → <code>Get-ChildItem</code></li>
+            <li><code>cd</code> → <code>Set-Location</code></li>
+            <li><code>cls</code> → <code>Clear-Host</code></li>
+            <li><code>echo</code> → <code>Write-Output</code></li>
+            <li><code>?</code> → <code>Where-Object</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Cmdlets de découverte essentielles</h3>
+      <div class="cmdlet-table-wrap">
+        <table class="cmdlet-table">
+          <thead><tr><th>Cmdlet</th><th>Usage</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Get-Command</td><td>Lister toutes les cmdlets disponibles</td><td><code>Get-Command -Verb Get</code> ou <code>-Noun Service</code></td></tr>
+            <tr><td>Get-Help</td><td>Obtenir l'aide d'une cmdlet</td><td><code>Get-Help Get-Service -Examples</code></td></tr>
+            <tr><td>Get-Member</td><td>Propriétés et méthodes d'un objet</td><td>Toujours après un pipe : <code>Get-Service | Get-Member</code></td></tr>
+            <tr><td>Get-Module</td><td>Modules chargés ou disponibles</td><td><code>Get-Module -ListAvailable</code></td></tr>
+            <tr><td>Import-Module</td><td>Charger un module</td><td><code>Import-Module ActiveDirectory</code></td></tr>
+            <tr><td>Find-Module</td><td>Chercher dans PSGallery</td><td>Nécessite PowerShellGet</td></tr>
+            <tr><td>Install-Module</td><td>Installer depuis PSGallery</td><td><code>Install-Module -Name Az</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tip"><strong>💡 Astuce :</strong> Utilisez <code>Get-Command *service*</code> pour trouver toutes les cmdlets contenant "service". L'autocomplétion avec Tab est votre meilleure alliée.</div>
+
+      <div class="code-block"><code><span class="comment"># Découverte des cmdlets Service</span>
+<span class="cmdlet">Get-Command</span> <span class="param">-Noun</span> Service
+<span class="cmdlet">Get-Help</span> Stop-Service <span class="param">-Examples</span>
+<span class="cmdlet">Get-Service</span> | <span class="cmdlet">Get-Member</span>   <span class="comment"># Voir toutes les propriétés</span>
+<span class="cmdlet">Get-Service</span> <span class="param">-Name</span> <span class="string">"BITS"</span> | <span class="cmdlet">Select-Object</span> <span class="param">-Property</span> *</code></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 2 — Administration système
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <span class="section-num">2</span>
+      <span class="section-title-text">Tâches d'administration système</span>
+      <span class="section-nb">4 modules</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag admin">AD</span>
+        <span class="tag admin">Serveur</span>
+        <span class="tag">Services</span>
+        <span class="tag">Fichiers</span>
+        <span class="tag">Réseau</span>
+      </div>
+
+      <h3>Gestion des services, processus et logs</h3>
+      <div class="cmdlet-table-wrap">
+        <table class="cmdlet-table">
+          <thead><tr><th>Cmdlet</th><th>Usage</th><th>Exemple</th></tr></thead>
+          <tbody>
+            <tr><td>Get-Service</td><td>Lister les services</td><td><code>Get-Service -Name W*</code></td></tr>
+            <tr><td>Start-Service / Stop-Service</td><td>Démarrer/arrêter</td><td><code>Stop-Service -Name Spooler</code></td></tr>
+            <tr><td>Restart-Service</td><td>Redémarrer un service</td><td><code>Restart-Service -Name WinRM</code></td></tr>
+            <tr><td>Get-Process</td><td>Processus en cours</td><td><code>Get-Process | Sort-Object CPU -Desc</code></td></tr>
+            <tr><td>Stop-Process</td><td>Tuer un processus</td><td><code>Stop-Process -Name notepad</code></td></tr>
+            <tr><td>Get-EventLog</td><td>Journaux d'événements (Windows)</td><td><code>Get-EventLog -LogName System -Newest 20</code></td></tr>
+            <tr><td>Get-WinEvent</td><td>Journaux (PS 3+, plus puissant)</td><td><code>Get-WinEvent -LogName Application</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Active Directory</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Module AD</h4>
+          <ul>
+            <li><code>Import-Module ActiveDirectory</code></li>
+            <li>Ou RSAT sur poste client</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Cmdlets AD clés</h4>
+          <ul>
+            <li><code>Get-ADUser</code> / <code>New-ADUser</code></li>
+            <li><code>Set-ADUser</code> / <code>Remove-ADUser</code></li>
+            <li><code>Get-ADGroup</code> / <code>Add-ADGroupMember</code></li>
+            <li><code>Get-ADComputer</code></li>
+            <li><code>Get-ADOrganizationalUnit</code></li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Filtres AD</h4>
+          <ul>
+            <li><code>-Filter {Enabled -eq $true}</code></li>
+            <li><code>-SearchBase "OU=Users,DC=…"</code></li>
+            <li><code>-Properties *</code> pour tout récupérer</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="code-block"><code><span class="comment"># Créer 100 utilisateurs AD depuis un CSV</span>
+<span class="keyword">Import-Csv</span> <span class="string">"users.csv"</span> | <span class="keyword">ForEach-Object</span> {
+  <span class="cmdlet">New-ADUser</span> <span class="param">-Name</span> $_.Name <span class="param">-SamAccountName</span> $_.Login `
+    <span class="param">-Enabled</span> $true <span class="param">-AccountPassword</span> (<span class="cmdlet">ConvertTo-SecureString</span> <span class="string">"P@ss!"</span> <span class="param">-AsPlainText</span> <span class="param">-Force</span>)
+}</code></div>
+
+      <h3>Gestion du système de fichiers</h3>
+      <div class="cmdlet-table-wrap">
+        <table class="cmdlet-table">
+          <thead><tr><th>Cmdlet</th><th>Usage</th></tr></thead>
+          <tbody>
+            <tr><td>Get-ChildItem</td><td>Lister fichiers/dossiers (<code>-Recurse</code>, <code>-Filter *.log</code>)</td></tr>
+            <tr><td>Copy-Item / Move-Item</td><td>Copier ou déplacer</td></tr>
+            <tr><td>Remove-Item</td><td>Supprimer (<code>-Recurse -Force</code> pour dossiers)</td></tr>
+            <tr><td>New-Item</td><td>Créer fichier ou dossier (<code>-ItemType Directory</code>)</td></tr>
+            <tr><td>Get-Content / Set-Content</td><td>Lire / écrire un fichier texte</td></tr>
+            <tr><td>Add-Content</td><td>Ajouter à la fin d'un fichier</td></tr>
+            <tr><td>Test-Path</td><td>Vérifier si un chemin existe</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 3 — Pipeline
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <span class="section-num">3</span>
+      <span class="section-title-text">Utiliser le pipeline Windows PowerShell</span>
+      <span class="section-nb">6 modules</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag">Pipeline</span>
+        <span class="tag">Objets</span>
+        <span class="tag">Filtrage</span>
+        <span class="tag">Formatage</span>
+        <span class="tag">Export</span>
+      </div>
+
+      <h3>Le pipeline — cœur de PowerShell</h3>
+      <div class="info"><strong>🔑 Concept clé :</strong> Contrairement aux shells Unix qui passent du texte, PowerShell passe des <strong>objets .NET</strong> dans le pipeline. Chaque cmdlet reçoit un objet complet avec ses propriétés et méthodes.</div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Filtrage — Where-Object</h4>
+          <ul>
+            <li><code>Where-Object { $_.Status -eq "Running" }</code></li>
+            <li>Alias : <code>?</code> ou <code>where</code></li>
+            <li>Syntaxe simplifiée : <code>Where-Object Status -eq Running</code></li>
+            <li><code>-like</code>, <code>-match</code>, <code>-gt</code>, <code>-lt</code>…</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Tri — Sort-Object</h4>
+          <ul>
+            <li><code>Sort-Object -Property Name</code></li>
+            <li><code>Sort-Object CPU -Descending</code></li>
+            <li>Tri multi-colonnes : <code>Sort-Object Name, CPU</code></li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Sélection — Select-Object</h4>
+          <ul>
+            <li><code>Select-Object -Property Name, Status</code></li>
+            <li><code>Select-Object -First 5</code> / <code>-Last 5</code></li>
+            <li><code>Select-Object -Unique</code></li>
+            <li>Propriétés calculées : <code>@{N="Taille";E={$_.Length/1MB}}</code></li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Comptage et mesure</h4>
+          <ul>
+            <li><code>Measure-Object</code> — count, sum, avg, min, max</li>
+            <li><code>Group-Object</code> — regrouper par propriété</li>
+            <li><code>Compare-Object</code> — différences entre deux collections</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Formatage de sortie</h3>
+      <div class="cmdlet-table-wrap">
+        <table class="cmdlet-table">
+          <thead><tr><th>Cmdlet</th><th>Usage</th><th>Quand l'utiliser</th></tr></thead>
+          <tbody>
+            <tr><td>Format-Table (ft)</td><td>Affichage en tableau</td><td>Peu de colonnes, comparaison rapide</td></tr>
+            <tr><td>Format-List (fl)</td><td>Liste propriété:valeur</td><td>Beaucoup de propriétés</td></tr>
+            <tr><td>Format-Wide (fw)</td><td>Une seule colonne en large</td><td>Listes de noms</td></tr>
+            <tr><td>Out-GridView</td><td>Grille interactive (GUI)</td><td>Exploration interactive</td></tr>
+            <tr><td>Out-File</td><td>Rediriger vers un fichier</td><td>Sortie texte brute</td></tr>
+            <tr><td>Export-Csv</td><td>Exporter en CSV</td><td>Import Excel / traitement</td></tr>
+            <tr><td>Export-Clixml</td><td>Sérialisation XML</td><td>Réimporter des objets PS</td></tr>
+            <tr><td>ConvertTo-Json</td><td>Convertir en JSON</td><td>APIs / Azure</td></tr>
+            <tr><td>ConvertTo-Html</td><td>Générer un rapport HTML</td><td>Rapports lisibles</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warn"><strong>⚠ Attention :</strong> Toujours placer les cmdlets <code>Format-*</code> <strong>en dernier</strong> dans le pipeline. Elles convertissent les objets en chaînes de formatage — les cmdlets suivantes ne pourront plus travailler sur les propriétés.</div>
+
+      <div class="code-block"><code><span class="comment"># Pipeline complet : filtrer, trier, sélectionner, exporter</span>
+<span class="cmdlet">Get-Process</span> |
+  <span class="cmdlet">Where-Object</span> { $_.WorkingSet <span class="param">-gt</span> 100MB } |
+  <span class="cmdlet">Sort-Object</span> WorkingSet <span class="param">-Descending</span> |
+  <span class="cmdlet">Select-Object</span> Name, CPU, <span class="keyword">@</span>{N=<span class="string">"RAM(MB)"</span>;E={[math]::Round($_.WorkingSet/1MB,1)}} |
+  <span class="cmdlet">Export-Csv</span> <span class="string">"gros-processus.csv"</span> <span class="param">-NoTypeInformation</span></code></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 4 — Fournisseurs et lecteurs
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <span class="section-num">4</span>
+      <span class="section-title-text">Fournisseurs PowerShell et lecteurs PSDrive</span>
+      <span class="section-nb">2 modules</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag">Providers</span>
+        <span class="tag">Registre</span>
+        <span class="tag">Certificats</span>
+      </div>
+
+      <h3>Qu'est-ce qu'un fournisseur (Provider) ?</h3>
+      <p>Un provider expose un magasin de données comme s'il était un système de fichiers. Vous naviguez dedans avec <code>Set-Location</code> et <code>Get-ChildItem</code>.</p>
+
+      <div class="cmdlet-table-wrap">
+        <table class="cmdlet-table">
+          <thead><tr><th>Provider</th><th>Lecteur (Drive)</th><th>Contenu</th></tr></thead>
+          <tbody>
+            <tr><td>FileSystem</td><td><code>C:</code>, <code>D:</code>…</td><td>Fichiers et dossiers</td></tr>
+            <tr><td>Registry</td><td><code>HKLM:</code>, <code>HKCU:</code></td><td>Base de registre Windows</td></tr>
+            <tr><td>Certificate</td><td><code>Cert:</code></td><td>Magasin de certificats</td></tr>
+            <tr><td>Environment</td><td><code>Env:</code></td><td>Variables d'environnement</td></tr>
+            <tr><td>Variable</td><td><code>Variable:</code></td><td>Variables PowerShell</td></tr>
+            <tr><td>Function</td><td><code>Function:</code></td><td>Fonctions chargées</td></tr>
+            <tr><td>Alias</td><td><code>Alias:</code></td><td>Alias définis</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block"><code><span class="comment"># Navigation dans le registre via le provider</span>
+<span class="cmdlet">Set-Location</span> HKLM:\SOFTWARE\Microsoft\Windows
+<span class="cmdlet">Get-ChildItem</span>
+<span class="cmdlet">Get-ItemProperty</span> <span class="param">-Path</span> <span class="string">"HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion"</span>
+
+<span class="comment"># Créer un lecteur personnalisé</span>
+<span class="cmdlet">New-PSDrive</span> <span class="param">-Name</span> <span class="string">"Logs"</span> <span class="param">-PSProvider</span> FileSystem <span class="param">-Root</span> <span class="string">"C:\Windows\Logs"</span>
+<span class="cmdlet">Set-Location</span> Logs:
+<span class="cmdlet">Get-ChildItem</span> <span class="param">-Recurse</span> <span class="param">-Filter</span> <span class="string">"*.log"</span></code></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 5 — CIM et WMI
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <span class="section-num">5</span>
+      <span class="section-title-text">CIM et Windows Management Instrumentation (WMI)</span>
+      <span class="section-nb">3 modules</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag">CIM</span>
+        <span class="tag">WMI</span>
+        <span class="tag admin">Inventaire</span>
+      </div>
+
+      <h3>CIM vs WMI — quelle différence ?</h3>
+      <div class="compare-table" style="overflow-x:auto">
+        <table class="compare-table">
+          <thead><tr><th>Critère</th><th>WMI (ancien)</th><th>CIM (moderne)</th></tr></thead>
+          <tbody>
+            <tr><td>Cmdlets</td><td><code>Get-WmiObject</code></td><td><code>Get-CimInstance</code></td></tr>
+            <tr><td>Protocole réseau</td><td>DCOM (port 135+)</td><td>WS-Man (port 5985/5986)</td></tr>
+            <tr><td>Objets retournés</td><td>Objets WMI légers</td><td>Objets CIM complets</td></tr>
+            <tr><td>Recommandé ?</td><td>Non (obsolète)</td><td>Oui (PS 3+)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Classes CIM fréquentes</h3>
+      <div class="cmdlet-table-wrap">
+        <table class="cmdlet-table">
+          <thead><tr><th>Classe</th><th>Information récupérée</th></tr></thead>
+          <tbody>
+            <tr><td>Win32_OperatingSystem</td><td>OS, version, mémoire disponible, uptime</td></tr>
+            <tr><td>Win32_ComputerSystem</td><td>Nom, fabricant, RAM totale, domaine</td></tr>
+            <tr><td>Win32_Processor</td><td>CPU, cœurs, fréquence</td></tr>
+            <tr><td>Win32_LogicalDisk</td><td>Disques, espace libre/total</td></tr>
+            <tr><td>Win32_NetworkAdapterConfiguration</td><td>Cartes réseau, IP, DHCP</td></tr>
+            <tr><td>Win32_Service</td><td>Services Windows</td></tr>
+            <tr><td>Win32_Product</td><td>Logiciels installés (lent !)</td></tr>
+            <tr><td>Win32_BIOS</td><td>Numéro de série, fabricant BIOS</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block"><code><span class="comment"># Inventaire hardware d'un serveur</span>
+<span class="cmdlet">Get-CimInstance</span> <span class="param">-ClassName</span> Win32_ComputerSystem |
+  <span class="cmdlet">Select-Object</span> Name, Manufacturer, TotalPhysicalMemory
+
+<span class="comment"># Espace disque sur plusieurs serveurs</span>
+<span class="cmdlet">Get-CimInstance</span> <span class="param">-ClassName</span> Win32_LogicalDisk <span class="param">-Filter</span> <span class="string">"DriveType=3"</span> |
+  <span class="cmdlet">Select-Object</span> DeviceID,
+    <span class="keyword">@</span>{N=<span class="string">"Libre(GB)"</span>;E={[math]::Round($_.FreeSpace/1GB,1)}},
+    <span class="keyword">@</span>{N=<span class="string">"Total(GB)"</span>;E={[math]::Round($_.Size/1GB,1)}}</code></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 6 — Variables, tableaux et hashtables
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <span class="section-num">6</span>
+      <span class="section-title-text">Variables, tableaux et tables de hachage</span>
+      <span class="section-nb">2 modules</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag script">Variables</span>
+        <span class="tag script">Arrays</span>
+        <span class="tag script">Hashtables</span>
+      </div>
+
+      <h3>Variables</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Déclaration et types</h4>
+          <ul>
+            <li><code>$nom = "valeur"</code> — chaîne</li>
+            <li><code>[int]$age = 30</code> — typage fort</li>
+            <li><code>$bool = $true</code> / <code>$false</code></li>
+            <li><code>$null</code> — valeur nulle</li>
+            <li><code>$_</code> — objet courant dans pipeline</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Variables spéciales</h4>
+          <ul>
+            <li><code>$PSVersionTable</code> — version PS</li>
+            <li><code>$env:COMPUTERNAME</code> — nom machine</li>
+            <li><code>$env:USERNAME</code> — utilisateur courant</li>
+            <li><code>$Error[0]</code> — dernière erreur</li>
+            <li><code>$?</code> — succès dernière commande</li>
+            <li><code>$LASTEXITCODE</code> — code retour</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Portée (Scope)</h4>
+          <ul>
+            <li><code>Global:</code> — accessible partout</li>
+            <li><code>Script:</code> — dans le script courant</li>
+            <li><code>Local:</code> — portée courante (défaut)</li>
+            <li><code>$Global:var = "valeur"</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Tableaux (Arrays)</h3>
+      <div class="code-block"><code><span class="comment"># Création</span>
+$serveurs = <span class="keyword">@</span>(<span class="string">"SRV01"</span>, <span class="string">"SRV02"</span>, <span class="string">"SRV03"</span>)
+$vide = <span class="keyword">@</span>()
+
+<span class="comment"># Accès et manipulation</span>
+$serveurs[0]              <span class="comment"># "SRV01"</span>
+$serveurs[-1]             <span class="comment"># "SRV03"</span>
+$serveurs.Count           <span class="comment"># 3</span>
+$serveurs += <span class="string">"SRV04"</span>     <span class="comment"># Ajouter</span>
+
+<span class="comment"># ArrayList (plus performant pour ajout/suppression)</span>
+$liste = [System.Collections.ArrayList]<span class="keyword">@</span>()
+$liste.Add(<span class="string">"Item1"</span>) | <span class="cmdlet">Out-Null</span></code></div>
+
+      <h3>Tables de hachage (Hashtables)</h3>
+      <div class="code-block"><code><span class="comment"># Création</span>
+$config = <span class="keyword">@</span>{
+  Serveur  = <span class="string">"SRV01"</span>
+  Port     = 443
+  SSL      = $true
+}
+
+<span class="comment"># Accès</span>
+$config[<span class="string">"Serveur"</span>]       <span class="comment"># ou $config.Serveur</span>
+$config.Keys             <span class="comment"># Toutes les clés</span>
+$config.ContainsKey(<span class="string">"Port"</span>)  <span class="comment"># $true</span>
+
+<span class="comment"># Ordered hashtable (préserve l'ordre)</span>
+$ordered = [ordered]<span class="keyword">@</span>{ A=1; B=2; C=3 }</code></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 7 — Scripts
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <span class="section-num">7</span>
+      <span class="section-title-text">Créer et modifier des scripts</span>
+      <span class="section-nb">6 modules</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag script">Scripts</span>
+        <span class="tag script">Fonctions</span>
+        <span class="tag script">Flux</span>
+        <span class="tag script">Erreurs</span>
+        <span class="tag script">Modules</span>
+      </div>
+
+      <h3>Structures de contrôle</h3>
+      <div class="code-block"><code><span class="comment"># Conditions</span>
+<span class="keyword">if</span> ($age <span class="param">-gt</span> 18) { <span class="string">"Majeur"</span> } <span class="keyword">elseif</span> ($age <span class="param">-eq</span> 18) { <span class="string">"Juste"</span> } <span class="keyword">else</span> { <span class="string">"Mineur"</span> }
+
+<span class="comment"># Switch</span>
+<span class="keyword">switch</span> ($env:COMPUTERNAME) {
+  <span class="string">"SRV01"</span>   { <span class="string">"Serveur 1"</span> }
+  <span class="string">"SRV02"</span>   { <span class="string">"Serveur 2"</span> }
+  <span class="keyword">default</span>   { <span class="string">"Inconnu"</span> }
+}
+
+<span class="comment"># Boucles</span>
+<span class="keyword">foreach</span> ($srv <span class="keyword">in</span> $serveurs) { <span class="cmdlet">Test-Connection</span> $srv <span class="param">-Count</span> 1 }
+<span class="keyword">for</span> ($i=0; $i <span class="param">-lt</span> 10; $i++) { <span class="cmdlet">Write-Host</span> $i }
+<span class="keyword">while</span> ($condition) { <span class="comment"># faire...</span> }
+<span class="keyword">do</span> { <span class="comment"># faire...</span> } <span class="keyword">while</span> ($condition)
+1..10 | <span class="cmdlet">ForEach-Object</span> { $_ * 2 }   <span class="comment"># Range et ForEach-Object</span></code></div>
+
+      <h3>Fonctions et paramètres</h3>
+      <div class="code-block"><code><span class="keyword">function</span> <span class="cmdlet">Get-DiskSpace</span> {
+  <span class="keyword">[CmdletBinding()]</span>
+  <span class="keyword">param</span>(
+    [Parameter(Mandatory)]
+    [string]$ComputerName,
+
+    [ValidateRange(1,100)]
+    [int]$SeuilAlerteGB = 10
+  )
+
+  <span class="cmdlet">Get-CimInstance</span> <span class="param">-ClassName</span> Win32_LogicalDisk <span class="param">-ComputerName</span> $ComputerName |
+    <span class="cmdlet">Where-Object</span> { $_.FreeSpace/1GB <span class="param">-lt</span> $SeuilAlerteGB }
+}
+
+<span class="comment"># Appel</span>
+<span class="cmdlet">Get-DiskSpace</span> <span class="param">-ComputerName</span> <span class="string">"SRV01"</span> <span class="param">-SeuilAlerteGB</span> 20</code></div>
+
+      <h3>Gestion des erreurs</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Try / Catch / Finally</h4>
+          <ul>
+            <li><code>try { ... } catch { ... } finally { ... }</code></li>
+            <li><code>$_.Exception.Message</code> dans le catch</li>
+            <li><code>-ErrorAction Stop</code> requis pour attraper</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>-ErrorAction</h4>
+          <ul>
+            <li><code>Stop</code> — génère une erreur fatale</li>
+            <li><code>Continue</code> — défaut, continue</li>
+            <li><code>SilentlyContinue</code> — ignore silencieusement</li>
+            <li><code>Inquire</code> — demande à l'utilisateur</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Write-* cmdlets</h4>
+          <ul>
+            <li><code>Write-Output</code> — vers le pipeline</li>
+            <li><code>Write-Host</code> — vers l'écran (hors pipeline)</li>
+            <li><code>Write-Verbose</code> — avec <code>-Verbose</code></li>
+            <li><code>Write-Warning</code> — avertissement jaune</li>
+            <li><code>Write-Error</code> — erreur non-fatale</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="code-block"><code><span class="keyword">try</span> {
+  <span class="cmdlet">Get-Item</span> <span class="string">"C:\inexistant.txt"</span> <span class="param">-ErrorAction</span> Stop
+} <span class="keyword">catch</span> [System.IO.FileNotFoundException] {
+  <span class="cmdlet">Write-Warning</span> <span class="string">"Fichier introuvable : $($_.Exception.Message)"</span>
+} <span class="keyword">catch</span> {
+  <span class="cmdlet">Write-Error</span> <span class="string">"Erreur inattendue : $_"</span>
+} <span class="keyword">finally</span> {
+  <span class="cmdlet">Write-Verbose</span> <span class="string">"Bloc finally toujours exécuté"</span>
+}</code></div>
+
+      <h3>Exécution de scripts — Politique d'exécution</h3>
+      <div class="cmdlet-table-wrap">
+        <table class="cmdlet-table">
+          <thead><tr><th>Stratégie</th><th>Comportement</th></tr></thead>
+          <tbody>
+            <tr><td>Restricted</td><td>Aucun script (défaut Windows)</td></tr>
+            <tr><td>AllSigned</td><td>Scripts signés uniquement</td></tr>
+            <tr><td>RemoteSigned</td><td>Scripts locaux + distants signés</td></tr>
+            <tr><td>Unrestricted</td><td>Tous les scripts (avec avertissement)</td></tr>
+            <tr><td>Bypass</td><td>Aucune restriction (pour automatisation)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tip"><strong>💡 En prod :</strong> <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code> est un bon compromis. Vérifier avec <code>Get-ExecutionPolicy -List</code>.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 8 — Administration distante
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <span class="section-num">8</span>
+      <span class="section-title-text">Administrer des ordinateurs distants (Remoting)</span>
+      <span class="section-nb">3 modules</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag admin">Remoting</span>
+        <span class="tag admin">WinRM</span>
+        <span class="tag admin">Sessions</span>
+      </div>
+
+      <h3>PowerShell Remoting (PSRemoting)</h3>
+      <div class="info"><strong>🔑 Protocole :</strong> PSRemoting utilise <strong>WS-Management (WinRM)</strong> sur le port 5985 (HTTP) ou 5986 (HTTPS). Prérequis : <code>Enable-PSRemoting</code> sur la cible.</div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Activation</h4>
+          <ul>
+            <li><code>Enable-PSRemoting -Force</code> sur le serveur cible</li>
+            <li>GPO pour le déploiement en masse</li>
+            <li>WinRM doit être démarré</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Connexion interactive</h4>
+          <ul>
+            <li><code>Enter-PSSession -ComputerName SRV01</code></li>
+            <li><code>Exit-PSSession</code> pour quitter</li>
+            <li><code>-Credential (Get-Credential)</code> pour s'authentifier</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Exécution distante (1-to-many)</h4>
+          <ul>
+            <li><code>Invoke-Command -ComputerName @("SRV01","SRV02")</code></li>
+            <li><code>-ScriptBlock { ... }</code></li>
+            <li>Exécution parallèle automatique</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>Sessions persistantes</h4>
+          <ul>
+            <li><code>New-PSSession</code> — crée une session</li>
+            <li><code>Invoke-Command -Session $s</code></li>
+            <li><code>Remove-PSSession</code> — ferme la session</li>
+            <li>L'état est conservé entre les commandes</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="code-block"><code><span class="comment"># Exécuter sur plusieurs serveurs simultanément</span>
+$serveurs = <span class="keyword">@</span>(<span class="string">"SRV01"</span>, <span class="string">"SRV02"</span>, <span class="string">"SRV03"</span>)
+<span class="cmdlet">Invoke-Command</span> <span class="param">-ComputerName</span> $serveurs <span class="param">-ScriptBlock</span> {
+  <span class="keyword">@</span>{
+    Serveur  = $env:COMPUTERNAME
+    Memoire  = [math]::Round((Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory/1MB, 1)
+    Disque   = [math]::Round((Get-PSDrive C).Free/1GB, 1)
+  }
+}
+
+<span class="comment"># Session persistante — variable d'état conservée</span>
+$s = <span class="cmdlet">New-PSSession</span> <span class="param">-ComputerName</span> <span class="string">"SRV01"</span>
+<span class="cmdlet">Invoke-Command</span> <span class="param">-Session</span> $s { $compteur = 0 }
+<span class="cmdlet">Invoke-Command</span> <span class="param">-Session</span> $s { $compteur++ ; $compteur }  <span class="comment"># → 1</span>
+<span class="cmdlet">Remove-PSSession</span> $s</code></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 9 — Cloud Azure
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <span class="section-num">9</span>
+      <span class="section-title-text">Gérer les ressources cloud Azure</span>
+      <span class="section-nb">3 modules</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag cloud">Azure</span>
+        <span class="tag cloud">Az Module</span>
+        <span class="tag cloud">ARM</span>
+        <span class="tag cloud">Azure AD</span>
+      </div>
+
+      <h3>Module Az — Installation et connexion</h3>
+      <div class="code-block"><code><span class="comment"># Installation</span>
+<span class="cmdlet">Install-Module</span> <span class="param">-Name</span> Az <span class="param">-AllowClobber</span> <span class="param">-Scope</span> CurrentUser
+
+<span class="comment"># Connexion</span>
+<span class="cmdlet">Connect-AzAccount</span>
+<span class="cmdlet">Connect-AzAccount</span> <span class="param">-TenantId</span> <span class="string">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span>
+
+<span class="comment"># Changer de subscription</span>
+<span class="cmdlet">Get-AzSubscription</span>
+<span class="cmdlet">Set-AzContext</span> <span class="param">-SubscriptionId</span> <span class="string">"xxxxxxxx-..."</span></code></div>
+
+      <h3>Ressources Azure courantes</h3>
+      <div class="cmdlet-table-wrap">
+        <table class="cmdlet-table">
+          <thead><tr><th>Ressource</th><th>Cmdlet Get</th><th>Cmdlet New</th></tr></thead>
+          <tbody>
+            <tr><td>Resource Group</td><td><code>Get-AzResourceGroup</code></td><td><code>New-AzResourceGroup</code></td></tr>
+            <tr><td>VM</td><td><code>Get-AzVM</code></td><td><code>New-AzVM</code></td></tr>
+            <tr><td>Storage Account</td><td><code>Get-AzStorageAccount</code></td><td><code>New-AzStorageAccount</code></td></tr>
+            <tr><td>Virtual Network</td><td><code>Get-AzVirtualNetwork</code></td><td><code>New-AzVirtualNetwork</code></td></tr>
+            <tr><td>Key Vault</td><td><code>Get-AzKeyVault</code></td><td><code>New-AzKeyVault</code></td></tr>
+            <tr><td>AKS Cluster</td><td><code>Get-AzAksCluster</code></td><td><code>New-AzAksCluster</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block"><code><span class="comment"># Inventaire VMs Azure avec leur statut</span>
+<span class="cmdlet">Get-AzVM</span> <span class="param">-Status</span> | <span class="cmdlet">Select-Object</span> Name, ResourceGroupName,
+  <span class="keyword">@</span>{N=<span class="string">"Statut"</span>;E={$_.PowerState}},
+  <span class="keyword">@</span>{N=<span class="string">"Région"</span>;E={$_.Location}} |
+  <span class="cmdlet">Format-Table</span> <span class="param">-AutoSize</span>
+
+<span class="comment"># Arrêter toutes les VMs d'un RG</span>
+<span class="cmdlet">Get-AzVM</span> <span class="param">-ResourceGroupName</span> <span class="string">"RG-DEV"</span> |
+  <span class="cmdlet">Stop-AzVM</span> <span class="param">-Force</span> <span class="param">-AsJob</span></code></div>
+
+      <div class="tip"><strong>💡 Azure Cloud Shell :</strong> Disponible directement dans le portail Azure, préconfigure le module Az et les identifiants. Idéal pour l'automatisation sans configuration locale.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 10 — Microsoft 365
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <span class="section-title-text">Gérer les services Microsoft 365</span>
+      <span class="section-nb">4 modules</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag cloud">Exchange Online</span>
+        <span class="tag cloud">SharePoint</span>
+        <span class="tag cloud">Teams</span>
+        <span class="tag cloud">Microsoft Graph</span>
+      </div>
+
+      <h3>Modules Microsoft 365</h3>
+      <div class="cmdlet-table-wrap">
+        <table class="cmdlet-table">
+          <thead><tr><th>Service</th><th>Module</th><th>Connexion</th></tr></thead>
+          <tbody>
+            <tr><td>Exchange Online</td><td><code>ExchangeOnlineManagement</code></td><td><code>Connect-ExchangeOnline</code></td></tr>
+            <tr><td>SharePoint Online</td><td><code>PnP.PowerShell</code> ou <code>Microsoft.Online.SharePoint.PowerShell</code></td><td><code>Connect-PnPOnline</code></td></tr>
+            <tr><td>Microsoft Teams</td><td><code>MicrosoftTeams</code></td><td><code>Connect-MicrosoftTeams</code></td></tr>
+            <tr><td>Microsoft Graph</td><td><code>Microsoft.Graph</code></td><td><code>Connect-MgGraph</code></td></tr>
+            <tr><td>Azure AD (déprécié)</td><td><code>AzureAD</code></td><td><code>Connect-AzureAD</code></td></tr>
+            <tr><td>MgGraph (remplace AzureAD)</td><td><code>Microsoft.Graph</code></td><td><code>Connect-MgGraph -Scopes "User.Read.All"</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Exchange Online — Cmdlets clés</h3>
+      <div class="code-block"><code><span class="cmdlet">Connect-ExchangeOnline</span> <span class="param">-UserPrincipalName</span> <span class="string">"admin@contoso.com"</span>
+
+<span class="comment"># Boîtes aux lettres</span>
+<span class="cmdlet">Get-Mailbox</span> <span class="param">-ResultSize</span> Unlimited | <span class="cmdlet">Where-Object</span> { $_.HiddenFromAddressListsEnabled }
+<span class="cmdlet">Set-Mailbox</span> <span class="param">-Identity</span> <span class="string">"user@contoso.com"</span> <span class="param">-ProhibitSendQuota</span> 50GB
+
+<span class="comment"># Statistiques</span>
+<span class="cmdlet">Get-MailboxStatistics</span> <span class="param">-Identity</span> <span class="string">"user@contoso.com"</span> |
+  <span class="cmdlet">Select-Object</span> DisplayName, TotalItemSize, ItemCount
+
+<span class="comment"># Groupes et distribution</span>
+<span class="cmdlet">Get-DistributionGroup</span>
+<span class="cmdlet">Get-DistributionGroupMember</span> <span class="param">-Identity</span> <span class="string">"dl-equipe@contoso.com"</span></code></div>
+
+      <h3>Microsoft Graph PowerShell</h3>
+      <div class="code-block"><code><span class="comment"># Remplace tous les modules AzureAD/MSOnline</span>
+<span class="cmdlet">Connect-MgGraph</span> <span class="param">-Scopes</span> <span class="string">"User.Read.All"</span>, <span class="string">"Group.Read.All"</span>
+
+<span class="cmdlet">Get-MgUser</span> <span class="param">-All</span> | <span class="cmdlet">Where-Object</span> { $_.AccountEnabled <span class="param">-eq</span> $false }
+<span class="cmdlet">Get-MgGroup</span> <span class="param">-Filter</span> <span class="string">"displayName eq 'Equipe IT'"</span>
+<span class="cmdlet">New-MgUser</span> <span class="param">-DisplayName</span> <span class="string">"John Doe"</span> <span class="param">-UserPrincipalName</span> <span class="string">"jdoe@contoso.com"</span> ...</code></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SECTION 11 — Jobs et tâches planifiées
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <span class="section-num">11</span>
+      <span class="section-title-text">Jobs en arrière-plan et tâches planifiées</span>
+      <span class="section-nb">2 modules</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag script">Background Jobs</span>
+        <span class="tag script">Scheduled Jobs</span>
+        <span class="tag script">Parallélisme</span>
+      </div>
+
+      <h3>Jobs en arrière-plan</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Jobs locaux</h4>
+          <ul>
+            <li><code>Start-Job</code> — démarrer en arrière-plan</li>
+            <li><code>Get-Job</code> — lister les jobs</li>
+            <li><code>Receive-Job</code> — récupérer les résultats</li>
+            <li><code>Wait-Job</code> — attendre la fin</li>
+            <li><code>Remove-Job</code> — nettoyer</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>-AsJob (distants)</h4>
+          <ul>
+            <li>Paramètre disponible sur beaucoup de cmdlets</li>
+            <li><code>Invoke-Command -AsJob</code></li>
+            <li><code>Get-AzVM -AsJob</code></li>
+            <li>Rend la main immédiatement</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>ForEach-Object -Parallel (PS 7+)</h4>
+          <ul>
+            <li>Exécution parallèle dans le pipeline</li>
+            <li><code>ForEach-Object -Parallel -ThrottleLimit 5</code></li>
+            <li>Plus rapide que les jobs classiques</li>
+            <li>Limite : portée isolée par thread</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="code-block"><code><span class="comment"># Jobs en parallèle sur plusieurs serveurs</span>
+$jobs = $serveurs | <span class="cmdlet">ForEach-Object</span> {
+  <span class="cmdlet">Start-Job</span> <span class="param">-ScriptBlock</span> {
+    param($srv)
+    <span class="keyword">@</span>{ Serveur=$srv; Ping=(<span class="cmdlet">Test-Connection</span> $srv <span class="param">-Count</span> 1 <span class="param">-Quiet</span>) }
+  } <span class="param">-ArgumentList</span> $_
+}
+
+$jobs | <span class="cmdlet">Wait-Job</span> | <span class="cmdlet">Receive-Job</span>
+$jobs | <span class="cmdlet">Remove-Job</span>
+
+<span class="comment"># PS 7+ — ForEach-Object -Parallel (plus élégant)</span>
+$serveurs | <span class="cmdlet">ForEach-Object</span> <span class="param">-Parallel</span> {
+  <span class="keyword">@</span>{ Serveur=$_; Ping=(<span class="cmdlet">Test-Connection</span> $_ <span class="param">-Count</span> 1 <span class="param">-Quiet</span>) }
+} <span class="param">-ThrottleLimit</span> 10</code></div>
+
+      <h3>Tâches planifiées (Scheduled Jobs)</h3>
+      <div class="code-block"><code><span class="comment"># Créer une tâche planifiée PowerShell</span>
+$trigger  = <span class="cmdlet">New-JobTrigger</span> <span class="param">-Daily</span> <span class="param">-At</span> <span class="string">"6:00 AM"</span>
+$options  = <span class="cmdlet">New-ScheduledJobOption</span> <span class="param">-WakeToRun</span> <span class="param">-RunElevated</span>
+
+<span class="cmdlet">Register-ScheduledJob</span> <span class="param">-Name</span> <span class="string">"RapportQuotidien"</span> `
+  <span class="param">-ScriptBlock</span> { <span class="cmdlet">Get-DiskSpace</span> | <span class="cmdlet">Export-Csv</span> <span class="string">"C:\Rapports\disque-$(Get-Date -f yyyyMMdd).csv"</span> } `
+  <span class="param">-Trigger</span> $trigger <span class="param">-ScheduledJobOption</span> $options
+
+<span class="comment"># Via le planificateur de tâches Windows (schtasks)</span>
+<span class="cmdlet">Get-ScheduledTask</span> <span class="param">-TaskName</span> <span class="string">"RapportQuotidien"</span></code></div>
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)">
+    Fiche de révision AZ-040T00 · Basée sur la documentation officielle Microsoft Learn ·
+    <a href="https://learn.microsoft.com/fr-fr/training/courses/az-040t00" target="_blank" style="color:var(--accent);text-decoration:none">microsoft.com/learn</a>
+  </footer>
+
+</div>
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("ps-az040-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("ps-az040-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>
