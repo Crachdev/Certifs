@@ -409,7 +409,7 @@ function planHTML(){
       </div>
     </div></li>`;
   }).join("")}</ol>
-  <p class="note">Ta progression est synchronisée sur tous tes appareils via Firestore (si tu es connecté avec un pseudo). Les questions sont originales, écrites à partir de la documentation officielle${examInfo?" ("+examInfo+")":""}.</p>
+  <p class="note">Les questions sont originales, écrites à partir de la documentation officielle${examInfo?" ("+examInfo+")":""}.</p>
   <p class="note" style="margin-top:6px">Connecté en tant que : <b id="pseudoDisplay" style="color:var(--accent)">${esc(getPseudo()||"Anonyme")}</b> — <button id="changePseudo" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:inherit;padding:0;text-decoration:underline">Changer</button></p>`;
 }
 
