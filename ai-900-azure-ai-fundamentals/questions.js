@@ -7,7 +7,13 @@ window.QUIZ_META = {
   fiche: "fiche.html",
   passScore: 70,
   examMins: 60,
-  totalQ: 351
+  totalQ: 351,
+  rules: [
+    ["40–60 q · 60 min", "dont non notées"],
+    ["700 / 1000", "score de réussite"],
+    ["0 pénalité", "ne jamais laisser vide"],
+    ["D3 › D1 › D2", "26–32 · 20–25 · 20–25 %"]
+  ]
 };
 
 window.QUIZ_PLAN = [
