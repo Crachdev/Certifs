@@ -395,8 +395,23 @@ function planHTML(){
     const ficheBlock=p.sections&&p.sections.length&&META.fiche?`
       <div class="fiche-day"><h3>📖 Fiche du jour</h3><ul class="fiche-list">${p.sections.map(sec=>{
         const lsKey=`certifs.read.${QKEY}.${p.d}.${sec.id}`;
+        const statusKey=`certifs.status.${QKEY}.${p.d}.${sec.id}`;
         let checked=false;try{checked=!!localStorage.getItem(lsKey);}catch(e){}
-        return `<li><label><input type="checkbox" class="fiche-cb" data-key="${lsKey}"${checked?" checked":""}> <a href="${META.fiche}#${sec.id}" target="_blank" rel="noopener">${esc(sec.titre)}</a></label></li>`;
+        let status=0;try{status=parseInt(localStorage.getItem(statusKey)||"0");}catch(e){}
+        const statusIcons=["🔘","✅","🔁"];
+        const statusLabels=["","Compris","À revoir"];
+        const statusColors=["","#1a7f4e","#a85a00"];
+        const statusBg=["","#d4f0e2","#ffecd4"];
+        const ic=statusIcons[status];
+        const lbl=statusLabels[status];
+        return `<li class="fiche-item" id="fi-${sec.id}" data-status="${status}" style="${status>0?`background:${statusBg[status]};border-left:3px solid ${statusColors[status]};padding-left:8px;border-radius:4px`:''}">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <label style="display:flex;align-items:center;gap:6px;min-width:0;flex:1">
+              <input type="checkbox" class="fiche-cb" data-key="${lsKey}"${checked?" checked":""}> <a href="${META.fiche}#${sec.id}" target="_blank" rel="noopener">${esc(sec.titre)}</a>
+            </label>
+            <button class="status-btn" data-status-key="${statusKey}" data-sec-id="${sec.id}" title="Changer le statut de compréhension" style="background:none;border:none;cursor:pointer;padding:2px 4px;font-size:1rem;border-radius:4px;flex-shrink:0;line-height:1">${ic}</button>${lbl?`<span style="font-size:.7rem;font-weight:600;color:${statusColors[status]};flex-shrink:0">${lbl}</span>`:""}
+          </div>
+        </li>`;
       }).join("")}</ul></div>`:"";
     return `<li class="day"><div class="tag"><span>Jour</span><b>${p.d}</b></div><div class="body">
       <div><h2>${esc(p.theme)}</h2><div class="chips" style="margin-top:6px">${(p.dom||[]).map(x=>`<span class="chip">${x}</span>`).join("")}${p.time?`<span class="chip" style="background:transparent;color:var(--muted)">${p.time}</span>`:""}</div></div>
@@ -819,6 +834,35 @@ function bind(){
   // Plan tab: fiche section checkboxes
   document.querySelectorAll(".fiche-cb").forEach(cb=>cb.onchange=()=>{
     try{if(cb.checked)localStorage.setItem(cb.dataset.key,"1");else localStorage.removeItem(cb.dataset.key);}catch(e){}
+  });
+  // Plan tab: concept status toggle (🔘 → ✅ Compris → 🔁 À revoir → 🔘)
+  const STATUS_ICONS=["🔘","✅","🔁"];
+  const STATUS_LABELS=["","Compris","À revoir"];
+  const STATUS_COLORS=["","#1a7f4e","#a85a00"];
+  const STATUS_BG=["","#d4f0e2","#ffecd4"];
+  document.querySelectorAll(".status-btn").forEach(btn=>{
+    btn.onclick=()=>{
+      const li=document.getElementById("fi-"+btn.dataset.secId);
+      if(!li)return;
+      let s=(parseInt(li.dataset.status||"0")+1)%3;
+      li.dataset.status=s;
+      btn.textContent=STATUS_ICONS[s];
+      // update label span
+      let span=btn.nextElementSibling;
+      if(span&&span.tagName==="SPAN"){span.remove();}
+      if(s>0){
+        const lbl=document.createElement("span");
+        lbl.style.cssText=`font-size:.7rem;font-weight:600;color:${STATUS_COLORS[s]};flex-shrink:0`;
+        lbl.textContent=STATUS_LABELS[s];
+        btn.insertAdjacentElement("afterend",lbl);
+      }
+      // update li background
+      li.style.background=s?STATUS_BG[s]:"";
+      li.style.borderLeft=s?`3px solid ${STATUS_COLORS[s]}`:"";
+      li.style.paddingLeft=s?"8px":"";
+      li.style.borderRadius=s?"4px":"";
+      try{if(s>0)localStorage.setItem(btn.dataset.statusKey,s);else localStorage.removeItem(btn.dataset.statusKey);}catch(e){}
+    };
   });
   // Plan tab: start full day
   document.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>{
