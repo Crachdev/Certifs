@@ -93,6 +93,8 @@ p{margin:6px 0 10px}
 .concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
 .concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
 .concept-card ul li{margin:2px 0}
+.concept-card.warn{border-left:3px solid var(--warn);border-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
 
 /* Cmdlets */
 .cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
@@ -194,6 +196,7 @@ p{margin:6px 0 10px}
       <a href="#s9" class="toc-item"><span class="toc-num">9</span>Ressources cloud (Azure)</a>
       <a href="#s10" class="toc-item"><span class="toc-num">10</span>Services Microsoft 365</a>
       <a href="#s11" class="toc-item"><span class="toc-num">11</span>Jobs et tâches planifiées</a>
+      <a href="#s12" class="toc-item"><span class="toc-num" style="background:#fef3cd;color:#996600">⚠</span>Pièges et routine</a>
     </div>
   </div>
 
@@ -751,6 +754,78 @@ $ordered = [ordered]<span class="keyword">@</span>{ A=1; B=2; C=3 }</code></div>
         </table>
       </div>
       <div class="tip"><strong>💡 En prod :</strong> <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code> est un bon compromis. Vérifier avec <code>Get-ExecutionPolicy -List</code>.</div>
+
+      <h3>Modules</h3>
+      <div class="cmdlet-table-wrap">
+        <table class="cmdlet-table">
+          <thead><tr><th>Cmdlet</th><th>Rôle</th></tr></thead>
+          <tbody>
+            <tr><td><code>Get-Module -ListAvailable</code></td><td>Modules installés sur la machine</td></tr>
+            <tr><td><code>Import-Module NomModule</code></td><td>Charger un module en session</td></tr>
+            <tr><td><code>Find-Module NomModule</code></td><td>Chercher dans PSGallery</td></tr>
+            <tr><td><code>Install-Module NomModule</code></td><td>Installer depuis PSGallery</td></tr>
+            <tr><td><code>Update-Module NomModule</code></td><td>Mettre à jour</td></tr>
+            <tr><td><code>Remove-Module NomModule</code></td><td>Décharger de la session</td></tr>
+            <tr><td><code>Get-Command -Module NomModule</code></td><td>Lister les cmdlets d'un module</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-block"><code><span class="comment"># Installer le module Az (Azure) et ActiveDirectory</span>
+<span class="cmdlet">Install-Module</span> Az <span class="param">-Scope</span> CurrentUser <span class="param">-Force</span>
+<span class="cmdlet">Install-Module</span> ActiveDirectory   <span class="comment"># sur Windows Server uniquement</span>
+
+<span class="comment"># Créer un module simple : sauvegarder les fonctions dans un .psm1</span>
+<span class="comment"># MesOutils\MesOutils.psm1 → contient les fonctions</span>
+<span class="comment"># MesOutils\MesOutils.psd1 → manifest (optionnel)</span>
+<span class="cmdlet">Import-Module</span> <span class="string">.\MesOutils\MesOutils.psm1</span>
+
+<span class="comment"># PSRepository : sources de modules</span>
+<span class="cmdlet">Get-PSRepository</span>                                      <span class="comment"># PSGallery par défaut</span>
+<span class="cmdlet">Register-PSRepository</span> <span class="param">-Name</span> <span class="string">"MonRepo"</span> <span class="param">-SourceLocation</span> <span class="string">"\\SRV\Share"</span></code></div>
+
+      <h3>Import / Export de données</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>CSV</h4>
+          <ul>
+            <li><code>Export-Csv -NoTypeInformation -Encoding UTF8</code></li>
+            <li><code>Import-Csv -Delimiter ';'</code></li>
+            <li>Chaque ligne = objet, chaque colonne = propriété</li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>JSON</h4>
+          <ul>
+            <li><code>ConvertTo-Json -Depth 5</code></li>
+            <li><code>ConvertFrom-Json</code></li>
+            <li><code>Get-Content fichier.json | ConvertFrom-Json</code></li>
+          </ul>
+        </div>
+        <div class="concept-card">
+          <h4>XML / Texte</h4>
+          <ul>
+            <li><code>Export-Clixml / Import-Clixml</code> (objets PS complets)</li>
+            <li><code>Get-Content / Set-Content / Add-Content</code></li>
+            <li><code>Out-File -Append -Encoding UTF8</code></li>
+          </ul>
+        </div>
+      </div>
+      <div class="code-block"><code><span class="comment"># Exporter la liste des services en CSV</span>
+<span class="cmdlet">Get-Service</span> | <span class="cmdlet">Select-Object</span> Name, Status |
+  <span class="cmdlet">Export-Csv</span> <span class="string">"C:\Temp\services.csv"</span> <span class="param">-NoTypeInformation</span> <span class="param">-Encoding</span> UTF8
+
+<span class="comment"># Importer un CSV et boucler sur chaque ligne</span>
+<span class="cmdlet">Import-Csv</span> <span class="string">"C:\Temp\utilisateurs.csv"</span> <span class="param">-Delimiter</span> <span class="string">';'</span> | <span class="cmdlet">ForEach-Object</span> {
+  <span class="cmdlet">New-ADUser</span> <span class="param">-Name</span> $_.Nom <span class="param">-SamAccountName</span> $_.Login
+}
+
+<span class="comment"># JSON — convertir et reconvertir</span>
+<span class="cmdlet">Get-Process</span> | <span class="cmdlet">Select-Object</span> Name, CPU | <span class="cmdlet">ConvertTo-Json</span> <span class="param">-Depth</span> 3 | <span class="cmdlet">Set-Content</span> <span class="string">"procs.json"</span>
+$data = <span class="cmdlet">Get-Content</span> <span class="string">"procs.json"</span> | <span class="cmdlet">ConvertFrom-Json</span>
+
+<span class="comment"># Saisie interactive</span>
+$nom = <span class="cmdlet">Read-Host</span> <span class="string">"Entrez un nom de serveur"</span>
+$mdp = <span class="cmdlet">Read-Host</span> <span class="string">"Mot de passe"</span> <span class="param">-AsSecureString</span></code></div>
     </div>
   </div>
 
@@ -1017,6 +1092,103 @@ $options  = <span class="cmdlet">New-ScheduledJobOption</span> <span class="para
 
 <span class="comment"># Via le planificateur de tâches Windows (schtasks)</span>
 <span class="cmdlet">Get-ScheduledTask</span> <span class="param">-TaskName</span> <span class="string">"RapportQuotidien"</span></code></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       BONUS — Pièges et routine d'apprentissage
+  ════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s12">
+    <div class="section-header">
+      <span class="section-num">⚠</span>
+      <span class="section-title-text">Pièges courants et routine d'apprentissage</span>
+      <span class="section-nb">Référence rapide</span>
+    </div>
+    <div class="section-body">
+      <div class="tags">
+        <span class="tag script">Pièges</span>
+        <span class="tag script">Bonnes pratiques</span>
+        <span class="tag script">Méthode</span>
+      </div>
+
+      <h3>Les 10 pièges les plus fréquents</h3>
+      <div class="concept-grid">
+        <div class="concept-card warn">
+          <h4>🚫 1 — Lancer un script sans <code>.\</code></h4>
+          <ul><li>Toujours écrire <code>.\mon-script.ps1</code></li><li>Sans <code>.\</code> PowerShell cherche une cmdlet, pas un fichier</li></ul>
+        </div>
+        <div class="concept-card warn">
+          <h4>🚫 2 — ExecutionPolicy restrictive</h4>
+          <ul><li>Vérifier : <code>Get-ExecutionPolicy -List</code></li><li>Corriger : <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code></li></ul>
+        </div>
+        <div class="concept-card warn">
+          <h4>🚫 3 — Format-Table au milieu d'un pipeline</h4>
+          <ul><li><code>Format-*</code> détruit les objets — mettre toujours <strong>en dernier</strong></li><li>Après <code>Format-Table</code> plus de propriétés accessibles</li></ul>
+        </div>
+        <div class="concept-card warn">
+          <h4>🚫 4 — Guillemets simples vs doubles</h4>
+          <ul><li><code>"$variable"</code> → remplacée ✅</li><li><code>'$variable'</code> → texte littéral ❌</li></ul>
+        </div>
+        <div class="concept-card warn">
+          <h4>🚫 5 — try/catch sans -ErrorAction Stop</h4>
+          <ul><li>Les erreurs non-terminantes ne sont pas capturées</li><li>Toujours ajouter <code>-ErrorAction Stop</code> dans le try</li></ul>
+        </div>
+        <div class="concept-card warn">
+          <h4>🚫 6 — Variable locale non transmise à distance</h4>
+          <ul><li>Dans un <code>Invoke-Command</code>, utiliser <code>$using:maVariable</code></li><li><code>$variable</code> seule est inconnue sur le serveur distant</li></ul>
+        </div>
+        <div class="concept-card warn">
+          <h4>🚫 7 — Comparer avec <code>=</code> au lieu de <code>-eq</code></h4>
+          <ul><li><code>=</code> affecte une valeur</li><li><code>-eq</code> compare (et <code>-ceq</code> sensible à la casse)</li></ul>
+        </div>
+        <div class="concept-card warn">
+          <h4>🚫 8 — Index à partir de 0</h4>
+          <ul><li>Premier élément : <code>$tableau[0]</code></li><li>Dernier élément : <code>$tableau[-1]</code></li></ul>
+        </div>
+        <div class="concept-card warn">
+          <h4>🚫 9 — Supprimer sans tester</h4>
+          <ul><li>Toujours tester avec <code>-WhatIf</code> d'abord</li><li><code>Remove-Item C:\Dossier -Recurse -WhatIf</code></li></ul>
+        </div>
+        <div class="concept-card warn">
+          <h4>🚫 10 — Oublier <code>-NoTypeInformation</code> sur Export-Csv</h4>
+          <ul><li>Sans ce paramètre, une ligne <code>#TYPE</code> parasite le CSV</li><li>PowerShell 7 : désactivé par défaut (PS 5.1 : toujours nécessaire)</li></ul>
+        </div>
+      </div>
+
+      <h3>Routine pour apprendre une commande inconnue</h3>
+      <div class="code-block"><code><span class="comment"># Étape 1 : découvrir une commande par thème</span>
+<span class="cmdlet">Get-Command</span> <span class="param">-Noun</span> <span class="string">"*dns*"</span>
+<span class="cmdlet">Get-Command</span> <span class="param">-Module</span> ActiveDirectory
+
+<span class="comment"># Étape 2 : lire la description rapide</span>
+<span class="cmdlet">Get-Help</span> <span class="cmdlet">Resolve-DnsName</span>
+
+<span class="comment"># Étape 3 : voir des exemples concrets</span>
+<span class="cmdlet">Get-Help</span> <span class="cmdlet">Resolve-DnsName</span> <span class="param">-Examples</span>
+
+<span class="comment"># Étape 4 : explorer les propriétés de l'objet retourné</span>
+<span class="cmdlet">Resolve-DnsName</span> <span class="string">"google.com"</span> | <span class="cmdlet">Get-Member</span>
+
+<span class="comment"># Étape 5 : filtrer ce qui vous intéresse</span>
+<span class="cmdlet">Resolve-DnsName</span> <span class="string">"google.com"</span> | <span class="cmdlet">Select-Object</span> Name, Type, IPAddress
+
+<span class="comment"># Étape 6 : tester à petite échelle avant de généraliser</span>
+<span class="cmdlet">Resolve-DnsName</span> <span class="string">"google.com"</span> <span class="param">-WhatIf</span>  <span class="comment"># si disponible</span></code></div>
+
+      <h3>Paramètres de sécurité courants</h3>
+      <div class="cmdlet-table-wrap">
+        <table class="cmdlet-table">
+          <thead><tr><th>Paramètre</th><th>Effet</th><th>Usage type</th></tr></thead>
+          <tbody>
+            <tr><td><code>-WhatIf</code></td><td>Simule sans exécuter</td><td>Avant tout <code>Remove-*</code>, <code>Set-*</code></td></tr>
+            <tr><td><code>-Confirm</code></td><td>Demande confirmation pour chaque objet</td><td>Suppressions sensibles</td></tr>
+            <tr><td><code>-ErrorAction Stop</code></td><td>Rend les erreurs fatales (capturables)</td><td>Blocs try/catch</td></tr>
+            <tr><td><code>-ErrorAction SilentlyContinue</code></td><td>Ignore les erreurs silencieusement</td><td>Vérifications d'existence</td></tr>
+            <tr><td><code>-Verbose</code></td><td>Affiche les messages Write-Verbose</td><td>Débogage, audit</td></tr>
+            <tr><td><code>-PassThru</code></td><td>Renvoie l'objet modifié dans le pipeline</td><td>Après <code>Set-*</code>, <code>Start-*</code></td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
