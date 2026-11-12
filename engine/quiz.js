@@ -81,7 +81,20 @@ async function syncFromFirestore(){
   if(attempts>10)return;
   setTimeout(()=>waitForFirebase(attempts+1),500);
 })(0);
-const Q=(d,i)=>{const r=window.QDATA[d][i];if(r&&r.opts&&!r.o){r.o=r.opts;r.a=r.ans;r.e={};r.o.forEach((_,k)=>{r.e[k]=r.why||"";});r.t=r.t||"";}return r;};
+const Q=(d,i)=>{
+  const r=window.QDATA[d][i];
+  if(!r)return r;
+  // Ancien format: opts/ans
+  if(r.opts&&!r.o){r.o=r.opts;r.a=r.ans;r.e={};r.o.forEach((_,k)=>{r.e[k]=r.why||"";});r.t=r.t||"";}
+  // Nouveau format: choices/answer/exp
+  if(r.choices&&!r.o){
+    r.o=r.choices;
+    r.a=Array.isArray(r.answer)?r.answer:[r.answer];
+    r.e={};r.o.forEach((_,k)=>{r.e[k]=r.exp||"";});
+    r.t=r.t||"";
+  }
+  return r;
+};
 const total=()=>Object.values(window.QDATA).reduce((s,a)=>s+a.length,0);
 const errors=()=>Object.keys(store.r).filter(k=>store.r[k]===0).map(k=>k.split("-").map(Number));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));

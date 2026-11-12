@@ -8,39 +8,44 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-:root{--paper:#f4f6f8;--sheet:#fff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;--accent:#7b2d8b;--accent-soft:#f3e8ff;--ok:#1d7a4f;--ok-soft:#e3f3ea;--warn:#8a5a00;--warn-soft:#fef3d0;--f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--f-body:"Public Sans","Segoe UI",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0f0a14;--sheet:#1a1025;--ink:#e8e0f0;--muted:#9485a8;--line:#2e2040;--accent:#c084fc;--accent-soft:#1e1030;--ok:#5ccf95;--ok-soft:#163327;--warn:#f5c843;--warn-soft:#2a2005;color-scheme:dark}}
-:root[data-theme="dark"]{--paper:#0f0a14;--sheet:#1a1025;--ink:#e8e0f0;--muted:#9485a8;--line:#2e2040;--accent:#c084fc;--accent-soft:#1e1030;--ok:#5ccf95;--ok-soft:#163327;--warn:#f5c843;--warn-soft:#2a2005;color-scheme:dark}
+:root{--paper:#f4f6f8;--sheet:#fff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;--accent:#0078d4;--accent2:#50a0e0;--accent-soft:#e8f3fc;--ok:#1d7a4f;--ok-soft:#e3f3ea;--warn:#8a5a00;--warn-soft:#fef3d0;--danger:#c0392b;--danger-soft:#fdecea;--f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--f-body:"Public Sans","Segoe UI",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0b0f14;--sheet:#111820;--ink:#dce6f0;--muted:#8099b0;--line:#1e2d3d;--accent:#4ca3e0;--accent2:#88bfe8;--accent-soft:#0d1e30;--ok:#5ccf95;--ok-soft:#0f261c;--warn:#f5c843;--warn-soft:#241900;--danger:#e57373;--danger-soft:#1e0a0a;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0b0f14;--sheet:#111820;--ink:#dce6f0;--muted:#8099b0;--line:#1e2d3d;--accent:#4ca3e0;--accent2:#88bfe8;--accent-soft:#0d1e30;--ok:#5ccf95;--ok-soft:#0f261c;--warn:#f5c843;--warn-soft:#241900;--danger:#e57373;--danger-soft:#1e0a0a;color-scheme:dark}
 *{box-sizing:border-box}body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
-.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.layout{display:grid;grid-template-columns:252px 1fr;min-height:100vh}
 .sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--sheet);border-right:1px solid var(--line);padding:20px 0}
 .sidebar-head{padding:0 16px 12px;border-bottom:1px solid var(--line);margin-bottom:8px}
 .sidebar-head .cert{font:500 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
-.sidebar-head .title{font:700 .95rem var(--f-display);margin-top:2px}
+.sidebar-head .title{font:700 .95rem var(--f-display);margin-top:2px;line-height:1.2}
+.toc-group{margin-top:4px}
+.toc-group-label{font:600 .68rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:8px 16px 2px}
 .toc{list-style:none;margin:0;padding:0}
-.toc a{display:block;padding:6px 16px;font-size:.82rem;color:var(--muted);text-decoration:none;border-left:2px solid transparent;transition:color .15s,border-color .15s;line-height:1.3}
+.toc a{display:block;padding:5px 16px;font-size:.82rem;color:var(--muted);text-decoration:none;border-left:2px solid transparent;transition:color .15s,border-color .15s;line-height:1.3}
 .toc a:hover,.toc a.active{color:var(--ink);border-left-color:var(--accent)}
 .toc a.active{color:var(--accent);font-weight:600}
-main{padding:32px 40px 80px;max-width:860px}
+main{padding:32px 40px 80px;max-width:880px}
 h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.2}
 h2{font-size:1.4rem;font-weight:700}h3{font-size:1.05rem;font-weight:600}
-section{scroll-margin-top:24px;margin-bottom:48px}
+section{scroll-margin-top:24px;margin-bottom:52px}
 .section-header{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--line)}
 .section-num{font:700 .72rem var(--f-mono);letter-spacing:.08em;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px}
-.hero{background:linear-gradient(135deg,var(--accent) 0%,#4a1060 100%);color:#fff;padding:40px;border-radius:16px;margin-bottom:40px}
+.hero{background:linear-gradient(135deg,#0063b1 0%,#003a6b 100%);color:#fff;padding:40px;border-radius:16px;margin-bottom:40px;position:relative;overflow:hidden}
+.hero::after{content:"AI-901";position:absolute;right:-10px;top:-10px;font:700 7rem var(--f-mono);opacity:.06;line-height:1}
 .hero .cert-label{font:500 .72rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;opacity:.8}
 .hero h1{font-size:2rem;margin:8px 0 4px}
 .hero .sub{opacity:.85;font-size:.95rem}
-.hero-meta{display:flex;flex-wrap:wrap;gap:16px;margin-top:20px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
 .hero-meta div{background:rgba(255,255,255,.12);padding:8px 14px;border-radius:8px}
 .hero-meta b{display:block;font:700 1.1rem var(--f-mono)}
 .hero-meta span{font-size:.72rem;opacity:.8;text-transform:uppercase;letter-spacing:.05em}
 .back-link{color:rgba(255,255,255,.75);font-size:.82rem;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:12px}
 .back-link:hover{color:#fff}
-.exam-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:32px}
-.exam-cell{background:var(--sheet);padding:14px 16px}
-.exam-cell .pct{font:700 1.6rem var(--f-display);color:var(--accent)}
-.exam-cell .dom{font-size:.82rem;color:var(--muted);margin-top:2px}
+.domain-bar{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:32px}
+.domain-cell{background:var(--sheet);padding:16px 20px}
+.domain-cell .pct{font:700 2rem var(--f-display);color:var(--accent);line-height:1}
+.domain-cell .dom{font-size:.82rem;color:var(--muted);margin-top:4px;line-height:1.3}
+.domain-cell .sub-items{margin-top:10px;padding-left:1em;font-size:.8rem;color:var(--muted)}
+.domain-cell .sub-items li{margin:2px 0}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px}
 .card{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
 .card h3{font-size:.9rem;margin-bottom:8px}
@@ -48,17 +53,19 @@ section{scroll-margin-top:24px;margin-bottom:48px}
 .check-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .check-list li{display:flex;gap:8px;align-items:flex-start;font-size:.9rem}
 .check-list li::before{content:"✓";color:var(--ok);font-weight:700;flex-shrink:0;margin-top:1px}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px}
 .tag{font:500 .72rem var(--f-mono);padding:3px 9px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
-.tag.ok{background:var(--ok-soft);color:var(--ok)}.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}.tag.warn{background:var(--warn-soft);color:var(--warn)}.tag.danger{background:var(--danger-soft);color:var(--danger)}
 .callout{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0;padding:12px 14px;margin:12px 0;font-size:.9rem}
 .callout.ok{border-color:var(--ok);background:var(--ok-soft)}
 .callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+.callout.danger{border-color:var(--danger);background:var(--danger-soft)}
 .kv{display:grid;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:16px}
-.kv-row{display:grid;grid-template-columns:180px 1fr;border-bottom:1px solid var(--line)}
+.kv-row{display:grid;grid-template-columns:200px 1fr;border-bottom:1px solid var(--line)}
 .kv-row:last-child{border-bottom:0}
 .kv-row dt,.kv-row dd{margin:0;padding:9px 12px;font-size:.88rem}
 .kv-row dt{background:var(--paper);font-weight:600;border-right:1px solid var(--line)}
+.kv-row dd code{font:500 .82rem var(--f-mono);background:var(--paper);padding:1px 5px;border-radius:3px;border:1px solid var(--line)}
 .compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .compare-box{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px}
 .compare-box h3{font-size:.85rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
@@ -69,364 +76,646 @@ th{background:var(--paper);font-weight:600;text-align:left;padding:8px 12px;bord
 td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
 tr:last-child td{border-bottom:0}
 .domain-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:6px;padding:4px 10px;font-size:.8rem;color:var(--accent);font-weight:600;margin-bottom:12px}
+.code-block{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px 16px;font:500 .82rem var(--f-mono);line-height:1.6;overflow-x:auto;margin:10px 0;white-space:pre}
+.step-list{counter-reset:step;list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.step-list li{counter-increment:step;display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;font-size:.9rem}
+.step-list li::before{content:counter(step);font:700 .75rem var(--f-mono);background:var(--accent);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 footer{border-top:1px solid var(--line);padding:24px 40px;font-size:.8rem;color:var(--muted);background:var(--sheet)}
 footer a{color:var(--accent);text-decoration:none}
-@media(max-width:800px){.layout{grid-template-columns:1fr}.sidebar{display:none}main{padding:20px 16px 60px}.compare{grid-template-columns:1fr}.exam-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.hero{padding:24px}.hero h1{font-size:1.5rem}.exam-grid{grid-template-columns:1fr}}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.sidebar{display:none}main{padding:20px 16px 60px}.compare{grid-template-columns:1fr}.domain-bar{grid-template-columns:1fr}.kv-row{grid-template-columns:1fr}}
+@media(max-width:480px){.hero{padding:24px}.hero h1{font-size:1.5rem}}
 </style>
 </head>
 <body>
 <div class="layout">
 <aside class="sidebar">
   <div class="sidebar-head">
-    <div class="cert">AI-901</div>
+    <div class="cert">AI-901 · Mise à jour avril 2026</div>
     <div class="title">Azure AI Fundamentals</div>
   </div>
-  <ul class="toc">
-    <li><a href="#s1">1. Workloads IA</a></li>
-    <li><a href="#s2">2. Machine Learning</a></li>
-    <li><a href="#s3">3. Computer Vision</a></li>
-    <li><a href="#s4">4. NLP</a></li>
-    <li><a href="#s5">5. IA générative</a></li>
-    <li><a href="#s6">6. Azure AI Services</a></li>
-    <li><a href="#s7">7. Azure ML Studio</a></li>
-    <li><a href="#s8">8. Azure OpenAI</a></li>
-    <li><a href="#s9">9. Responsible AI</a></li>
-    <li><a href="#s10">10. Prompt Engineering</a></li>
-    <li><a href="#s11">11. RAG & Copilots</a></li>
-    <li><a href="#s12">12. Pièges fréquents</a></li>
-  </ul>
+  <div class="toc-group">
+    <div class="toc-group-label">Domaine 1 — Concepts IA (40–45%)</div>
+    <ul class="toc">
+      <li><a href="#s1">1. IA responsable</a></li>
+      <li><a href="#s2">2. Modèles IA — composants</a></li>
+      <li><a href="#s3">3. Charges de travail IA</a></li>
+    </ul>
+  </div>
+  <div class="toc-group">
+    <div class="toc-group-label">Domaine 2 — Microsoft Foundry (55–60%)</div>
+    <ul class="toc">
+      <li><a href="#s4">4. Portail Foundry</a></li>
+      <li><a href="#s5">5. Apps & agents génératifs</a></li>
+      <li><a href="#s6">6. SDK Foundry (Python)</a></li>
+      <li><a href="#s7">7. Texte & parole</a></li>
+      <li><a href="#s8">8. Vision & génération d'images</a></li>
+      <li><a href="#s9">9. Content Understanding</a></li>
+    </ul>
+  </div>
+  <div class="toc-group">
+    <div class="toc-group-label">Révision</div>
+    <ul class="toc">
+      <li><a href="#s10">10. Prompt engineering</a></li>
+      <li><a href="#s11">11. RAG & recherche vectorielle</a></li>
+      <li><a href="#s12">12. Pièges &amp; mémos exam</a></li>
+    </ul>
+  </div>
 </aside>
 <div>
 <main>
+
 <div class="hero">
   <a href="../ai-901-azure-ai-fundamentals/index.html" class="back-link">← Retour au quiz</a>
-  <div class="cert-label">Microsoft Azure · AI-901</div>
+  <div class="cert-label">Microsoft Azure · Examen AI-901 · Mise à jour 15 avril 2026</div>
   <h1>Azure AI Fundamentals</h1>
-  <div class="sub">Fiche de révision complète — 7 jours · 350 questions</div>
+  <div class="sub">Fiche de révision — référentiel officiel 2026 · 350 questions · 7 jours</div>
   <div class="hero-meta">
     <div><b>700</b><span>Score requis</span></div>
-    <div><b>45 min</b><span>Durée exam</span></div>
+    <div><b>60 min</b><span>Durée exam</span></div>
     <div><b>40–60</b><span>Questions</span></div>
-    <div><b>4 domaines</b><span>Compétences</span></div>
+    <div><b>2 domaines</b><span>Compétences</span></div>
   </div>
 </div>
 
-<div class="exam-grid">
-  <div class="exam-cell"><div class="pct">15–20%</div><div class="dom">Workloads &amp; concepts IA</div></div>
-  <div class="exam-cell"><div class="pct">20–25%</div><div class="dom">Machine Learning fondamental</div></div>
-  <div class="exam-cell"><div class="pct">15–20%</div><div class="dom">Computer Vision &amp; NLP</div></div>
-  <div class="exam-cell"><div class="pct">35–40%</div><div class="dom">IA générative &amp; Azure AI</div></div>
+<div class="domain-bar">
+  <div class="domain-cell">
+    <div class="pct">40–45%</div>
+    <div class="dom">Domaine 1 — Identifier les concepts et fonctionnalités de l'IA</div>
+    <ul class="sub-items">
+      <li>Principes de l'IA responsable</li>
+      <li>Composants et configurations des modèles</li>
+      <li>Charges de travail IA (générative, agentique, NLP, vision…)</li>
+    </ul>
+  </div>
+  <div class="domain-cell">
+    <div class="pct">55–60%</div>
+    <div class="dom">Domaine 2 — Implémenter des solutions IA avec Microsoft Foundry</div>
+    <ul class="sub-items">
+      <li>Apps & agents génératifs (SDK Foundry)</li>
+      <li>Solutions texte & parole (Azure Speech)</li>
+      <li>Vision par ordinateur & génération d'images</li>
+      <li>Extraction d'informations (Content Understanding)</li>
+    </ul>
+  </div>
 </div>
 
+<!-- ═══════════════════════════════════════ DOMAINE 1 ═════════════════════ -->
+
 <section id="s1">
-<div class="section-header"><span class="section-num">01</span><h2>Workloads et concepts IA</h2></div>
-<div class="domain-badge">Domaine 1 · 15–20%</div>
-<p>L'IA englobe des sous-disciplines complémentaires. Comprendre leurs différences est fondamental pour l'examen.</p>
-<div class="cards">
-  <div class="card"><h3>Intelligence Artificielle</h3><ul><li>Simuler l'intelligence humaine</li><li>Prendre des décisions automatiques</li><li>Englobe ML, vision, NLP</li></ul></div>
-  <div class="card"><h3>Machine Learning</h3><ul><li>Apprendre à partir de données</li><li>Amélioration continue avec l'expérience</li><li>Sous-ensemble de l'IA</li></ul></div>
-  <div class="card"><h3>Deep Learning</h3><ul><li>Réseaux de neurones profonds</li><li>Nécessite gros volumes de données</li><li>Excellents en vision/NLP</li></ul></div>
+<div class="section-header"><span class="section-num">01</span><h2>IA Responsable — 6 principes Microsoft</h2></div>
+<div class="domain-badge">Domaine 1 · ~15% de l'examen</div>
+
+<p>Microsoft définit <strong>6 principes</strong> pour concevoir et déployer une IA de confiance. Mémorise l'acronyme <strong>F·R·P·I·T·A</strong>.</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Principe</th><th>En quoi ça consiste</th><th>Exemple concret</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Fairness</strong> (Équité)</td><td>Traiter tous les groupes sans discrimination</td><td>Modèle de crédit qui n'avantage pas un genre</td></tr>
+    <tr><td><strong>Reliability &amp; Safety</strong> (Fiabilité)</td><td>Fonctionner de façon sûre même dans des cas inattendus</td><td>Voiture autonome qui s'arrête correctement</td></tr>
+    <tr><td><strong>Privacy &amp; Security</strong> (Confidentialité)</td><td>Protéger les données personnelles</td><td>Ne pas stocker des données médicales sans consentement</td></tr>
+    <tr><td><strong>Inclusiveness</strong> (Inclusivité)</td><td>Bénéficier à tous, y compris les personnes marginalisées</td><td>Sous-titrage automatique pour les malentendants</td></tr>
+    <tr><td><strong>Transparency</strong> (Transparence)</td><td>Expliquer comment le système prend ses décisions</td><td>Indiquer qu'un chatbot est un robot</td></tr>
+    <tr><td><strong>Accountability</strong> (Responsabilité)</td><td>Des personnes sont responsables des décisions IA</td><td>Comité d'éthique IA dans une entreprise</td></tr>
+  </tbody>
+</table>
 </div>
-<div class="callout">
-<strong>Types de workloads IA :</strong> Prédiction/Régression · Classification · Clustering · Détection d'anomalies · Computer Vision · NLP · IA générative
+
+<div class="callout warn">
+<strong>Piège examen :</strong> Il y a exactement 6 principes — pas 5, pas 7. L'examen peut proposer des formulations proches ; repère bien les 6 noms exacts.
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Azure AI Content Safety</dt><dd>Filtre automatique : violence, haine, autoagression, contenu sexuel — 4 catégories sur une échelle 0–7</dd></div>
+  <div class="kv-row"><dt>Responsible AI Dashboard</dt><dd>Dans Azure ML : Fairness, erreurs du modèle, interpretabilité (SHAP values), analyse contrefactuelle</dd></div>
+  <div class="kv-row"><dt>Differential Privacy</dt><dd>Ajoute du bruit statistique calculé pour protéger les données individuelles tout en conservant les tendances globales</dd></div>
+  <div class="kv-row"><dt>Model Cards</dt><dd>Documentation standardisée d'un modèle : objectif, limites, biais connus, métriques de performance</dd></div>
+</div>
+
+<div class="callout ok">
+<strong>Mnémotechnique :</strong> <em>F·R·P·I·T·A</em> → <strong>F</strong>airness · <strong>R</strong>eliability · <strong>P</strong>rivacy · <strong>I</strong>nclusiveness · <strong>T</strong>ransparency · <strong>A</strong>ccountability
 </div>
 </section>
 
 <section id="s2">
-<div class="section-header"><span class="section-num">02</span><h2>Machine Learning fondamental</h2></div>
-<div class="domain-badge">Domaine 2 · 20–25%</div>
+<div class="section-header"><span class="section-num">02</span><h2>Modèles IA — Composants & configurations</h2></div>
+<div class="domain-badge">Domaine 1 · ~12% de l'examen</div>
 
-<div class="compare">
-  <div class="compare-box">
-    <h3>Apprentissage supervisé</h3>
-    <ul>
-      <li>Données <strong>étiquetées</strong></li>
-      <li>Classification (labels discrets)</li>
-      <li>Régression (valeurs continues)</li>
-      <li>Ex : spam filter, prédiction prix</li>
-    </ul>
-  </div>
-  <div class="compare-box">
-    <h3>Apprentissage non supervisé</h3>
-    <ul>
-      <li>Données <strong>non étiquetées</strong></li>
-      <li>Clustering (regroupement)</li>
-      <li>Réduction de dimensionnalité</li>
-      <li>Ex : segmentation clients</li>
-    </ul>
-  </div>
+<h3 style="margin-bottom:10px">Comment fonctionnent les modèles génératifs (LLM)</h3>
+<div class="cards">
+  <div class="card"><h3>Architecture Transformer</h3><ul><li>Mécanisme d'<strong>attention</strong></li><li>Traitement parallèle des tokens</li><li>Encoder (comprendre) + Decoder (générer)</li><li>Base de GPT-4, Llama, Mistral…</li></ul></div>
+  <div class="card"><h3>Tokens</h3><ul><li>Unité minimale de traitement</li><li>≈ ¾ d'un mot anglais</li><li>Limite contexte = window size</li><li>Coût API basé sur nb de tokens</li></ul></div>
+  <div class="card"><h3>Embeddings</h3><ul><li>Représentation vectorielle du texte</li><li>Capturent le <strong>sens sémantique</strong></li><li>Permettent recherche par similarité</li><li>Modèle : <code>text-embedding-3</code></li></ul></div>
 </div>
 
-<div class="compare">
-  <div class="compare-box">
-    <h3>Apprentissage par renforcement</h3>
-    <ul>
-      <li>Agent · Environnement · Récompense</li>
-      <li>Apprend par essai/erreur</li>
-      <li>Ex : jeux, robotique</li>
-    </ul>
-  </div>
-  <div class="compare-box">
-    <h3>Transfer Learning</h3>
-    <ul>
-      <li>Réutilise un modèle pré-entraîné</li>
-      <li>Fine-tuning sur nouvelles données</li>
-      <li>Réduit temps et coût d'entraînement</li>
-    </ul>
-  </div>
-</div>
-
-<h3>Métriques d'évaluation</h3>
+<h3 style="margin:16px 0 10px">Choisir le bon modèle</h3>
 <div class="table-wrap">
 <table>
-  <thead><tr><th>Métrique</th><th>Usage</th><th>Formule / Note</th></tr></thead>
+  <thead><tr><th>Besoin</th><th>Modèle recommandé</th><th>Notes</th></tr></thead>
   <tbody>
-    <tr><td>Accuracy</td><td>Classification</td><td>Correct / Total</td></tr>
-    <tr><td>Precision</td><td>Classification</td><td>TP / (TP + FP)</td></tr>
-    <tr><td>Recall</td><td>Classification</td><td>TP / (TP + FN)</td></tr>
-    <tr><td>F1 Score</td><td>Équilibre P/R</td><td>2 × (P × R) / (P + R)</td></tr>
-    <tr><td>AUC-ROC</td><td>Classification binaire</td><td>0.5 = aléatoire, 1.0 = parfait</td></tr>
-    <tr><td>MAE / RMSE</td><td>Régression</td><td>Erreur absolue / quadratique</td></tr>
-    <tr><td>R²</td><td>Régression</td><td>Variance expliquée (0–1)</td></tr>
+    <tr><td>Génération de texte avancée</td><td>GPT-4o, GPT-4.1</td><td>Multimodal (texte + images)</td></tr>
+    <tr><td>Génération légère / rapide</td><td>GPT-4o mini, Phi-4</td><td>Coût réduit</td></tr>
+    <tr><td>Génération d'images</td><td>DALL-E 3, gpt-image-1</td><td>Prompt → image</td></tr>
+    <tr><td>Transcription vocale</td><td>Whisper</td><td>Speech-to-text open source</td></tr>
+    <tr><td>Embeddings vectoriels</td><td>text-embedding-3-small/large</td><td>Pour RAG / recherche</td></tr>
+    <tr><td>Modèles open-source</td><td>Llama 3, Mistral, Phi</td><td>Catalog Foundry</td></tr>
   </tbody>
 </table>
 </div>
 
-<div class="callout warn">
-<strong>Surapprentissage (Overfitting) :</strong> Le modèle performe sur le train mais pas sur le test. Solution : régularisation, dropout, plus de données, validation croisée.
+<h3 style="margin:16px 0 10px">Paramètres de déploiement clés</h3>
+<div class="kv">
+  <div class="kv-row"><dt>Temperature (0–2)</dt><dd>0 = déterministe/reproductible · 1+ = créatif/varié. Utilise 0 pour du code, 0.7–1 pour de la créativité.</dd></div>
+  <div class="kv-row"><dt>Max tokens</dt><dd>Limite la longueur de la réponse générée (tokens de sortie).</dd></div>
+  <div class="kv-row"><dt>Top-p (nucleus sampling)</dt><dd>Ne considère que les tokens dont la probabilité cumulée atteint p. Alternatif à temperature.</dd></div>
+  <div class="kv-row"><dt>Frequency penalty</dt><dd>Réduit la répétition de tokens déjà fréquemment utilisés dans la réponse.</dd></div>
+  <div class="kv-row"><dt>Presence penalty</dt><dd>Encourage l'introduction de nouveaux sujets / réduit les redites de concepts.</dd></div>
+  <div class="kv-row"><dt>Stop sequences</dt><dd>Tokens qui déclenchent l'arrêt de la génération (ex : <code>"\n\n"</code>, <code>"###"</code>).</dd></div>
+</div>
+
+<div class="callout">
+<strong>Fine-tuning vs RAG :</strong> Le fine-tuning <em>modifie les poids</em> du modèle (long, coûteux, permanent). Le RAG <em>injecte des documents</em> dans le contexte au moment de la requête (flexible, sans réentraînement).
 </div>
 </section>
 
 <section id="s3">
-<div class="section-header"><span class="section-num">03</span><h2>Computer Vision</h2></div>
-<div class="domain-badge">Domaine 3 · 15–20%</div>
+<div class="section-header"><span class="section-num">03</span><h2>Charges de travail IA</h2></div>
+<div class="domain-badge">Domaine 1 · ~15% de l'examen</div>
 
 <div class="tags">
-  <span class="tag">Classification d'images</span>
-  <span class="tag">Détection d'objets</span>
-  <span class="tag">Segmentation sémantique</span>
-  <span class="tag">OCR</span>
-  <span class="tag">Analyse faciale</span>
-</div>
-
-<div class="kv">
-  <div class="kv-row"><dt>Azure AI Vision</dt><dd>Analyse, description, tags, couleurs, catégories dans les images</dd></div>
-  <div class="kv-row"><dt>Custom Vision</dt><dd>Entraîner des modèles de classification/détection personnalisés</dd></div>
-  <div class="kv-row"><dt>Face API</dt><dd>Détection, vérification, identification de visages</dd></div>
-  <div class="kv-row"><dt>Azure AI Document Intelligence</dt><dd>Extraction de données depuis documents (anciennement Form Recognizer)</dd></div>
-  <div class="kv-row"><dt>Video Indexer</dt><dd>Analyse vidéo : transcription, detection visages, sujets</dd></div>
-</div>
-
-<div class="callout">
-<strong>Custom Vision :</strong> Nécessite minimum 15 images par tag pour l'entraînement. Deux projets : Classification (une image = un label) et Détection d'objets (bounding boxes).
-</div>
-</section>
-
-<section id="s4">
-<div class="section-header"><span class="section-num">04</span><h2>Traitement du Langage Naturel (NLP)</h2></div>
-<div class="domain-badge">Domaine 3 · 15–20%</div>
-
-<div class="cards">
-  <div class="card"><h3>Azure AI Language</h3><ul><li>Analyse de sentiment</li><li>Extraction d'entités (NER)</li><li>Détection de langue</li><li>Résumé automatique</li><li>Question answering</li></ul></div>
-  <div class="card"><h3>Azure AI Translator</h3><ul><li>Traduction texte 100+ langues</li><li>Translitération</li><li>Détection de langue</li><li>Dictionnaire bilingue</li></ul></div>
-  <div class="card"><h3>Azure AI Speech</h3><ul><li>Speech-to-Text (STT)</li><li>Text-to-Speech (TTS)</li><li>Speaker recognition</li><li>Real-time transcription</li></ul></div>
-</div>
-
-<div class="kv">
-  <div class="kv-row"><dt>CLU (Conversational Language Understanding)</dt><dd>Intentions + entités pour bots (remplace LUIS)</dd></div>
-  <div class="kv-row"><dt>Custom Question Answering</dt><dd>Base de connaissances FAQ en langage naturel</dd></div>
-  <div class="kv-row"><dt>Analyse de sentiment</dt><dd>Score positif/négatif/neutre par phrase et document</dd></div>
-  <div class="kv-row"><dt>NER (Named Entity Recognition)</dt><dd>Personnes, lieux, organisations, dates dans le texte</dd></div>
-</div>
-</section>
-
-<section id="s5">
-<div class="section-header"><span class="section-num">05</span><h2>IA Générative</h2></div>
-<div class="domain-badge">Domaine 4 · 35–40%</div>
-
-<p>L'IA générative crée du nouveau contenu (texte, images, code, audio). Elle repose sur des <strong>Large Language Models (LLMs)</strong>.</p>
-
-<div class="cards">
-  <div class="card"><h3>LLMs — Bases</h3><ul><li>Transformer architecture</li><li>Pré-entraînés sur vastes corpus</li><li>Prédiction du token suivant</li><li>Température = créativité</li></ul></div>
-  <div class="card"><h3>Types de contenu généré</h3><ul><li>Texte (GPT-4, GPT-4o)</li><li>Images (DALL-E 3)</li><li>Code (GPT-4, Codex)</li><li>Audio / Vidéo</li></ul></div>
-  <div class="card"><h3>Tokens</h3><ul><li>Unité de traitement LLM</li><li>≈ ¾ d'un mot anglais</li><li>Limite de contexte = fenêtre tokens</li><li>Coût API basé sur tokens</li></ul></div>
-</div>
-
-<div class="callout ok">
-<strong>Embeddings :</strong> Représentation vectorielle numérique du texte qui capture le sens sémantique. Permettent la recherche de similarité et le RAG.
-</div>
-</section>
-
-<section id="s6">
-<div class="section-header"><span class="section-num">06</span><h2>Azure AI Services</h2></div>
-<div class="domain-badge">Domaine 4 · 35–40%</div>
-
-<div class="table-wrap">
-<table>
-  <thead><tr><th>Service</th><th>Catégorie</th><th>Cas d'usage principal</th></tr></thead>
-  <tbody>
-    <tr><td>Azure AI Vision</td><td>Vision</td><td>Analyse et description d'images</td></tr>
-    <tr><td>Custom Vision</td><td>Vision</td><td>Classification/détection personnalisée</td></tr>
-    <tr><td>Face API</td><td>Vision</td><td>Reconnaissance faciale</td></tr>
-    <tr><td>Document Intelligence</td><td>Vision/Docs</td><td>Extraction de formulaires et documents</td></tr>
-    <tr><td>Azure AI Language</td><td>NLP</td><td>Sentiment, NER, résumé</td></tr>
-    <tr><td>Translator</td><td>NLP</td><td>Traduction multi-langues</td></tr>
-    <tr><td>Azure AI Speech</td><td>Audio</td><td>STT, TTS, traduction vocale</td></tr>
-    <tr><td>Azure OpenAI</td><td>Générative</td><td>GPT-4, DALL-E, embeddings</td></tr>
-    <tr><td>Azure AI Search</td><td>Recherche</td><td>Recherche cognitive + vecteurs</td></tr>
-    <tr><td>Bot Service</td><td>Conversation</td><td>Chatbots multi-canaux</td></tr>
-    <tr><td>Content Safety</td><td>Modération</td><td>Détection contenu nuisible</td></tr>
-  </tbody>
-</table>
-</div>
-
-<div class="callout">
-<strong>Azure AI Foundry (anciennement Azure AI Studio) :</strong> Hub unifié pour explorer, déployer et gérer les modèles IA. Inclut un catalogue de modèles, playground, fine-tuning et déploiement d'endpoints.
-</div>
-</section>
-
-<section id="s7">
-<div class="section-header"><span class="section-num">07</span><h2>Azure Machine Learning Studio</h2></div>
-
-<div class="kv">
-  <div class="kv-row"><dt>Automated ML (AutoML)</dt><dd>Teste automatiquement algorithmes + hyperparamètres → meilleur modèle</dd></div>
-  <div class="kv-row"><dt>Designer</dt><dd>Interface glisser-déposer pour pipelines ML visuels</dd></div>
-  <div class="kv-row"><dt>Notebooks</dt><dd>Jupyter intégré pour code Python/R personnalisé</dd></div>
-  <div class="kv-row"><dt>Compute Clusters</dt><dd>Clusters élastiques pour entraînement distribué</dd></div>
-  <div class="kv-row"><dt>Compute Instances</dt><dd>VM dédiées pour développement et tests</dd></div>
-  <div class="kv-row"><dt>Managed Endpoints</dt><dd>Déploiement en ligne (temps réel) ou batch</dd></div>
-  <div class="kv-row"><dt>MLflow</dt><dd>Suivi des expériences, métriques, artefacts</dd></div>
-  <div class="kv-row"><dt>Responsible AI Dashboard</dt><dd>Fairness, explicabilité, erreurs de modèle</dd></div>
+  <span class="tag">IA générative</span>
+  <span class="tag">IA agentique</span>
+  <span class="tag">Analyse de texte</span>
+  <span class="tag">Reconnaissance vocale</span>
+  <span class="tag">Vision par ordinateur</span>
+  <span class="tag">Extraction d'informations</span>
 </div>
 
 <div class="compare">
   <div class="compare-box">
-    <h3>Déploiement en ligne</h3>
+    <h3>IA générative</h3>
     <ul>
-      <li>Prédictions en temps réel</li>
-      <li>REST API endpoint</li>
-      <li>Latence faible requise</li>
-      <li>Ex : recommandations live</li>
+      <li>Crée du <strong>nouveau contenu</strong> (texte, images, code)</li>
+      <li>Basée sur LLMs (GPT-4o, Llama…)</li>
+      <li>Réponse à des prompts en langage naturel</li>
+      <li>Résumé, traduction, génération de code</li>
     </ul>
   </div>
   <div class="compare-box">
-    <h3>Déploiement batch</h3>
+    <h3>IA agentique</h3>
     <ul>
-      <li>Grands volumes de données</li>
-      <li>Traitement asynchrone planifié</li>
-      <li>Coût réduit (pas de serveur permanent)</li>
-      <li>Ex : scoring nocturne</li>
+      <li>Agent = LLM + <strong>outils</strong> + mémoire + planification</li>
+      <li>Exécute des <strong>actions autonomes</strong> (appels API, recherche…)</li>
+      <li>Peut décomposer des tâches complexes</li>
+      <li>Multi-agents : agents spécialisés qui collaborent</li>
+    </ul>
+  </div>
+</div>
+
+<div class="compare">
+  <div class="compare-box">
+    <h3>Analyse de texte (NLP)</h3>
+    <ul>
+      <li><strong>Extraction de mots-clés</strong> : termes importants</li>
+      <li><strong>Détection d'entités (NER)</strong> : personnes, lieux, organisations</li>
+      <li><strong>Analyse de sentiment</strong> : positif / négatif / neutre</li>
+      <li><strong>Synthèse</strong> : résumé extractif ou abstractif</li>
+    </ul>
+  </div>
+  <div class="compare-box">
+    <h3>Reconnaissance vocale</h3>
+    <ul>
+      <li><strong>Speech-to-Text (STT)</strong> : voix → texte</li>
+      <li><strong>Text-to-Speech (TTS)</strong> : texte → voix synthétique</li>
+      <li><strong>Traduction vocale</strong> : parole d'une langue → texte d'une autre</li>
+      <li><strong>Speaker recognition</strong> : identifier qui parle</li>
+    </ul>
+  </div>
+</div>
+
+<div class="compare">
+  <div class="compare-box">
+    <h3>Vision par ordinateur</h3>
+    <ul>
+      <li><strong>Classification d'images</strong> : que représente cette image ?</li>
+      <li><strong>Détection d'objets</strong> : où sont les objets + bounding boxes</li>
+      <li><strong>OCR</strong> : extraire du texte d'une image</li>
+      <li><strong>Génération d'images</strong> : DALL-E 3, gpt-image-1</li>
+      <li><strong>Modèles multimodaux</strong> : comprendre texte + image</li>
+    </ul>
+  </div>
+  <div class="compare-box">
+    <h3>Extraction d'informations</h3>
+    <ul>
+      <li>Depuis <strong>documents &amp; formulaires</strong> (PDFs, factures)</li>
+      <li>Depuis <strong>images</strong> (photos, captures)</li>
+      <li>Depuis <strong>audio</strong> (réunions, appels)</li>
+      <li>Depuis <strong>vidéos</strong> (meetings, formations)</li>
+      <li>Outil Azure : <strong>Content Understanding</strong></li>
     </ul>
   </div>
 </div>
 </section>
 
-<section id="s8">
-<div class="section-header"><span class="section-num">08</span><h2>Azure OpenAI Service</h2></div>
-<div class="domain-badge">Domaine 4 · 35–40%</div>
+<!-- ═══════════════════════════════════════ DOMAINE 2 ═════════════════════ -->
 
-<div class="cards">
-  <div class="card"><h3>Modèles disponibles</h3><ul><li>GPT-4 / GPT-4o (texte)</li><li>GPT-4 Vision (images + texte)</li><li>DALL-E 3 (génération d'images)</li><li>text-embedding-ada-002</li><li>Whisper (transcription)</li></ul></div>
-  <div class="card"><h3>API Chat Completions</h3><ul><li>Messages : system / user / assistant</li><li>Temperature (0=déterministe)</li><li>Max tokens</li><li>Top-p, frequency/presence penalty</li></ul></div>
-  <div class="card"><h3>Fine-tuning</h3><ul><li>Adapte GPT à un style/domaine</li><li>Données : JSONL (prompt/completion)</li><li>Réduit le prompt engineering</li><li>Modèle déployé = endpoint privé</li></ul></div>
+<section id="s4">
+<div class="section-header"><span class="section-num">04</span><h2>Microsoft Foundry — Le portail</h2></div>
+<div class="domain-badge">Domaine 2 · cœur de l'examen (55–60%)</div>
+
+<div class="callout">
+<strong>Azure AI Foundry</strong> (anciennement Azure AI Studio) est le hub unifié pour explorer, déployer et gérer les solutions IA sur Azure. L'examen AI-901 teste désormais principalement les compétences Foundry.
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt>Catalogue de modèles</dt><dd>Bibliothèque de modèles : Azure OpenAI (GPT-4o, DALL-E…), modèles open-source (Llama 3, Mistral, Phi-4), modèles partenaires</dd></div>
+  <div class="kv-row"><dt>Playground Chat</dt><dd>Interface pour tester des modèles en direct, ajuster les paramètres (temperature, max tokens…) et itérer sur les prompts système</dd></div>
+  <div class="kv-row"><dt>Playground Images</dt><dd>Générer des images avec DALL-E 3 ou gpt-image-1 directement dans le portail</dd></div>
+  <div class="kv-row"><dt>Foundry Tools</dt><dd>Suite d'outils intégrés : Azure Speech, Azure Vision, Content Understanding, Language — accessibles sans quitter Foundry</dd></div>
+  <div class="kv-row"><dt>Agent Builder</dt><dd>Créer, configurer et tester des agents IA (single-agent) avec tools, instructions et évaluations</dd></div>
+  <div class="kv-row"><dt>Évaluations</dt><dd>Mesurer la qualité des réponses d'un modèle ou d'un agent avec des métriques intégrées (pertinence, cohérence, fluidité…)</dd></div>
+  <div class="kv-row"><dt>Fine-tuning</dt><dd>Adapter un modèle de base sur tes propres données JSONL, directement depuis le portail</dd></div>
+  <div class="kv-row"><dt>Connexions</dt><dd>Connecter des ressources Azure (Azure AI Search, Storage, Cosmos DB…) au projet Foundry</dd></div>
+</div>
+
+<h3 style="margin:16px 0 10px">Hiérarchie Foundry</h3>
+<div class="code-block">Hub Foundry (niveau organisation)
+└── Projet Foundry (niveau équipe / application)
+    ├── Déploiements de modèles (endpoints)
+    ├── Connexions (Azure AI Search, Storage…)
+    ├── Foundry Tools (Speech, Vision, Language…)
+    └── Agents</div>
+
+<div class="callout warn">
+<strong>Hub vs Projet :</strong> Le Hub est le conteneur racine partagé par plusieurs projets. Le Projet est l'espace de travail d'une équipe ou application. Les déploiements de modèles et les agents sont créés dans un Projet.
+</div>
+</section>
+
+<section id="s5">
+<div class="section-header"><span class="section-num">05</span><h2>Apps & agents génératifs avec Foundry</h2></div>
+<div class="domain-badge">Domaine 2 · ~20% de l'examen</div>
+
+<h3 style="margin-bottom:10px">Déployer un modèle dans Foundry</h3>
+<ol class="step-list">
+  <li>Ouvrir le <strong>Catalogue de modèles</strong> dans le portail Foundry</li>
+  <li>Sélectionner le modèle (ex : GPT-4o) et cliquer sur <strong>Deploy</strong></li>
+  <li>Choisir le type : <em>Standard</em> (serverless, pay-per-token) ou <em>Provisioned</em> (throughput garanti)</li>
+  <li>Nommer le déploiement → il devient accessible via l'endpoint du projet</li>
+  <li>Tester dans le <strong>Playground</strong> avant d'intégrer dans une app</li>
+</ol>
+
+<h3 style="margin:20px 0 10px">Écrire des prompts efficaces</h3>
+<div class="compare">
+  <div class="compare-box">
+    <h3>Prompt système</h3>
+    <ul>
+      <li>Définit le <strong>rôle et comportement</strong> de l'assistant</li>
+      <li>Invisible pour l'utilisateur final</li>
+      <li>Exemple : <em>"Tu es un assistant juridique. Réponds toujours en français. Ne donne pas de conseils médicaux."</em></li>
+      <li>Doit être précis, sans ambiguïté</li>
+    </ul>
+  </div>
+  <div class="compare-box">
+    <h3>Prompt utilisateur</h3>
+    <ul>
+      <li>Message de l'utilisateur dans le tour de conversation</li>
+      <li>Peut contenir : contexte, exemples few-shot, données</li>
+      <li>Techniques : zero-shot, one-shot, few-shot, chain-of-thought</li>
+      <li>Grounding : inclure des faits ou documents pour ancrer la réponse</li>
+    </ul>
+  </div>
+</div>
+
+<h3 style="margin:16px 0 10px">Créer un agent dans Foundry</h3>
+<div class="kv">
+  <div class="kv-row"><dt>Instructions (system prompt)</dt><dd>Définit le comportement, les limites, le ton et le rôle de l'agent</dd></div>
+  <div class="kv-row"><dt>Tools (outils)</dt><dd>Fonctions que l'agent peut appeler : recherche web, exécution de code, appels d'API, Azure AI Search…</dd></div>
+  <div class="kv-row"><dt>Mémoire / Thread</dt><dd>Chaque conversation (thread) garde l'historique des échanges pour maintenir le contexte</dd></div>
+  <div class="kv-row"><dt>Évaluation</dt><dd>Tester les réponses de l'agent avec des jeux de données de test et des métriques automatisées</dd></div>
+</div>
+
+<div class="callout ok">
+<strong>Agent = LLM + outils + mémoire.</strong> L'agent reçoit un objectif, planifie ses étapes, appelle ses outils (recherche, code, API), analyse les résultats et génère une réponse finale.
+</div>
+</section>
+
+<section id="s6">
+<div class="section-header"><span class="section-num">06</span><h2>SDK Foundry — Applications Python légères</h2></div>
+<div class="domain-badge">Domaine 2 · ~15% de l'examen</div>
+
+<p>L'examen teste la capacité à créer des applications clientes légères avec le <strong>SDK Azure AI Foundry</strong> (package <code>azure-ai-projects</code>).</p>
+
+<h3 style="margin-bottom:10px">Structure d'une app de chat basique</h3>
+<div class="code-block">from azure.ai.projects import AIProjectClient
+from azure.identity import DefaultAzureCredential
+
+# Connexion au projet Foundry
+client = AIProjectClient(
+    endpoint="https://&lt;hub&gt;.services.ai.azure.com/api/projects/&lt;project&gt;",
+    credential=DefaultAzureCredential()
+)
+
+# Appel chat completion
+response = client.inference.chat_completions.create(
+    model="gpt-4o",          # nom du déploiement
+    messages=[
+        {"role": "system",   "content": "Tu es un assistant utile."},
+        {"role": "user",     "content": "Explique le RAG en 3 lignes."}
+    ],
+    temperature=0.7,
+    max_tokens=256
+)
+print(response.choices[0].message.content)</div>
+
+<h3 style="margin:16px 0 10px">Client pour un agent</h3>
+<div class="code-block">from azure.ai.projects.models import AgentThread, MessageRole
+
+# Créer un thread (conversation)
+thread = client.agents.create_thread()
+
+# Ajouter un message utilisateur
+client.agents.create_message(
+    thread_id=thread.id,
+    role=MessageRole.USER,
+    content="Cherche les dernières nouvelles sur l'IA générative."
+)
+
+# Lancer l'agent (run)
+run = client.agents.create_and_process_run(
+    thread_id=thread.id,
+    agent_id="asst_xxxx"      # ID de l'agent créé dans Foundry
+)
+
+# Lire la réponse
+messages = client.agents.list_messages(thread_id=thread.id)
+print(messages.data[0].content[0].text.value)</div>
+
+<div class="callout warn">
+<strong>Authentification :</strong> L'examen attend <code>DefaultAzureCredential</code> (Entra ID) et non une API key hardcodée. En local : <code>az login</code> suffit. En production : identité managée de la ressource Azure.
+</div>
+
+<div class="kv">
+  <div class="kv-row"><dt><code>AIProjectClient</code></dt><dd>Client principal — accès à inference, agents, tools, connections</dd></div>
+  <div class="kv-row"><dt><code>client.inference</code></dt><dd>Chat completions, embeddings, image generation depuis le projet</dd></div>
+  <div class="kv-row"><dt><code>client.agents</code></dt><dd>Créer/gérer des agents, threads, messages, runs</dd></div>
+  <div class="kv-row"><dt><code>client.connections</code></dt><dd>Accéder aux connexions configurées (Azure AI Search, Storage…)</dd></div>
+</div>
+</section>
+
+<section id="s7">
+<div class="section-header"><span class="section-num">07</span><h2>Texte & parole avec Foundry</h2></div>
+<div class="domain-badge">Domaine 2 · ~10% de l'examen</div>
+
+<h3 style="margin-bottom:10px">Azure AI Language — Analyse de texte</h3>
+<div class="kv">
+  <div class="kv-row"><dt>Analyse de sentiment</dt><dd>Score positif / négatif / neutre par phrase et par document. Renvoie un score de confiance (0–1).</dd></div>
+  <div class="kv-row"><dt>Extraction d'entités (NER)</dt><dd>Identifie : Personne, Organisation, Lieu, Date, Quantité, URL… dans le texte.</dd></div>
+  <div class="kv-row"><dt>Extraction de mots-clés</dt><dd>Renvoie les termes les plus représentatifs du document.</dd></div>
+  <div class="kv-row"><dt>Résumé (Summarization)</dt><dd>Extractif (phrases du document) ou Abstractif (reformulé) — disponible pour textes et conversations.</dd></div>
+  <div class="kv-row"><dt>Détection de langue</dt><dd>Identifie la langue du texte avec un score de confiance.</dd></div>
+  <div class="kv-row"><dt>Traduction (Translator)</dt><dd>Service séparé : traduction dans 100+ langues, translitération, dictionnaire bilingue.</dd></div>
 </div>
 
 <div class="callout">
-<strong>Déploiement :</strong> Azure OpenAI n'est pas automatiquement disponible — il faut demander l'accès. Les modèles sont déployés dans une ressource Azure OpenAI, pas directement via l'API OpenAI publique.
+<strong>Dans Foundry :</strong> Accéder à Language via <em>Foundry Tools → Language</em>. Tester directement dans le portail ou appeler l'API depuis le SDK avec <code>client.language</code>.
+</div>
+
+<h3 style="margin:16px 0 10px">Azure AI Speech</h3>
+<div class="compare">
+  <div class="compare-box">
+    <h3>Speech-to-Text (STT)</h3>
+    <ul>
+      <li>Transcription en temps réel ou par batch</li>
+      <li>Supporte 100+ langues et accents</li>
+      <li>Custom Speech : adapter à un vocabulaire spécifique</li>
+      <li>Résultats : texte brut + mots avec timestamps</li>
+    </ul>
+  </div>
+  <div class="compare-box">
+    <h3>Text-to-Speech (TTS)</h3>
+    <ul>
+      <li>Neural voices : voix naturelles et expressives</li>
+      <li>Custom Voice : créer une voix de marque</li>
+      <li>SSML : contrôler rythme, pauses, emphase</li>
+      <li>Format de sortie : WAV, MP3, OGG</li>
+    </ul>
+  </div>
+</div>
+
+<h3 style="margin:16px 0 10px">Répondre à des invites vocales avec un modèle multimodal</h3>
+<div class="code-block">import azure.cognitiveservices.speech as speechsdk
+
+# STT : microphone → texte
+speech_config = speechsdk.SpeechConfig(subscription=KEY, region=REGION)
+recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config)
+result = recognizer.recognize_once()          # texte reconnu
+user_text = result.text
+
+# → envoyer user_text à GPT-4o (via SDK Foundry)
+# → récupérer la réponse texte
+# TTS : texte → voix
+synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config)
+synthesizer.speak_text_async(response_text)</div>
+</section>
+
+<section id="s8">
+<div class="section-header"><span class="section-num">08</span><h2>Vision par ordinateur & génération d'images</h2></div>
+<div class="domain-badge">Domaine 2 · ~10% de l'examen</div>
+
+<h3 style="margin-bottom:10px">Modèles multimodaux — interpréter des images</h3>
+<p>GPT-4o et les modèles multimodaux peuvent recevoir une image <em>dans le prompt</em> et répondre à des questions sur son contenu.</p>
+
+<div class="code-block">response = client.inference.chat_completions.create(
+    model="gpt-4o",
+    messages=[{
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "Décris ce que tu vois dans cette image."},
+            {"type": "image_url", "image_url": {
+                "url": "data:image/jpeg;base64,&lt;base64_data&gt;"
+                # ou une URL publique : "url": "https://..."
+            }}
+        ]
+    }]
+)</div>
+
+<h3 style="margin:16px 0 10px">Génération d'images</h3>
+<div class="kv">
+  <div class="kv-row"><dt>DALL-E 3</dt><dd>Génère des images réalistes depuis un prompt texte. Tailles : 1024×1024, 1024×1792, 1792×1024. Style : vivid ou natural.</dd></div>
+  <div class="kv-row"><dt>gpt-image-1</dt><dd>Nouveau modèle de génération d'images intégré dans Foundry, plus précis sur le texte dans les images.</dd></div>
+  <div class="kv-row"><dt>Styles</dt><dd><em>vivid</em> : couleurs intenses, dramatique · <em>natural</em> : réaliste, moins saturé</dd></div>
+  <div class="kv-row"><dt>Content filtering</dt><dd>Filtre automatique activé par défaut : refuse les prompts qui génèrent du contenu nuisible ou offensant</dd></div>
+</div>
+
+<div class="code-block"># Génération d'image avec DALL-E 3
+result = client.inference.image_generations.create(
+    model="dall-e-3",
+    prompt="Une ville futuriste sous la pluie, style cyberpunk, éclairage néon",
+    size="1024x1024",
+    style="vivid",
+    n=1
+)
+image_url = result.data[0].url</div>
+
+<h3 style="margin:16px 0 10px">Azure AI Vision (Foundry Tools)</h3>
+<div class="kv">
+  <div class="kv-row"><dt>Analyse d'image</dt><dd>Tags, description, objets détectés, couleurs dominantes, type d'image</dd></div>
+  <div class="kv-row"><dt>OCR (Read API)</dt><dd>Extraction de texte imprimé ou manuscrit depuis images et PDFs</dd></div>
+  <div class="kv-row"><dt>Face</dt><dd>Détection + attributs (âge estimé, émotion, lunettes). La vérification d'identité nécessite une approbation spéciale.</dd></div>
 </div>
 </section>
 
 <section id="s9">
-<div class="section-header"><span class="section-num">09</span><h2>Responsible AI</h2></div>
+<div class="section-header"><span class="section-num">09</span><h2>Extraction d'informations — Content Understanding</h2></div>
+<div class="domain-badge">Domaine 2 · ~10% de l'examen</div>
 
-<p>Microsoft définit <strong>6 principes</strong> pour une IA responsable :</p>
-
-<div class="check-list">
-  <li><strong>Fairness (Équité) :</strong> Les systèmes IA doivent traiter tous les groupes équitablement, sans discrimination.</li>
-  <li><strong>Reliability &amp; Safety (Fiabilité) :</strong> Fonctionnement sûr et fiable dans toutes les conditions.</li>
-  <li><strong>Privacy &amp; Security (Confidentialité) :</strong> Protection des données personnelles et sécurité des systèmes.</li>
-  <li><strong>Inclusiveness (Inclusivité) :</strong> L'IA doit bénéficier à tous et ne laisser personne de côté.</li>
-  <li><strong>Transparency (Transparence) :</strong> Compréhension du fonctionnement des systèmes IA.</li>
-  <li><strong>Accountability (Responsabilité) :</strong> Les personnes et organisations sont responsables des systèmes IA.</li>
+<div class="callout">
+<strong>Azure Content Understanding</strong> est le service Foundry qui extrait des informations structurées depuis des sources multimodales : documents, images, audio et vidéo. C'est l'évolution d'Azure Document Intelligence (Form Recognizer).
 </div>
 
-<div class="callout warn">
-<strong>Biais IA :</strong> Les modèles peuvent hériter des biais présents dans les données d'entraînement. Tools Azure : Fairlearn, Responsible AI Dashboard, Azure AI Content Safety.
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Source</th><th>Ce qu'on extrait</th><th>Cas d'usage</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Documents &amp; formulaires</strong></td><td>Champs structurés (nom, montant, date), tableaux, signatures, cases cochées</td><td>Factures, contrats, formulaires fiscaux, bons de commande</td></tr>
+    <tr><td><strong>Images</strong></td><td>Texte (OCR), objets, données visuelles, schémas</td><td>Cartes de visite, étiquettes produits, photos de terrain</td></tr>
+    <tr><td><strong>Audio</strong></td><td>Transcription, identification des locuteurs, résumé, sujets clés</td><td>Réunions, appels clients, interviews</td></tr>
+    <tr><td><strong>Vidéos</strong></td><td>Transcription, chapitrage automatique, détection d'événements visuels</td><td>Formations, webinaires, surveillance</td></tr>
+  </tbody>
+</table>
 </div>
 
-<div class="kv">
-  <div class="kv-row"><dt>Azure AI Content Safety</dt><dd>Filtre contenu nuisible : violence, haine, autoagression, contenu sexuel</dd></div>
-  <div class="kv-row"><dt>Interpretability</dt><dd>SHAP values, LIME → comprendre pourquoi un modèle fait une prédiction</dd></div>
-  <div class="kv-row"><dt>Differential Privacy</dt><dd>Ajoute du bruit statistique pour protéger les données individuelles</dd></div>
+<h3 style="margin:16px 0 10px">Modèles prédéfinis vs modèles personnalisés</h3>
+<div class="compare">
+  <div class="compare-box">
+    <h3>Modèles prédéfinis (prebuilt)</h3>
+    <ul>
+      <li>Prêts à l'emploi, sans entraînement</li>
+      <li>Facture, reçu, carte d'identité, carte de visite</li>
+      <li>Formulaire général (layout model)</li>
+      <li>Résultats immédiatement disponibles</li>
+    </ul>
+  </div>
+  <div class="compare-box">
+    <h3>Modèles personnalisés (custom)</h3>
+    <ul>
+      <li>Entraîner sur tes propres documents</li>
+      <li>Minimum 5 exemples labellisés</li>
+      <li>Champs spécifiques à ton métier</li>
+      <li>Compose plusieurs modèles ensemble</li>
+    </ul>
+  </div>
 </div>
+
+<div class="code-block">from azure.ai.documentintelligence import DocumentIntelligenceClient
+
+# Analyser une facture avec le modèle prédéfini
+client_di = DocumentIntelligenceClient(endpoint=ENDPOINT, credential=cred)
+poller = client_di.begin_analyze_document(
+    model_id="prebuilt-invoice",
+    body={"urlSource": "https://example.com/invoice.pdf"}
+)
+result = poller.result()
+invoice = result.documents[0]
+print(invoice.fields["VendorName"].content)   # Nom du fournisseur
+print(invoice.fields["TotalTax"].content)     # Montant TVA</div>
 </section>
+
+<!-- ═══════════════════════════════════════ RÉVISION ═════════════════════ -->
 
 <section id="s10">
 <div class="section-header"><span class="section-num">10</span><h2>Prompt Engineering</h2></div>
 
 <div class="table-wrap">
 <table>
-  <thead><tr><th>Technique</th><th>Description</th><th>Exemple</th></tr></thead>
+  <thead><tr><th>Technique</th><th>Description</th><th>Quand l'utiliser</th></tr></thead>
   <tbody>
-    <tr><td>Zero-shot</td><td>Aucun exemple fourni</td><td>"Traduis en anglais : Bonjour"</td></tr>
-    <tr><td>One-shot</td><td>Un exemple dans le prompt</td><td>"France → Paris. Japon → ?"</td></tr>
-    <tr><td>Few-shot</td><td>Plusieurs exemples</td><td>2–10 exemples input/output</td></tr>
-    <tr><td>Chain-of-Thought</td><td>"Réfléchis étape par étape"</td><td>Raisonnement mathématique</td></tr>
-    <tr><td>System prompt</td><td>Rôle et comportement du modèle</td><td>"Tu es un assistant médical…"</td></tr>
-    <tr><td>Grounding</td><td>Ancrer le modèle dans des faits</td><td>Fournir un document de référence</td></tr>
+    <tr><td><strong>Zero-shot</strong></td><td>Aucun exemple dans le prompt</td><td>Tâches simples, modèles très capables</td></tr>
+    <tr><td><strong>One-shot</strong></td><td>Un seul exemple fourni</td><td>Quand le format de réponse doit être précis</td></tr>
+    <tr><td><strong>Few-shot</strong></td><td>2–10 exemples input → output</td><td>Tâches complexes, format inhabituel</td></tr>
+    <tr><td><strong>Chain-of-Thought</strong></td><td>"Réfléchis étape par étape"</td><td>Raisonnement mathématique, logique complexe</td></tr>
+    <tr><td><strong>System prompt</strong></td><td>Rôle et instructions permanentes</td><td>Toutes les apps — définir le comportement de base</td></tr>
+    <tr><td><strong>Grounding</strong></td><td>Inclure des faits/documents dans le prompt</td><td>Réduire les hallucinations, répondre sur une base factuelle</td></tr>
+    <tr><td><strong>ReAct</strong></td><td>Raisonnement + Action en boucle</td><td>Agents qui utilisent des outils</td></tr>
   </tbody>
 </table>
 </div>
 
-<div class="callout">
-<strong>Hallucination :</strong> Le modèle génère des informations fausses mais convaincantes. Solution : RAG, grounding avec sources vérifiées, temperature basse.
+<div class="callout warn">
+<strong>Hallucination :</strong> Le modèle génère des informations fausses mais convaincantes. Solutions : RAG (ajouter des sources réelles), grounding, temperature basse, demander au modèle de citer ses sources.
+</div>
+
+<div class="callout danger">
+<strong>Prompt injection :</strong> Un utilisateur malveillant insère des instructions dans son message pour détourner le comportement de l'assistant. Mitigation : valider les entrées, utiliser un système de modération, Content Safety.
 </div>
 </section>
 
 <section id="s11">
-<div class="section-header"><span class="section-num">11</span><h2>RAG et Copilots</h2></div>
+<div class="section-header"><span class="section-num">11</span><h2>RAG & Recherche vectorielle</h2></div>
 
 <div class="kv">
-  <div class="kv-row"><dt>RAG (Retrieval-Augmented Generation)</dt><dd>Combine recherche documentaire + LLM → réponses fondées sur des sources réelles</dd></div>
-  <div class="kv-row"><dt>Azure AI Search</dt><dd>Indexation vectorielle + sémantique pour le RAG. Connecte documents → LLM</dd></div>
-  <div class="kv-row"><dt>Azure AI Foundry</dt><dd>Hub pour créer des applications IA de bout en bout (anciennement Azure AI Studio)</dd></div>
-  <div class="kv-row"><dt>Microsoft Copilot Studio</dt><dd>Créer des copilotes personnalisés sans code (ancien Power Virtual Agents)</dd></div>
-  <div class="kv-row"><dt>Semantic Kernel</dt><dd>SDK open-source pour orchestration d'agents IA (C#, Python, Java)</dd></div>
+  <div class="kv-row"><dt>RAG (Retrieval-Augmented Generation)</dt><dd>Combine recherche documentaire + LLM. Les documents pertinents sont injectés dans le prompt pour ancrer la réponse dans des faits réels.</dd></div>
+  <div class="kv-row"><dt>Azure AI Search</dt><dd>Service de recherche hybride (texte classique + vecteurs). Indexe des documents et les rend accessibles au modèle LLM. Clé du RAG sur Azure.</dd></div>
+  <div class="kv-row"><dt>Vecteurs (embeddings)</dt><dd>Chaque chunk de document est converti en vecteur numérique. La recherche trouve les N documents les plus proches (cosine similarity).</dd></div>
+  <div class="kv-row"><dt>Semantic Ranker</dt><dd>Couche de reclassement dans Azure AI Search qui utilise un modèle de langage pour améliorer la pertinence des résultats.</dd></div>
 </div>
 
-<div class="cards">
-  <div class="card"><h3>Architecture RAG</h3><ul><li>1. Indexer documents → vecteurs</li><li>2. Question utilisateur → embedding</li><li>3. Recherche similarité (cosine)</li><li>4. Top-K docs → contexte LLM</li><li>5. LLM génère réponse grounded</li></ul></div>
-  <div class="card"><h3>Copilot Extensions</h3><ul><li>Microsoft 365 Copilot</li><li>GitHub Copilot</li><li>Power Platform Copilot</li><li>Azure Copilot</li><li>Extensions plugins/connectors</li></ul></div>
+<h3 style="margin:16px 0 10px">Architecture RAG étape par étape</h3>
+<ol class="step-list">
+  <li><strong>Indexation :</strong> découper les documents en chunks → générer un embedding par chunk → stocker dans Azure AI Search</li>
+  <li><strong>Requête utilisateur :</strong> convertir la question en embedding avec le même modèle</li>
+  <li><strong>Recherche vectorielle :</strong> trouver les K chunks les plus similaires (similarité cosinus)</li>
+  <li><strong>Augmentation :</strong> injecter les chunks récupérés dans le prompt comme contexte</li>
+  <li><strong>Génération :</strong> le LLM génère une réponse fondée sur le contexte injecté</li>
+</ol>
+
+<div class="callout ok">
+<strong>RAG vs Fine-tuning :</strong> RAG = ajouter de la connaissance au runtime (flexible, pas de réentraînement). Fine-tuning = modifier les poids (long, coûteux, pour des styles/formats, pas pour des faits récents).
 </div>
 </section>
 
 <section id="s12">
-<div class="section-header"><span class="section-num">12</span><h2>Pièges fréquents à l'examen</h2></div>
+<div class="section-header"><span class="section-num">12</span><h2>Pièges fréquents &amp; mémos examen</h2></div>
 
-<div class="callout warn">
-<strong>Azure AI Foundry vs Azure ML Studio :</strong> AI Foundry = modèles génératifs, LLMs, Azure OpenAI. Azure ML Studio = ML classique, AutoML, Designer, entraînement de modèles custom.
+<div class="callout danger">
+<strong>⚠ Différence clé :</strong> L'examen AI-901 (avril 2026) n'est PAS AI-900. Les domaines ont complètement changé. 55–60% porte sur <strong>Microsoft Foundry</strong> — pas sur Azure ML classique.
 </div>
 
 <div class="check-list">
-  <li>CLU remplace LUIS pour la compréhension du langage conversationnel</li>
-  <li>Document Intelligence = Form Recognizer (renommé)</li>
-  <li>Custom Vision nécessite min. 15 images par classe</li>
-  <li>Responsible AI = 6 principes (pas 5, pas 7)</li>
-  <li>Temperature 0 = déterministe, temperature 1+ = créatif</li>
-  <li>Fine-tuning ≠ RAG : fine-tuning modifie les poids, RAG ajoute du contexte au runtime</li>
-  <li>Embeddings = vecteurs numériques de sens sémantique</li>
-  <li>Overfitting : bonne perf train, mauvaise perf test → régulariser</li>
-  <li>Underfitting : mauvaise perf partout → modèle trop simple</li>
-  <li>Azure OpenAI nécessite une approbation d'accès (pas ouvert par défaut)</li>
+  <li><strong>Foundry ≠ Azure ML Studio :</strong> Foundry = IA générative, LLMs, agents. Azure ML = ML classique, AutoML, Designer.</li>
+  <li><strong>Content Understanding</strong> (nouveau nom) = anciennement Azure Document Intelligence / Form Recognizer.</li>
+  <li><strong>Temperature 0</strong> = déterministe. <strong>Temperature élevée</strong> = créatif mais moins précis.</li>
+  <li><strong>Responsible AI = 6 principes exactement</strong> : F·R·P·I·T·A.</li>
+  <li><strong>Fine-tuning ≠ RAG</strong> : fine-tuning modifie les poids, RAG injecte du contexte.</li>
+  <li><strong>Agent = LLM + outils + mémoire (threads)</strong>. Sans outils, c'est juste un chat.</li>
+  <li><strong>DefaultAzureCredential</strong> = authentification recommandée (Entra ID), pas la clé API.</li>
+  <li><strong>STT</strong> = Speech-to-Text (voix → texte). <strong>TTS</strong> = Text-to-Speech (texte → voix).</li>
+  <li><strong>Embeddings</strong> = vecteurs numériques de sens sémantique. Modèle : <code>text-embedding-3-small</code>.</li>
+  <li><strong>Hallucination</strong> → corriger avec RAG + grounding + sources vérifiées.</li>
+  <li><strong>Prompt injection</strong> → risque de sécurité, mitiger avec Content Safety.</li>
+  <li><strong>Hub Foundry</strong> = niveau organisation. <strong>Projet Foundry</strong> = niveau app / équipe.</li>
+</ul>
+
+<div class="table-wrap" style="margin-top:20px">
+<table>
+  <thead><tr><th>Service / Concept</th><th>Alias / Ancien nom</th><th>Rôle</th></tr></thead>
+  <tbody>
+    <tr><td>Azure AI Foundry</td><td>Azure AI Studio (ancien)</td><td>Hub unifié pour modèles IA</td></tr>
+    <tr><td>Content Understanding</td><td>Document Intelligence / Form Recognizer</td><td>Extraction documents, images, audio, vidéo</td></tr>
+    <tr><td>CLU</td><td>LUIS (ancien)</td><td>Compréhension du langage conversationnel</td></tr>
+    <tr><td>Microsoft Copilot Studio</td><td>Power Virtual Agents (ancien)</td><td>Créer des copilotes sans code</td></tr>
+    <tr><td>Azure AI Search</td><td>Azure Cognitive Search (ancien)</td><td>Recherche hybride + vecteurs pour RAG</td></tr>
+  </tbody>
+</table>
 </div>
 
 <div class="callout ok">
-<strong>Mnémotechnique Responsible AI :</strong> <em>F-R-P-I-T-A</em> → Fairness · Reliability · Privacy · Inclusiveness · Transparency · Accountability
+<strong>Stratégie d'examen :</strong> L'exam comporte 40–60 questions en 60 min. Score minimum : 700/1000. Priorité absolue : maîtriser Foundry (55–60%) avant de réviser les concepts (40–45%).
 </div>
 </section>
+
 </main>
-<footer>Fiche de révision AI-901 · Auteur : RB · Repo : <a href="https://github.com/Crachdev/certifs">Crachdev/certifs</a></footer>
+<footer>Fiche de révision AI-901 · Référentiel officiel avril 2026 · Repo : <a href="https://github.com/Crachdev/certifs">Crachdev/certifs</a></footer>
 </div>
 </div>
 <script>
