@@ -240,6 +240,14 @@ li{margin:3px 0}
   <li>Minimum Healthy Percentage configurable (ex: 90% = max 10% remplacées à la fois)</li>
   <li>Warm-up period à respecter</li>
 </ul>
+
+<h4>Lifecycle Hooks</h4>
+<ul>
+  <li>Pause une instance pendant le lancement (<code>autoscaling:EC2_INSTANCE_LAUNCHING</code>) ou la terminaison (<code>autoscaling:EC2_INSTANCE_TERMINATING</code>)</li>
+  <li>Permet d'exécuter des scripts custom : installer agent, extraire logs, drainer connexions</li>
+  <li>Instance en état <strong>Pending:Wait</strong> ou <strong>Terminating:Wait</strong> pendant le hook (max 48h)</li>
+  <li>Notification via SNS/SQS/EventBridge pour déclencher Lambda ou script</li>
+</ul>
 </div>
 
 <div class="section" id="rds-ha">
@@ -369,6 +377,15 @@ li{margin:3px 0}
   <tr><td>Governance</td><td>Users avec permission spéciale</td><td>Test de politique, flexibilité</td></tr>
   <tr><td>Compliance</td><td>Personne (même root)</td><td>Compliance réglementaire stricte (SEC, FINRA)</td></tr>
 </table>
+
+<h4>S3 Transfer Acceleration</h4>
+<ul>
+  <li>Accélère les uploads S3 sur longues distances via les <strong>Points of Presence CloudFront</strong> (edge locations)</li>
+  <li>Utilisé quand des utilisateurs distants (autre continent) uploadent vers un bucket S3 d'une région spécifique</li>
+  <li>URL spéciale : <code>bucket.s3-accelerate.amazonaws.com</code></li>
+  <li>Différent de multipart upload (gros fichiers locaux) → Transfer Acceleration = latence géographique</li>
+  <li>Coût additionnel; vérifier via AWS S3 Transfer Acceleration Speed Comparison Tool si bénéfice réel</li>
+</ul>
 </div>
 
 <div class="section" id="global-accelerator">
@@ -393,6 +410,8 @@ li{margin:3px 0}
   <li><strong>Origin Shield</strong> : couche de cache supplémentaire entre Edge et Origin (réduit la charge origin)</li>
   <li><strong>Price Class</strong> : réduire le nombre de PoPs pour économiser (All, 100, 200)</li>
   <li><strong>Signed URLs / Cookies</strong> : accès restreint au contenu (Signed URL = 1 fichier, Cookie = plusieurs)</li>
+  <li><strong>Lambda@Edge</strong> : fonctions Lambda exécutées dans les PoPs CloudFront pour manipuler requêtes/réponses HTTP. 4 triggers : Viewer Request, Origin Request, Origin Response, Viewer Response. Cas d'usage : A/B testing, redirections géographiques, manipulation headers, auth légère.</li>
+  <li><strong>CloudFront Functions</strong> : JS ultra-léger côté Viewer uniquement (sub-milliseconde). Pour transformations simples de headers/URL.</li>
 </ul>
 </div>
 
@@ -653,6 +672,14 @@ li{margin:3px 0}
 </div>
 <div class="callout warn">Cognito User Pools = authentification des UTILISATEURS. Cognito Identity Pools = autorisation d'accès aux RESSOURCES AWS. Les deux peuvent être chaînés.</div>
 
+<h4>IAM Permission Boundaries</h4>
+<ul>
+  <li>Limite <strong>maximale</strong> de permissions qu'une entité IAM peut avoir (en plus des politiques d'identité)</li>
+  <li>Exemple : politique d'identité donne <code>s3:*</code> + Permission Boundary limite à <code>s3:GetObject</code> → seul GetObject est autorisé</li>
+  <li>Cas d'usage : déléguer la création de rôles IAM aux équipes tout en empêchant l'escalade de privilèges</li>
+  <li><strong>Évaluation IAM</strong> : DENY explicit > SCP > Resource Policy > Permission Boundary > Identity Policy</li>
+</ul>
+
 <h3>Sécurité des workloads &amp; applications</h3>
 <div class="kv">
   <div class="kv-row"><span class="k">Amazon GuardDuty</span><span>Détection de menaces basée sur le ML. Analyse CloudTrail, VPC Flow Logs, DNS logs. Identifie : instances compromises, appels API suspects, communications C2, cryptomining. Activation en 1 clic, sans agent.</span></div>
@@ -795,6 +822,92 @@ li{margin:3px 0}
   <tr><td>Multi-Site / Active-Active</td><td>Secondes</td><td>Zéro</td><td>💰💰💰💰</td><td>Deux régions actives simultanément, Route 53 pondéré</td></tr>
 </table>
 </div>
+
+<h2 id="services-complementaires">Services complémentaires — In-Scope SAA-C03</h2>
+
+<h3>Migration & Transfert de données</h3>
+<div class="table-wrap"><table>
+  <tr><th>Service</th><th>Usage principal</th><th>Quand l'utiliser</th></tr>
+  <tr><td><strong>AWS DMS</strong> (Database Migration Service)</td><td>Migration de bases de données homogène (MySQL→MySQL) ou hétérogène (Oracle→Aurora)</td><td>Migration BD on-premises vers AWS ou entre moteurs différents; supporte migration continue avec CDC</td></tr>
+  <tr><td><strong>AWS Snow Family</strong> — Snowcone (8 TB), Snowball Edge (80 TB), Snowmobile (100 PB)</td><td>Transfert physique massif de données vers AWS</td><td>Connexion réseau insuffisante, volume > 10 TB, déconnecté (militaire, navire)</td></tr>
+  <tr><td><strong>AWS Application Migration Service</strong> (MGN)</td><td>Lift-and-shift de serveurs physiques/VM vers EC2 (réplication continue)</td><td>Migration serveurs sans changer l'architecture; remplace Server Migration Service (SMS)</td></tr>
+  <tr><td><strong>AWS Application Discovery Service</strong></td><td>Inventaire et analyse des serveurs on-premises avant migration</td><td>Planification migration; détecte dépendances, utilisation CPU/RAM/réseau</td></tr>
+</table></div>
+<div class="tip">⚠️ <strong>Piège DMS</strong> : migration homogène (même moteur) → aucun Schema Conversion Tool. Hétérogène (moteurs différents) → AWS SCT obligatoire avant DMS.</div>
+
+<h3>Gouvernance, Conformité & IaC</h3>
+<ul>
+  <li><strong>AWS CloudFormation</strong> — IaC déclaratif (JSON/YAML) : Stack (ressources), StackSet (multi-comptes/régions), Change Set (prévisualiser les changements). Supports <code>DependsOn</code>, <code>DeletionPolicy: Retain/Snapshot</code>. Drift detection détecte les écarts config.</li>
+  <li><strong>AWS Config</strong> — Enregistre l'historique de config des ressources, évalue les règles de conformité (Config Rules). Remédiation automatique via SSM. Différent de CloudTrail (logs d'API calls) → Config = état de la ressource dans le temps.</li>
+  <li><strong>AWS Systems Manager (SSM)</strong> — Fleet management EC2 sans SSH : Patch Manager, Run Command, Session Manager, Parameter Store (config non-sensible), Automation (runbooks). Parameter Store vs Secrets Manager : SM = rotation auto + intégration RDS.</li>
+  <li><strong>AWS CloudFormation StackSets</strong> — Déploie des stacks dans plusieurs comptes AWS et régions depuis un compte administrateur en une seule opération.</li>
+  <li><strong>AWS Service Catalog</strong> — Catalogue de produits CloudFormation approuvés pour les équipes internes; contrôle ce que les utilisateurs peuvent provisionner.</li>
+  <li><strong>AWS License Manager</strong> — Suivi et gestion des licences logicielles (Microsoft, Oracle, SAP) sur AWS et on-premises.</li>
+  <li><strong>AWS Well-Architected Tool</strong> — Évalue l'architecture contre les 6 piliers (Op Excellence, Security, Reliability, Performance, Cost Opt, Sustainability); génère un rapport de recommandations.</li>
+  <li><strong>AWS Compute Optimizer</strong> — Recommandations de right-sizing basées sur l'utilisation réelle (ML) pour EC2, EBS, Lambda, ECS. Utilise les métriques CloudWatch.</li>
+</ul>
+
+<h3>Coût — Outils de gestion budgétaire</h3>
+<div class="table-wrap"><table>
+  <tr><th>Service</th><th>Rôle</th><th>Différence clé</th></tr>
+  <tr><td><strong>AWS Cost Explorer</strong></td><td>Visualiser et analyser les coûts historiques et prévisions (12 mois passés, 12 mois futurs)</td><td>Analyse + RI/Savings Plans recommendations</td></tr>
+  <tr><td><strong>AWS Budgets</strong></td><td>Alertes quand coûts/utilisation/couverture RI dépassent un seuil; actions automatiques (SCP, arrêt service)</td><td>Proactif (alertes + actions) vs Cost Explorer (analyse)</td></tr>
+  <tr><td><strong>Cost and Usage Report (CUR)</strong></td><td>Export granulaire (ressource par ressource, heure par heure) vers S3; source de vérité pour FinOps</td><td>Données brutes les plus détaillées; intégrable Athena/QuickSight</td></tr>
+  <tr><td><strong>Savings Plans</strong></td><td>Engagement $/heure sur 1 ou 3 ans; Compute SP (tous EC2+Fargate+Lambda), EC2 SP (famille fixe)</td><td>Plus flexible que RI; Compute SP s'applique même en changeant de région/famille</td></tr>
+</table></div>
+
+<h3>Sécurité avancée — Services complémentaires</h3>
+<ul>
+  <li><strong>AWS CloudHSM</strong> — Module HSM dédié dans votre VPC (FIPS 140-2 Level 3). Vous gérez les clés vous-même (AWS n'a pas accès). Cas d'usage : compliance stricte (PCI-DSS), clé de chiffrement non partagée. Différence KMS : KMS = service géré partagé, CloudHSM = hardware dédié.</li>
+  <li><strong>AWS Security Hub</strong> — Agrège les findings GuardDuty + Inspector + Macie + IAM Analyzer dans une vue unifiée. Score de sécurité selon AWS Foundational Security Best Practices.</li>
+  <li><strong>AWS Network Firewall</strong> — Pare-feu réseau managé au niveau VPC (stateful + stateless rules, IPS/IDS). Différent de WAF (HTTP L7) et NACL (sans état, L4). Idéal pour inspection trafic est-ouest entre VPC.</li>
+  <li><strong>AWS Firewall Manager</strong> — Gestion centralisée multi-comptes des politiques WAF, Shield Advanced, Security Groups, Network Firewall via AWS Organizations.</li>
+  <li><strong>Amazon Detective</strong> — Analyse forensique post-incident : corrèle données VPC Flow Logs, CloudTrail, GuardDuty pour investiguer une alerte. Différent de GuardDuty (détection) → Detective = investigation.</li>
+  <li><strong>AWS Directory Service</strong> — Managed Microsoft AD (ou AD Connector pour proxy vers AD on-premises). Utilisé pour joindre EC2 à un domaine Windows, intégrer avec IAM Identity Center.</li>
+  <li><strong>AWS Artifact</strong> — Portail de téléchargement des rapports de conformité AWS (SOC, ISO, PCI, HIPAA BAA). Important pour audits réglementaires.</li>
+  <li><strong>AWS Resource Access Manager (RAM)</strong> — Partager des ressources AWS (Transit Gateway, subnets, Route 53 Resolver) entre comptes AWS dans la même Organisation sans VPC peering supplémentaire.</li>
+</ul>
+
+<h3>Bases de données — Compléments</h3>
+<ul>
+  <li><strong>Aurora Serverless v2</strong> — Capacité Aurora (MySQL/PostgreSQL) qui scale automatiquement de 0 à des centaines d'ACU (Aurora Capacity Units). Idéal pour workloads imprévisibles. v2 = scale en continu (vs v1 = saut de capacité). Minimum peut descendre à 0 (pause après inactivité).</li>
+  <li><strong>Amazon Redshift</strong> — Data warehouse colonnaire pour analytics OLAP. Redshift Spectrum : requêtes SQL directement sur S3. RA3 : stockage géré séparé du compute (S3). Clusters multi-AZ depuis 2023. COPY command pour import massif depuis S3/DynamoDB/Kinesis.</li>
+  <li><strong>Amazon OpenSearch Service</strong> (ex-Elasticsearch) — Recherche full-text, analyse de logs, monitoring. Intégration native avec Kinesis Data Firehose pour ingest. Utilisé pour log analytics, search applicatif.</li>
+  <li><strong>Amazon MSK</strong> (Managed Streaming for Apache Kafka) — Kafka géré. Alternative à Kinesis pour les équipes qui connaissent Kafka. MSK = topics/partitions Kafka standard; Kinesis Data Streams = API AWS propriétaire.</li>
+  <li><strong>Amazon Keyspaces</strong> — Cassandra géré et serverless. Tables wide-column, réplication multi-région native. Cas d'usage : migration depuis Cassandra on-premises.</li>
+  <li><strong>Amazon Neptune</strong> — Base de données graphe (Property Graph / RDF SPARQL). Cas d'usage : réseaux sociaux, détection de fraude, knowledge graph.</li>
+  <li><strong>Amazon DocumentDB</strong> — Compatible MongoDB (API MongoDB 3.6/4.0). Stockage distribué Aurora-like. <em>Piège</em> : pas 100% compatible MongoDB, certaines fonctionnalités manquantes.</li>
+</ul>
+
+<h3>Compute & Applications Web — Compléments</h3>
+<ul>
+  <li><strong>AWS Elastic Beanstalk</strong> — PaaS : déploie et gère automatiquement l'infrastructure (EC2, ELB, Auto Scaling, RDS) pour code applicatif. Langues supportées : Java, .NET, PHP, Node.js, Python, Ruby, Go, Docker. Dev reste propriétaire des ressources. Idéal pour dev qui veut focus sur le code.</li>
+  <li><strong>AWS Batch</strong> — Orchestrateur de jobs batch managé. Gère automatiquement le provisioning EC2 (ou Fargate) pour des queues de jobs. Différent de Lambda (durée max 15 min) → Batch = jobs longs, HPC, ML training.</li>
+  <li><strong>AWS Amplify</strong> — Framework full-stack pour apps web/mobile : hébergement frontend (React/Vue), backend serverless (AppSync, Cognito, API Gateway, DynamoDB auto-provisionné). CI/CD intégré depuis Git.</li>
+  <li><strong>Amazon API Gateway</strong> — API REST/HTTP/WebSocket managé. Throttling, caching, authentication (IAM, Cognito, Lambda authorizer). Edge-optimized (CloudFront) vs Regional vs Private (VPC). Usage plan + API keys pour rate limiting par client.</li>
+  <li><strong>AWS Outposts</strong> — Rack AWS on-premises : même infrastructure, services, API AWS dans votre datacenter. Latence ultra-faible pour workloads locaux. Services supportés : EC2, EBS, S3, ECS, EKS, RDS.</li>
+</ul>
+
+<h3>Intégration & Messaging — Compléments</h3>
+<ul>
+  <li><strong>Amazon EventBridge</strong> — Bus d'événements serverless. Sources : services AWS, SaaS (Zendesk, Datadog...), custom events. Règles de routage vers cibles (Lambda, SQS, SNS, Step Functions). EventBridge Scheduler = cron serverless. Différent de SNS : EventBridge = routage basé sur patterns/métadonnées, SNS = pub/sub simple.</li>
+  <li><strong>Amazon MQ</strong> — Message broker managé compatible ActiveMQ et RabbitMQ. Migration lift-and-shift depuis brokers on-premises sans changer le code. Différent de SQS (AWS-natif) → MQ = compatibilité AMQP/STOMP/MQTT pour apps existantes.</li>
+  <li><strong>Amazon AppFlow</strong> — Transferts de données bidirectionnels entre SaaS (Salesforce, Slack, SAP, Google Analytics) et AWS (S3, Redshift). No-code, chiffré, sans VPN.</li>
+</ul>
+
+<h3>Stockage — Compléments</h3>
+<ul>
+  <li><strong>AWS Backup</strong> — Service centralisé de sauvegarde multi-services : EBS, RDS, Aurora, DynamoDB, EFS, FSx, S3, Storage Gateway. Backup plans (schedules + rétention), Backup Vault Lock (WORM compliance). Cross-account et cross-region backup supportés.</li>
+  <li><strong>Amazon FSx</strong> — 4 types : <code>FSx for Windows File Server</code> (SMB, Active Directory), <code>FSx for Lustre</code> (HPC, ML, haute performance, intégration S3), <code>FSx for NetApp ONTAP</code> (multi-protocoles NFS/SMB/iSCSI), <code>FSx for OpenZFS</code>. FSx Lustre = examen fréquent pour workloads HPC.</li>
+  <li><strong>Amazon QuickSight</strong> — BI serverless : tableaux de bord et visualisations sur Redshift, Athena, S3, RDS. SPICE = cache in-memory pour performance. Partage dashboards via URL (pas besoin de compte AWS pour les lecteurs).</li>
+</ul>
+
+<h3>Réseau — Compléments</h3>
+<ul>
+  <li><strong>AWS Client VPN</strong> — VPN SSL/TLS pour utilisateurs individuels (remote workers) → accès sécurisé à AWS et on-premises. Scale automatique. Authentification : Active Directory, SAML, certificats mutuels.</li>
+  <li><strong>AWS PrivateLink</strong> — Accès privé aux services AWS (S3, DynamoDB, etc.) ou services tiers depuis un VPC <em>sans passer par Internet</em>. Crée un Endpoint ENI dans le VPC. Interface Endpoint (PrivateLink) vs Gateway Endpoint (S3/DynamoDB, dans la route table, gratuit).</li>
+  <li><strong>AWS Transit Gateway</strong> — Hub centralisé pour connecter des VPCs et réseaux on-premises (site-to-site VPN, Direct Connect). Remplace le mesh de VPC peering. Supporte le multicast et les routes partagées.</li>
+</ul>
 
 <h2 id="antipatterns">Anti-patterns & Pièges exam</h2>
 <div class="section">
