@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#326CE5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche CKA — Kubernetes Administrator</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E☸️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#326CE5;--accent-soft:#e8eefb;
+  --k8s:#326CE5;--k8s-mid:#5b8ff5;--k8s-light:#e8eefb;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --tag-arch:#dbeafe;--tag-arch-ink:#1e40af;
+  --tag-wl:#fce7f3;--tag-wl-ink:#9d174d;
+  --tag-net:#fef9c3;--tag-net-ink:#854d0e;
+  --tag-store:#ede9fe;--tag-store-ink:#5b21b6;
+  --tag-ts:#dcfce7;--tag-ts-ink:#166534;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0f151c;--sheet:#17202a;--ink:#e5ebf1;--muted:#97a4b2;--line:#2b3744;
+  --accent:#6b9eff;--accent-soft:#0f1e40;
+  --k8s:#6b9eff;--k8s-mid:#99bcff;--k8s-light:#0f1e40;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#f5c542;--warn-soft:#2e2400;
+  --tag-arch:#1e3a6b;--tag-arch-ink:#93c5fd;
+  --tag-wl:#4a1040;--tag-wl-ink:#f9a8d4;
+  --tag-net:#3f2d00;--tag-net-ink:#fde68a;
+  --tag-store:#2e1a6b;--tag-store-ink:#c4b5fd;
+  --tag-ts:#14432a;--tag-ts-ink:#86efac;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f151c;--sheet:#17202a;--ink:#e5ebf1;--muted:#97a4b2;--line:#2b3744;
+  --accent:#6b9eff;--accent-soft:#0f1e40;
+  --k8s:#6b9eff;--k8s-mid:#99bcff;--k8s-light:#0f1e40;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#f5c542;--warn-soft:#2e2400;
+  --tag-arch:#1e3a6b;--tag-arch-ink:#93c5fd;
+  --tag-wl:#4a1040;--tag-wl-ink:#f9a8d4;
+  --tag-net:#3f2d00;--tag-net-ink:#fde68a;
+  --tag-store:#2e1a6b;--tag-store-ink:#c4b5fd;
+  --tag-ts:#14432a;--tag-ts-ink:#86efac;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:20px 64px}
+.wrap{max-width:900px;margin:0 auto}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:2rem;font-weight:700;letter-spacing:-.02em}
+h2{font-size:1.35rem;font-weight:700;margin-bottom:4px}
+h3{font-size:1rem;font-weight:700;margin-bottom:2px}
+h4{font-size:.88rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+a{color:var(--accent)}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+code,kbd{font-family:var(--f-mono);font-size:.82em;background:var(--accent-soft);color:var(--accent);padding:.1em .4em;border-radius:4px}
+kbd{background:var(--sheet);border:1px solid var(--line);color:var(--ink)}
+
+/* Nav */
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:10px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.back-quiz{float:right;font:600 .8rem var(--f-mono);color:var(--accent);text-decoration:none;padding:6px 12px;border:1px solid var(--accent);border-radius:6px;transition:background .15s}
+.back-quiz:hover{background:var(--accent-soft)}
+
+/* TOC */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:20px 0 28px;display:grid;gap:8px}
+.toc-title{font:700 .78rem var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px 20px}
+.toc-grid a{font-size:.85rem;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:6px;padding:2px 0}
+.toc-grid a:hover{text-decoration:underline}
+.toc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Exam banner */
+.exam-banner{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:20px;margin-bottom:28px;display:grid;gap:14px}
+.exam-rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.exam-rules div{background:var(--sheet);padding:10px 12px}
+.exam-rules b{display:block;font:600 1rem var(--f-mono)}
+.exam-rules span{font-size:.76rem;color:var(--muted)}
+.domains{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.dom{font:500 .76rem var(--f-mono);padding:3px 10px;border-radius:20px}
+
+/* Domain weight bars */
+.domain-weights{display:grid;gap:8px;margin-top:8px}
+.dw-row{display:grid;grid-template-columns:1fr 36px;align-items:center;gap:8px}
+.dw-label{font-size:.82rem;font-weight:600}
+.dw-bar-wrap{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.dw-bar{height:100%;background:var(--accent);border-radius:3px}
+.dw-pct{font:.82rem var(--f-mono);color:var(--muted);text-align:right}
+
+/* Section */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:12px;margin-bottom:20px;overflow:hidden}
+.section-head{padding:18px 20px 14px;border-bottom:1px solid var(--line)}
+.section-body{padding:16px 20px}
+.section-tag{display:inline-block;font:.75rem var(--f-mono);font-weight:600;padding:2px 9px;border-radius:20px;margin-bottom:10px}
+.tag-arch{background:var(--tag-arch);color:var(--tag-arch-ink)}
+.tag-wl{background:var(--tag-wl);color:var(--tag-wl-ink)}
+.tag-net{background:var(--tag-net);color:var(--tag-net-ink)}
+.tag-store{background:var(--tag-store);color:var(--tag-store-ink)}
+.tag-ts{background:var(--tag-ts);color:var(--tag-ts-ink)}
+
+/* Concept cards */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:14px 0}
+.concept-card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;border-left:3px solid var(--accent)}
+.concept-card h4{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-family:var(--f-mono);margin-bottom:6px}
+.concept-card p{font-size:.87rem;margin:0;line-height:1.5;color:var(--ink)}
+.concept-card.warn{border-left-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+.concept-card.ok{border-left-color:var(--ok)}
+.concept-card.ok h4{color:var(--ok)}
+
+/* Tables */
+.table-wrap{overflow-x:auto;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:.87rem}
+th{background:var(--accent-soft);color:var(--accent);font:600 .78rem var(--f-mono);text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;text-align:left;border-bottom:2px solid var(--accent)}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:var(--paper)}
+
+/* Code blocks */
+pre{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow-x:auto;font:500 .82rem var(--f-mono);line-height:1.6;margin:14px 0}
+pre code{background:none;padding:0;color:inherit;font-size:1em}
+.cmd-comment{color:var(--muted)}
+.cmd-flag{color:var(--ok)}
+.cmd-val{color:var(--warn)}
+
+/* Lists */
+ul.check{list-style:none;padding:0;margin:10px 0;display:flex;flex-direction:column;gap:4px}
+ul.check li{padding-left:22px;position:relative;font-size:.9rem}
+ul.check li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-weight:700;font-family:var(--f-mono)}
+ul.bullets{padding-left:18px;margin:8px 0;font-size:.9rem;line-height:1.6}
+ul.bullets li{margin-bottom:3px}
+
+/* Info/warn boxes */
+.info-box{padding:12px 16px;border-radius:8px;font-size:.88rem;line-height:1.55;margin:12px 0;border-left:3px solid var(--accent);background:var(--accent-soft)}
+.warn-box{padding:12px 16px;border-radius:8px;font-size:.88rem;line-height:1.55;margin:12px 0;border-left:3px solid var(--warn);background:var(--warn-soft)}
+.ok-box{padding:12px 16px;border-radius:8px;font-size:.88rem;line-height:1.55;margin:12px 0;border-left:3px solid var(--ok);background:var(--ok-soft)}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#1a3a8a 0%,#326CE5 60%,#5b8ff5 100%);color:#fff;border-radius:12px;padding:28px 24px 24px;margin-bottom:24px;position:relative;overflow:hidden}
+.hero::after{content:"☸";position:absolute;right:-10px;top:-20px;font-size:140px;opacity:.08;line-height:1;pointer-events:none}
+.hero .eyebrow{color:rgba(255,255,255,.7)}
+.hero h1{color:#fff;margin:6px 0 10px}
+.hero p{color:rgba(255,255,255,.85);margin:0;font-size:.95rem}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.hero-badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;font:.75rem var(--f-mono);padding:3px 10px;border-radius:20px}
+
+/* Theme toggle */
+.theme-btn{position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--sheet);color:var(--ink);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:10;transition:background .2s}
+.theme-btn:hover{background:var(--accent-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="../index.html" class="home-link">← Dashboard</a>
+  <a href="index.html" class="back-quiz">☸️ Quiz CKA →</a>
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="eyebrow">CNCF · Certified Kubernetes Administrator</p>
+    <h1>Fiche CKA</h1>
+    <p>Examen pratique en ligne — 2h · Kubernetes v1.37 · Passation 66 %</p>
+    <div class="hero-badges">
+      <span class="hero-badge">Performance-based</span>
+      <span class="hero-badge">CLI uniquement</span>
+      <span name="hero-badge" class="hero-badge">Docs officielles autorisées</span>
+      <span class="hero-badge">17 tâches pratiques</span>
+      <span class="hero-badge">2 tentatives incluses</span>
+    </div>
+  </div>
+
+  <!-- EXAM BANNER -->
+  <div class="exam-banner">
+    <div>
+      <h4>Domaines &amp; pondérations</h4>
+      <div class="domain-weights">
+        <div class="dw-row">
+          <div>
+            <div class="dw-label">Troubleshooting</div>
+            <div class="dw-bar-wrap"><div class="dw-bar" style="width:30%"></div></div>
+          </div>
+          <div class="dw-pct">30 %</div>
+        </div>
+        <div class="dw-row">
+          <div>
+            <div class="dw-label">Cluster Architecture, Installation &amp; Config</div>
+            <div class="dw-bar-wrap"><div class="dw-bar" style="width:25%"></div></div>
+          </div>
+          <div class="dw-pct">25 %</div>
+        </div>
+        <div class="dw-row">
+          <div>
+            <div class="dw-label">Services &amp; Networking</div>
+            <div class="dw-bar-wrap"><div class="dw-bar" style="width:20%"></div></div>
+          </div>
+          <div class="dw-pct">20 %</div>
+        </div>
+        <div class="dw-row">
+          <div>
+            <div class="dw-label">Workloads &amp; Scheduling</div>
+            <div class="dw-bar-wrap"><div class="dw-bar" style="width:15%"></div></div>
+          </div>
+          <div class="dw-pct">15 %</div>
+        </div>
+        <div class="dw-row">
+          <div>
+            <div class="dw-label">Storage</div>
+            <div class="dw-bar-wrap"><div class="dw-bar" style="width:10%"></div></div>
+          </div>
+          <div class="dw-pct">10 %</div>
+        </div>
+      </div>
+    </div>
+    <div class="exam-rules">
+      <div><b>2h</b><span>durée</span></div>
+      <div><b>66 %</b><span>score pass</span></div>
+      <div><b>v1.37</b><span>version K8s</span></div>
+      <div><b>2 ans</b><span>validité</span></div>
+      <div><b>CLI</b><span>format</span></div>
+      <div><b>Docs ok</b><span>kubernetes.io</span></div>
+    </div>
+    <div class="info-box">💡 <strong>Stratégie examen :</strong> utilise <code>kubectl explain &lt;resource&gt;.spec</code> pour retrouver les champs sans quitter le terminal. Alias indispensable : <code>alias k=kubectl</code> et active l'autocomplétion bash dès le début.</div>
+  </div>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="toc-title">Sommaire</div>
+    <div class="toc-grid">
+      <a href="#s1"><span class="toc-dot" style="background:#326CE5"></span>Architecture &amp; Installation</a>
+      <a href="#s2"><span class="toc-dot" style="background:#9d174d"></span>Workloads &amp; Scheduling</a>
+      <a href="#s3"><span class="toc-dot" style="background:#854d0e"></span>Services &amp; Networking</a>
+      <a href="#s4"><span class="toc-dot" style="background:#5b21b6"></span>Storage</a>
+      <a href="#s5"><span class="toc-dot" style="background:#166534"></span>Troubleshooting</a>
+      <a href="#s6"><span class="toc-dot" style="background:#326CE5"></span>kubectl — commandes clés</a>
+      <a href="#s7"><span class="toc-dot" style="background:#1d7a4f"></span>RBAC</a>
+      <a href="#s8"><span class="toc-dot" style="background:#8a5a00"></span>Pièges &amp; astuces CKA</a>
+    </div>
+  </nav>
+
+  <!-- S1 : ARCHITECTURE -->
+  <section class="section" id="s1">
+    <div class="section-head">
+      <span class="section-tag tag-arch">Architecture · 25 %</span>
+      <h2>Architecture, Installation &amp; Configuration</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">Composants du control plane, kubeadm, RBAC, Helm, opérateurs</p>
+    </div>
+    <div class="section-body">
+
+      <h3 style="margin-bottom:10px">Composants du cluster</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>kube-apiserver</h4>
+          <p>Point d'entrée unique de toutes les requêtes. Authentifie, autorise (RBAC), valide et persiste dans etcd. Stateless — peut être répliqué.</p>
+        </div>
+        <div class="concept-card">
+          <h4>etcd</h4>
+          <p>Base de données clé-valeur distribuée (Raft). Stocke tout l'état du cluster. Sauvegarder avec <code>etcdctl snapshot save</code>.</p>
+        </div>
+        <div class="concept-card">
+          <h4>kube-scheduler</h4>
+          <p>Assigne les Pods aux nœuds selon resources, affinity, taints/tolerations. Ne démarre pas les containers — délègue au kubelet.</p>
+        </div>
+        <div class="concept-card">
+          <h4>kube-controller-manager</h4>
+          <p>Exécute les boucles de contrôle : Node Controller, ReplicaSet Controller, Endpoints Controller, etc.</p>
+        </div>
+        <div class="concept-card">
+          <h4>kubelet</h4>
+          <p>Agent sur chaque nœud. Reçoit les PodSpecs (via apiserver), crée les containers via le CRI, envoie le statut au plan de contrôle.</p>
+        </div>
+        <div class="concept-card">
+          <h4>kube-proxy</h4>
+          <p>Maintient les règles réseau (iptables ou IPVS) pour le routage des Services. Ne touche pas le trafic pod-à-pod direct.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Installer un cluster avec kubeadm</h3>
+      <pre><code><span class="cmd-comment"># Sur tous les nœuds — désactiver le swap</span>
+swapoff -a && sed -i '/swap/d' /etc/fstab
+
+<span class="cmd-comment"># Initialiser le control plane</span>
+kubeadm init \
+  <span class="cmd-flag">--pod-network-cidr</span>=<span class="cmd-val">192.168.0.0/16</span> \
+  <span class="cmd-flag">--apiserver-advertise-address</span>=<span class="cmd-val">192.168.1.10</span>
+
+<span class="cmd-comment"># Configurer kubectl (en tant qu'utilisateur normal)</span>
+mkdir -p $HOME/.kube
+cp /etc/kubernetes/admin.conf $HOME/.kube/config
+
+<span class="cmd-comment"># Installer un CNI (ex: Calico)</span>
+kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
+
+<span class="cmd-comment"># Rejoindre un worker node (commande donnée par kubeadm init)</span>
+kubeadm join 192.168.1.10:6443 \
+  <span class="cmd-flag">--token</span> <span class="cmd-val">abcdef.0123456789abcdef</span> \
+  <span class="cmd-flag">--discovery-token-ca-cert-hash</span> sha256:<span class="cmd-val">...</span></code></pre>
+
+      <h3 style="margin:16px 0 10px">Interfaces standards (CNI / CRI / CSI)</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Interface</th><th>Rôle</th><th>Exemples</th></tr>
+          <tr><td><code>CNI</code></td><td>Container Network Interface — réseau pod-à-pod</td><td>Calico, Flannel, Cilium, Weave</td></tr>
+          <tr><td><code>CRI</code></td><td>Container Runtime Interface — exécution des containers</td><td>containerd, CRI-O</td></tr>
+          <tr><td><code>CSI</code></td><td>Container Storage Interface — volumes persistants</td><td>AWS EBS, NFS, Ceph RBD</td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Helm &amp; Kustomize</h3>
+      <pre><code><span class="cmd-comment"># Helm — installer un chart</span>
+helm repo add stable https://charts.helm.sh/stable
+helm install my-release stable/nginx-ingress \
+  <span class="cmd-flag">--namespace</span> <span class="cmd-val">ingress</span> \
+  <span class="cmd-flag">--create-namespace</span> \
+  <span class="cmd-flag">--set</span> controller.replicaCount=2
+
+<span class="cmd-comment"># Kustomize — appliquer une couche de personnalisation</span>
+kubectl apply <span class="cmd-flag">-k</span> ./overlays/production</code></pre>
+
+      <h3 style="margin:16px 0 10px">CRD &amp; Opérateurs</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>CRD — Custom Resource Definition</h4>
+          <p>Étend l'API Kubernetes avec de nouveaux types de ressources. Exemple : <code>kind: Certificate</code> pour cert-manager.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Opérateur</h4>
+          <p>Controller custom qui utilise des CRD pour automatiser la gestion d'applications complexes (databases, kafka…). Installe via Helm ou OLM.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Haute disponibilité du control plane</h3>
+      <div class="ok-box">
+        Un cluster HA nécessite <strong>3 ou 5 nœuds control plane</strong> (nombre impair pour le quorum etcd). kubeadm supporte le mode HA via <code>--control-plane-endpoint</code> pointant vers un load balancer (HAProxy, cloud LB). Les nœuds workers rejoignent comme d'habitude.
+      </div>
+
+    </div>
+  </section>
+
+  <!-- S2 : WORKLOADS -->
+  <section class="section" id="s2">
+    <div class="section-head">
+      <span class="section-tag tag-wl">Workloads &amp; Scheduling · 15 %</span>
+      <h2>Workloads &amp; Scheduling</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">Deployments, ConfigMaps/Secrets, autoscaling, affinités</p>
+    </div>
+    <div class="section-body">
+
+      <h3 style="margin-bottom:10px">Types de workloads</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Deployment</h4>
+          <p>Gère des Pods stateless avec rolling updates. Supporte <code>rollback</code>, <code>pause/resume</code>. Utilise un ReplicaSet sous-jacent.</p>
+        </div>
+        <div class="concept-card">
+          <h4>StatefulSet</h4>
+          <p>Pods avec identité stable (nom-0, nom-1…) et stockage persistant ordonnancé. Pour databases, Kafka, Elasticsearch.</p>
+        </div>
+        <div class="concept-card">
+          <h4>DaemonSet</h4>
+          <p>Un Pod par nœud (ou sélection). Utilisé pour agents de monitoring (Prometheus node-exporter), CNI plugins, log shippers.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Job / CronJob</h4>
+          <p>Job : exécution ponctuelle jusqu'à complétion. CronJob : planification cron. <code>completions</code>, <code>parallelism</code>, <code>backoffLimit</code>.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Rolling update &amp; rollback</h3>
+      <pre><code><span class="cmd-comment"># Mettre à jour l'image d'un deployment</span>
+kubectl set image deployment/nginx-deploy nginx=<span class="cmd-val">nginx:1.25</span>
+
+<span class="cmd-comment"># Surveiller le rollout</span>
+kubectl rollout status deployment/nginx-deploy
+
+<span class="cmd-comment"># Historique des révisions</span>
+kubectl rollout history deployment/nginx-deploy
+
+<span class="cmd-comment"># Rollback à la révision précédente</span>
+kubectl rollout undo deployment/nginx-deploy
+
+<span class="cmd-comment"># Rollback à une révision précise</span>
+kubectl rollout undo deployment/nginx-deploy <span class="cmd-flag">--to-revision</span>=<span class="cmd-val">2</span></code></pre>
+
+      <h3 style="margin:16px 0 10px">ConfigMap &amp; Secret</h3>
+      <pre><code><span class="cmd-comment"># Créer un ConfigMap depuis des valeurs</span>
+kubectl create configmap app-config \
+  <span class="cmd-flag">--from-literal</span>=DB_HOST=<span class="cmd-val">postgres</span> \
+  <span class="cmd-flag">--from-literal</span>=DB_PORT=<span class="cmd-val">5432</span>
+
+<span class="cmd-comment"># Créer un Secret opaque</span>
+kubectl create secret generic db-secret \
+  <span class="cmd-flag">--from-literal</span>=password=<span class="cmd-val">s3cr3t</span>
+
+<span class="cmd-comment"># Consommer via envFrom dans un Pod</span>
+<span class="cmd-comment"># spec.containers[].envFrom:</span>
+<span class="cmd-comment">#   - configMapRef: { name: app-config }</span>
+<span class="cmd-comment">#   - secretRef:    { name: db-secret  }</span></code></pre>
+
+      <h3 style="margin:16px 0 10px">Autoscaling</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Type</th><th>Commande / objet</th><th>Rôle</th></tr>
+          <tr><td>HPA</td><td><code>kubectl autoscale deploy/nginx --min=2 --max=10 --cpu-percent=70</code></td><td>Scale horizontal selon CPU/mémoire/métriques custom</td></tr>
+          <tr><td>VPA</td><td>objet <code>VerticalPodAutoscaler</code></td><td>Ajuste les requests/limits automatiquement</td></tr>
+          <tr><td>CA</td><td>Cluster Autoscaler</td><td>Ajoute/retire des nœuds au niveau infra cloud</td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Scheduling avancé</h3>
+      <pre><code><span class="cmd-comment"># Taint un nœud (empêche les Pods sans tolérance)</span>
+kubectl taint nodes node1 key=<span class="cmd-val">gpu</span>:NoSchedule
+
+<span class="cmd-comment"># Tolérance dans le Pod spec</span>
+<span class="cmd-comment"># tolerations:</span>
+<span class="cmd-comment"># - key: "gpu" operator: "Equal" value: "gpu" effect: "NoSchedule"</span>
+
+<span class="cmd-comment"># Node affinity (préférence)</span>
+<span class="cmd-comment"># affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution</span>
+
+<span class="cmd-comment"># Forcer un nœud avec nodeName (bypass scheduler)</span>
+<span class="cmd-comment"># spec.nodeName: node1</span></code></pre>
+
+      <h3 style="margin:16px 0 10px">Limites &amp; Requests</h3>
+      <div class="warn-box">
+        ⚠️ Un Pod sans <code>requests</code> peut être évincé en premier lors d'une pression mémoire (QoS BestEffort). Toujours définir requests et limits en prod. <strong>Requests</strong> = réservation nœud. <strong>Limits</strong> = plafond hard (OOMKill si dépassé pour mémoire).
+      </div>
+
+    </div>
+  </section>
+
+  <!-- S3 : SERVICES & NETWORKING -->
+  <section class="section" id="s3">
+    <div class="section-head">
+      <span class="section-tag tag-net">Services &amp; Networking · 20 %</span>
+      <h2>Services &amp; Networking</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">Services, Ingress, NetworkPolicies, CoreDNS, Gateway API</p>
+    </div>
+    <div class="section-body">
+
+      <h3 style="margin-bottom:10px">Types de Services</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Type</th><th>Accès</th><th>Usage</th></tr>
+          <tr><td><code>ClusterIP</code></td><td>Interne cluster uniquement</td><td>Communication inter-services (défaut)</td></tr>
+          <tr><td><code>NodePort</code></td><td>IP nœud + port 30000–32767</td><td>Accès externe sans LB (dev, bare-metal)</td></tr>
+          <tr><td><code>LoadBalancer</code></td><td>IP externe via cloud LB</td><td>Production sur cloud (AWS ELB, GCP LB…)</td></tr>
+          <tr><td><code>ExternalName</code></td><td>CNAME DNS vers hôte externe</td><td>Abstraction de services externes</td></tr>
+        </table>
+      </div>
+
+      <pre><code><span class="cmd-comment"># Exposer un deployment en ClusterIP</span>
+kubectl expose deployment nginx <span class="cmd-flag">--port</span>=<span class="cmd-val">80</span> <span class="cmd-flag">--target-port</span>=<span class="cmd-val">8080</span>
+
+<span class="cmd-comment"># Exposer en NodePort</span>
+kubectl expose deployment nginx <span class="cmd-flag">--type</span>=NodePort <span class="cmd-flag">--port</span>=<span class="cmd-val">80</span>
+
+<span class="cmd-comment"># DNS interne : <service>.<namespace>.svc.cluster.local</span>
+<span class="cmd-comment"># ex: postgres.default.svc.cluster.local:5432</span></code></pre>
+
+      <h3 style="margin:16px 0 10px">Ingress</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Ingress Controller</h4>
+          <p>Composant qui lit les objets Ingress et configure un reverse proxy (nginx, Traefik, HAProxy). Doit être déployé séparément (n'est pas inclus par défaut).</p>
+        </div>
+        <div class="concept-card">
+          <h4>Ingress Resource</h4>
+          <p>Règles HTTP(S) : routing par hostname et path vers des Services. Supporte TLS via Secret de type <code>kubernetes.io/tls</code>.</p>
+        </div>
+      </div>
+      <pre><code><span class="cmd-comment"># Exemple d'Ingress avec TLS</span>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts: [app.example.com]
+    secretName: tls-secret
+  rules:
+  - host: app.example.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service: { name: api-svc, port: { number: 80 } }</code></pre>
+
+      <h3 style="margin:16px 0 10px">NetworkPolicy</h3>
+      <div class="warn-box">
+        ⚠️ Les NetworkPolicies nécessitent un CNI qui les supporte (Calico, Cilium, Weave). Par défaut, tout trafic est autorisé. Une NetworkPolicy vide sur un Pod <strong>bloque tout</strong> le trafic non explicitement autorisé.
+      </div>
+      <pre><code><span class="cmd-comment"># Autoriser uniquement le trafic entrant depuis le namespace "frontend"</span>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-from-frontend
+spec:
+  podSelector:
+    matchLabels: { app: backend }
+  policyTypes: [Ingress]
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels: { name: frontend }</code></pre>
+
+      <h3 style="margin:16px 0 10px">CoreDNS</h3>
+      <ul class="bullets">
+        <li>DNS interne du cluster, déployé comme Deployment dans <code>kube-system</code></li>
+        <li>Format FQDN : <code>&lt;svc&gt;.&lt;ns&gt;.svc.cluster.local</code> / <code>&lt;pod-ip&gt;.&lt;ns&gt;.pod.cluster.local</code></li>
+        <li>Config dans le ConfigMap <code>coredns</code> (espace kube-system)</li>
+        <li>Dépanner : <code>kubectl exec -it &lt;pod&gt; -- nslookup kubernetes.default</code></li>
+      </ul>
+
+      <h3 style="margin:16px 0 10px">Gateway API (nouveau)</h3>
+      <div class="ok-box">
+        La Gateway API remplace progressivement Ingress avec un modèle plus expressif : <strong>GatewayClass</strong> (infrastructure), <strong>Gateway</strong> (listener), <strong>HTTPRoute / TCPRoute</strong> (règles). Supporte le routage par header, poids, etc.
+      </div>
+
+    </div>
+  </section>
+
+  <!-- S4 : STORAGE -->
+  <section class="section" id="s4">
+    <div class="section-head">
+      <span class="section-tag tag-store">Storage · 10 %</span>
+      <h2>Storage</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">PV, PVC, StorageClass, modes d'accès, reclaim policies</p>
+    </div>
+    <div class="section-body">
+
+      <h3 style="margin-bottom:10px">Architecture du stockage</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>PersistentVolume (PV)</h4>
+          <p>Ressource de stockage provisionnée par l'admin (ou dynamiquement). Indépendant du cycle de vie des Pods.</p>
+        </div>
+        <div class="concept-card">
+          <h4>PersistentVolumeClaim (PVC)</h4>
+          <p>Demande de stockage par un Pod. Le scheduler trouve le PV correspondant (capacity, accessMode, storageClass).</p>
+        </div>
+        <div class="concept-card">
+          <h4>StorageClass</h4>
+          <p>Définit le provisioner et les paramètres pour le <strong>provisionnement dynamique</strong>. Évite de créer des PV manuellement.</p>
+        </div>
+        <div class="concept-card">
+          <h4>CSI Driver</h4>
+          <p>Plugin standard pour intégrer n'importe quel système de stockage (EBS, GCE PD, NFS, Ceph…) sans modifier K8s.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Access Modes</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Mode</th><th>Abrév.</th><th>Description</th></tr>
+          <tr><td>ReadWriteOnce</td><td><code>RWO</code></td><td>Un seul nœud peut monter en lecture/écriture</td></tr>
+          <tr><td>ReadOnlyMany</td><td><code>ROX</code></td><td>Plusieurs nœuds peuvent monter en lecture seule</td></tr>
+          <tr><td>ReadWriteMany</td><td><code>RWX</code></td><td>Plusieurs nœuds en lecture/écriture (NFS, CephFS…)</td></tr>
+          <tr><td>ReadWriteOncePod</td><td><code>RWOP</code></td><td>Un seul Pod en lecture/écriture (K8s 1.22+)</td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Reclaim Policies</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Policy</th><th>Comportement quand le PVC est supprimé</th></tr>
+          <tr><td><code>Retain</code></td><td>PV conservé, données préservées, doit être libéré manuellement</td></tr>
+          <tr><td><code>Delete</code></td><td>PV et données supprimés automatiquement (défaut cloud)</td></tr>
+          <tr><td><code>Recycle</code></td><td>Déprecié — rm -rf + re-mise à disposition</td></tr>
+        </table>
+      </div>
+
+      <pre><code><span class="cmd-comment"># Créer un PVC et le monter dans un Pod</span>
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-pvc
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 5Gi
+<span class="cmd-comment">---</span>
+<span class="cmd-comment"># Dans le Pod spec:</span>
+<span class="cmd-comment"># volumes:</span>
+<span class="cmd-comment">#   - name: data</span>
+<span class="cmd-comment">#     persistentVolumeClaim: { claimName: data-pvc }</span>
+<span class="cmd-comment"># containers[].volumeMounts:</span>
+<span class="cmd-comment">#   - name: data  mountPath: /var/data</span></code></pre>
+
+    </div>
+  </section>
+
+  <!-- S5 : TROUBLESHOOTING -->
+  <section class="section" id="s5">
+    <div class="section-head">
+      <span class="section-tag tag-ts">Troubleshooting · 30 %</span>
+      <h2>Troubleshooting — le domaine le plus lourd</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">Clusters, composants, networking, logging — maîtriser ce domaine = réussir le CKA</p>
+    </div>
+    <div class="section-body">
+
+      <h3 style="margin-bottom:10px">Méthodologie de diagnostic</h3>
+      <div class="ok-box">
+        🔍 Toujours dans cet ordre : <strong>1. describe</strong> la ressource → <strong>2. logs</strong> du container → <strong>3. events</strong> du namespace → <strong>4. composants système</strong> (kubelet, apiserver) → <strong>5. réseau</strong>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Dépannage des Pods</h3>
+      <pre><code><span class="cmd-comment"># Voir les events et l'état d'un Pod</span>
+kubectl describe pod &lt;pod-name&gt;
+
+<span class="cmd-comment"># Logs du container en cours</span>
+kubectl logs &lt;pod-name&gt; <span class="cmd-flag">-c</span> &lt;container&gt; <span class="cmd-flag">--previous</span>
+
+<span class="cmd-comment"># Shell interactif dans un Pod</span>
+kubectl exec -it &lt;pod-name&gt; -- /bin/sh
+
+<span class="cmd-comment"># Pod de debug éphémère (K8s 1.23+)</span>
+kubectl debug -it &lt;pod-name&gt; <span class="cmd-flag">--image</span>=<span class="cmd-val">busybox</span> <span class="cmd-flag">--target</span>=&lt;container&gt;</code></pre>
+
+      <h3 style="margin:16px 0 10px">États des Pods — signification</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>État</th><th>Cause probable</th><th>Action</th></tr>
+          <tr><td><code>Pending</code></td><td>Pas assez de ressources, PVC en attente, nœud tainté</td><td><code>describe pod</code> → Events</td></tr>
+          <tr><td><code>CrashLoopBackOff</code></td><td>Container crash au démarrage répété</td><td><code>logs --previous</code></td></tr>
+          <tr><td><code>ImagePullBackOff</code></td><td>Image introuvable ou registry inaccessible</td><td>Vérifier nom/tag, imagePullSecrets</td></tr>
+          <tr><td><code>OOMKilled</code></td><td>Mémoire limits dépassée</td><td>Augmenter limits ou corriger memory leak</td></tr>
+          <tr><td><code>ContainerCreating</code></td><td>Volume non monté, ConfigMap/Secret manquant</td><td><code>describe pod</code> → Events</td></tr>
+          <tr><td><code>NodeNotReady</code></td><td>kubelet HS, réseau CNI, disque plein</td><td><code>systemctl status kubelet</code></td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Dépannage des nœuds</h3>
+      <pre><code><span class="cmd-comment"># Status et conditions des nœuds</span>
+kubectl get nodes
+kubectl describe node &lt;node-name&gt;
+
+<span class="cmd-comment"># Logs du kubelet (sur le nœud directement)</span>
+systemctl status kubelet
+journalctl -u kubelet <span class="cmd-flag">-n</span> <span class="cmd-val">100</span>
+
+<span class="cmd-comment"># Vérifier les static Pods du control plane</span>
+ls /etc/kubernetes/manifests/
+
+<span class="cmd-comment"># Redémarrer le kubelet</span>
+systemctl daemon-reload && systemctl restart kubelet</code></pre>
+
+      <h3 style="margin:16px 0 10px">Dépannage des Services et du réseau</h3>
+      <pre><code><span class="cmd-comment"># Vérifier les endpoints d'un Service</span>
+kubectl get endpoints &lt;service-name&gt;
+<span class="cmd-comment"># → si vide : les labels du selector ne matchent aucun Pod</span>
+
+<span class="cmd-comment"># Tester la connectivité depuis un Pod</span>
+kubectl run test <span class="cmd-flag">--image</span>=busybox <span class="cmd-flag">--rm</span> <span class="cmd-flag">-it</span> -- wget -O- http://&lt;service&gt;:80
+
+<span class="cmd-comment"># Vérifier kube-proxy</span>
+kubectl get ds kube-proxy <span class="cmd-flag">-n</span> kube-system
+iptables -t nat -L KUBE-SERVICES | grep &lt;service-ip&gt;</code></pre>
+
+      <h3 style="margin:16px 0 10px">Sauvegarde &amp; restauration etcd</h3>
+      <pre><code><span class="cmd-comment"># Snapshot etcd</span>
+ETCDCTL_API=3 etcdctl snapshot save /backup/etcd-snapshot.db \
+  <span class="cmd-flag">--endpoints</span>=https://127.0.0.1:2379 \
+  <span class="cmd-flag">--cacert</span>=/etc/kubernetes/pki/etcd/ca.crt \
+  <span class="cmd-flag">--cert</span>=/etc/kubernetes/pki/etcd/server.crt \
+  <span class="cmd-flag">--key</span>=/etc/kubernetes/pki/etcd/server.key
+
+<span class="cmd-comment"># Vérifier le snapshot</span>
+ETCDCTL_API=3 etcdctl snapshot status /backup/etcd-snapshot.db
+
+<span class="cmd-comment"># Restauration</span>
+ETCDCTL_API=3 etcdctl snapshot restore /backup/etcd-snapshot.db \
+  <span class="cmd-flag">--data-dir</span>=/var/lib/etcd-restore</code></pre>
+
+    </div>
+  </section>
+
+  <!-- S6 : KUBECTL COMMANDES -->
+  <section class="section" id="s6">
+    <div class="section-head">
+      <span class="section-tag tag-arch">kubectl · Commandes essentielles</span>
+      <h2>kubectl — Référence rapide CKA</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">Les commandes les plus utilisées à l'examen</p>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        💡 <strong>Setup obligatoire au démarrage de l'examen :</strong><br>
+        <code>alias k=kubectl</code><br>
+        <code>source &lt;(kubectl completion bash)</code><br>
+        <code>complete -F __start_kubectl k</code><br>
+        <code>export do="--dry-run=client -o yaml"</code>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Génération rapide de YAML</h3>
+      <pre><code><span class="cmd-comment"># Pod</span>
+kubectl run nginx <span class="cmd-flag">--image</span>=nginx <span class="cmd-flag">--dry-run=client -o yaml</span> > pod.yaml
+
+<span class="cmd-comment"># Deployment</span>
+kubectl create deploy web <span class="cmd-flag">--image</span>=nginx <span class="cmd-flag">--replicas</span>=3 <span class="cmd-flag">$do</span> > deploy.yaml
+
+<span class="cmd-comment"># Service (depuis un deployment)</span>
+kubectl expose deploy web <span class="cmd-flag">--port</span>=80 <span class="cmd-flag">$do</span> > svc.yaml
+
+<span class="cmd-comment"># ConfigMap</span>
+kubectl create cm my-cm <span class="cmd-flag">--from-literal</span>=key=val <span class="cmd-flag">$do</span> > cm.yaml
+
+<span class="cmd-comment"># Secret</span>
+kubectl create secret generic my-sec <span class="cmd-flag">--from-literal</span>=pass=1234 <span class="cmd-flag">$do</span> > sec.yaml
+
+<span class="cmd-comment"># ServiceAccount</span>
+kubectl create sa my-sa <span class="cmd-flag">$do</span> > sa.yaml</code></pre>
+
+      <h3 style="margin:16px 0 10px">Commandes de diagnostic rapide</h3>
+      <pre><code><span class="cmd-comment"># Tous les pods avec leur nœud</span>
+k get pods <span class="cmd-flag">-A</span> <span class="cmd-flag">-o wide</span>
+
+<span class="cmd-comment"># Events triés par date</span>
+k get events <span class="cmd-flag">-A</span> <span class="cmd-flag">--sort-by</span>=.lastTimestamp
+
+<span class="cmd-comment"># Consommation CPU/mémoire</span>
+k top nodes
+k top pods <span class="cmd-flag">-A</span>
+
+<span class="cmd-comment"># Champs d'une ressource</span>
+k explain pod.spec.containers.resources
+
+<span class="cmd-comment"># Changer de contexte / namespace</span>
+k config use-context &lt;context&gt;
+k config set-context <span class="cmd-flag">--current</span> <span class="cmd-flag">--namespace</span>=&lt;ns&gt;</code></pre>
+
+      <h3 style="margin:16px 0 10px">JSONPath &amp; output formaté</h3>
+      <pre><code><span class="cmd-comment"># IP de tous les nœuds</span>
+k get nodes <span class="cmd-flag">-o</span> jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}'
+
+<span class="cmd-comment"># Nom + image de tous les containers dans kube-system</span>
+k get pods <span class="cmd-flag">-n</span> kube-system <span class="cmd-flag">-o</span> custom-columns='NAME:.metadata.name,IMAGE:.spec.containers[0].image'
+
+<span class="cmd-comment"># Labels d'un pod</span>
+k get pod &lt;pod&gt; <span class="cmd-flag">-o</span> jsonpath='{.metadata.labels}'</code></pre>
+
+    </div>
+  </section>
+
+  <!-- S7 : RBAC -->
+  <section class="section" id="s7">
+    <div class="section-head">
+      <span class="section-tag tag-arch">RBAC · Sécurité</span>
+      <h2>RBAC — Role Based Access Control</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">Roles, ClusterRoles, RoleBindings — composant central du CKA</p>
+    </div>
+    <div class="section-body">
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Role</h4>
+          <p>Permissions dans un namespace précis. Exemple : lire les Pods dans <code>default</code>.</p>
+        </div>
+        <div class="concept-card">
+          <h4>ClusterRole</h4>
+          <p>Permissions cluster-wide (nœuds, PV, namespaces) ou réutilisable dans plusieurs namespaces.</p>
+        </div>
+        <div class="concept-card">
+          <h4>RoleBinding</h4>
+          <p>Lie un Role (ou ClusterRole) à un user/group/SA dans un namespace.</p>
+        </div>
+        <div class="concept-card">
+          <h4>ClusterRoleBinding</h4>
+          <p>Lie un ClusterRole à un subject pour tout le cluster.</p>
+        </div>
+      </div>
+
+      <pre><code><span class="cmd-comment"># Créer un Role qui permet de lire les pods</span>
+kubectl create role pod-reader \
+  <span class="cmd-flag">--verb</span>=get,list,watch \
+  <span class="cmd-flag">--resource</span>=pods
+
+<span class="cmd-comment"># Lier ce Role à un utilisateur</span>
+kubectl create rolebinding bob-pod-reader \
+  <span class="cmd-flag">--role</span>=pod-reader \
+  <span class="cmd-flag">--user</span>=bob
+
+<span class="cmd-comment"># ClusterRole pour accéder aux nœuds</span>
+kubectl create clusterrole node-reader \
+  <span class="cmd-flag">--verb</span>=get,list \
+  <span class="cmd-flag">--resource</span>=nodes
+
+<span class="cmd-comment"># Vérifier les permissions d'un utilisateur</span>
+kubectl auth can-i create pods <span class="cmd-flag">--as</span>=bob
+kubectl auth can-i get nodes <span class="cmd-flag">--as</span>=system:serviceaccount:default:my-sa</code></pre>
+
+      <div class="warn-box">
+        ⚠️ <strong>Service Account ≠ User.</strong> Les Pods utilisent des ServiceAccounts pour s'authentifier à l'API. Par défaut, le SA <code>default</code> de chaque namespace a des permissions minimales. Toujours créer des SA dédiés en prod et lier uniquement les permissions nécessaires.
+      </div>
+
+    </div>
+  </section>
+
+  <!-- S8 : PIEGES -->
+  <section class="section" id="s8">
+    <div class="section-head">
+      <span class="section-tag" style="background:var(--warn-soft);color:var(--warn)">⚠️ Pièges &amp; astuces</span>
+      <h2>Pièges courants à l'examen CKA</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">Erreurs classiques qui font perdre des points</p>
+    </div>
+    <div class="section-body">
+      <div class="concept-grid">
+        <div class="concept-card warn">
+          <h4>Oublier le contexte</h4>
+          <p>Chaque tâche CKA spécifie un contexte et/ou un namespace. Toujours lancer <code>kubectl config use-context &lt;ctx&gt;</code> avant de commencer.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>Ne pas lire le namespace</h4>
+          <p>Beaucoup de ressources sont dans un namespace précis. Vérifier avec <code>-n &lt;ns&gt;</code> ou <code>-A</code>. Un Pod "introuvable" est souvent dans un autre namespace.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>Certificats etcd</h4>
+          <p>Toujours passer les 3 flags TLS à <code>etcdctl</code> : <code>--cacert</code>, <code>--cert</code>, <code>--key</code>. Sans ça, la commande échoue silencieusement.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>Static Pods vs Deployments</h4>
+          <p>Les composants du control plane (apiserver, etcd…) sont des Static Pods dans <code>/etc/kubernetes/manifests/</code>. Ne pas essayer de les gérer avec <code>kubectl delete pod</code>.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>Selector labels</h4>
+          <p>Un Service n'a pas d'Endpoints ? Vérifier que ses labels <code>spec.selector</code> matchent exactement les labels des Pods (casse, tirets, etc.).</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>imagePullPolicy</h4>
+          <p>Avec <code>:latest</code>, <code>imagePullPolicy</code> est <code>Always</code> par défaut. En examen, utiliser des tags précis pour éviter les pulls réseau.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>PVC en Pending</h4>
+          <p>Un PVC reste Pending si aucun PV compatible n'existe (accessMode, storageClass, capacity). Vérifier avec <code>kubectl describe pvc</code>.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>Permissions RBAC manquantes</h4>
+          <p>Un Pod qui échoue à appeler l'API K8s : vérifier le ServiceAccount, le Role et le RoleBinding. Tester avec <code>kubectl auth can-i</code>.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>NetworkPolicy bloque tout</h4>
+          <p>Une NetworkPolicy avec un <code>podSelector</code> vide <code>{}</code> s'applique à <strong>tous les Pods</strong> du namespace. Toujours limiter avec des labels précis.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>Kubelet pas redémarré</h4>
+          <p>Après modification d'un fichier de config kubelet ou manifest Static Pod, faire <code>systemctl daemon-reload && systemctl restart kubelet</code> pour appliquer.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:20px 0 10px">Routine de préparation d'une tâche CKA</h3>
+      <pre><code><span class="cmd-comment"># 1. Changer de contexte (toujours !)</span>
+kubectl config use-context &lt;context-donné&gt;
+
+<span class="cmd-comment"># 2. Vérifier le namespace de la tâche</span>
+export NS=&lt;namespace&gt;
+
+<span class="cmd-comment"># 3. Lire la ressource existante si besoin</span>
+kubectl get &lt;resource&gt; <span class="cmd-flag">-n</span> $NS
+
+<span class="cmd-comment"># 4. Générer le YAML de base</span>
+kubectl create &lt;resource&gt; &lt;name&gt; ... <span class="cmd-flag">--dry-run=client -o yaml</span> > /tmp/task.yaml
+
+<span class="cmd-comment"># 5. Éditer si nécessaire</span>
+vi /tmp/task.yaml
+
+<span class="cmd-comment"># 6. Appliquer</span>
+kubectl apply <span class="cmd-flag">-f</span> /tmp/task.yaml
+
+<span class="cmd-comment"># 7. Vérifier</span>
+kubectl get &lt;resource&gt; <span class="cmd-flag">-n</span> $NS
+kubectl describe &lt;resource&gt; &lt;name&gt; <span class="cmd-flag">-n</span> $NS</code></pre>
+
+      <h3 style="margin:20px 0 10px">Ressources de préparation</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Ressource</th><th>Usage</th></tr>
+          <tr><td><a href="https://kubernetes.io/docs/home/" target="_blank">kubernetes.io/docs</a></td><td>Documentation officielle autorisée à l'examen</td></tr>
+          <tr><td><a href="https://killer.sh" target="_blank">killer.sh</a></td><td>Simulateur officiel CKA (2 tentatives incluses)</td></tr>
+          <tr><td><a href="https://github.com/cncf/curriculum" target="_blank">CNCF Curriculum PDF</a></td><td>Programme officiel détaillé</td></tr>
+          <tr><td><a href="https://killercoda.com/killer-shell-cka" target="_blank">KillerCoda CKA</a></td><td>Exercices pratiques gratuits en ligne</td></tr>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<button class="theme-btn" id="themeBtn" title="Changer de thème">🌙</button>
+<script>
+(function(){
+  const btn = document.getElementById('themeBtn');
+  const root = document.documentElement;
+  let theme = '';
+  try { theme = localStorage.getItem('cka-theme') || ''; } catch(e){}
+  if(theme) { root.dataset.theme = theme; btn.textContent = theme === 'dark' ? '☀️' : '🌙'; }
+  btn.addEventListener('click', () => {
+    const cur = root.dataset.theme;
+    const next = cur === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    btn.textContent = next === 'dark' ? '☀️' : '🌙';
+    try { localStorage.setItem('cka-theme', next); } catch(e){}
+  });
+})();
+</script>
+</body>
+</html>
