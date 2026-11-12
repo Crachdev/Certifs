@@ -1,5 +1,7 @@
 window.QKEY = "az-802";
 window.QUIZ_META = {
+  title: "Windows Server Hybrid Administrator Associate",
+  code: "AZ-802",
   exam: "Microsoft Certified: Windows Server Hybrid Administrator Associate AZ-802",
   passScore:70,
   examMins:120,
