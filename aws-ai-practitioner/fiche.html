@@ -133,6 +133,7 @@ h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
     <li><a href="#s7"><span class="toc-num">07</span>Services AWS IA clés</a></li>
     <li><a href="#s8"><span class="toc-num">08</span>Mots-clés examen</a></li>
     <li><a href="#s9"><span class="toc-num">09</span>Pièges classiques</a></li>
+    <li><a href="#s10"><span class="toc-num">10</span>Services in-scope complémentaires</a></li>
   </ul>
 </nav>
 <main class="main">
@@ -421,6 +422,7 @@ h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
           <tr><td><strong>Amazon Transcribe</strong></td><td>Audio → Texte</td><td>Transcription audio (Speech-to-Text)</td></tr>
           <tr><td><strong>Amazon Polly</strong></td><td>Texte → Audio</td><td>Text-to-Speech (TTS)</td></tr>
           <tr><td><strong>Amazon Translate</strong></td><td>Traduction</td><td>Traduction automatique en temps réel</td></tr>
+          <tr><td><strong>Amazon Textract</strong></td><td>OCR IA</td><td>Extraire texte et données structurées depuis documents (PDF, images). OCR + reconnaissance de formulaires et tableaux.</td></tr>
           <tr><td><strong>Amazon Comprehend</strong></td><td>NLP</td><td>Analyse de sentiments, entités, topics sur du texte</td></tr>
           <tr><td><strong>Amazon Lex</strong></td><td>Chatbot</td><td>Créer des chatbots avec NLU (même techno qu'Alexa)</td></tr>
           <tr><td><strong>Amazon Kendra</strong></td><td>Recherche IA</td><td>Moteur de recherche intelligent sur documents internes</td></tr>
@@ -458,6 +460,7 @@ h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
           <tr><td>« Recommandations personnalisées »</td><td>Amazon Personalize</td></tr>
           <tr><td>« Prévisions de demande »</td><td>Amazon Forecast</td></tr>
           <tr><td>« Analyse de sentiments sur texte »</td><td>Amazon Comprehend</td></tr>
+          <tr><td>« Extraire du texte depuis des PDF / factures »</td><td>Amazon Textract</td></tr>
           <tr><td>« Injection de prompt »</td><td>Menace → Bedrock Guardrails</td></tr>
           <tr><td>« Modèle qui génère fausses informations »</td><td>Hallucination → RAG / Guardrails grounding</td></tr>
           <tr><td>« Assistant IA sur données internes de l'entreprise »</td><td>Amazon Q Business</td></tr>
@@ -482,6 +485,119 @@ h3{font:700 .95rem var(--f-display);color:var(--ink);margin:16px 0 8px}
       <li><strong>Prompt Injection ≠ SQL Injection</strong> : Prompt Injection = manipulation d'un LLM via son input pour ignorer ses instructions. Spécifique aux LLMs.</li>
       <li><strong>ROUGE pour résumés, BLEU pour traductions</strong> : ROUGE mesure le chevauchement pour les résumés. BLEU mesure la qualité de traduction. Les deux sont basés sur les n-grammes.</li>
     </ul>
+  </section>
+
+  <section id="s10">
+    <div class="section-header"><span class="section-num">10</span><h2>Services in-scope complémentaires AIF-C01</h2></div>
+    <div class="callout"><strong>Périmètre officiel</strong>Ces services figurent dans la liste officielle AWS des services in-scope pour AIF-C01. Ils constituent le contexte infrastructurel et data des solutions IA — l'examen peut demander de choisir le bon service de stockage, base de données ou pipeline de données pour un workload IA.</div>
+
+    <h3>Données &amp; Analytique</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Service</th><th>Rôle pour les workloads IA</th><th>Mot-clé examen</th></tr></thead>
+        <tbody>
+          <tr><td><strong>AWS Glue</strong></td><td>ETL serverless : extraire, transformer et charger des données pour alimenter les pipelines ML. Catalogue de données (Glue Data Catalog) = inventaire centralisé des datasets.</td><td>« Préparer des données pour SageMaker »</td></tr>
+          <tr><td><strong>AWS Glue DataBrew</strong></td><td>Outil visuel (no-code) de nettoyage et transformation de données. 250+ transformations prêtes à l'emploi. Intégré avec SageMaker et S3.</td><td>« Nettoyer des données sans coder »</td></tr>
+          <tr><td><strong>AWS Lake Formation</strong></td><td>Créer, sécuriser et gérer un data lake sur S3. Contrôle d'accès fin aux données : colonnes, lignes. Gouvernance des données ML.</td><td>« Gouvernance sécurisée d'un data lake »</td></tr>
+          <tr><td><strong>AWS Data Exchange</strong></td><td>Marché de données tierces : abonnement à des datasets externes (financiers, géographiques, santé). Alimenter les modèles ML avec des données enrichies.</td><td>« Données tierces pour enrichir un modèle »</td></tr>
+          <tr><td><strong>Amazon EMR</strong></td><td>Plateforme big data managée (Spark, Hadoop). Prétraitement de très grands volumes de données d'entraînement.</td><td>« Traitement big data pour ML »</td></tr>
+          <tr><td><strong>Amazon Redshift</strong></td><td>Data warehouse analytique. ML intégré (Redshift ML) : entraîner des modèles SageMaker depuis SQL. Accès SQL aux données massives pour analyse IA.</td><td>« SQL sur données massives + ML »</td></tr>
+          <tr><td><strong>Amazon OpenSearch</strong></td><td>Moteur de recherche et analytique. Base vectorielle pour RAG (k-NN vector search). Utilisé comme vector store dans Bedrock Knowledge Bases.</td><td>« Vector store pour RAG »</td></tr>
+          <tr><td><strong>Amazon QuickSight</strong></td><td>Business Intelligence serverless. QuickSight Q = questions en langage naturel sur des données. Générative BI avec Amazon Q intégré.</td><td>« BI avec questions en langage naturel »</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Stockage</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Service</th><th>Rôle pour les workloads IA</th><th>Mot-clé examen</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Amazon S3</strong></td><td>Stockage objet fondamental pour l'IA : datasets d'entraînement, modèles entraînés, artefacts ML, logs d'inférence. Source principale de Bedrock Knowledge Bases et SageMaker.</td><td>« Stocker les données d'entraînement »</td></tr>
+          <tr><td><strong>Amazon S3 Glacier</strong></td><td>Archivage à long terme à faible coût. Archiver les anciens datasets d'entraînement, les versions de modèles, les logs d'audit IA pour conformité.</td><td>« Archiver des modèles / datasets »</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Bases de données</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Service</th><th>Rôle pour les workloads IA</th><th>Mot-clé examen</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Amazon Aurora</strong></td><td>Base relationnelle managée (MySQL/PostgreSQL). Aurora pgvector : extension PostgreSQL pour stocker et interroger des embeddings vectoriels. Vector store pour RAG dans Bedrock Knowledge Bases.</td><td>« Base SQL avec embeddings vectoriels »</td></tr>
+          <tr><td><strong>Amazon DynamoDB</strong></td><td>NoSQL serverless. Stocker les sessions de conversation des chatbots (historique Bedrock Agents), les métadonnées de recommandations (Personalize), les états d'agents IA à faible latence.</td><td>« Sessions chatbot / état agent IA »</td></tr>
+          <tr><td><strong>Amazon DocumentDB</strong></td><td>Base documentaire compatible MongoDB. Stocker les documents source pour RAG, les embeddings non-structurés, les sorties de modèles en JSON.</td><td>« Documents JSON pour RAG »</td></tr>
+          <tr><td><strong>Amazon ElastiCache</strong></td><td>Cache en mémoire (Redis/Memcached). Mettre en cache les réponses d'inférence fréquentes pour réduire les coûts et la latence Bedrock/SageMaker. Semantic caching.</td><td>« Cache des réponses IA pour réduire coûts »</td></tr>
+          <tr><td><strong>Amazon Neptune</strong></td><td>Base de données graphe. Modéliser les relations complexes pour les systèmes de recommandation (graphe utilisateur-produit), les knowledge graphs qui alimentent le RAG.</td><td>« Knowledge graph pour RAG »</td></tr>
+          <tr><td><strong>Amazon RDS</strong></td><td>Base relationnelle managée multi-moteurs. RDS for PostgreSQL avec pgvector pour les embeddings. Stocker les métadonnées et configurations des workloads ML.</td><td>« Base SQL pour métadonnées ML »</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Compute &amp; Conteneurs</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Service</th><th>Rôle pour les workloads IA</th><th>Mot-clé examen</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Amazon EC2</strong></td><td>Instances GPU/Inferentia pour l'entraînement et l'inférence ML. Types P (GPU NVIDIA), G (GPU graphique), Trn (AWS Trainium pour entraînement), Inf (AWS Inferentia pour inférence).</td><td>« Instances GPU pour entraîner un modèle »</td></tr>
+          <tr><td><strong>AWS Lambda</strong></td><td>Serverless pour orchestrer les pipelines ML, déclencher des inférences légères, prétraiter des données, intégrer Bedrock dans des applications sans serveur.</td><td>« Déclencher une inférence sans serveur »</td></tr>
+          <tr><td><strong>Amazon ECS</strong></td><td>Conteneurs managés pour déployer des modèles ML packagés en Docker. Scaling automatique des endpoints d'inférence.</td><td>« Déployer un modèle ML en conteneur »</td></tr>
+          <tr><td><strong>Amazon EKS</strong></td><td>Kubernetes managé pour les workflows ML complexes. Kubeflow sur EKS pour les pipelines ML. Opérateurs SageMaker sur Kubernetes.</td><td>« Orchestrer des pipelines ML avec Kubernetes »</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Nouveaux outils IA pour développeurs</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Service</th><th>Description</th><th>Différence clé</th></tr></thead>
+        <tbody>
+          <tr><td><strong>AWS Transform</strong></td><td>Service de migration et modernisation du code legacy assisté par IA. Transforme du code COBOL, Java 8 vers Java 21, et mainframes vers le cloud. Utilise les LLMs pour comprendre et réécrire le code.</td><td>Spécifique à la migration/transformation de code legacy ≠ Q Developer (assistance en temps réel)</td></tr>
+          <tr><td><strong>Kiro</strong></td><td>IDE IA nouvelle génération (spec-first). Génère des spécifications techniques et du code à partir des exigences business. Intégré avec les modèles AWS.</td><td>IDE IA complet ≠ Q Developer (plugin pour IDE existant)</td></tr>
+          <tr><td><strong>Strands Agents</strong></td><td>Framework open-source AWS pour construire des agents IA multi-steps. Basé sur le Model Context Protocol (MCP). Alternative à Bedrock Agents pour les développeurs Python.</td><td>SDK open-source ≠ Bedrock Agents (service managé)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout"><strong>💡 Kiro &amp; Strands Agents — Nouveaux services 2025/2026</strong>Kiro et Strands Agents sont des ajouts récents à l'écosystème AWS IA, reflétant la tendance agentic AI. L'examen AIF-C01 mis à jour les inclut comme services in-scope. Retenir : Kiro = IDE IA, Strands = framework agents open-source Python.</div>
+
+    <h3>Coûts et gouvernance financière IA</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">AWS Budgets</span><span>Définir des seuils d'alerte pour les dépenses Bedrock, SageMaker, EC2 (GPU). Alertes automatiques par email/SNS quand les coûts dépassent les budgets. Essentiel pour contrôler les dépenses IA génératives (facturation par token).</span></div>
+      <div class="kv-row"><span class="k">AWS Cost Explorer</span><span>Analyser et visualiser les coûts IA. Identifier quels modèles Bedrock ou endpoints SageMaker sont les plus coûteux. Prévoir les dépenses futures. Rightsizing : dimensionner correctement les ressources ML.</span></div>
+    </div>
+
+    <h3>Sécurité complémentaire</h3>
+    <div class="kv">
+      <div class="kv-row"><span class="k">AWS Secrets Manager</span><span>Stocker et rotation automatique des clés API pour les services IA tiers (OpenAI, Anthropic, etc.) ou les tokens d'accès aux datasets. Ne jamais hardcoder des credentials dans le code ML.</span></div>
+      <div class="kv-row"><span class="k">Amazon CloudFront</span><span>CDN pour distribuer globalement les applications IA à faible latence. Mettre en cache les réponses statiques. Protéger les endpoints d'API d'inférence (AWS WAF intégré).</span></div>
+    </div>
+
+    <h3>Tableau récapitulatif — Mots-clés examen supplémentaires</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Scénario / mot-clé</th><th>Réponse</th></tr></thead>
+        <tbody>
+          <tr><td>« Préparer / transformer des données pour ML »</td><td>AWS Glue (ETL) ou AWS Glue DataBrew (no-code)</td></tr>
+          <tr><td>« Gouverner l'accès à un data lake »</td><td>AWS Lake Formation</td></tr>
+          <tr><td>« Données tierces pour enrichir un modèle »</td><td>AWS Data Exchange</td></tr>
+          <tr><td>« Vector store pour Bedrock Knowledge Bases »</td><td>Amazon OpenSearch, Aurora (pgvector), DynamoDB</td></tr>
+          <tr><td>« Stocker les datasets d'entraînement »</td><td>Amazon S3</td></tr>
+          <tr><td>« Archiver les anciens modèles / datasets »</td><td>Amazon S3 Glacier</td></tr>
+          <tr><td>« Cache des réponses Bedrock pour réduire les coûts »</td><td>Amazon ElastiCache (semantic caching)</td></tr>
+          <tr><td>« Sessions de conversation persistantes »</td><td>Amazon DynamoDB</td></tr>
+          <tr><td>« Knowledge graph pour recommandations »</td><td>Amazon Neptune</td></tr>
+          <tr><td>« Instances GPU pour entraînement »</td><td>Amazon EC2 (P4, P5, Trn1)</td></tr>
+          <tr><td>« Moderniser du code COBOL/Java legacy »</td><td>AWS Transform</td></tr>
+          <tr><td>« IDE IA spec-first »</td><td>Kiro</td></tr>
+          <tr><td>« Framework open-source pour agents IA »</td><td>Strands Agents</td></tr>
+          <tr><td>« Alerte dépassement budget Bedrock »</td><td>AWS Budgets</td></tr>
+          <tr><td>« Analyser les coûts SageMaker »</td><td>AWS Cost Explorer</td></tr>
+          <tr><td>« BI en langage naturel »</td><td>Amazon QuickSight Q / Q in QuickSight</td></tr>
+          <tr><td>« Big data preprocessing pour ML »</td><td>Amazon EMR (Spark)</td></tr>
+          <tr><td>« SQL sur entrepôt + ML intégré »</td><td>Amazon Redshift ML</td></tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <footer>
