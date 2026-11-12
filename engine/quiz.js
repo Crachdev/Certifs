@@ -74,12 +74,8 @@ async function syncFromFirestore(){
   }catch(e){}
 }
 
-// Attendre que Firebase soit prêt avant de syncer (max 5 secondes)
-(function waitForFirebase(attempts){
-  if(typeof window.loadProgression==="function"){syncFromFirestore();return;}
-  if(attempts>10)return;
-  setTimeout(()=>waitForFirebase(attempts+1),500);
-})(0);
+// loadProgression attend elle-même que Firebase soit prêt (voir firebase.js)
+syncFromFirestore();
 const Q=(d,i)=>{
   const r=window.QDATA[d][i];
   if(!r)return r;

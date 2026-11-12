@@ -167,8 +167,22 @@
 
   // ── loadProgression ──────────────────────────────────────────────────────
   // Retourne store.r depuis Firestore (ou null si absent)
+  // Attend que Firebase soit prêt (max 8s) avant de lire
   window.loadProgression = async function (cert, pseudo) {
-    if (!_ready || !_db || !pseudo || pseudo === "Anonyme") return null;
+    if (!pseudo || pseudo === "Anonyme") return null;
+    // Attendre que Firebase soit prêt si ce n'est pas encore le cas
+    if (!_ready) {
+      await new Promise((resolve) => {
+        const start = Date.now();
+        const check = () => {
+          if (_ready) { resolve(); return; }
+          if (Date.now() - start > 8000) { resolve(); return; } // timeout 8s
+          setTimeout(check, 200);
+        };
+        check();
+      });
+    }
+    if (!_ready || !_db) return null;
     const docId = String(pseudo).slice(0, 30).replace(/[^a-z0-9_-]/gi, "_") + "__" + cert;
     try {
       const snap = await _db.collection("progression").doc(docId).get();
