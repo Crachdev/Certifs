@@ -382,7 +382,7 @@ function planHTML(){
   return `<p class="intro">${dureeLabel}, un bloc de domaine par jour, pondéré comme l'examen. Chaque jour est découpé en <b>5 modules de 10 questions</b>. Lis ${ficheLink}, puis fais les modules un par un.</p>
   <div class="rules">${rulesHTML}</div>
   <ol class="days">${PLAN.map(p=>{
-    const s=dayStats(p.d),pct=Math.round(s.done/s.n*100);
+    const s=dayStats(p.d),pct=s.n>0?Math.round(s.done/s.n*100):0;
     const nm=dayModCount(p.d);
     const dots=Array.from({length:nm},(_,m)=>`<span class="${dotClass(p.d,m)}" title="Module ${m+1}"></span>`).join("");
     const modBtns=Array.from({length:nm},(_,m)=>{
