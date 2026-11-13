@@ -2840,6 +2840,157 @@ window.QDATA = {
     a: 1,
     e: "Le pattern recommandé : (1) créer une lib CDK (cdk init lib) avec les Constructs réutilisables (VpcConstruct, DatabaseConstruct, etc.), (2) packager avec jsii (permet d'utiliser en TypeScript, Python, Java, C# depuis un seul code TS), (3) publier dans CodeArtifact (npm pour TS, pip pour Python), (4) les équipes consommatrices installent la lib comme dépendance. Projen automatise la gestion de ce type de projet. AWS Construct Hub répertorie les Constructs publics."
   }
+],
+
+7: [
+  // ─── SSM Parameter Store ─────────────────────────────────────────────────
+  {
+    t: "SSM Parameter Store fondamentaux",
+    q: "Quelle est la différence entre un paramètre SSM de type 'String' et 'SecureString' ?",
+    o: [
+      "String est pour les textes courts ; SecureString est pour les textes longs",
+      "String stocke la valeur en clair ; SecureString chiffre la valeur avec KMS — recommandé pour les mots de passe, tokens et secrets",
+      "String est gratuit ; SecureString est payant uniquement",
+      "SecureString est uniquement pour les certificats SSL"
+    ],
+    a: 1,
+    e: "SSM Parameter Store propose trois types : (1) String : texte brut en clair. (2) StringList : liste de valeurs séparées par virgule. (3) SecureString : valeur chiffrée via AWS KMS (clé AWS managed aws/ssm ou clé CMK personnalisée). Pour les secrets, utilisez toujours SecureString. Avantage vs Secrets Manager : Parameter Store Standard (gratuit) vs Advanced (payant). Secrets Manager offre la rotation automatique des secrets."
+  },
+  {
+    t: "SSM Parameter Store",
+    q: "Comment organiser les paramètres SSM pour plusieurs environnements (dev, staging, prod) d'une application ?",
+    o: [
+      "Créer un compte AWS séparé par environnement",
+      "Utiliser une hiérarchie de chemins : /app/env/param (ex: /myapp/prod/db-password, /myapp/dev/db-password) — permet des permissions IAM granulaires par chemin",
+      "Préfixer les paramètres avec l'environnement : prod_db_password, dev_db_password",
+      "SSM ne supporte pas plusieurs environnements dans le même compte"
+    ],
+    a: 1,
+    e: "La convention de nommage avec hiérarchie de chemins est recommandée : /application/environnement/paramètre. Avantages : (1) IAM granulaire — autoriser l'accès à /myapp/prod/* uniquement pour les rôles de production, (2) GetParametersByPath permet de récupérer tous les paramètres d'un préfixe en une seule API call, (3) lisibilité et organisation. L'API GetParametersByPath retourne tous les paramètres sous /myapp/prod/ par exemple."
+  },
+  {
+    t: "SSM Parameter Store",
+    q: "Comment référencer un paramètre SSM dans un template CloudFormation sans coder la valeur en dur ?",
+    o: [
+      "Via la fonction !SSMRef dans CloudFormation",
+      "Via le type de paramètre AWS::SSM::Parameter::Value::String dans la section Parameters du template CloudFormation",
+      "Via un Custom Resource qui lit SSM au déploiement",
+      "CloudFormation ne peut pas référencer SSM Parameter Store nativement"
+    ],
+    a: 1,
+    e: "CloudFormation supporte les types de paramètres SSM natifs : AWS::SSM::Parameter::Value::String, AWS::SSM::Parameter::Value::AWS::EC2::Image::Id (pour les AMI IDs), etc. Déclaration : Parameters: DbPassword: Type: AWS::SSM::Parameter::Value::String Default: /myapp/prod/db-password. CloudFormation résout la valeur lors du déploiement. Avantage : le template ne contient jamais la valeur sensible, seulement le chemin SSM."
+  },
+  {
+    t: "SSM Parameter Store tiers",
+    q: "Quelle est la différence entre les tiers 'Standard' et 'Advanced' de SSM Parameter Store ?",
+    o: [
+      "Standard est pour les petits paramètres ; Advanced est pour les grands",
+      "Standard : gratuit, max 4KB par paramètre, max 10 000 paramètres, pas d'historique ni de TTL. Advanced : payant (0.05$/10k API calls), max 8KB, TTL configurable, politiques de paramètres, historique illimité",
+      "Advanced est requis pour les SecureString uniquement",
+      "Les deux tiers ont les mêmes fonctionnalités — Advanced est simplement plus rapide"
+    ],
+    a: 1,
+    e: "SSM Parameter Store Standard (gratuit) : max 10 000 paramètres par compte/région, max 4KB par paramètre. Advanced (payant) : max 100 000 paramètres, max 8KB, permet les Parameter Policies (TTL/expiration pour forcer la rotation, EventBridge notification à l'expiration), et l'historique des versions. Pour les organisations, Advanced est souvent nécessaire pour le volume et la gouvernance."
+  },
+  // ─── SSM Session Manager ─────────────────────────────────────────────────
+  {
+    t: "SSM Session Manager",
+    q: "Comment SSM Session Manager permet-il d'accéder aux instances EC2 sans ouvrir le port SSH 22 ?",
+    o: [
+      "Session Manager utilise le port 443 (HTTPS) via l'agent SSM — l'agent établit une connexion sortante vers SSM, éliminant le besoin d'inbound SSH",
+      "Session Manager utilise un VPN AWS dédié",
+      "Session Manager nécessite quand même le port SSH mais via une connexion chiffrée",
+      "Session Manager fonctionne uniquement pour les instances dans un VPC privé"
+    ],
+    a: 0,
+    e: "Session Manager fonctionne via l'agent SSM (ssm-agent) préinstallé sur les AMIs AWS récentes. L'agent établit une connexion SORTANTE (port 443) vers le service SSM — pas de port entrant requis. Avantages sécurité : zéro port entrant (22/3389), pas de bastion, IAM pour l'autorisation (ssm:StartSession), audit complet dans CloudTrail, logs de session dans S3/CloudWatch. Requis : instance profile avec AmazonSSMManagedInstanceCore."
+  },
+  {
+    t: "SSM Run Command",
+    q: "Un admin doit exécuter un patch de sécurité sur 500 instances EC2 simultanément. Quelle fonctionnalité SSM utiliser ?",
+    o: [
+      "SSM Session Manager — ouvrir une session sur chaque instance",
+      "SSM Run Command avec un document AWS-RunShellScript — exécute le script sur toutes les instances ciblées simultanément, avec contrôle de concurrence et rapport centralisé",
+      "CodeDeploy pour déployer le patch sur les instances",
+      "Lambda pour orchestrer les connexions SSH vers chaque instance"
+    ],
+    a: 1,
+    e: "SSM Run Command permet l'exécution de commandes à distance sur des flottes d'instances EC2 (ou on-premises avec l'agent SSM) : sans SSH, sans bastion. Ciblage par IDs, tags (all instances with Env=prod), ou Resource Groups. Rate control : MaxConcurrency (nombre d'instances simultanées), MaxErrors (arrêter si trop d'erreurs). Documents SSM prédéfinis : AWS-RunShellScript (Linux), AWS-RunPowerShellScript (Windows), AWS-RunAnsiblePlaybook. Résultats centralisés dans la console SSM."
+  },
+  // ─── SSM Patch Manager ───────────────────────────────────────────────────
+  {
+    t: "SSM Patch Manager",
+    q: "Comment automatiser l'application de patches de sécurité sur les instances EC2 avec SSM ?",
+    o: [
+      "Manuellement via SSH sur chaque instance",
+      "Via SSM Patch Manager avec Patch Baselines (règles de quels patches appliquer) et Maintenance Windows (quand appliquer) — automatise le patching selon les politiques définies",
+      "Via CodeDeploy avec un script de patch",
+      "Via CloudWatch Events déclenché toutes les nuits"
+    ],
+    a: 1,
+    e: "SSM Patch Manager : (1) Patch Baseline — définit quels patches sont 'approved' (par sévérité, classification, age). AWS fournit des baselines prédéfinies par OS (AWS-AmazonLinux2DefaultPatchBaseline, etc.). (2) Patch Groups — identifier des groupes d'instances par tag (Patch Group: WebServers). (3) Maintenance Windows — planifier le patching (ex: samedi 02h00-05h00). (4) Run Task : AWS-RunPatchBaseline. Compliance dashboard montre les instances non conformes."
+  },
+  // ─── SSM Automation ──────────────────────────────────────────────────────
+  {
+    t: "SSM Automation fondamentaux",
+    q: "Qu'est-ce que SSM Automation et en quoi diffère-t-il de SSM Run Command ?",
+    o: [
+      "SSM Automation est l'ancien nom de SSM Run Command",
+      "SSM Automation exécute des workflows multi-étapes (Runbooks/Documents SSM) qui peuvent orchestrer des services AWS (EC2, RDS, Lambda...) ; Run Command exécute des commandes OS sur les instances",
+      "SSM Automation est uniquement pour les instances Windows",
+      "Run Command supporte des workflows complexes ; Automation est pour les commandes simples"
+    ],
+    a: 1,
+    e: "SSM Automation orchestre des workflows multi-étapes via des Runbooks (Documents SSM de type Automation) : chaque step peut appeler une API AWS (CreateSnapshot, StopInstances, etc.), exécuter une Lambda, attendre une condition. Run Command exécute des commandes OS sur les instances (shell, PowerShell). Automation ne nécessite pas d'agent sur les instances pour les opérations sur APIs AWS. Documents prédéfinis : AWS-StopEC2InstanceWithApproval, AWS-CreateImage, AWS-RestartEC2Instance."
+  },
+  {
+    t: "SSM Automation",
+    q: "Une Automation SSM doit créer un AMI, attendre sa disponibilité, puis partager le snapshot. Comment implémenter l'attente ?",
+    o: [
+      "Utiliser une pause de 30 minutes dans le document SSM",
+      "Utiliser l'action 'waitForResourceProperty' ou 'aws:waitForAwsResourceProperty' pour attendre qu'un attribut de ressource atteigne une valeur cible (ex: AMI State = available)",
+      "Lancer une Lambda qui poll le statut de l'AMI",
+      "SSM Automation ne peut pas attendre la completion d'une opération AWS"
+    ],
+    a: 1,
+    e: "SSM Automation dispose de l'action aws:waitForAwsResourceProperty qui attend qu'une propriété AWS atteigne une valeur : {action: aws:waitForAwsResourceProperty, inputs: {Service: EC2, Api: DescribeImages, ImageIds: ['{{CreateImageStep.ImageId}}'], PropertySelector: Images[0].State, DesiredValues: ['available']}}. Polling automatique jusqu'à la valeur cible ou timeout. Évite les sleeps arbitraires et rend le workflow robuste."
+  },
+  {
+    t: "SSM Automation",
+    q: "Comment implémenter une approbation manuelle dans un workflow SSM Automation pour les opérations critiques ?",
+    o: [
+      "SSM Automation ne supporte pas les approbations manuelles",
+      "Via l'action 'aws:approve' dans le document SSM — envoie une notification via SNS, attend l'approbation d'un utilisateur/rôle IAM avant de continuer",
+      "Via une Lambda qui envoie un email et attend la réponse",
+      "Via un Step Functions workflow en parallèle"
+    ],
+    a: 1,
+    e: "L'action aws:approve dans SSM Automation : {action: aws:approve, inputs: {NotificationArn: 'arn:aws:sns:...', Message: 'Approve production deployment?', MinRequiredApprovals: 1, Approvers: ['arn:aws:iam::123:role/OpsRole']}}. Un email SNS est envoyé avec des liens d'approbation/rejet. L'automation attend (jusqu'au timeout configuré). Utile pour les opérations critiques comme les déploiements production, les suppressions de données, les changements de configuration majeurs."
+  },
+  {
+    t: "SSM Inventory",
+    q: "Qu'est-ce que SSM Inventory et quelle valeur apporte-t-il pour la gouvernance ?",
+    o: [
+      "SSM Inventory est un outil de backup des instances EC2",
+      "SSM Inventory collecte des métadonnées sur les instances (packages installés, services, network config, registre Windows) et centralise ces données pour les requêtes et la conformité",
+      "SSM Inventory surveille les performances des instances EC2",
+      "SSM Inventory remplace CloudTrail pour l'audit des instances"
+    ],
+    a: 1,
+    e: "SSM Inventory collecte automatiquement des données depuis les instances : packages installés (rpm, deb, Windows MSI), applications, services, configurations réseau, fichiers, registre Windows, etc. Ces données sont agrégées dans SSM et peuvent être envoyées vers S3 puis Athena pour des requêtes SQL. Use cases : audit des logiciels installés (compliance licences), détecter des versions vulnérables sur toute la flotte, rapport de conformité. Fonctionne avec l'agent SSM."
+  },
+  {
+    t: "SSM scénario Pro",
+    q: "Une équipe veut s'assurer que toutes les instances EC2 de production ont l'agent CloudWatch installé et démarré. Comment automatiser cette vérification et remédiation avec SSM ?",
+    o: [
+      "Créer un cron Lambda qui vérifie chaque instance manuellement",
+      "Utiliser AWS Config Rule pour détecter les instances non conformes + SSM Automation pour la remédiation automatique (installer/démarrer l'agent CloudWatch)",
+      "Utiliser CloudFormation pour recréer les instances non conformes",
+      "Utiliser CodeDeploy pour déployer l'agent sur toutes les instances"
+    ],
+    a: 1,
+    e: "Le pattern Config + SSM Automation : (1) AWS Config Rule ec2-instance-detailed-monitoring-enabled détecte les instances non conformes. (2) Systems Manager Automation Remediation : configurer une remédiation automatique qui déclenche le Runbook AWS-InstallAndManageCloudWatchAgent sur les instances non conformes. (3) Ce Runbook installe et configure l'agent CloudWatch via Run Command. Résultat : toute nouvelle instance ou instance modifiée qui ne respecte pas la règle est automatiquement remise en conformité."
+  }
 ]
 
 };
