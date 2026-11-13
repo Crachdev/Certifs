@@ -2435,6 +2435,238 @@ window.QDATA = {
     a: 1,
     e: "CodeArtifact avec un upstream npmjs.com : le premier build télécharge les packages depuis npm public et les met en cache dans CodeArtifact (même région AWS que le build CodeBuild). Les builds suivants téléchargent depuis CodeArtifact via le réseau intra-région AWS (très rapide, pas de latence internet). En pratique, cela peut réduire le temps de téléchargement de 80-90% pour des builds fréquents."
   }
+],
+
+5: [
+  // ─── CloudFormation fondamentaux ─────────────────────────────────────────
+  {
+    t: "CloudFormation concepts",
+    q: "Qu'est-ce qu'AWS CloudFormation et quel est son rôle fondamental dans le DevOps ?",
+    o: [
+      "Un outil de monitoring des ressources AWS",
+      "Un service d'Infrastructure as Code (IaC) qui permet de décrire et provisionner l'infrastructure AWS via des templates déclaratifs (JSON/YAML)",
+      "Un service de déploiement d'applications similaire à CodeDeploy",
+      "Un outil de gestion de configuration similaire à Ansible"
+    ],
+    a: 1,
+    e: "CloudFormation est le service IaC natif d'AWS. Il permet de définir l'infrastructure AWS dans des templates YAML/JSON (déclaratif), puis de créer/modifier/supprimer des stacks (ensembles cohérents de ressources). Avantages : reproductibilité, versioning, drift detection, rollback automatique. C'est la fondation du paradigme Infrastructure as Code sur AWS."
+  },
+  {
+    t: "CloudFormation structure",
+    q: "Quelles sont les sections obligatoires et optionnelles d'un template CloudFormation ?",
+    o: [
+      "Obligatoires : AWSTemplateFormatVersion, Resources. Optionnelles : toutes les autres",
+      "Obligatoire : Resources uniquement. Optionnelles : AWSTemplateFormatVersion, Description, Metadata, Parameters, Mappings, Conditions, Transform, Outputs",
+      "Obligatoires : AWSTemplateFormatVersion, Resources, Outputs",
+      "Obligatoires : Resources, Parameters. Optionnelles : toutes les autres"
+    ],
+    a: 1,
+    e: "La seule section OBLIGATOIRE dans un template CloudFormation est 'Resources' — elle contient les ressources AWS à créer. Toutes les autres sections sont optionnelles : AWSTemplateFormatVersion (version du format), Description (texte libre), Metadata (données arbitraires), Parameters (valeurs d'entrée), Mappings (lookup tables), Conditions (logique conditionnelle), Transform (macros SAM/etc.), Outputs (valeurs exportées)."
+  },
+  {
+    t: "CloudFormation Parameters",
+    q: "Comment passer une valeur dynamique (ex: nom d'environnement) à un template CloudFormation ?",
+    o: [
+      "Via des variables d'environnement dans le template",
+      "Via la section 'Parameters' — déclarer le paramètre dans le template et le référencer avec !Ref ou !Sub, puis passer la valeur au moment de la création/mise à jour de la stack",
+      "En éditant directement le template à chaque déploiement",
+      "Via des tags CloudFormation"
+    ],
+    a: 1,
+    e: "Les Parameters permettent de rendre les templates réutilisables. Déclaration : Parameters: EnvName: Type: String. Référence : !Ref EnvName ou !Sub 'bucket-${EnvName}'. Passage de valeur : via la console (prompt), CLI (--parameters ParameterKey=EnvName,ParameterValue=prod), ou CodePipeline (ParameterOverrides). Les types supportés incluent String, Number, List, AWS::EC2::Image::Id, etc."
+  },
+  {
+    t: "CloudFormation Mappings",
+    q: "À quoi sert la section 'Mappings' dans un template CloudFormation ?",
+    o: [
+      "Pour mapper des ressources à des régions AWS",
+      "Pour définir des tables de correspondance statiques (clé/valeur) utilisées avec !FindInMap — utile pour des valeurs qui varient selon la région ou l'environnement",
+      "Pour mapper des paramètres à des conditions",
+      "Pour configurer le mapping des tags sur les ressources"
+    ],
+    a: 1,
+    e: "Mappings définit des tables de lookup statiques. Exemple : Mappings: RegionMap: us-east-1: AMI: ami-123 eu-west-1: AMI: ami-456. Utilisation : !FindInMap [RegionMap, !Ref AWS::Region, AMI]. Avantage : permet d'adapter automatiquement les valeurs selon la région, l'environnement ou le type d'instance sans modifier le template. Contrairement aux Parameters, les Mappings sont statiques dans le template."
+  },
+  {
+    t: "CloudFormation Outputs",
+    q: "Pourquoi utiliser les 'Outputs' dans CloudFormation et comment les partager entre stacks ?",
+    o: [
+      "Les Outputs servent uniquement à l'affichage dans la console",
+      "Les Outputs permettent d'exporter des valeurs depuis une stack (via Export: Name) et de les importer dans d'autres stacks avec !ImportValue — permet les stacks croisées",
+      "Les Outputs remplacent les Parameters pour les valeurs dynamiques",
+      "Les Outputs sont automatiquement envoyés à CloudWatch"
+    ],
+    a: 1,
+    e: "Les Outputs servent à deux fins : (1) afficher des informations post-déploiement (URL de l'ALB, endpoint RDS, etc.), (2) exporter des valeurs vers d'autres stacks avec Export: Name: MonExport. L'autre stack importe avec !ImportValue MonExport. Important : une stack avec des exports ne peut pas être supprimée tant qu'une autre stack l'importe. Cela crée une dépendance explicite entre stacks."
+  },
+  {
+    t: "CloudFormation Conditions",
+    q: "Comment créer une ressource uniquement en environnement de production avec CloudFormation ?",
+    o: [
+      "Utiliser un Parameter de type Boolean",
+      "Définir une Condition basée sur un Parameter (ex: !Equals [!Ref Env, prod]) et attacher la condition à la ressource avec 'Condition: IsProd'",
+      "Créer deux templates séparés (prod et non-prod)",
+      "Utiliser des tags CloudFormation pour filtrer les ressources"
+    ],
+    a: 1,
+    e: "Pattern standard avec Conditions : Parameters: Env: Type: String. Conditions: IsProd: !Equals [!Ref Env, prod]. Dans la ressource : Type: AWS::RDS::DBInstance Condition: IsProd. La ressource n'est créée que si la condition est vraie. Les Conditions peuvent aussi être utilisées dans les Outputs (!If [IsProd, valeur-prod, valeur-non-prod]) et pour les valeurs de propriétés."
+  },
+  {
+    t: "CloudFormation intrinsic functions",
+    q: "Quelle est la différence entre !Ref et !GetAtt dans CloudFormation ?",
+    o: [
+      "!Ref retourne l'ID de la ressource ; !GetAtt retourne un attribut spécifique de la ressource",
+      "!Ref est pour les Parameters ; !GetAtt est pour les Resources",
+      "!Ref retourne l'ARN ; !GetAtt retourne le nom",
+      "Les deux sont identiques — !GetAtt est l'alias de !Ref"
+    ],
+    a: 0,
+    e: "!Ref retourne la valeur 'principale' de la ressource (souvent l'ID ou le nom) : !Ref MonBucket retourne le nom du bucket S3, !Ref MonSG retourne l'ID du Security Group. !GetAtt retourne un attribut spécifique : !GetAtt MonALB.DNSName retourne le DNS de l'ALB, !GetAtt MonLambda.Arn retourne l'ARN de la Lambda. Chaque type de ressource définit ce que !Ref retourne et quels attributs sont disponibles via !GetAtt."
+  },
+  {
+    t: "CloudFormation intrinsic functions",
+    q: "Comment construire une chaîne dynamique dans CloudFormation, par exemple un nom de bucket qui inclut l'environnement et la région ?",
+    o: [
+      "!Join ['mon-bucket', !Ref Env, !Ref AWS::Region]",
+      "!Sub 'mon-bucket-${Env}-${AWS::Region}' où Env est un Parameter et AWS::Region une pseudo-variable",
+      "!Concat [mon-bucket, !Ref Env, !Ref AWS::Region]",
+      "!Format 'mon-bucket-{Env}-{region}'"
+    ],
+    a: 1,
+    e: "!Sub (substitution) est la fonction la plus puissante pour construire des strings. !Sub 'mon-bucket-${Env}-${AWS::Region}' substitue ${Env} par la valeur du Parameter et ${AWS::Region} par la pseudo-variable de région. !Join peut aussi faire ça : !Join ['-', [mon-bucket, !Ref Env, !Ref AWS::Region]]. !Sub est généralement plus lisible pour des patterns complexes."
+  },
+  {
+    t: "CloudFormation pseudo-parameters",
+    q: "Quelles pseudo-variables CloudFormation permettent d'obtenir l'ID de compte AWS et la région sans les coder en dur ?",
+    o: [
+      "!Ref AWS::AccountNumber et !Ref AWS::RegionName",
+      "!Ref AWS::AccountId et !Ref AWS::Region",
+      "!GetAtt AWS::Account.Id et !GetAtt AWS::Stack.Region",
+      "Variables::AccountId et Variables::Region"
+    ],
+    a: 1,
+    e: "Les pseudo-paramètres CloudFormation sont des variables prédéfinies disponibles dans tout template : AWS::AccountId (ID du compte), AWS::Region (région du déploiement, ex: eu-west-1), AWS::StackId (ARN de la stack), AWS::StackName (nom de la stack), AWS::NoValue (supprimer une propriété conditionnellement). Ils s'utilisent avec !Ref : !Ref AWS::AccountId."
+  },
+  {
+    t: "CloudFormation stack operations",
+    q: "Qu'est-ce qu'un Change Set CloudFormation et pourquoi l'utiliser avant une mise à jour ?",
+    o: [
+      "Un historique des modifications passées d'une stack",
+      "Un aperçu des modifications qui seraient apportées à une stack avant de les appliquer — permet de valider les changements sans risque avant la mise à jour",
+      "Un mécanisme de rollback automatique",
+      "Un export des ressources de la stack vers un fichier"
+    ],
+    a: 1,
+    e: "Un Change Set CloudFormation montre exactement ce qui va se passer lors d'une mise à jour : quelles ressources seront ajoutées (Add), modifiées (Modify), ou supprimées (Remove), et si une modification nécessite un remplacement de ressource (remplacement = interruption de service potentielle). Bonne pratique obligatoire avant toute mise à jour en production. Workflow : create-change-set, review, execute-change-set."
+  },
+  {
+    t: "CloudFormation rollback",
+    q: "Que se passe-t-il par défaut si une ressource échoue à créer lors d'un déploiement CloudFormation ?",
+    o: [
+      "CloudFormation s'arrête à la ressource en échec et laisse les autres ressources créées",
+      "CloudFormation effectue un rollback automatique — toutes les ressources déjà créées dans le déploiement en cours sont supprimées, la stack revient à l'état précédent",
+      "CloudFormation réessaie la création 3 fois avant d'échouer",
+      "CloudFormation crée la stack partiellement et signale l'erreur dans les tags"
+    ],
+    a: 1,
+    e: "Par défaut, CloudFormation utilise le comportement ROLLBACK_ON_FAILURE : si une ressource échoue, toutes les ressources créées pendant ce déploiement sont supprimées et la stack revient à son état précédent (ou est supprimée si c'est une création). Option --on-failure DO_NOTHING permet de garder les ressources pour le debug. L'option ROLLBACK (depuis 2022) préserve les ressources réussies et retente uniquement les ressources en échec."
+  },
+  {
+    t: "CloudFormation DependsOn",
+    q: "Dans quel cas utiliser 'DependsOn' dans CloudFormation ?",
+    o: [
+      "Pour chaque ressource dans le template",
+      "Quand une ressource doit être créée après une autre, mais qu'il n'y a pas de référence directe (pas de !Ref ou !GetAtt) entre elles — CloudFormation ne détecte pas automatiquement cette dépendance",
+      "Pour éviter que CloudFormation crée des ressources en parallèle",
+      "DependsOn est équivalent à !Ref et peut être utilisé à la place"
+    ],
+    a: 1,
+    e: "CloudFormation détecte automatiquement les dépendances via !Ref et !GetAtt et crée les ressources dans le bon ordre. DependsOn est nécessaire uniquement quand la dépendance est implicite : par exemple, une instance EC2 qui doit démarrer APRÈS un Internet Gateway attaché au VPC, même si l'instance ne référence pas l'IGW directement. Sans DependsOn, les deux pourraient se créer en parallèle et l'instance pourrait échouer."
+  },
+  {
+    t: "CloudFormation deletion policies",
+    q: "Comment éviter qu'une base de données RDS soit supprimée quand on supprime la stack CloudFormation ?",
+    o: [
+      "CloudFormation ne supprime jamais les ressources RDS",
+      "Ajouter 'DeletionPolicy: Retain' sur la ressource RDS — la ressource reste dans AWS même si la stack est supprimée",
+      "Mettre un tag 'Protected: true' sur la ressource RDS",
+      "Utiliser 'DependsOn' pour empêcher la suppression"
+    ],
+    a: 1,
+    e: "DeletionPolicy contrôle ce qui arrive à une ressource quand la stack est supprimée : (1) Delete (défaut pour la plupart) : la ressource est supprimée. (2) Retain : la ressource reste dans AWS, non managée par CloudFormation. (3) Snapshot (pour RDS, ElastiCache, Redshift) : un snapshot final est créé avant suppression. Pour les données critiques, DeletionPolicy: Retain ET UpdateReplacePolicy: Retain protègent contre les suppressions accidentelles."
+  },
+  {
+    t: "CloudFormation nested stacks",
+    q: "Pourquoi utiliser des 'nested stacks' (stacks imbriquées) dans CloudFormation ?",
+    o: [
+      "Les nested stacks sont plus rapides à déployer",
+      "Pour dépasser la limite de 500 ressources par stack et pour modulariser l'infrastructure en composants réutilisables (VPC, security, app...)",
+      "Pour créer des ressources dans plusieurs régions simultanément",
+      "Les nested stacks permettent de partager des credentials IAM entre stacks"
+    ],
+    a: 1,
+    e: "Les nested stacks (Type: AWS::CloudFormation::Stack) permettent de : (1) dépasser la limite de 500 ressources par stack, (2) modulariser l'infrastructure en séparant VPC, IAM, RDS, App en stacks séparées, (3) réutiliser un même template de VPC par plusieurs équipes. La stack parente passe des paramètres aux stacks enfants et peut récupérer leurs Outputs. Différent des StackSets qui ciblent plusieurs comptes et régions."
+  },
+  {
+    t: "CloudFormation scénario Pro",
+    q: "Une mise à jour CloudFormation va remplacer une instance EC2 (Replacement: True dans le Change Set). Quelle est l'implication et comment minimiser l'impact ?",
+    o: [
+      "Le remplacement est transparent — CloudFormation maintient deux instances pendant la transition",
+      "Le remplacement signifie que l'ancienne instance sera supprimée et une nouvelle créée. Avec un ASG et un rolling update policy, l'impact est minimisé ; sans ASG, cela peut causer une interruption de service",
+      "Replacement: True signifie simplement que les tags seront mis à jour",
+      "CloudFormation garde automatiquement l'ancienne instance pendant 24h après le remplacement"
+    ],
+    a: 1,
+    e: "Replacement: True dans un Change Set indique que la modification d'une propriété immutable (ex: AMI ID) nécessite la création d'une NOUVELLE ressource et la suppression de l'ancienne. Pour EC2 : ancienne instance terminée, nouvelle créée avec un nouvel ID. Stratégies : (1) utiliser un ASG avec UpdatePolicy (AutoScalingRollingUpdate), (2) déployer Blue/Green via CodeDeploy, (3) planifier une fenêtre de maintenance."
+  },
+  {
+    t: "CloudFormation scénario Pro",
+    q: "Une stack CloudFormation est bloquée en état 'UPDATE_ROLLBACK_FAILED'. Comment récupérer ?",
+    o: [
+      "Supprimer et recréer la stack depuis zéro",
+      "Utiliser 'continue-update-rollback' avec --resources-to-skip pour ignorer les ressources bloquant le rollback, puis résoudre le problème manuellement",
+      "Attendre que CloudFormation termine le rollback automatiquement",
+      "Contacter AWS Support pour débloquer la stack"
+    ],
+    a: 1,
+    e: "UPDATE_ROLLBACK_FAILED signifie que le rollback lui-même a échoué (souvent car une ressource hors CloudFormation a été modifiée manuellement). Récupération : (1) identifier la ressource bloquante dans les événements de la stack, (2) résoudre manuellement le problème, ou (3) utiliser 'aws cloudformation continue-update-rollback --stack-name X --resources-to-skip [ResourceName]' pour ignorer la ressource bloquante. La stack passe ensuite en UPDATE_ROLLBACK_COMPLETE."
+  },
+  {
+    t: "CloudFormation scénario Pro",
+    q: "Comment détecter et corriger une 'drift' (dérive) entre la stack CloudFormation et l'état réel des ressources AWS ?",
+    o: [
+      "CloudFormation détecte automatiquement et corrige les drifts en temps réel",
+      "Lancer une détection de drift (detect-stack-drift), identifier les ressources dérivées, puis mettre à jour la stack ou les ressources pour les resynchroniser",
+      "Supprimer et recréer la stack pour corriger automatiquement toutes les drifts",
+      "Les drifts ne peuvent pas être détectées — c'est une limitation de CloudFormation"
+    ],
+    a: 1,
+    e: "Drift detection : 'aws cloudformation detect-stack-drift --stack-name X' lance une détection asynchrone. 'describe-stack-resource-drifts' liste les ressources avec statut MODIFIED, DELETED, NOT_CHECKED. Pour corriger : (1) mettre à jour le template pour refléter les changements manuels (si voulus), ou (2) modifier manuellement les ressources pour revenir à l'état du template, ou (3) mettre à jour la stack. La gouvernance IaC doit interdire les modifications manuelles en production."
+  },
+  {
+    t: "CloudFormation StackSets",
+    q: "Quelle est la différence entre une CloudFormation Stack et un CloudFormation StackSet ?",
+    o: [
+      "Un StackSet est une stack avec plus de 500 ressources",
+      "Un StackSet permet de déployer un même template CloudFormation dans plusieurs comptes AWS et/ou plusieurs régions simultanément",
+      "Un StackSet est une stack privée non partageable",
+      "Un StackSet regroupe plusieurs templates en un seul déploiement"
+    ],
+    a: 1,
+    e: "CloudFormation StackSets extend les stacks : un StackSet définit le template et les cibles (comptes et régions), et crée automatiquement des Stack Instances dans chaque cible. Cas d'usage : déployer une configuration de sécurité baseline dans tous les comptes d'une Organisation AWS, déployer des ressources multi-régions. Deux modes : SELF_MANAGED (rôles IAM manuels) et SERVICE_MANAGED (intégration AWS Organizations automatique)."
+  },
+  {
+    t: "CloudFormation StackSets",
+    q: "Comment déployer automatiquement une stack de compliance dans tous les nouveaux comptes AWS d'une Organisation via StackSets ?",
+    o: [
+      "Créer un cron EventBridge qui surveille la création de nouveaux comptes",
+      "Activer l'option 'Automatic Deployments' dans les StackSets avec AWS Organizations : les nouvelles accounts dans les OUs cibles reçoivent automatiquement une Stack Instance",
+      "Utiliser AWS Config Rules pour déployer automatiquement des stacks",
+      "Les StackSets ne supportent pas le déploiement automatique sur nouveaux comptes"
+    ],
+    a: 1,
+    e: "StackSets avec SERVICE_MANAGED (AWS Organizations) supporte les Automatic Deployments : quand un compte rejoint une OU cible, CloudFormation crée automatiquement une Stack Instance dans ce compte. Quand un compte quitte l'OU, la Stack Instance peut être supprimée automatiquement (RetainStacksOnAccountRemoval: false). C'est le pattern standard pour les account vending machines et architectures Landing Zone."
+  }
 ]
 
 };
