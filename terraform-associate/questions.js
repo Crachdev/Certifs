@@ -1417,7 +1417,7 @@ window.QDATA = {
   },
   {
    "id": "tf-assoc-j3-6",
-   "q": "Quel backend S3 utilisait traditionnellement DynamoDB et pour quel usage ?",
+   "q": "À quoi servait traditionnellement une table DynamoDB associée au backend S3 ?",
    "choices": [
     "A. Le verrouillage de l'état",
     "B. Le stockage chiffré des plans",
@@ -1681,7 +1681,7 @@ window.QDATA = {
   },
   {
    "id": "tf-assoc-j3-28",
-   "q": "Quelle commande supprime les ressources orphelines détectées pendant le refresh seulement ?",
+   "q": "Quelle commande synchronise l'état avec l'infrastructure réelle (objets modifiés ou disparus) sans modifier l'infrastructure ?",
    "choices": [
     "A. terraform refresh --delete",
     "B. terraform state clean",

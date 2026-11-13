@@ -1285,7 +1285,7 @@ window.QDATA = {
   },
   {
    "id": "cka-j2-45",
-   "q": "Quel protocole utilise l'Ingress pour le TLS ?",
+   "q": "Comment configure-t-on la terminaison TLS sur un Ingress ?",
    "choices": [
     "A. mTLS automatique entre pods",
     "B. IPsec entre nœuds",
@@ -1839,7 +1839,7 @@ window.QDATA = {
   },
   {
    "id": "cka-j3-41",
-   "q": "Quel champ d'un Secret monté en volume met à jour automatiquement son contenu ?",
+   "q": "Comment le contenu d'un Secret monté en volume est-il mis à jour ?",
    "choices": [
     "A. Aucune mise à jour jamais",
     "B. Seulement au redémarrage du nœud",
