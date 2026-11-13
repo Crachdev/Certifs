@@ -43,6 +43,8 @@ h1{font-size:2rem;font-weight:700}
 .card-progress-label .pct{font-weight:700}
 .card-foot{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;border-top:1px solid var(--line);font-size:.78rem;color:var(--muted)}
 .card-foot .pill{background:var(--accent-soft);color:var(--accent);font:500 .68rem var(--f-mono);padding:2px 8px;border-radius:4px}
+.card-foot .pill-fiche{background:var(--ok-soft);color:var(--ok);font:600 .68rem var(--f-mono);padding:2px 8px;border-radius:4px;text-decoration:none;border:1px solid transparent;transition:border-color .15s}
+.card-foot .pill-fiche:hover{border-color:var(--ok)}
 /* FEATURE 3 : badge d'état */
 .card-foot .badge-state{font:600 .68rem var(--f-mono);padding:2px 8px;border-radius:4px}
 .badge-state.done{background:var(--ok-soft);color:var(--ok)}
@@ -345,7 +347,7 @@ footer a{color:var(--accent);text-decoration:none}
         <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-terraform-associate" style="width:0%"></div></div>
         <div class="card-progress-label"><span id="done-terraform-associate">0/57</span><span class="pct" id="pct-terraform-associate"></span></div>
       </div>
-      <div class="card-foot"><span>57 questions · 60 min</span><span class="pill" id="pill-terraform-associate">Quiz</span></div>
+      <div class="card-foot"><span>57 questions · 60 min</span><div style="display:flex;gap:6px;align-items:center"><a href="terraform-associate/fiche.html" class="pill-fiche" onclick="event.stopPropagation()">📋 Fiche</a><span class="pill" id="pill-terraform-associate">Quiz</span></div></div>
     </a>
 
     <a href="kubernetes-cka/index.html" class="cert-card" data-qkey="kubernetes-cka">
@@ -359,7 +361,7 @@ footer a{color:var(--accent);text-decoration:none}
         <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-kubernetes-cka" style="width:0%"></div></div>
         <div class="card-progress-label"><span id="done-kubernetes-cka">0/0</span><span class="pct" id="pct-kubernetes-cka"></span></div>
       </div>
-      <div class="card-foot"><span>Examen pratique · 120 min</span><span class="pill" id="pill-kubernetes-cka">Quiz</span></div>
+      <div class="card-foot"><span>Examen pratique · 120 min</span><div style="display:flex;gap:6px;align-items:center"><a href="kubernetes-cka/fiche.html" class="pill-fiche" onclick="event.stopPropagation()">📋 Fiche</a><span class="pill" id="pill-kubernetes-cka">Quiz</span></div></div>
     </a>
 
     <a href="aws-devops-pro/index.html" class="cert-card" data-qkey="aws-devops-pro">
@@ -373,7 +375,7 @@ footer a{color:var(--accent);text-decoration:none}
         <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-aws-devops-pro" style="width:0%"></div></div>
         <div class="card-progress-label"><span id="done-aws-devops-pro">0/75</span><span class="pct" id="pct-aws-devops-pro"></span></div>
       </div>
-      <div class="card-foot"><span>75 questions · 180 min</span><span class="pill" id="pill-aws-devops-pro">Quiz</span></div>
+      <div class="card-foot"><span>75 questions · 180 min</span><div style="display:flex;gap:6px;align-items:center"><a href="aws-devops-pro/fiche.html" class="pill-fiche" onclick="event.stopPropagation()">📋 Fiche</a><span class="pill" id="pill-aws-devops-pro">Quiz</span></div></div>
     </a>
 
     <a href="docker-dca/index.html" class="cert-card" data-qkey="docker-dca">
@@ -387,7 +389,7 @@ footer a{color:var(--accent);text-decoration:none}
         <div class="card-progress-bar"><div class="card-progress-bar-fill" id="bar-docker-dca" style="width:0%"></div></div>
         <div class="card-progress-label"><span id="done-docker-dca">0/55</span><span class="pct" id="pct-docker-dca"></span></div>
       </div>
-      <div class="card-foot"><span>55 questions · 90 min</span><span class="pill" id="pill-docker-dca">Quiz</span></div>
+      <div class="card-foot"><span>55 questions · 90 min</span><div style="display:flex;gap:6px;align-items:center"><a href="docker-dca/fiche.html" class="pill-fiche" onclick="event.stopPropagation()">📋 Fiche</a><span class="pill" id="pill-docker-dca">Quiz</span></div></div>
     </a>
   </div>
 
