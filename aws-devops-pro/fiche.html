@@ -301,6 +301,7 @@ footer a { color: var(--accent2); }
       <li><a href="#s6">🚨 INCIDENT &amp; EVENTS (14 %)</a></li>
       <li><a href="#s7">💻 AWS CLI — Référence</a></li>
       <li><a href="#s8">⚠️ PIÈGES &amp; ASTUCES</a></li>
+      <li><a href="#s9">📅 PLAN 15 JOURS</a></li>
     </ul>
   </aside>
 
@@ -332,6 +333,10 @@ footer a { color: var(--accent2); }
 
         <div class="info-box">
           💡 <strong>Stratégie :</strong> Le DOP-C02 teste la résolution de problèmes architecturaux. Chaque question décrit un scénario et demande la solution la plus <em>efficace</em>, <em>scalable</em> et <em>automatisée</em>. Penser toujours : <strong>automatiser &gt; manuel</strong>, <strong>managed service &gt; DIY</strong>, <strong>moindre privilège</strong>.
+        </div>
+
+        <div class="warn-box">
+          ⚠️ <strong>Niveau Professional :</strong> Contrairement aux certifications Associate, le DOP-C02 s'attend à ce que vous conceviez des architectures complètes et choisissez entre des approches nuancées. Les questions sont souvent longues (3-4 paragraphes), lisez-les entièrement. Les deux premières options sont souvent toutes les deux « correctes » ; choisir la plus efficace/automatisée/scalable.
         </div>
 
       </div>
@@ -436,6 +441,60 @@ Hooks:
           ✅ <strong>Elastic Beanstalk</strong> gère automatiquement le provisionnement EC2, Auto Scaling, ELB, déploiements et monitoring. Idéal pour les apps sans gestion d'infra. Supporte Blue/Green via le swap d'URL d'environnement.
         </div>
 
+        <h3>CodeBuild — approfondissement</h3>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>Cache</h4>
+            <p>Cache S3 (entre builds différents) ou cache local (dans le même build fleet). Stratégies : <code>LOCAL_SOURCE_CACHE</code>, <code>LOCAL_DOCKER_LAYER_CACHE</code>, <code>LOCAL_CUSTOM_CACHE</code>. Réduit drastiquement le temps de build.</p>
+          </div>
+          <div class="concept-card">
+            <h4>VPC Integration</h4>
+            <p>CodeBuild peut s'exécuter dans votre VPC pour accéder aux RDS, ElastiCache privés. Configurer le VPC, subnet(s) et security group dans le projet CodeBuild.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Test Reports</h4>
+            <p>Publie les résultats de tests JUnit/NUnit/Cucumber directement dans la console. Visualise les tendances, traque les flaky tests. Format : <code>JunitXml</code> ou <code>CucumberJson</code>.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Env Variables</h4>
+            <p>Types : <code>PLAINTEXT</code> (visible), <code>PARAMETER_STORE</code> (SSM), <code>SECRETS_MANAGER</code>. Toujours utiliser Parameter Store ou Secrets Manager pour les valeurs sensibles. Ne jamais hardcoder dans buildspec.</p>
+          </div>
+        </div>
+
+        <h3>Lambda Traffic Shifting — déploiements progressifs</h3>
+        <div class="table-wrap">
+          <table>
+            <tr><th>Stratégie CodeDeploy</th><th>Description</th><th>Cas d'usage</th></tr>
+            <tr><td><strong>AllAtOnce</strong></td><td>100 % du trafic immédiatement sur la nouvelle version</td><td>Dev/staging, corrections critiques</td></tr>
+            <tr><td><strong>Canary10Percent5Minutes</strong></td><td>10 % → 5 min → 100 %</td><td>Release fréquente avec tests smoke</td></tr>
+            <tr><td><strong>Canary10Percent30Minutes</strong></td><td>10 % → 30 min → 100 %</td><td>Release prudente, plus de temps d'observation</td></tr>
+            <tr><td><strong>Linear10PercentEvery1Minute</strong></td><td>+10 % chaque minute sur 10 min</td><td>Déploiement très progressif, haute criticité</td></tr>
+            <tr><td><strong>Linear10PercentEvery10Minutes</strong></td><td>+10 % toutes les 10 min sur 100 min</td><td>Services critiques, rollback facile à chaque étape</td></tr>
+          </table>
+        </div>
+
+        <div class="info-box">
+          💡 <strong>Pattern Lambda blue/green :</strong> Alias Lambda (ex: <code>PROD</code>) pointe vers une version. CodeDeploy shift progressivement le poids de l'alias. <code>BeforeAllowTraffic</code> et <code>AfterAllowTraffic</code> hooks Lambda = smoke tests. CloudWatch Alarms déclenchent rollback auto si erreurs ou latence anormale.
+        </div>
+
+        <h3>GitOps et multi-environnements avec CodePipeline</h3>
+        <pre><code><span class="cmd-comment"># Pattern GitOps : branche par environnement</span>
+<span class="cmd-comment">#</span>
+<span class="cmd-comment"># develop  → Pipeline DEV    → ECS dev  (auto)</span>
+<span class="cmd-comment"># staging  → Pipeline STAGING → ECS staging (auto)</span>
+<span class="cmd-comment"># main     → Pipeline PROD   → ECS prod (approbation manuelle)</span>
+<span class="cmd-comment">#</span>
+<span class="cmd-comment"># EventBridge Rule sur CodeCommit push :</span>
+{
+  "source": ["aws.codecommit"],
+  "detail-type": ["CodeCommit Repository State Change"],
+  "detail": {
+    "event": ["referenceUpdated"],
+    "referenceName": ["main"]
+  }
+}
+<span class="cmd-comment"># → Target : CodePipeline StartPipelineExecution</span></code></pre>
+
       </div>
     </div>
 
@@ -520,7 +579,48 @@ aws cloudformation detect-stack-drift <span class="cmd-flag">--stack-name</span>
             <tr><td><strong>CloudFormation</strong></td><td>YAML/JSON</td><td>Natif AWS, gratuit, rollback auto</td><td>Verbeux, pas de boucles</td></tr>
             <tr><td><strong>CDK</strong></td><td>TypeScript/Python…</td><td>Abstractions haut niveau, réutilisable</td><td>Génère du CFN, courbe d'apprentissage</td></tr>
             <tr><td><strong>Terraform</strong></td><td>HCL</td><td>Multi-cloud, state géré</td><td>State à gérer, non natif AWS</td></tr>
+            <tr><td><strong>AWS SAM</strong></td><td>YAML (superset CFN)</td><td>Simplifie Lambda/API GW/DynamoDB, test local</td><td>Limité serverless, extension CFN</td></tr>
           </table>
+        </div>
+
+        <h3>AWS CDK — concepts fondamentaux</h3>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>App, Stacks, Constructs</h4>
+            <p>App → plusieurs Stacks (déployables indépendamment) → Constructs (L1=CFN brut, L2=haut niveau avec defaults, L3=patterns complets). L2/L3 = productivité maximale.</p>
+          </div>
+          <div class="concept-card">
+            <h4>cdk diff &amp; synth</h4>
+            <p><code>cdk synth</code> génère le template CFN. <code>cdk diff</code> compare l'état déployé et le code local (équivalent CFN Change Sets). Toujours faire <code>cdk diff</code> avant <code>cdk deploy</code> en production.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Bootstrapping</h4>
+            <p><code>cdk bootstrap</code> crée les ressources nécessaires dans le compte/région cible (bucket S3 pour assets, rôles IAM). À faire une fois par compte/région avant tout déploiement CDK.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Aspects</h4>
+            <p>Transformations appliquées à toute l'app CDK. Ex : forcer le chiffrement KMS sur tous les buckets S3, appliquer des tags à toutes les ressources. Comparable aux Policy-as-Code.</p>
+          </div>
+        </div>
+
+        <h3>CloudFormation — macros et transforms</h3>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>AWS::Serverless (SAM)</h4>
+            <p>Transform SAM dans CloudFormation. <code>AWS::Serverless::Function</code> génère Lambda + IAM Role + Log Group automatiquement. Facilite les déploiements serverless.</p>
+          </div>
+          <div class="concept-card">
+            <h4>CloudFormation Macros</h4>
+            <p>Lambda invoquée pour transformer les templates avant déploiement. Peut ajouter des ressources, modifier des propriétés, implémenter des abstractions custom. Transform global sur le template entier.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Service Catalog</h3>
+            <p>Catalogue de stacks CloudFormation approuvées. Permet aux utilisateurs de déployer des ressources conformes sans connaître CFN. Gouvernance + self-service. Utilisé dans les grandes orgs.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Config Rules + Conformance Packs</h4>
+            <p>Conformance Packs = collection de règles Config packagées (CIS, PCI-DSS, HIPAA). Déployables via StackSets multi-comptes. <code>AWS-BestPractices-ConformancePack</code> = point de départ.</p>
+          </div>
         </div>
 
       </div>
@@ -604,6 +704,46 @@ aws configservice put-remediation-configurations \
           </div>
         </div>
 
+        <h3>DevSecOps — sécurité dans le pipeline CI/CD</h3>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>SAST dans CodeBuild</h4>
+            <p>Intégrer des outils SAST (Semgrep, Checkov, cfn-nag, tfsec) dans CodeBuild. <code>cfn-nag</code> analyse les templates CloudFormation. Échec du build si violations critiques.</p>
+          </div>
+          <div class="concept-card">
+            <h4>ECR Image Scanning</h4>
+            <p>Amazon Inspector scanne les images ECR automatiquement à chaque push. Rapports CVE dans la console ECR. Bloquer les déploiements si vulnérabilités critiques via Lambda + EventBridge.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Secrets dans le code</h4>
+            <p>Git Secrets ou truffleHog dans le pre-commit et CodeBuild pour détecter les credentials hardcodés. Ne jamais stocker de clés dans les repos. Utiliser Parameter Store/Secrets Manager.</p>
+          </div>
+          <div class="concept-card">
+            <h4>IAM Access Analyzer</h4>
+            <p>Détecte les ressources partagées avec l'extérieur. Peut être intégré au pipeline CloudFormation avec <code>aws accessanalyzer validate-policy</code> pour valider les policies avant déploiement.</p>
+          </div>
+        </div>
+
+        <h3>AWS Organizations — multi-comptes DevOps</h3>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>Structure recommandée</h4>
+            <p>Management Account (facturation uniquement) → OUs : Security, Infrastructure, Workloads (Dev/Staging/Prod). Chaque environnement dans son propre compte = isolation totale.</p>
+          </div>
+          <div class="concept-card">
+            <h4>SCPs par OU</h4>
+            <p>SCP sur l'OU Prod : interdire la suppression de CloudTrail, forcer les tags, bloquer certaines régions. SCP sur Dev : limiter les types d'instances EC2 coûteux. Gouvernance automatique.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Sharing avec RAM</h4>
+            <p>AWS Resource Access Manager : partager des ressources entre comptes (Transit Gateway, VPC Subnets, Route53 Resolver Rules). Évite de dupliquer l'infrastructure réseau par compte.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Cross-account Deployment</h4>
+            <p>CodePipeline dans le compte outils, déployant dans les comptes Dev/Staging/Prod via des rôles cross-account. Trust entre le compte outils et les comptes cibles via IAM Role.</p>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -678,6 +818,31 @@ aws logs create-export-task \
           ⚠️ CloudTrail a un délai de ~15 minutes. Pour une réponse en temps réel aux événements de sécurité, utiliser <strong>EventBridge</strong> (quasi temps réel) plutôt que CloudTrail directement.
         </div>
 
+        <h3>Observabilité avancée — Container Insights &amp; EMF</h3>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>Container Insights (ECS/EKS)</h4>
+            <p>Métriques de performance au niveau cluster, service, task et container. Activation via paramètre CloudWatch dans la définition de tâche. Dashboards automatiques dans la console.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Embedded Metrics Format (EMF)</h4>
+            <p>Publie des métriques custom directement dans les logs structurés (JSON). Lambda et ECS la supportent nativement. Évite les appels <code>PutMetricData</code> séparés. Coût réduit.</p>
+          </div>
+          <div class="concept-card">
+            <h4>CloudWatch Contributor Insights</h4>
+            <p>Identifie les top contributeurs à un problème : IP avec le plus d'erreurs, utilisateurs causant le plus de latence. Requêtes sur VPC Flow Logs, ALB access logs, DynamoDB, Route53.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Synthetics Canaries</h4>
+            <p>Scripts Puppeteer/Selenium exécutés périodiquement sur vos endpoints. Monitore les URLs, workflows UI, APIs. Alerte si dégradation avant que les vrais utilisateurs ne l'expérimentent.</p>
+          </div>
+        </div>
+
+        <h3>AWS Distro for OpenTelemetry (ADOT)</h3>
+        <div class="ok-box">
+          ✅ <strong>ADOT</strong> est la distribution AWS d'OpenTelemetry pour la collecte de métriques et traces. Permet une instrumentation standard (sans SDK propriétaire AWS), compatible avec X-Ray, CloudWatch, Prometheus, Jaeger, Zipkin. Idéal pour les architectures multi-cloud ou les équipes souhaitant éviter le vendor lock-in au niveau observabilité.
+        </div>
+
       </div>
     </div>
 
@@ -734,6 +899,46 @@ aws logs create-export-task \
           <div class="concept-card">
             <h4>RDS Proxy</h4>
             <p>Pool de connexions entre Lambda/ECS et RDS. Réduit les connexions directes (problème classique Lambda). Failover transparent.</p>
+          </div>
+        </div>
+
+        <h3>VPC — Bonnes pratiques DevOps</h3>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>VPC par environnement</h4>
+            <p>Dev, Staging, Prod dans des VPCs séparés (et idéalement comptes séparés). Transit Gateway pour la connectivité centralisée entre VPCs et on-premise. Évite les CIDR qui se chevauchent.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Interface Endpoints dans le pipeline</h4>
+            <p>CodeBuild dans un VPC privé a besoin d'Interface Endpoints pour accéder à: CodeCommit, S3, ECR, SSM, Secrets Manager, CloudWatch Logs. Sans eux, le build échoue en réseau privé.</p>
+          </div>
+          <div class="concept-card">
+            <h4>NAT Gateway pour builds</h4>
+            <p>CodeBuild dans un subnet privé avec NAT Gateway pour télécharger les dépendances npm/pip depuis Internet. Pas de NAT = builds sans accès aux packages publics.</p>
+          </div>
+          <div class="concept-card">
+            <h4>VPC Flow Logs + Athena</h4>
+            <p>Flow Logs vers S3 → Athena + Glue pour requêtes. Identifier les connexions inattendues, diagnostiquer les blocages réseau dans les pipelines, audit de sécurité réseau.</p>
+          </div>
+        </div>
+
+        <h3>ECS/Fargate — patterns de déploiement</h3>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>Blue/Green sur ECS</h4>
+            <p>CodeDeploy crée un nouveau task set (Green) sur le même service ECS. ALB/NLB bascule progressivement le trafic. Rollback instantané : re-basculer vers le task set Blue existant.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Rolling Update</h4>
+            <p>ECS remplace progressivement les tasks avec la nouvelle version de la task definition. Minimum healthy percent et maximum percent contrôlent la fenêtre de déploiement.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Fargate Spot</h4>
+            <p>Tasks Fargate sur capacité spot (60-70 % moins cher). Interruptible avec 2 min de préavis. Idéal pour les builds et tests non critiques. Utiliser avec Fargate on-demand en base.</p>
+          </div>
+          <div class="concept-card">
+            <h4>ECS Service Connect</h4>
+            <p>Service mesh léger natif ECS. Remplace Cloud Map pour la découverte de services. Métriques de trafic automatiques dans CloudWatch. Plus simple qu'App Mesh pour les architectures microservices ECS.</p>
           </div>
         </div>
 
@@ -972,6 +1177,47 @@ aws ssm get-parameter \
             <tr><td><a href="https://tutorialsdojo.com/aws-certified-devops-engineer-professional/" target="_blank">Tutorials Dojo</a></td><td>Practice exams, cheat sheets</td></tr>
           </table>
         </div>
+
+      </div>
+    </div>
+
+    <!-- S9 : PLAN 15 JOURS -->
+    <div class="section-card" id="s9">
+      <h2>📅 Plan de révision — 15 jours</h2>
+      <div class="section-body">
+
+        <div class="info-box">
+          💡 <strong>Méthode recommandée :</strong> 1h30 de documentation AWS ou cours vidéo + 1h de quiz quotidien. Les 5 domaines sont tous pondérés entre 14 % et 22 %, donc aucun ne peut être négligé.
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J1</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">CodeCommit, CodeBuild, CodeDeploy — fondamentaux</div><div style="font-size:11px;color:var(--muted)">D1 — SDLC 22 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J2</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">CodePipeline, Elastic Beanstalk, stratégies de déploiement</div><div style="font-size:11px;color:var(--muted)">D1 — SDLC 22 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J3</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Lambda traffic shifting, ECS Blue/Green, Fargate patterns</div><div style="font-size:11px;color:var(--muted)">D1 — SDLC 22 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J4</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">CloudFormation avancé : StackSets, Drift, Custom Resources, cfn-init</div><div style="font-size:11px;color:var(--muted)">D2 — IaC 17 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J5</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">CDK, SSM (tous les modules), Service Catalog</div><div style="font-size:11px;color:var(--muted)">D2 — IaC 17 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J6</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">IAM avancé : Boundaries, SCPs, Identity Center, ABAC</div><div style="font-size:11px;color:var(--muted)">D3 — Security 17 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J7</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">KMS, Secrets Manager, DevSecOps dans CI/CD, Organizations</div><div style="font-size:11px;color:var(--muted)">D3 — Security 17 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J8</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">CloudWatch : métriques, alarmes, Logs Insights, Container Insights</div><div style="font-size:11px;color:var(--muted)">D4 — Monitoring 15 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J9</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">CloudTrail, X-Ray, Synthetics Canaries, AWS Config</div><div style="font-size:11px;color:var(--muted)">D4 — Monitoring 15 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J10</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Auto Scaling, ELB, RDS HA, stratégies DR, Aurora Global</div><div style="font-size:11px;color:var(--muted)">D5 — Resilience 15 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J11</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">EventBridge, SNS, SQS, Step Functions, patterns d'orchestration</div><div style="font-size:11px;color:var(--muted)">D6 — Incidents 14 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J12</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">VPC, networking DevOps, remédiation Config+SSM, GuardDuty</div><div style="font-size:11px;color:var(--muted)">D6 — Incidents 14 %</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J13</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Révision pièges &amp; astuces + mock exam (D1-D3)</div><div style="font-size:11px;color:var(--muted)">Révision transversale</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J14</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Mock exam complet (D4-D6) + revoir les points faibles identifiés</div><div style="font-size:11px;color:var(--muted)">Révision transversale</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 2h30</span></div>
+          <div style="background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:grid;grid-template-columns:60px 1fr auto;gap:10px;align-items:center"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)">J15</span><div><div style="font-size:13px;font-weight:600;color:var(--ink)">🏆 Mock exam final Tutorials Dojo — 75 questions minutées</div><div style="font-size:11px;color:var(--muted)">Tous domaines — Format examen</div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">≈ 3h</span></div>
+        </div>
+
+        <h3>Checklist J-1 avant l'examen</h3>
+        <ul>
+          <li>Réviser les <strong>pièges courants</strong> de cette fiche (section ⚠️)</li>
+          <li>Revoir les <strong>stratégies de déploiement</strong> : Canary, Linear, Blue/Green sur ECS/Lambda</li>
+          <li>Mémoriser l'ordre <strong>évaluation IAM</strong> : Deny explicite → SCP → Resource Policy → Permission Boundary → IAM Policy</li>
+          <li>Revoir les <strong>comparatifs messaging</strong> : SNS vs SQS vs EventBridge vs Kinesis</li>
+          <li>Réviser <strong>cfn-init / cfn-signal / CreationPolicy</strong> (très souvent testé)</li>
+          <li>Revoir <strong>RDS Proxy + Lambda</strong> pattern et <strong>Aurora Global</strong> pour multi-région</li>
+          <li>Bonne nuit de sommeil, 3h d'examen = endurance requise</li>
+        </ul>
 
       </div>
     </div>
