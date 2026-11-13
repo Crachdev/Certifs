@@ -4090,6 +4090,131 @@ window.QDATA = {
     a: 1,
     e: "Chaîne de réponse optimale : T+0 : CloudWatch Alarm (latency > 5s ou 5xx > 10%) → Incident Manager (Response Plan SEV-1). T+0 (automatique) : SSM Runbook : (1) snapshot RDS, (2) restart ECS service, (3) if no recovery in 2min → scale ASG x2, (4) if no recovery in 5min → Route 53 failover DR. T+0 (automatique) : notification SMS/voice on-call + Slack channel incident. T+2 to T+5 min : ingénieur de permanence acknowledge → diagnostic via ServiceLens (métriques + traces + logs unifiés). T+15 min (si pas de résolution) : escalade automatique vers manager. T+resolusi : Incident Manager résolu, timeline capturée. Post-mortem T+48h."
   }
+],
+
+16: [
+  // ─── SSM Runbooks ─────────────────────────────────────────────────────────
+  {
+    t: "SSM Automation fondamentaux",
+    q: "Qu'est-ce que SSM Automation et comment diffère-t-il de SSM Run Command ?",
+    o: [
+      "SSM Automation et Run Command sont identiques",
+      "SSM Automation exécute des workflows multi-étapes (Documents YAML/JSON avec steps, branches, approbations) sur des ressources AWS ; Run Command exécute des commandes shell simples sur des instances EC2/on-premises",
+      "Run Command est pour les workflows complexes ; Automation pour les commandes simples",
+      "SSM Automation ne peut pas cibler des instances EC2"
+    ],
+    a: 1,
+    e: "SSM Automation vs Run Command : (1) SSM Run Command : exécute des commandes ou scripts sur des instances (EC2, on-premises, edge devices). Idéal pour : installer des packages, configurer des services, collecter des diagnostics. Résultats dans S3/CloudWatch Logs. (2) SSM Automation : orchestration d'actions AWS (API calls, Run Command, Lambda, Step Functions) via Documents YAML/JSON. Étapes : aws:executeScript, aws:runCommand, aws:waitForAwsResourceProperty, aws:approve. Use cases : golden AMI pipeline, patch management orchestré, incident remediation automatique. Automation peut cibler des ressources AWS (EC2, RDS, etc.) sans agent nécessaire pour les API calls."
+  },
+  {
+    t: "SSM Documents",
+    q: "Comment créer un SSM Automation Document qui redémarre un service ECS en cas d'incident ?",
+    o: [
+      "SSM ne peut pas gérer ECS — uniquement EC2",
+      "Créer un SSM Automation Document YAML avec steps : aws:executeAwsApi (ecs:UpdateService, desiredCount=0) puis attente, puis aws:executeAwsApi (ecs:UpdateService, desiredCount=original) — exécutable manuellement ou depuis Incident Manager",
+      "Utiliser Run Command pour redémarrer des services ECS",
+      "Un SSM Document ne peut contenir qu'une seule action"
+    ],
+    a: 1,
+    e: "SSM Automation Document pour ECS restart : schéma YAML : schemaVersion 0.3, description, parameters (clusterName, serviceName, desiredCount), mainSteps : (1) aws:executeAwsApi : service=ecs, api=UpdateService, parameters={cluster, service, desiredCount=0}. (2) aws:waitForAwsResourceProperty : service=ecs, api=DescribeServices, PropertySelector=services[0].runningCount, DesiredValues=[0]. (3) aws:executeAwsApi : UpdateService desiredCount original. IAM : Automation Assume Role avec ecs:UpdateService + ecs:DescribeServices. Documents AWS prédéfinis : AWS-RestartEC2Instance, AWS-StartEC2Instance, AWS-CreateRdsSnapshot, etc. (200+ documents publics)."
+  },
+  {
+    t: "SSM Patch Manager",
+    q: "Comment automatiser le patching de 500 instances EC2 avec SSM Patch Manager en minimisant l'impact production ?",
+    o: [
+      "Lancer manuellement le patching sur toutes les instances simultanément",
+      "Créer des Maintenance Windows avec Patch Groups (tagging des instances par env), configurer une Patch Baseline (règles d'approbation), utiliser des taux de déploiement échelonnés (10% d'abord) et des jours de maintenance non-peak",
+      "SSM Patch Manager ne gère que Linux — Windows nécessite WSUS",
+      "Patcher toutes les instances en une fois hors heures de pointe"
+    ],
+    a: 1,
+    e: "SSM Patch Manager stratégie : (1) Patch Groups : tagger instances (patch-group=production, patch-group=staging). (2) Patch Baseline : règles d'approbation automatique (Critical patches auto-approve after 7 days, Important after 14 days). (3) Maintenance Window : CRON schedule (ex: dimanche 2h-6h UTC), targets (patch groups), tasks (AWS-RunPatchBaseline), concurrency (max % instances en même temps), error threshold. (4) Rate control : concurrency=10% (10% max simultanément), errorThreshold=1% (arrêter si 1% d'erreurs). (5) Pre/Post hooks : SSM Run Command pour drain ALB, smoke tests après patch. Rapports : Patch Compliance dans SSM + S3."
+  },
+  {
+    t: "SSM Session Manager",
+    q: "Pourquoi SSM Session Manager est préférable à SSH pour accéder aux instances EC2 en production ?",
+    o: [
+      "SSH est plus sécurisé que Session Manager",
+      "Session Manager : pas de ports ouverts (22/3389), pas de bastion host, accès via IAM (MFA possible), sessions enregistrées dans S3/CloudWatch Logs, audit complet CloudTrail — réduit la surface d'attaque",
+      "Session Manager ne fonctionne que si l'instance a une IP publique",
+      "Session Manager ne peut exécuter que des commandes en lecture seule"
+    ],
+    a: 1,
+    e: "SSM Session Manager avantages vs SSH : (1) Pas de port 22 ouvert = surface d'attaque réduite. (2) Pas de key pairs SSH à gérer (rotation, perte, partage). (3) Pas de bastion host. (4) Authentification IAM : IAM Policy + MFA enforced. (5) Audit : chaque session loggée dans CloudTrail (StartSession, TerminateSession). (6) Session recording : commandes + output dans S3 ou CloudWatch Logs. (7) Fonctionne même en VPC privé sans internet (via VPC endpoints SSM). (8) Port forwarding : tunnel vers des ressources privées (RDS, Elasticsearch). Prérequis : SSM Agent + IAM Instance Profile avec AmazonSSMManagedInstanceCore. DOP-C02 : Session Manager = best practice accès instances."
+  },
+  // ─── AWS Config ───────────────────────────────────────────────────────────
+  {
+    t: "AWS Config fondamentaux",
+    q: "Qu'est-ce qu'AWS Config et quelle est sa fonction principale ?",
+    o: [
+      "AWS Config est un outil de déploiement similaire à CloudFormation",
+      "AWS Config enregistre en continu les changements de configuration des ressources AWS et évalue leur conformité par rapport à des règles définies — fournit un historique et des snapshots de configuration",
+      "AWS Config est uniquement pour les ressources EC2",
+      "AWS Config remplace CloudTrail pour l'audit"
+    ],
+    a: 1,
+    e: "AWS Config : (1) Configuration Recorder : enregistre les changements de configuration de toutes les ressources AWS (EC2, S3, RDS, VPC, IAM, etc.) dans un S3 bucket. (2) Configuration Items : snapshot de la configuration d'une ressource à un instant T. (3) Configuration History : timeline des changements (qui a changé quoi et quand). (4) Config Rules : évaluation de conformité automatique. (5) Remediation : actions automatiques sur les non-conformités. Différence CloudTrail : CloudTrail = qui a fait quelle action API (audit). Config = quelle est la configuration actuelle et comment elle a changé (compliance). Les deux sont complémentaires."
+  },
+  {
+    t: "AWS Config Rules",
+    q: "Quels sont les types de Config Rules et comment créer une règle custom ?",
+    o: [
+      "Seules les règles AWS prédéfinies peuvent être utilisées",
+      "Managed Rules (prédéfinies AWS : 200+), Organisational Rules (via Organizations), Custom Rules (Lambda ou Guard), Service-linked Rules (services AWS spécifiques) — une rule custom Lambda évalue les ressources et retourne COMPLIANT/NON_COMPLIANT",
+      "Config Rules ne supportent pas les règles custom",
+      "Les règles Config s'évaluent uniquement quand on les déclenche manuellement"
+    ],
+    a: 1,
+    e: "AWS Config Rules types : (1) AWS Managed Rules : 200+ règles prédéfinies (s3-bucket-public-read-prohibited, restricted-ssh, root-account-mfa-enabled, encrypted-volumes, etc.). (2) Custom Lambda Rules : Lambda fonction qui reçoit configurationItem + ruleParameters → retourne {ComplianceResourceType, ComplianceResourceId, ComplianceType: COMPLIANT/NON_COMPLIANT, Annotation}. (3) Custom Guard Rules : CloudFormation Guard policies (syntaxe DSL, sans Lambda). (4) Organizational Rules : déployées sur tous les comptes de l'organisation. Triggers : configuration change (évaluation à chaque changement de ressource) ou periodic (évaluation périodique). Coût : par rule active + par évaluation."
+  },
+  {
+    t: "AWS Config Remediation",
+    q: "Comment configurer une remediation automatique dans AWS Config pour corriger les S3 buckets publics ?",
+    o: [
+      "Config ne peut pas remédier automatiquement — uniquement alerter",
+      "Associer une Remediation Action au Config Rule : choisir un SSM Automation Document (AWS-DisableS3BucketPublicReadWrite) avec Auto Remediation activé — exécuté automatiquement quand une ressource est NON_COMPLIANT",
+      "Utiliser Lambda via CloudWatch Events pour la remediation",
+      "Config Remediation ne fonctionne qu'avec les règles managed"
+    ],
+    a: 1,
+    e: "Config Auto Remediation : (1) Sur la Config Rule, choisir Remediation Action. (2) Action type : SSM Automation Document (AWS managed ou custom). (3) Document : AWS-DisableS3BucketPublicReadWrite, AWS-EnableS3BucketEncryption, etc. (4) Auto Remediation : activé = exécuté immédiatement quand NON_COMPLIANT. Désactivé = remediation manuelle ou planifiée. (5) Retry : configurer le nombre de tentatives automatiques. (6) IAM Role : Config doit avoir les permissions d'exécuter l'Automation. Limitation : la remediation ne corrige pas rétroactivement toutes les ressources existantes → utiliser AWS Config Conformance Pack ou batch remediation. Best practice : tester la remediation en mode manuel d'abord."
+  },
+  {
+    t: "AWS Config Conformance Packs",
+    q: "Qu'est-ce qu'un AWS Config Conformance Pack et comment l'utiliser pour la compliance ?",
+    o: [
+      "Un Conformance Pack est un ensemble de Config Rules déployées en tant qu'unité sur un compte ou toute une organisation",
+      "Un Conformance Pack est un document CloudFormation contenant plusieurs Config Rules et remediations, déployable sur un compte ou une organisation entière via Organizations",
+      "Les Conformance Packs ne supportent pas le déploiement organisationnel",
+      "Un Conformance Pack ne peut contenir qu'une seule Config Rule"
+    ],
+    a: 1,
+    e: "AWS Config Conformance Packs : collection de Config Rules + remediations packagées en YAML (format CloudFormation). Avantages : (1) Déploiement uniforme : un seul pack déployé sur des centaines de comptes via Organizations. (2) Frameworks prédéfinis : NIST 800-53, PCI DSS, HIPAA, CIS AWS Foundations, AWS Best Practices. (3) Score de conformité : % de ressources conformes par pack. (4) Custom packs : créer vos propres ensembles de règles métier. (5) Drift detection : identifier les comptes/régions qui s'écartent de la baseline. DOP-C02 : Conformance Pack + Organizations = standard de compliance multi-comptes centralisé."
+  },
+  {
+    t: "AWS Config multi-comptes",
+    q: "Comment centraliser la compliance AWS Config sur une organisation de 50 comptes ?",
+    o: [
+      "Configurer Config manuellement sur chaque compte",
+      "Utiliser AWS Config Aggregator (compte central) + Organizations : consolide les données Config de tous les comptes/régions dans un tableau de bord unique, permet les Organizational Config Rules déployées automatiquement sur nouveaux comptes",
+      "Config multi-comptes nécessite AWS Control Tower obligatoirement",
+      "AWS Security Hub remplace Config pour le multi-comptes"
+    ],
+    a: 1,
+    e: "AWS Config multi-comptes avec Organizations : (1) Config Aggregator : compte de gestion ou compte délégué agrège les données Config de tous les comptes membres. Vue unifiée : nombre de ressources non-conformes par compte, par règle. (2) Organizational Config Rules : règles déployées automatiquement sur tous les comptes (existants et futurs). (3) Organizational Conformance Packs : packs déployés sur toute l'organisation. (4) AWS Config Recorder : activé automatiquement dans les nouveaux comptes via Organizations si Config est configuré. (5) S3 centralisé : tous les snapshots Config vers un S3 bucket central (compte Log Archive). Combiné avec Security Hub pour la vue d'ensemble sécurité."
+  },
+  {
+    t: "Config vs CloudTrail",
+    q: "Un incident de sécurité s'est produit : un Security Group a été modifié pour autoriser 0.0.0.0/0 sur le port 22. Quels services permettent de retracer ce changement ?",
+    o: [
+      "Uniquement CloudTrail — Config ne peut pas aider",
+      "AWS Config montre QUOI a changé (configuration avant/après du Security Group) ; CloudTrail montre QUI a fait le changement (utilisateur IAM, timestamp, source IP, appel API AuthorizeSecurityGroupIngress)",
+      "Amazon GuardDuty détecte et retracer ce type de changement",
+      "Config et CloudTrail sont identiques — un seul suffit"
+    ],
+    a: 1,
+    e: "Investigation combinée Config + CloudTrail : (1) AWS Config → Configuration History du Security Group : configuration avant (sans 0.0.0.0/0) et après (avec 0.0.0.0/0), timestamp exact du changement, diff visuel. (2) CloudTrail → chercher l'event AuthorizeSecurityGroupIngress à ce timestamp : UserIdentity (arn:aws:iam::123456:user/john), SourceIPAddress, UserAgent, requestParameters. (3) IAM Access Analyzer : vérifier si d'autres ressources sont exposées. (4) GuardDuty : aurait pu alerter si le port 22 ouvert a été exploité. Config Rule + Remediation : si restricted-ssh rule était active → auto-remediation aurait révoqué la règle immédiatement."
+  }
 ]
 
 };
