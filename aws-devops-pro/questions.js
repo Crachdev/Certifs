@@ -3953,6 +3953,143 @@ window.QDATA = {
     a: 1,
     e: "Critères de choix : EventBridge : (1) Routage par contenu des événements (filtrage riche). (2) Sources multiples (AWS + SaaS + custom). (3) Schema Registry pour discovery et validation. (4) Archive et replay. (5) Orchestration d'événements cross-account. SNS : (1) Fan-out vers N subscribers simultanément. (2) Notifications push (mobile, SMS, email). (3) Pub/sub simple et rapide. SQS : (1) Buffer entre producteur et consommateur. (2) Découplage avec persistance. (3) Retry automatique avec DLQ. (4) Fan-in (N producteurs → 1 queue). Pattern fréquent DOP-C02 : SNS (fan-out) + SQS (buffer/retry) + EventBridge (routage/scheduling)."
   }
+],
+
+15: [
+  // ─── AWS Incident Manager ─────────────────────────────────────────────────
+  {
+    t: "Incident Manager fondamentaux",
+    q: "Qu'est-ce qu'AWS Systems Manager Incident Manager et quels problèmes résout-il ?",
+    o: [
+      "Incident Manager est un outil de ticketing comme Jira",
+      "Incident Manager est un service de gestion d'incidents qui automatise la détection, la notification des on-call, l'exécution des runbooks et la collaboration d'équipe pendant les incidents de production",
+      "Incident Manager gère uniquement les incidents de sécurité via GuardDuty",
+      "Incident Manager remplace PagerDuty et ne peut pas s'y intégrer"
+    ],
+    a: 1,
+    e: "AWS Systems Manager Incident Manager : gestion d'incidents intégrée au cloud. Fonctionnalités : (1) Response Plans : définissent les actions automatiques au déclenchement d'un incident (notifications, runbooks, escalades). (2) Contacts et Escalades : plans d'on-call avec rotations, channels de notification (SMS, email, voice, Slack, Teams). (3) Runbooks : SSM Automation Documents exécutés automatiquement pendant l'incident. (4) Timeline : historique automatique des actions. (5) Post-incident analysis : template de post-mortem. Intégrations : CloudWatch Alarms, EventBridge, PagerDuty, Slack/Teams (via Chatbot). DOP-C02 : interconnexion CloudWatch → Incident Manager → SSM Runbooks."
+  },
+  {
+    t: "Incident Manager Response Plans",
+    q: "Que contient un Response Plan dans Incident Manager et comment le déclenche-t-on ?",
+    o: [
+      "Un Response Plan est un document texte décrivant les étapes manuelles",
+      "Un Response Plan contient : titre/impact, contacts à notifier, runbooks SSM à exécuter, chat channels, répartition des responsabilités — déclenché par une alarme CloudWatch, EventBridge rule, ou manuellement via API/console",
+      "Les Response Plans se déclenchent uniquement manuellement",
+      "Un Response Plan ne peut contenir qu'une seule action automatique"
+    ],
+    a: 1,
+    e: "Response Plan components : (1) Incident Title/Impact : SEV-1, SEV-2, etc. (2) Contacts : équipes et individus à notifier (via Contact Plans). (3) Runbooks : SSM Automation Documents déclenchés automatiquement. (4) Chat Channels : Slack/Teams via AWS Chatbot pour collaboration temps-réel. (5) PagerDuty Integration : sync bidirectionnelle des incidents. Déclenchement : CloudWatch Alarm → Incident Manager (action type Incident Manager), EventBridge Rule → StartIncident API, CodePipeline failure, ou API directe. Best practice : Response Plan différent par severity level (SEV-1 réveille tout le monde, SEV-3 crée juste un ticket)."
+  },
+  {
+    t: "Incident Manager runbooks",
+    q: "Comment les SSM Automation Runbooks s'intègrent-ils dans la gestion d'incidents ?",
+    o: [
+      "Les runbooks sont des documents Word partagés par email lors d'un incident",
+      "Les SSM Automation Documents sont exécutés automatiquement par Incident Manager au déclenchement d'un incident — ils peuvent redémarrer des services, prendre des snapshots, isoler des instances, sans intervention humaine",
+      "SSM Runbooks nécessitent une approbation manuelle avant chaque étape",
+      "Les runbooks s'exécutent uniquement après résolution de l'incident"
+    ],
+    a: 1,
+    e: "SSM Automation + Incident Manager : (1) Association : lier un SSM Automation Document au Response Plan. (2) Exécution automatique : au déclenchement de l'incident, le runbook commence immédiatement. (3) Actions typiques : restart d'un service ECS/EC2, snapshot RDS, increase ASG desired capacity, flush cache ElastiCache, switch Route 53 failover. (4) Paramètres : peuvent être injectés depuis l'événement déclencheur. (5) Approval steps : pour les actions destructives (optionnel). Timeline : chaque action du runbook est enregistrée automatiquement dans la timeline de l'incident. Réduction du MTTR via l'automatisation des premières actions de remediation."
+  },
+  {
+    t: "Incident Manager contacts et escalades",
+    q: "Comment configurer une escalade dans Incident Manager si personne ne répond en 5 minutes ?",
+    o: [
+      "L'escalade doit être configurée manuellement pendant l'incident",
+      "Créer un Escalation Plan : Contact A (notifié en premier, 5 minutes de délai) → si pas d'acknowledgement → Contact B → si pas d'acknowledgement → Manager + équipe complète",
+      "Incident Manager n'a pas de fonctionnalité d'escalade automatique",
+      "L'escalade se configure uniquement dans PagerDuty, pas Incident Manager"
+    ],
+    a: 1,
+    e: "Incident Manager Escalation Plans : (1) Définir des contacts (individus ou équipes) avec leurs channels de notification préférés (SMS, email, voice). (2) Escalation Plan : stage 1 (délai=0 min) → notifier l'équipe de permanence. Stage 2 (délai=5 min, si pas d'ack) → notifier le lead technique. Stage 3 (délai=15 min) → notifier le manager + bridge de guerre. (3) Contact Rotations : on-call hebdomadaire avec override pour vacances. (4) Acknowledge : la personne notifiée confirme via SMS/email/console. Best practice DOP-C02 : toujours avoir au moins 2 niveaux d'escalade et un canal de backup pour les incidents critiques."
+  },
+  // ─── AWS Health ───────────────────────────────────────────────────────────
+  {
+    t: "AWS Health Dashboard",
+    q: "Quelle est la différence entre AWS Service Health Dashboard et AWS Personal Health Dashboard ?",
+    o: [
+      "Ce sont deux noms pour le même service",
+      "Service Health Dashboard (status.aws.amazon.com) : état global des services AWS tous comptes confondus. Personal Health Dashboard (aws.amazon.com/premiumsupport/phd) : événements affectant VOTRE infrastructure spécifique — plus actionnable",
+      "Service Health Dashboard est payant ; Personal Health Dashboard est gratuit",
+      "Personal Health Dashboard ne couvre que les événements EC2"
+    ],
+    a: 1,
+    e: "AWS Health services : (1) Service Health Dashboard : page publique status.aws.amazon.com, état global de tous les services AWS dans toutes les régions. Consulter pour savoir si AWS a un problème général. (2) AWS Health Dashboard (Personal) : vue personnalisée des événements qui VOUS affectent — maintenances planifiées sur vos instances, problèmes sur vos services, notifications de dépréciation. API Health accessible programmatiquement. (3) AWS Health EventBridge Events : automatiser les réponses aux événements Health. Exemple : instance EC2 impactée par une défaillance hardware → EventBridge Rule → Lambda migre automatiquement l'instance. DOP-C02 : Personal Health + EventBridge = réponse automatisée."
+  },
+  {
+    t: "AWS Health EventBridge",
+    q: "Comment automatiser la réponse à une notification AWS Health indiquant qu'une instance EC2 sera retirée pour maintenance ?",
+    o: [
+      "Surveiller manuellement le Personal Health Dashboard et agir avant la date",
+      "EventBridge Rule sur aws.health events (detail-type: AWS Health Event, detail.service: EC2) → Lambda qui crée un snapshot EBS + migre l'instance vers une nouvelle instance saine avant la date de maintenance",
+      "AWS Health gère automatiquement la migration — aucune action requise",
+      "Utiliser CloudTrail pour détecter les événements de maintenance EC2"
+    ],
+    a: 1,
+    e: "AWS Health + EventBridge automation : (1) Event pattern : {source:[aws.health], detail-type:[AWS Health Event], detail:{service:[EC2], eventTypeCategory:[scheduledChange]}}. (2) Target Lambda : (a) identifier l'instance affectée depuis event.detail.affectedEntities. (b) créer snapshot EBS. (c) envoyer notification à l'équipe. (d) si instance dans ASG → terminer proprement (RemoveInstance, laisser ASG en créer une nouvelle). (3) Notification : SNS → Slack/email avec détails. Types d'événements Health : scheduledChange (maintenance), issue (incident en cours), accountNotification (compliance, dépréciation). Organisation AWS : consolidation des Health events de tous les comptes membres."
+  },
+  {
+    t: "Trusted Advisor",
+    q: "Qu'est-ce qu'AWS Trusted Advisor et comment l'utiliser dans une organisation multi-comptes ?",
+    o: [
+      "Trusted Advisor est uniquement disponible pour le compte root AWS",
+      "Trusted Advisor analyse votre infrastructure selon 5 catégories (cost optimization, performance, security, fault tolerance, service limits) et fournit des recommandations — avec Business/Enterprise Support : toutes les checks disponibles + API + notification EventBridge",
+      "Trusted Advisor remplace AWS Config pour la compliance",
+      "Trusted Advisor ne peut analyser que les ressources EC2 et RDS"
+    ],
+    a: 1,
+    e: "AWS Trusted Advisor : 5 catégories de checks : (1) Cost Optimization : idle resources, reserved instances sous-utilisées. (2) Performance : instance types, CloudFront configuration. (3) Security : MFA root, S3 public buckets, security groups trop permissifs. (4) Fault Tolerance : Multi-AZ RDS, Auto Scaling, EBS snapshots. (5) Service Limits : ressources proches des quotas. Niveaux : Basic/Developer = 7 checks seulement. Business/Enterprise = 115+ checks + API + EventBridge events. Multi-comptes : AWS Organizations + Trusted Advisor Dashboard organisationnel. Automation : EventBridge events pour les checks changeant de statut (Warning, Error) → SNS → Slack."
+  },
+  {
+    t: "Incident Manager post-incident",
+    q: "Comment structurer un post-mortem efficace après un incident de production avec Incident Manager ?",
+    o: [
+      "Le post-mortem consiste à identifier et punir les responsables",
+      "Utiliser le template Post-Incident Analysis d'Incident Manager : timeline automatique, 5 Whys (causes profondes), impact, actions correctives avec propriétaires et délais — culture blameless",
+      "Un post-mortem se fait uniquement pour les incidents SEV-1",
+      "Incident Manager génère automatiquement un rapport complet sans intervention"
+    ],
+    a: 1,
+    e: "Post-Incident Analysis avec Incident Manager : (1) Timeline automatique : toutes les actions (runbooks, notifications, acknowledgements) sont enregistrées. (2) Template structuré : résumé d'impact, chronologie détaillée, causes profondes (5 Whys ou Fishbone), facteurs contributifs. (3) Actions correctives (action items) : chaque item avec propriétaire, délai, lien vers ticket (Jira, etc.). (4) Culture blameless : focus sur les systèmes et processus, pas les individus. (5) Distribution : partager avec les équipes, stakeholders. Best practices DOP-C02 : (a) Post-mortem pour tout incident SEV-1/2. (b) Actions de prévention, non seulement de correction. (c) Partager les apprentissages avec toute l'organisation (learning reviews publiques)."
+  },
+  {
+    t: "CloudWatch vs Incident Manager",
+    q: "Comment intégrer CloudWatch Alarms avec Incident Manager pour une réponse automatique aux incidents ?",
+    o: [
+      "CloudWatch et Incident Manager ne peuvent pas être intégrés directement",
+      "Dans CloudWatch Alarm, ajouter une action Incident Manager (OpsItem ou Incident) qui référence un Response Plan — l'alarme déclenche automatiquement l'incident avec notifications et runbooks",
+      "Utiliser CloudTrail entre CloudWatch et Incident Manager",
+      "Incident Manager ne peut être déclenché que manuellement via la console"
+    ],
+    a: 1,
+    e: "Integration CloudWatch → Incident Manager : (1) CloudWatch Alarm Action : choisir type Incident Manager, sélectionner un Response Plan ARN. (2) Déclenchement : quand l'alarme passe en ALARM → Incident Manager crée automatiquement un incident avec le Response Plan. (3) Auto-resolution : quand l'alarme revient OK → Incident Manager peut automatiquement résoudre l'incident (configurable). (4) Paramètres : titre de l'incident peut inclure le nom de l'alarme, l'impact, les informations contextuelles. Pipeline type DOP-C02 : CloudWatch Alarm (CPU > 90% pendant 5min) → Incident Manager (SEV-2 Response Plan) → SSM Runbook (scale up ASG) + notification Slack + escalade si pas de resolution en 15min."
+  },
+  {
+    t: "OpsCenter",
+    q: "Qu'est-ce qu'AWS Systems Manager OpsCenter et comment s'intègre-t-il avec Incident Manager ?",
+    o: [
+      "OpsCenter remplace complètement Incident Manager",
+      "OpsCenter agrège des OpsItems (problèmes opérationnels) depuis plusieurs sources (CloudWatch, Config, Security Hub, CodeDeploy) pour une vue unifiée des problèmes — Incident Manager gère les incidents actifs avec coordination en temps réel",
+      "OpsCenter est uniquement pour les problèmes de sécurité",
+      "OpsCenter et Incident Manager sont deux noms pour le même service"
+    ],
+    a: 1,
+    e: "SSM OpsCenter : agrégation de problèmes opérationnels (OpsItems) depuis : CloudWatch Alarms, Config Rules non-compliances, Security Hub findings, CodeDeploy failures, EventBridge events. Chaque OpsItem contient : contexte (ressources affectées, métriques), runbooks recommandés, historique. Lien avec Incident Manager : (1) OpsCenter = gestion des problèmes opérationnels (préventif, basse urgence). (2) Incident Manager = gestion des incidents actifs (réactif, haute urgence, coordination temps-réel). (3) Transition : un OpsItem peut déclencher un Incident Manager si la situation s'aggrave. Vue unifiée via SSM Explorer dashboard : OpsItems + Compliance + Inventory + métriques."
+  },
+  {
+    t: "Incident response scénario Pro",
+    q: "Un site e-commerce est down à 23h vendredi. Quelle chaîne d'outils AWS minimise le temps de résolution ?",
+    o: [
+      "Envoyer un email à l'équipe et attendre le lundi matin",
+      "CloudWatch Alarm → Incident Manager (Response Plan SEV-1) → SSM Runbook (actions automatiques : restart ECS, scale ASG, DNS failover) + notification on-call (SMS/voice) + Slack bridge → post-mortem lundi",
+      "PagerDuty uniquement — AWS n'a pas d'outils pour la gestion d'incidents",
+      "CloudTrail → CloudWatch Logs Insights pour analyser et résoudre manuellement"
+    ],
+    a: 1,
+    e: "Chaîne de réponse optimale : T+0 : CloudWatch Alarm (latency > 5s ou 5xx > 10%) → Incident Manager (Response Plan SEV-1). T+0 (automatique) : SSM Runbook : (1) snapshot RDS, (2) restart ECS service, (3) if no recovery in 2min → scale ASG x2, (4) if no recovery in 5min → Route 53 failover DR. T+0 (automatique) : notification SMS/voice on-call + Slack channel incident. T+2 to T+5 min : ingénieur de permanence acknowledge → diagnostic via ServiceLens (métriques + traces + logs unifiés). T+15 min (si pas de résolution) : escalade automatique vers manager. T+resolusi : Incident Manager résolu, timeline capturée. Post-mortem T+48h."
+  }
 ]
 
 };
