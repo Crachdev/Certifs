@@ -3141,6 +3141,143 @@ window.QDATA = {
     a: 1,
     e: "Workflow automatisé complet : (1) Config Rule restricted-ssh détecte les SGs avec 0.0.0.0/0:22. (2) EventBridge Rule sur Config Compliance Change (COMPLIANT → NON_COMPLIANT) → SNS → email/Slack à l'équipe sécurité. (3) Config Automatic Remediation : SSM Automation AWS-DisablePublicAccessForSecurityGroup retire la règle 0.0.0.0/0:22. (4) Config enregistre le retour à COMPLIANT. Résultat : détection < 1 minute, remédiation automatique, audit trail complet."
   }
+],
+
+9: [
+  // ─── Auto Scaling avancé ─────────────────────────────────────────────────
+  {
+    t: "Auto Scaling fondamentaux",
+    q: "Quelles sont les trois politiques de scaling disponibles dans un Auto Scaling Group (ASG) ?",
+    o: [
+      "Manual, Automatic, Scheduled",
+      "Target Tracking (maintenir une métrique à une valeur cible), Step Scaling (ajuster par paliers selon l'alarme), Scheduled Scaling (scaling planifié par cron)",
+      "CPU-based, Memory-based, Network-based",
+      "Scale-Up, Scale-Down, Scale-Out"
+    ],
+    a: 1,
+    e: "Les politiques de scaling ASG : (1) Target Tracking — la plus simple : spécifier la valeur cible d'une métrique (CPU = 60%, requêtes ALB par instance = 1000) et ASG ajuste automatiquement. (2) Step Scaling — définir des paliers d'ajustement selon la magnitude de l'alarme (CPU 70-80% → +1, CPU 80-90% → +2, CPU>90% → +4). (3) Scheduled Scaling — scaling prédictif par cron (augmenter à 08h00, réduire à 20h00). Combinables : Target Tracking pour le quotidien + Scheduled pour les pics prévus."
+  },
+  {
+    t: "Auto Scaling fondamentaux",
+    q: "Qu'est-ce que le 'cooldown period' dans un ASG et pourquoi est-il important ?",
+    o: [
+      "Le temps de démarrage d'une nouvelle instance EC2",
+      "Une période après un événement de scaling pendant laquelle ASG n'effectue pas d'autre scaling — évite les oscillations (scale-out puis scale-in immédiat)",
+      "Le délai avant que l'ALB envoie du trafic à une nouvelle instance",
+      "Le temps de grâce pendant lequel une instance peut échouer aux health checks"
+    ],
+    a: 1,
+    e: "Le cooldown period (défaut 300s) empêche ASG de lancer de nouveaux événements de scaling avant que les métriques se stabilisent. Sans cooldown, le scaling pourrait boucler : scale-out déclenché par CPU élevé → nouvelles instances démarrent → CPU baisse → scale-in → CPU remonte → scale-out... Le cooldown laisse le temps aux nouvelles instances de démarrer et d'absorber le trafic. Pour Target Tracking, le cooldown est géré automatiquement."
+  },
+  {
+    t: "Auto Scaling lifecycle hooks",
+    q: "Qu'est-ce qu'un Lifecycle Hook dans un ASG et quel est son cas d'usage typique ?",
+    o: [
+      "Un hook est un script exécuté sur l'instance lors du démarrage",
+      "Un hook met l'instance en état 'Pending:Wait' ou 'Terminating:Wait' pour exécuter des actions personnalisées (bootstrap, drain de connexions) avant que l'instance rejoigne ou quitte le service",
+      "Un hook est une notification SNS envoyée lors du scaling",
+      "Un hook est équivalent à un User Data script"
+    ],
+    a: 1,
+    e: "Lifecycle Hooks interceptent les transitions d'état ASG : (1) Launch Hook (Pending → Pending:Wait → InService) : permet de configurer l'instance avant qu'elle reçoive du trafic (installer des agents, copier des fichiers, s'enregistrer dans un service discovery). (2) Terminate Hook (Terminating → Terminating:Wait → Terminated) : permet de drainer les connexions, envoyer les logs, désenregistrer de services. L'instance reste dans l'état Wait jusqu'à complete-lifecycle-action ou timeout (max 48h)."
+  },
+  {
+    t: "Auto Scaling advanced policies",
+    q: "Comment éviter qu'un ASG supprime une instance qui a des connexions actives en cours lors d'un scale-in ?",
+    o: [
+      "Mettre une protection 'DeletionProtection' sur les instances EC2",
+      "Utiliser un Lifecycle Hook sur la terminaison + Connection Draining sur l'ALB (Deregistration Delay) pour drainer les connexions avant la terminaison",
+      "Augmenter le cooldown period à 24 heures",
+      "Utiliser un ASG avec MinSize = MaxSize pour éviter le scale-in"
+    ],
+    a: 1,
+    e: "Le combo recommandé : (1) ALB Deregistration Delay (défaut 300s) : quand ASG signale qu'une instance doit être terminée, l'ALB cesse d'envoyer de nouvelles connexions et attend que les connexions actives se terminent (jusqu'au délai configuré). (2) ASG Termination Lifecycle Hook : met l'instance en Terminating:Wait pendant que les connexions drainent. (3) L'instance signale complete-lifecycle-action une fois le drain terminé. Sans ce mécanisme, les connexions actives seraient brusquement interrompues."
+  },
+  {
+    t: "Auto Scaling instance refresh",
+    q: "Qu'est-ce que l'Instance Refresh d'un ASG et quand l'utiliser ?",
+    o: [
+      "Un redémarrage forcé de toutes les instances d'un ASG",
+      "Un mécanisme pour mettre à jour progressivement les instances d'un ASG avec une nouvelle configuration (nouveau AMI, nouveau Launch Template) — remplace les instances par batch en maintenant la capacité",
+      "Une vérification périodique de l'état de santé des instances",
+      "Instance Refresh est équivalent au rolling update de CodeDeploy"
+    ],
+    a: 1,
+    e: "Instance Refresh permet de déployer une nouvelle configuration (nouveau AMI, User Data mis à jour, instance type changé via Launch Template) sans recréer l'ASG. Paramètres clés : MinHealthyPercentage (% d'instances saines à maintenir pendant le refresh, ex: 90%) et InstanceWarmup (temps d'attente avant de considérer une nouvelle instance stable). Le refresh remplace les instances par batches. Utile après la création d'un nouveau Golden AMI ou une mise à jour de configuration."
+  },
+  // ─── Disaster Recovery ───────────────────────────────────────────────────
+  {
+    t: "DR stratégies fondamentaux",
+    q: "Quelles sont les 4 stratégies de Disaster Recovery AWS classées par RTO/RPO croissant (du plus rapide au plus lent à récupérer) ?",
+    o: [
+      "Backup/Restore, Pilot Light, Warm Standby, Active/Active",
+      "Active/Active (Multi-Site), Warm Standby, Pilot Light, Backup and Restore",
+      "Cold Standby, Hot Standby, Warm Standby, Active/Active",
+      "Single Region, Multi-AZ, Multi-Region, Global"
+    ],
+    a: 1,
+    e: "Les 4 stratégies DR AWS par ordre de RTO/RPO (rapide → lent, coût élevé → faible) : (1) Multi-Site Active/Active : RTO quasiment 0, RPO quasiment 0, coût maximal (deux environments pleinement actifs). (2) Warm Standby : RTO minutes, RPO minutes, infrastructure allégée toujours active dans la DR. (3) Pilot Light : RTO heures, RPO heures, composants critiques uniquement dans la DR (DB répliquée, AMIs disponibles). (4) Backup and Restore : RTO heures-jours, RPO heures, sauvegardes dans S3/Glacier."
+  },
+  {
+    t: "DR stratégies",
+    q: "Qu'est-ce que la stratégie 'Pilot Light' en Disaster Recovery et quels composants sont maintenus actifs ?",
+    o: [
+      "Tous les composants sont actifs à pleine capacité dans la région DR",
+      "Seuls les composants critiques et difficiles à provisionner rapidement (base de données répliquée, AMIs à jour) sont maintenus actifs dans la DR — le reste est provisionné au moment du failover",
+      "Aucun composant n'est actif dans la DR — tout est reconstruit depuis des backups",
+      "Pilot Light utilise des instances Spot dans la région DR pour réduire les coûts"
+    ],
+    a: 1,
+    e: "Pilot Light maintient uniquement la 'flamme pilote' — les composants essentiels : RDS en read replica (peut être promu en primaire lors du failover), AMIs à jour des serveurs d'application, configuration de base dans la région DR. Lors du failover : (1) promouvoir le read replica RDS en primary, (2) lancer les instances EC2 depuis les AMIs, (3) rediriger le DNS vers la région DR. RTO typique : 1-4 heures. Économique : only DB + storage actifs en permanence."
+  },
+  {
+    t: "DR stratégies",
+    q: "Qu'est-ce que la stratégie 'Warm Standby' et comment diffère-t-elle de Pilot Light ?",
+    o: [
+      "Warm Standby et Pilot Light sont identiques",
+      "Warm Standby maintient une version allégée de l'environnement COMPLET en DR (toutes les couches actives mais à capacité réduite) — le failover nécessite seulement de scaler up, pas de provisionner",
+      "Warm Standby utilise uniquement des instances Spot pour réduire les coûts",
+      "Warm Standby ne nécessite pas de réplication des données"
+    ],
+    a: 1,
+    e: "Warm Standby vs Pilot Light : Pilot Light = seulement les composants critiques. Warm Standby = toutes les couches de l'application actives dans la région DR mais à capacité réduite (1-2 instances au lieu de 20, DB répliquée active). Failover : juste scaler les ASG à la capacité normale + rediriger le DNS. RTO : minutes (vs heures pour Pilot Light). Coût : modéré (infrastructure allégée). Warm Standby est adapté aux applications avec RTO < 1 heure."
+  },
+  {
+    t: "RTO et RPO",
+    q: "Quelle est la différence entre RTO et RPO en Disaster Recovery ?",
+    o: [
+      "RTO est le temps de réponse du système ; RPO est le temps de démarrage",
+      "RTO (Recovery Time Objective) est le temps maximum acceptable pour restaurer le service ; RPO (Recovery Point Objective) est la perte de données maximale acceptable (en temps)",
+      "RPO est la durée du test de DR ; RTO est la durée de la fenêtre de maintenance",
+      "Les deux termes sont synonymes"
+    ],
+    a: 1,
+    e: "RTO (Recovery Time Objective) : combien de temps maximum peut-on tolérer que le système soit DOWN après un incident ? Ex: RTO = 4h signifie que le service doit être restauré en < 4h. RPO (Recovery Point Objective) : combien de données peut-on se permettre de perdre ? Ex: RPO = 1h signifie qu'on peut perdre au maximum 1 heure de données (backup toutes les heures). Ces deux métriques définissent les exigences DR et guident le choix de stratégie et les coûts."
+  },
+  {
+    t: "DR multi-région",
+    q: "Comment implémenter un failover DNS automatique vers une région DR avec AWS Route 53 ?",
+    o: [
+      "Modifier manuellement les enregistrements DNS lors d'un incident",
+      "Configurer une Failover Routing Policy Route 53 avec des Health Checks sur la région primaire — Route 53 bascule automatiquement vers la région secondaire si la primaire devient unhealthy",
+      "Utiliser un CNAME qui pointe vers les deux régions simultanément",
+      "Route 53 ne supporte pas le failover automatique entre régions"
+    ],
+    a: 1,
+    e: "Route 53 Failover Routing : (1) créer un Health Check sur l'endpoint primaire (URL, IP, CloudWatch Alarm). (2) Créer un record 'PRIMARY' (Failover: Primary) et un record 'SECONDARY' (Failover: Secondary) avec le même nom DNS. Route 53 route tout le trafic vers le Primary tant qu'il est healthy. Si le Health Check échoue, Route 53 bascule automatiquement vers le Secondary. TTL bas recommandé (60s) pour une propagation rapide."
+  },
+  {
+    t: "DR scénario Pro",
+    q: "Une application critique (RTO=15min, RPO=5min) utilise RDS. Quelle architecture DR multi-région mettre en place ?",
+    o: [
+      "Backups quotidiens dans S3 et restauration manuelle",
+      "RDS Multi-AZ dans la région primaire + RDS Cross-Region Read Replica dans la DR (RPO~5min via réplication async) + Route 53 Health Check pour failover automatique + Warm Standby dans la DR",
+      "RDS automatiquement répliqué par AWS sans configuration",
+      "RDS Aurora Global Database avec réplication < 1 seconde + Route 53 failover automatique"
+    ],
+    a: [1, 3],
+    e: "Deux approches valides : (1) RDS Cross-Region Read Replica (RPO ~ lag réplication, typiquement < 5min) + promote manuel ou automatisé (Lambda) au failover + Route 53. (2) Aurora Global Database : réplication synchrone entre régions avec RPO < 1 seconde, RTO < 1 minute, managed failover en 1 clic ou automatique. Pour RTO=15min et RPO=5min, Aurora Global Database est la solution optimale (RPO et RTO dépassent les exigences). Les deux valident la question dans l'examen."
+  }
 ]
 
 };
