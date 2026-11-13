@@ -1813,6 +1813,356 @@ window.QDATA = {
     a: [0, 1],
     e: "Les avantages de CodeBuild vs GitHub Actions pour AWS : (A) les credentials AWS sont injectés via le service role IAM — pas besoin de stocker des access keys dans GitHub Secrets. (B) CodeBuild s'intègre nativement comme action dans CodePipeline. GitHub Actions a une syntaxe YAML plus riche (C est fausse) et supporte autant de langages (D est fausse)."
   }
+],
+
+3: [
+  // ─── Fondamentaux CodeDeploy ──────────────────────────────────────────────
+  {
+    t: "CodeDeploy fondamentaux",
+    q: "Quelles sont les plateformes de déploiement supportées par CodeDeploy ? (choisir 2)",
+    o: [
+      "Instances EC2/On-premises (agent CodeDeploy requis)",
+      "AWS Lambda (déploiements de fonctions Lambda)",
+      "Amazon ECS (déploiements Blue/Green sur Fargate et EC2)",
+      "Amazon RDS (déploiements de schémas de base de données)"
+    ],
+    a: [0, 2],
+    e: "CodeDeploy supporte trois plateformes : (1) EC2/On-premises — l'agent CodeDeploy est installé sur les instances. (2) Lambda — déploiements canary/linear/all-at-once des fonctions. (3) ECS — déploiements Blue/Green sur les services ECS. RDS n'est pas une plateforme CodeDeploy."
+  },
+  {
+    t: "CodeDeploy fondamentaux",
+    q: "Qu'est-ce qu'un 'Deployment Group' dans CodeDeploy ?",
+    o: [
+      "Un groupe de fichiers à déployer (l'artifact)",
+      "Un ensemble d'instances EC2/ECS services/Lambda functions cibles, avec sa configuration de déploiement",
+      "Un groupe d'utilisateurs IAM autorisés à déclencher des déploiements",
+      "Un groupe de règles CloudWatch Alarms associées au déploiement"
+    ],
+    a: 1,
+    e: "Un Deployment Group définit les cibles du déploiement et comment les atteindre : les instances EC2 (par tags ou AutoScaling Groups), le service ECS ou la fonction Lambda, la configuration de déploiement (vitesse), les hooks, et les alarmes de rollback. Une application CodeDeploy peut avoir plusieurs Deployment Groups (dev, staging, prod)."
+  },
+  {
+    t: "CodeDeploy fondamentaux",
+    q: "Quel est le rôle du fichier appspec.yml dans un déploiement CodeDeploy EC2 ?",
+    o: [
+      "Définir le code source à compiler",
+      "Définir les fichiers à copier et les scripts hooks à exécuter à chaque étape du déploiement",
+      "Configurer les variables d'environnement de l'application",
+      "Spécifier les instances EC2 cibles du déploiement"
+    ],
+    a: 1,
+    e: "L'appspec.yml est le manifeste de déploiement CodeDeploy. Pour EC2 : section 'files' (source → destination des fichiers à copier) et section 'hooks' (scripts à exécuter à chaque lifecycle event : ApplicationStop, BeforeInstall, AfterInstall, ApplicationStart, ValidateService). Sans appspec.yml, CodeDeploy ne sait pas quoi faire avec l'artifact."
+  },
+  // ─── In-place deployment ──────────────────────────────────────────────────
+  {
+    t: "CodeDeploy in-place",
+    q: "Dans un déploiement In-Place CodeDeploy sur EC2, dans quel ordre les lifecycle hooks s'exécutent-ils ?",
+    o: [
+      "BeforeInstall → AfterInstall → ApplicationStart → ValidateService",
+      "ApplicationStop → DownloadBundle → BeforeInstall → Install → AfterInstall → ApplicationStart → ValidateService",
+      "Install → BeforeInstall → AfterInstall → ValidateService → ApplicationStart",
+      "DownloadBundle → Install → ApplicationStart → ValidateService"
+    ],
+    a: 1,
+    e: "L'ordre complet des lifecycle events pour un In-Place EC2 est : ApplicationStop → DownloadBundle → BeforeInstall → Install → AfterInstall → ApplicationStart → ValidateService. ApplicationStop arrête l'app existante. DownloadBundle récupère l'artifact. BeforeInstall/AfterInstall sont des crochets custom. Install copie les fichiers. ApplicationStart lance la nouvelle version. ValidateService vérifie le déploiement."
+  },
+  {
+    t: "CodeDeploy in-place",
+    q: "Un script dans le hook 'ValidateService' de CodeDeploy effectue un health check HTTP. Si le service renvoie 500, que se passe-t-il ?",
+    o: [
+      "CodeDeploy ignore l'erreur et marque le déploiement comme réussi",
+      "Le script doit retourner un exit code non-zéro pour signaler l'échec à CodeDeploy, qui déclenche un rollback automatique",
+      "CodeDeploy réessaie le hook ValidateService 3 fois avant d'échouer",
+      "CodeDeploy envoie une notification SNS mais continue le déploiement"
+    ],
+    a: 1,
+    e: "CodeDeploy interprète l'exit code des scripts de lifecycle hooks : exit 0 = succès, exit non-zéro = échec. Si ValidateService échoue, CodeDeploy marque le déploiement comme FAILED et peut déclencher un rollback automatique (si configuré). Le script doit donc retourner exit 1 (ou tout code non-zéro) quand le health check échoue."
+  },
+  // ─── Blue/Green deployment ────────────────────────────────────────────────
+  {
+    t: "CodeDeploy Blue/Green",
+    q: "Dans un déploiement Blue/Green CodeDeploy sur EC2 avec ALB, quelle est la séquence correcte ?",
+    o: [
+      "Démarrer nouvelles instances (Green) → déployer sur Green → tester → basculer le trafic ALB vers Green → terminer les Blue",
+      "Terminer les instances Blue → démarrer les Green → déployer → basculer le trafic",
+      "Déployer sur les instances Blue existantes → créer les Green → basculer",
+      "Basculer le trafic ALB vers Green → déployer sur Green → tester → terminer Blue"
+    ],
+    a: 0,
+    e: "Le processus Blue/Green CodeDeploy EC2 : (1) provisioner un nouveau groupe d'instances (Green), (2) déployer l'application sur Green, (3) ré-enregistrer les instances Green dans le Target Group ALB, (4) CodeDeploy redirige le trafic vers Green, (5) après le délai de rétention configuré, terminer les instances Blue. Le trafic ne bascule qu'après validation du déploiement Green."
+  },
+  {
+    t: "CodeDeploy Blue/Green",
+    q: "Dans un déploiement Blue/Green CodeDeploy sur ECS, qu'est-ce qui remplace les instances EC2 dans le concept Blue/Green ?",
+    o: [
+      "Les task definitions ECS (ancienne vs nouvelle version)",
+      "Les Target Groups ALB/NLB (un pour le trafic de production, un pour le test)",
+      "Les clusters ECS (un cluster Blue, un cluster Green)",
+      "Les images Docker dans ECR (image Blue et image Green)"
+    ],
+    a: 1,
+    e: "Pour ECS Blue/Green, les deux 'environnements' sont représentés par deux Target Groups : le Target Group de production (Blue, reçoit 100% du trafic initialement) et le Target Group de test (Green, reçoit le nouveau déploiement). CodeDeploy déploie la nouvelle task definition sur Green, permet le testing via le listener de test, puis bascule le trafic production vers Green."
+  },
+  {
+    t: "CodeDeploy Blue/Green",
+    q: "Pendant un déploiement Blue/Green ECS, comment tester la nouvelle version avant de basculer le trafic de production ?",
+    o: [
+      "Accéder directement aux tâches ECS Green via leur IP privée",
+      "Utiliser le listener de test ALB (généralement port 8080) qui pointe vers le Target Group Green pendant le déploiement",
+      "Créer un DNS Route 53 temporaire vers le Target Group Green",
+      "Le test automatique n'est pas possible — il faut inspecter les logs CloudWatch"
+    ],
+    a: 1,
+    e: "Pendant un Blue/Green ECS, l'ALB est configuré avec deux listeners : le listener de production (port 443/80) pointant vers Blue, et un listener de test (souvent port 8080) pointant vers Green. Pendant le déploiement, Green reçoit le nouveau code et on peut le tester via le listener de test avant le basculement final. CodeDeploy peut aussi exécuter des Lambda de test automatique."
+  },
+  // ─── Deployment configurations ────────────────────────────────────────────
+  {
+    t: "CodeDeploy configuration",
+    q: "Quelle est la différence entre CodeDeployDefault.OneAtATime et CodeDeployDefault.AllAtOnce ?",
+    o: [
+      "OneAtATime déploie sur une instance à la fois (disponibilité maximale) ; AllAtOnce déploie sur toutes les instances simultanément (rapidité maximale mais downtime possible)",
+      "AllAtOnce est pour les environnements de prod ; OneAtATime pour les environnements de dev",
+      "OneAtATime est pour Lambda ; AllAtOnce est pour EC2",
+      "Les deux configurations sont identiques pour les environnements à instance unique"
+    ],
+    a: 0,
+    e: "OneAtATime : une instance à la fois hors du LB, déploiement, retour dans le LB — disponibilité maximale mais déploiement lent. AllAtOnce : toutes les instances simultanément — plus rapide mais downtime pendant le déploiement. HalfAtATime : moitié des instances simultanément. Pour la production, OneAtATime ou HalfAtATime sont recommandés. AllAtOnce convient aux environnements non-critiques."
+  },
+  {
+    t: "CodeDeploy configuration",
+    q: "Dans un déploiement Lambda CodeDeploy, qu'est-ce que le mode 'Canary10Percent5Minutes' ?",
+    o: [
+      "10% des utilisateurs reçoivent la nouvelle version pendant 5 minutes, puis 100% basculent",
+      "La nouvelle version reçoit 10% du trafic pendant 5 minutes, puis si les alarmes sont OK, 100% basculent",
+      "Le déploiement prend 5 minutes avec 10% de rollback automatique",
+      "10% des fonctions Lambda sont mises à jour toutes les 5 minutes"
+    ],
+    a: 1,
+    e: "CodeDeploy Lambda Canary : on envoie un petit pourcentage du trafic (10%) vers la nouvelle version de la Lambda pendant une durée définie (5 minutes). Pendant ce temps, CodeDeploy surveille les CloudWatch Alarms. Si aucune alarme ne se déclenche, 100% du trafic bascule vers la nouvelle version. Sinon, rollback automatique vers l'ancienne version. Les modes disponibles : Canary (deux steps) et Linear (incréments réguliers)."
+  },
+  {
+    t: "CodeDeploy configuration",
+    q: "Quels modes de déploiement CodeDeploy sont disponibles pour Lambda ? (choisir 2)",
+    o: [
+      "Canary — envoie un pourcentage du trafic vers la nouvelle version, puis bascule tout",
+      "Linear — augmente progressivement le pourcentage de trafic vers la nouvelle version",
+      "BlueGreen — maintient deux versions de la fonction en parallèle",
+      "RollingWithAdditionalBatch — ajoute des instances avant de déployer"
+    ],
+    a: [0, 1],
+    e: "Pour Lambda, CodeDeploy propose : (1) Canary : X% du trafic vers la nouvelle version pendant N minutes, puis 100% si OK. Ex: Canary10Percent5Minutes. (2) Linear : augmentation progressive par incréments fixes. Ex: Linear10PercentEvery1Minute. Plus AllAtOnce (migration immédiate). Les modes BlueGreen et Rolling sont pour EC2/ECS, pas Lambda."
+  },
+  // ─── AppSpec ──────────────────────────────────────────────────────────────
+  {
+    t: "CodeDeploy AppSpec",
+    q: "Voici un appspec.yml pour ECS. Que spécifie la section 'Resources' ?",
+    o: [
+      "Les fichiers à copier depuis l'artifact S3",
+      "Le service ECS cible et la task definition à déployer (nom de famille + container/port)",
+      "Les instances EC2 cibles du déploiement",
+      "Les scripts hooks à exécuter pendant le déploiement"
+    ],
+    a: 1,
+    e: "Dans un appspec.yml ECS, la section 'Resources' spécifie : le service ECS cible (clusterName + serviceName), la task definition à déployer (taskDefinitionArn), et le container/port du load balancer (containerName + containerPort). C'est la description de ce qui doit tourner, pas des fichiers à copier (c'est pour EC2)."
+  },
+  {
+    t: "CodeDeploy AppSpec",
+    q: "Dans un appspec.yml EC2, comment exécuter un script de validation de santé après le démarrage de l'application ?",
+    o: [
+      "Ajouter le script dans la section 'files' avec le flag 'execute: true'",
+      "Ajouter le script dans la section 'hooks' sous 'ValidateService' avec le chemin et le timeout",
+      "Mettre le script dans la section 'environment' du buildspec.yml",
+      "Créer une règle CloudWatch Events qui appelle le script"
+    ],
+    a: 1,
+    e: "Dans l'appspec.yml EC2, la section 'hooks' mappe les lifecycle events vers des scripts : ValidateService est l'événement approprié pour un health check post-démarrage. Format : ValidateService: [{location: scripts/health_check.sh, timeout: 300, runas: ec2-user}]. Le timeout définit la durée max d'exécution du script."
+  },
+  // ─── Rollback ─────────────────────────────────────────────────────────────
+  {
+    t: "CodeDeploy rollback",
+    q: "Comment configurer un rollback automatique dans CodeDeploy ? (choisir 2)",
+    o: [
+      "Configurer 'Automatic rollback on failure' dans les paramètres du Deployment Group",
+      "Associer des CloudWatch Alarms au Deployment Group — si elles se déclenchent, rollback automatique",
+      "Mettre un script de rollback dans le hook 'ApplicationStop'",
+      "Activer 'Auto Rollback' dans le fichier appspec.yml"
+    ],
+    a: [0, 1],
+    e: "CodeDeploy propose deux mécanismes de rollback automatique : (A) 'Rollback when a deployment fails' dans la configuration du Deployment Group — si un hook échoue, rollback vers la dernière révision connue bonne. (B) CloudWatch Alarms — si une alarme configurée se déclenche pendant ou après le déploiement, rollback automatique. Les deux peuvent être actifs simultanément."
+  },
+  {
+    t: "CodeDeploy rollback",
+    q: "Qu'est-ce qu'un 'rollback' CodeDeploy techniquement ?",
+    o: [
+      "CodeDeploy réapplique les changements inversés (git revert) sur les instances",
+      "CodeDeploy re-déploie la dernière révision connue bonne comme un nouveau déploiement",
+      "CodeDeploy restaure un snapshot EBS pris avant le déploiement",
+      "CodeDeploy réinstalle le package précédent depuis le registre de packages"
+    ],
+    a: 1,
+    e: "Un rollback CodeDeploy est en réalité un nouveau déploiement de la révision précédente — ce n'est pas une opération inverse. CodeDeploy exécute tous les lifecycle hooks normalement mais avec l'ancienne révision. Cela signifie que si les hooks ont effectué des migrations de base de données non réversibles, le rollback ne les annulera pas automatiquement."
+  },
+  // ─── Intégrations & scénarios ─────────────────────────────────────────────
+  {
+    t: "CodeDeploy intégrations",
+    q: "Comment intégrer CodeDeploy dans un pipeline CodePipeline pour déployer sur EC2 ?",
+    o: [
+      "Ajouter un stage 'Deploy' avec l'action provider 'CodeDeploy', en spécifiant l'application et le Deployment Group",
+      "CodeDeploy s'intègre automatiquement dans CodePipeline sans configuration",
+      "Créer une action custom dans CodePipeline qui appelle l'API CodeDeploy via Lambda",
+      "Utiliser l'action 'ElasticBeanstalk' qui inclut CodeDeploy nativement"
+    ],
+    a: 0,
+    e: "Dans CodePipeline, un stage de déploiement EC2 utilise l'action provider 'CodeDeploy'. On spécifie l'application CodeDeploy, le Deployment Group, et optionnellement le fichier appspec (sinon cherché à la racine de l'artifact). CodePipeline attend la fin du déploiement et propage succès/échec."
+  },
+  {
+    t: "CodeDeploy intégrations",
+    q: "Une équipe veut déployer une application sur des instances EC2 On-Premises (datacenter) avec CodeDeploy. Quelle est la prérequis principale ?",
+    o: [
+      "Établir une connexion VPN entre le datacenter et AWS",
+      "Installer l'agent CodeDeploy sur les serveurs on-premises et enregistrer les instances avec un profil IAM via aws configure ou un IAM user",
+      "Utiliser AWS Outposts pour étendre le datacenter",
+      "Les serveurs on-premises ne sont pas supportés — CodeDeploy est AWS uniquement"
+    ],
+    a: 1,
+    e: "CodeDeploy supporte les instances on-premises : (1) installer l'agent CodeDeploy sur chaque serveur, (2) créer un IAM user ou utiliser les credentials STS pour chaque instance, (3) enregistrer les instances on-premises dans CodeDeploy avec register-on-premises-instance. Les instances apparaissent dans la console comme des instances taggables, traitées de la même façon que les EC2."
+  },
+  {
+    t: "CodeDeploy scénario avancé",
+    q: "Un déploiement CodeDeploy Blue/Green ECS nécessite 10 minutes pour être validé par les tests automatiques avant le basculement final. Comment configurer ce délai ?",
+    o: [
+      "Mettre un sleep(600) dans le hook AfterAllowTestTraffic de l'appspec.yml",
+      "Configurer 'Wait time before rerouting traffic' dans les paramètres du Deployment Group",
+      "Créer une alarme CloudWatch qui déclenche le basculement après 10 minutes",
+      "Le basculement est toujours immédiat — on ne peut pas configurer de délai"
+    ],
+    a: 1,
+    e: "Dans la configuration du Deployment Group ECS Blue/Green, le paramètre 'Wait time before rerouting traffic (minutes)' permet de configurer une fenêtre de test avant le basculement. Pendant ce délai, les testeurs (ou des tests automatiques via le hook AfterAllowTestTraffic) peuvent valider la version Green via le listener de test. Après le délai, le trafic bascule vers Green."
+  },
+  {
+    t: "CodeDeploy scénario avancé",
+    q: "Comment CodeDeploy gère-t-il les déploiements sur un Auto Scaling Group qui scale pendant le déploiement ?",
+    o: [
+      "Le déploiement échoue si le groupe scale pendant l'opération",
+      "CodeDeploy déploie automatiquement sur les nouvelles instances lancées par l'ASG via un hook de lifecycle ASG",
+      "Les nouvelles instances lancées pendant le déploiement reçoivent l'ancienne version jusqu'au prochain déploiement",
+      "CodeDeploy suspend temporairement l'Auto Scaling pendant le déploiement"
+    ],
+    a: 1,
+    e: "CodeDeploy s'intègre avec Auto Scaling via un lifecycle hook ASG. Quand une nouvelle instance est lancée pendant ou après un déploiement, CodeDeploy détecte l'événement via le hook et déploie automatiquement la dernière révision réussie sur la nouvelle instance avant qu'elle ne passe en service. Cela garantit que toutes les instances de l'ASG ont toujours la même version."
+  },
+  {
+    t: "CodeDeploy scénario avancé",
+    q: "Une application utilise CodeDeploy avec le mode 'OneAtATime' sur 10 instances EC2. Après le déploiement de la 3ème instance, une erreur est détectée. Que se passe-t-il si le rollback automatique est activé ?",
+    o: [
+      "CodeDeploy rolback uniquement les 3 instances déjà mises à jour vers l'ancienne version",
+      "CodeDeploy arrête le déploiement sur les 7 instances restantes, puis re-déploie la version précédente sur toutes les 10 instances",
+      "CodeDeploy arrête le déploiement sur les 7 instances restantes. Les 3 mises à jour gardent la nouvelle version",
+      "CodeDeploy ne peut pas rollback un déploiement partiel — intervention manuelle requise"
+    ],
+    a: 1,
+    e: "Quand le rollback automatique est déclenché pendant un déploiement partiel : CodeDeploy arrête immédiatement le déploiement sur les instances restantes (7 non touchées), puis exécute un nouveau déploiement de la version précédente sur TOUTES les 10 instances — y compris les 3 déjà mises à jour. L'objectif est de remettre toutes les instances dans un état cohérent avec la version précédente."
+  },
+  // ─── Monitoring ───────────────────────────────────────────────────────────
+  {
+    t: "CodeDeploy monitoring",
+    q: "Comment suivre l'avancement d'un déploiement CodeDeploy en temps réel ?",
+    o: [
+      "Via la console CodeDeploy → Deployments → Deployment ID (statut par instance + lifecycle events)",
+      "Via CloudTrail uniquement",
+      "Via les logs d'accès ALB",
+      "CodeDeploy n'offre pas de suivi en temps réel — seulement les résultats finaux"
+    ],
+    a: 0,
+    e: "La console CodeDeploy offre un suivi détaillé en temps réel : statut global du déploiement, nombre d'instances par état (Pending/In Progress/Succeeded/Failed/Skipped), et pour chaque instance les lifecycle events avec leur résultat et les logs des scripts. L'API DescribeDeploymentInstances retourne les mêmes informations programmatiquement."
+  },
+  {
+    t: "CodeDeploy monitoring",
+    q: "Quels événements CodeDeploy peut-on envoyer vers EventBridge pour déclencher des automations ? (choisir 2)",
+    o: [
+      "DeploymentStart — début d'un déploiement",
+      "DeploymentSuccess — déploiement réussi",
+      "DeploymentFailure — déploiement échoué",
+      "InstanceHealthCheck — résultat du health check de chaque instance"
+    ],
+    a: [1, 2],
+    e: "CodeDeploy publie des événements vers EventBridge : DEPLOYMENT_SUCCESS, DEPLOYMENT_FAILURE, DEPLOYMENT_STOP, DEPLOYMENT_ROLLBACK_START, DEPLOYMENT_ROLLBACK_SUCCESS, INSTANCE_START, INSTANCE_SUCCESS, INSTANCE_FAILURE. On peut créer des règles EventBridge pour envoyer des notifications SNS, déclencher des Lambdas, ou créer des tickets Jira automatiquement sur échec."
+  },
+  // ─── Troubleshooting ──────────────────────────────────────────────────────
+  {
+    t: "CodeDeploy troubleshooting",
+    q: "Un déploiement CodeDeploy échoue avec 'The deployment failed because no instances were found in your deployment group'. Quelle est la cause ?",
+    o: [
+      "L'artifact S3 est vide ou corrompu",
+      "Aucune instance EC2 dans le Deployment Group ne correspond aux tags configurés ou ne tourne l'agent CodeDeploy",
+      "Le rôle IAM CodeDeploy n'a pas les permissions EC2:DescribeInstances",
+      "Le fichier appspec.yml est manquant dans l'artifact"
+    ],
+    a: 1,
+    e: "Cette erreur signifie que CodeDeploy ne trouve aucune instance à cibler. Causes : (1) aucune instance EC2 avec les tags configurés dans le Deployment Group ne tourne, (2) l'agent CodeDeploy n'est pas installé/running sur les instances, (3) les instances sont dans un état non-éligible (stopped, terminated). Vérifier les tags EC2, l'état des instances et le statut de l'agent (service codedeploy-agent status)."
+  },
+  {
+    t: "CodeDeploy troubleshooting",
+    q: "Un déploiement CodeDeploy échoue au hook 'AfterInstall' avec exit code 1. Comment déboguer ?",
+    o: [
+      "Consulter les logs de l'agent CodeDeploy sur l'instance EC2 (/var/log/aws/codedeploy-agent/)",
+      "Vérifier les CloudTrail API logs",
+      "Consulter les logs ALB Access Logs",
+      "Redémarrer le service CodeDeploy-Agent sur toutes les instances"
+    ],
+    a: 0,
+    e: "Pour déboguer un hook échoué : (1) logs de l'agent CodeDeploy sur l'instance : /var/log/aws/codedeploy-agent/codedeploy-agent.log et /opt/codedeploy-agent/deployment-root/{deployment-id}/{instance-id}/logs/scripts.log. (2) Dans la console CodeDeploy, cliquer sur l'instance failed → voir les lifecycle events → cliquer sur le hook failed → voir les logs. Ces logs contiennent l'output stdout/stderr du script."
+  },
+  // ─── Comparaisons & patterns Pro ─────────────────────────────────────────
+  {
+    t: "CodeDeploy patterns Pro",
+    q: "Une équipe hésite entre In-Place et Blue/Green pour déployer une API critique. Quels sont les avantages du Blue/Green ? (choisir 2)",
+    o: [
+      "Zéro downtime — le trafic bascule instantanément de la version Blue à la version Green",
+      "Rollback instantané — il suffit de rebascule le trafic vers Blue si un problème est détecté",
+      "Coût réduit — Blue/Green nécessite moins d'instances EC2",
+      "Compatible avec les bases de données sans schéma de migration"
+    ],
+    a: [0, 1],
+    e: "Les avantages principaux du Blue/Green : (A) Zéro downtime — les nouvelles instances Green sont prêtes avant que le trafic ne bascule, contrairement à l'In-Place où les instances sont temporairement hors service. (B) Rollback rapide — rebascule le LB vers Blue en quelques secondes si problème. L'inconvénient est le coût : on paie temporairement deux environnements. Les migrations DB sont un défi dans les deux cas."
+  },
+  {
+    t: "CodeDeploy patterns Pro",
+    q: "Comment implémenter un déploiement 'Canary' sur EC2 avec CodeDeploy ? (Lambda le supporte nativement, mais EC2 ?) ",
+    o: [
+      "Utiliser la configuration CodeDeployDefault.Canary disponible pour EC2",
+      "EC2 ne supporte pas le Canary nativement — simuler avec deux Deployment Groups (un petit pour le canary, un grand pour la suite)",
+      "Utiliser AWS Global Accelerator avec CodeDeploy pour le traffic shifting EC2",
+      "Canary n'est pas possible sur EC2 — uniquement sur Lambda et ECS"
+    ],
+    a: 1,
+    e: "EC2 ne dispose pas de mode Canary natif dans CodeDeploy (contrairement à Lambda). Le pattern recommandé : créer deux Deployment Groups — un 'Canary' cible un petit sous-ensemble d'instances (ex: 5% via tag 'env=canary'), l'autre 'Production' cible le reste. On déploie d'abord sur Canary, on monitore, puis on déploie sur Production. Cette approche nécessite une gestion manuelle ou via pipeline."
+  },
+  {
+    t: "CodeDeploy patterns Pro",
+    q: "Une application monolithique déploie 500 MB d'artifacts via CodeDeploy S3. Les déploiements sont lents (10+ min juste pour le téléchargement). Comment accélérer ?",
+    o: [
+      "Augmenter la taille de bande passante des instances EC2",
+      "Utiliser CodeDeploy avec Amazon S3 Transfer Acceleration",
+      "Optimiser l'artifact : ne packager que les fichiers modifiés (delta deployment) ou utiliser un bucket S3 dans la même région que les instances",
+      "Passer à un bucket EFS partagé entre toutes les instances"
+    ],
+    a: 2,
+    e: "Pour accélérer les téléchargements CodeDeploy : (1) s'assurer que le bucket S3 est dans la même région que les instances — le transfert intra-région est plus rapide et sans coût. (2) Réduire la taille des artifacts en ne packager que les fichiers nécessaires (pas les node_modules ou les assets non modifiés). (3) Utiliser la compression gzip. (4) Envisager un cache de proxy S3 local si les déploiements sont très fréquents."
+  },
+  // ─── IAM ──────────────────────────────────────────────────────────────────
+  {
+    t: "CodeDeploy IAM",
+    q: "Quels sont les deux rôles IAM requis pour utiliser CodeDeploy ? (choisir 2)",
+    o: [
+      "Service role CodeDeploy — permet à CodeDeploy d'appeler les services AWS (EC2, ECS, ALB, ASG…)",
+      "Instance profile EC2 — permet à l'agent CodeDeploy de lire les artifacts depuis S3",
+      "Deployment role — permet aux développeurs de déclencher des déploiements",
+      "Hook role — permet aux scripts de lifecycle d'appeler des services AWS"
+    ],
+    a: [0, 1],
+    e: "Deux rôles IAM sont essentiels : (A) Service role CodeDeploy (attaché à l'application) : permet à CodeDeploy d'accéder aux instances EC2, ALB, ASG, ECS — policy AWSCodeDeployRole. (B) Instance profile EC2 (attaché aux instances) : permet à l'agent CodeDeploy sur l'instance de lire l'artifact depuis S3 et d'appeler les APIs CodeDeploy pour le reporting. Sans l'un ou l'autre, le déploiement échoue."
+  }
 ]
 
 };
