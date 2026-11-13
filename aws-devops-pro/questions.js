@@ -17,7 +17,7 @@ window.QUIZ_META = {
     ["0 pénalité", "ne jamais laisser vide"],
     ["D1 › D2=D6 › D3=D4=D5", "22 · 17 · 15 · 15 · 14 %"]
   ],
-  totalQ: 0
+  totalQ: 327
 };
 
 // ── Plan de révision 20 jours ───────────────────────────────────────────────
@@ -4590,6 +4590,190 @@ window.QDATA = {
     ],
     a: 1,
     e: "AWS Macie : data security et privacy service pour S3. Fonctionnalités : (1) Sensitive data discovery : ML détecte PII (noms, emails, numéros SS, numéros CB), credentials (AWS keys, SSH keys), financial data, PHI dans les objets S3. (2) Findings : rapport par bucket et objet, niveau de confidence. (3) Bucket security findings : public access, chiffrement désactivé, partagé cross-account. RGPD integration : (1) Découverte automatique des buckets contenant des données personnelles → cartographie. (2) Findings → EventBridge → Lambda → notifier DPO, bloquer accès public, chiffrer. (3) Automated sensitive data discovery : scan continu multi-comptes via Organizations. Coûts : par Go de données analysées + par bucket monitored. Architecture : Macie findings → Security Hub → workflow de conformité."
+  }
+],
+
+20: [
+  // ─── 15 pièges Pro DOP-C02 ───────────────────────────────────────────────
+  {
+    t: "Piège #1 : CodeDeploy hooks",
+    q: "[PIÈGE PRO] Pendant un déploiement CodeDeploy AllAtOnce vers EC2, le hook ApplicationStop échoue sur une nouvelle instance qui n'a jamais eu l'application. Que se passe-t-il ?",
+    o: [
+      "Le déploiement échoue car ApplicationStop est obligatoire",
+      "CodeDeploy ignore l'échec de ApplicationStop sur les nouvelles instances (aucune révision précédente) et continue le déploiement — ce comportement est intentionnel et documenté",
+      "CodeDeploy réessaie ApplicationStop 3 fois avant d'échouer",
+      "CodeDeploy crée automatiquement un script ApplicationStop vide"
+    ],
+    a: 1,
+    e: "PIÈGE : ApplicationStop s'exécute AVANT le téléchargement de la nouvelle révision. Sur une nouvelle instance sans déploiement précédent, CodeDeploy récupère l'appspec.yml de la DERNIÈRE révision déployée avec succès dans le groupe. S'il n'y en a aucune → ApplicationStop est ignoré et le déploiement continue. Ce comportement surprend en entretien : on croit que l'échec de ApplicationStop bloque tout. En réalité, le seul hook qui peut bloquer un premier déploiement sur nouvelle instance est BeforeInstall et les hooks suivants."
+  },
+  {
+    t: "Piège #2 : CloudFormation DependsOn",
+    q: "[PIÈGE PRO] Vous avez une ressource RDS et une ressource EC2 dans un template CloudFormation. L'EC2 doit démarrer APRÈS que RDS soit disponible. Quelle approche est correcte ?",
+    o: [
+      "Utiliser DependsOn: MyRDS sur la ressource EC2 — CloudFormation attendra que RDS soit 'disponible' avant de créer EC2",
+      "DependsOn garantit uniquement l'ordre de CREATION (resource CREATE Complete) mais pas que RDS accepte des connexions. Utiliser un cfn-signal dans les EC2 UserData avec WaitCondition, ou un Custom Resource Lambda qui poll l'état RDS, pour une dépendance fonctionnelle réelle",
+      "CloudFormation crée automatiquement les ressources dans le bon ordre sans DependsOn",
+      "Utiliser CreationPolicy sur EC2 pour attendre RDS"
+    ],
+    a: 1,
+    e: "PIÈGE CLASSIQUE DOP-C02 : DependsOn ne garantit que l'ordre de création CloudFormation (l'API create-db-instance est appelée et retourne SUCCESS), pas que RDS est prêt à accepter des connexions (ça peut prendre plusieurs minutes supplémentaires). Pour une dépendance fonctionnelle : (1) cfn-init + cfn-signal dans UserData EC2 : l'instance attend que RDS soit ready (poll describe-db-instances) puis signal CloudFormation. (2) CreationPolicy sur EC2 avec timeout. (3) Custom Resource (Lambda) qui poll l'état RDS avant de signaler le succès. DependsOn est suffisant pour l'ordre de déploiement, insuffisant pour les dépendances fonctionnelles."
+  },
+  {
+    t: "Piège #3 : ASG et terminaison d'instances",
+    q: "[PIÈGE PRO] Un Auto Scaling Group avec Desired=5 est configuré avec une Termination Policy 'OldestInstance'. Une scale-in se déclenche. Quelle instance sera terminée en premier ?",
+    o: [
+      "L'instance avec le CPU le plus bas sera terminée",
+      "ASG sélectionne d'abord l'AZ avec le plus d'instances, puis dans cette AZ applique OldestInstance (l'instance lancée le plus tôt) — si égalité entre AZs, l'AZ est choisie aléatoirement",
+      "OldestInstance termine toujours l'instance avec le plus ancien Launch Configuration",
+      "ASG termine la première instance créée dans le groupe, peu importe l'AZ"
+    ],
+    a: 1,
+    e: "PIÈGE : la Termination Policy s'applique APRÈS la sélection de l'AZ. Algorithme ASG scale-in : (1) Sélectionner l'AZ avec le plus grand nombre d'instances (équilibrage AZ). (2) DANS cette AZ, appliquer la Termination Policy (OldestInstance, NewestInstance, OldestLaunchConfiguration, OldestLaunchTemplate, ClosestToNextInstanceHour, Default). Default Policy : OldestLaunchTemplate → OldestLaunchConfiguration → ClosestToNextInstanceHour. Instance Protection : aws autoscaling set-instance-protection protège des instances spécifiques de la terminaison. Lifecycle hooks : delay de terminaison pour drain les connexions."
+  },
+  {
+    t: "Piège #4 : S3 Versioning et suppression",
+    q: "[PIÈGE PRO] Un bucket S3 a Versioning activé. Un utilisateur exécute aws s3 rm s3://bucket/important-file.txt. Que se passe-t-il réellement ?",
+    o: [
+      "Le fichier et toutes ses versions sont supprimés définitivement",
+      "Une Delete Marker est ajoutée — l'objet semble supprimé (s3 ls ne le montre plus) mais toutes les versions précédentes sont intactes et récupérables via s3api list-object-versions + get-object --version-id",
+      "La commande échoue car Versioning empêche la suppression",
+      "Seule la version la plus récente est supprimée, les autres restent accessibles normalement"
+    ],
+    a: 1,
+    e: "PIÈGE : avec Versioning activé, une suppression sans --version-id crée un DELETE MARKER (objet spécial marquant la suppression logique). L'objet disparaît des listings normaux (s3 ls, s3api list-objects) mais TOUTES les versions restent dans S3. Pour lister : aws s3api list-object-versions --bucket mybucket. Pour récupérer : aws s3api get-object --bucket mybucket --key myfile --version-id <id>. Pour suppression réelle : aws s3api delete-object --bucket mybucket --key myfile --version-id <specific-id>. MFA Delete : protection supplémentaire — nécessite MFA pour supprimer des versions ou désactiver Versioning. S3 Lifecycle : ExpiredObjectDeleteMarker pour nettoyer automatiquement les delete markers orphelins."
+  },
+  {
+    t: "Piège #5 : Lambda concurrence",
+    q: "[PIÈGE PRO] Une Lambda function a Reserved Concurrency = 10. Que se passe-t-il si 15 requêtes simultanées arrivent ?",
+    o: [
+      "Lambda scale automatiquement jusqu'à 15 exécutions en ignorant la Reserved Concurrency",
+      "10 requêtes s'exécutent, les 5 restantes reçoivent un 429 TooManyRequestsException (throttle) — Reserved Concurrency est un PLAFOND qui protège les autres fonctions mais limite aussi cette fonction",
+      "Lambda met en file d'attente les 5 requêtes excédentaires",
+      "Reserved Concurrency ne s'applique qu'aux fonctions synchrones"
+    ],
+    a: 1,
+    e: "PIÈGE : Reserved Concurrency = PLAFOND (limite maximale) ET RESERVATION (garantit cette capacité pour cette fonction). Double effet : (1) Limite : cette function ne dépassera jamais 10 exécutions simultanées → 429 si dépassé. (2) Réserve : ces 10 unités de concurrence sont exclues du pool global → les autres fonctions ne peuvent pas les utiliser. Throttles : asynchrone → Lambda retry 2 fois puis DLQ. Synchrone (API Gateway) → 429 au client. Provisioned Concurrency : pre-warm des instances Lambda pour éliminer les cold starts (différent de Reserved). Account soft limit : 1000 concurrent executions par région par défaut, augmentable via Support."
+  },
+  {
+    t: "Piège #6 : ECS rolling update",
+    q: "[PIÈGE PRO] Un ECS Service a Minimum healthy percent = 50% et Maximum percent = 100% avec Desired count = 4. Comment se déroule le rolling update ?",
+    o: [
+      "ECS arrête 2 tâches, déploie 2 nouvelles, arrête les 2 restantes, déploie 2 nouvelles",
+      "ECS ne peut pas démarrer de nouvelles tâches car Maximum = 100% (pas de capacité supplémentaire) : il arrête 2 tâches (jusqu'à 50%), démarre 2 nouvelles (retour à 100%), arrête 2 autres, démarre 2 autres — c'est un rolling update classique sans capacité supplémentaire",
+      "ECS lance 4 nouvelles tâches puis arrête les 4 anciennes",
+      "ECS arrête toutes les tâches puis redémarre avec la nouvelle version"
+    ],
+    a: 1,
+    e: "PIÈGE : Maximum 100% = AUCUNE tâche supplémentaire possible (capacity-constrained deployment). Avec Desired=4, Min=50% (2 tâches), Max=100% (4 tâches) : Phase 1 : stop 2 tâches → 2 running (50% minimum atteint). Phase 2 : start 2 nouvelles tâches nouvelle version → 4 running (100%). Phase 3 : stop 2 anciennes → 2 running. Phase 4 : start 2 nouvelles → 4 running. Pour Blue/Green ou zero-downtime total : Max=200% (8 tâches max) — ECS démarre toutes les nouvelles avant d'arrêter les anciennes. ECS Deployment Circuit Breaker : détecte les déploiements qui échouent et rollback automatiquement."
+  },
+  {
+    t: "Piège #7 : CloudWatch Logs retention",
+    q: "[PIÈGE PRO] Un Log Group CloudWatch est créé par une Lambda function. Quelle est la rétention par défaut et quel est le risque ?",
+    o: [
+      "La rétention par défaut est de 90 jours",
+      "La rétention par défaut est NEVER EXPIRE (rétention indéfinie) — les logs s'accumulent et génèrent des coûts croissants ; configurer une retention policy dans CloudFormation ou via Lambda function déclenchée par CloudWatch Logs CreateLogGroup event",
+      "La rétention par défaut est de 30 jours",
+      "Lambda configure automatiquement une rétention de 7 jours"
+    ],
+    a: 1,
+    e: "PIÈGE OPÉRATIONNEL : CloudWatch Logs retention par défaut = Never Expire. Implications : coûts de stockage illimités (0.03$/Go/mois), compliance risk (logs conservés indéfiniment). Solutions : (1) CloudFormation : AWS::Logs::LogGroup avec RetentionInDays. (2) Lambda automatisation : EventBridge Rule sur CreateLogGroup event → Lambda qui applique put-retention-policy sur chaque nouveau log group. (3) AWS Config Rule : vérifie que tous les log groups ont une retention policy configurée. (4) Organisations : SCP ou Config Rule org-wide pour enforcer. Recommandation : 30-90 jours pour la plupart des workloads, plus long pour compliance/audit. Archivage : exporter vers S3 pour rétention long terme à coût réduit."
+  },
+  {
+    t: "Piège #8 : CodePipeline et approvals",
+    q: "[PIÈGE PRO] Une action Approval dans CodePipeline attend une réponse. Après 7 jours sans réponse, que se passe-t-il ?",
+    o: [
+      "La pipeline attend indéfiniment jusqu'à ce qu'une décision soit prise",
+      "L'action Approval expire après 7 jours (timeout fixe non configurable) et la pipeline passe en FAILED — il faut relancer manuellement",
+      "La pipeline approuve automatiquement après 7 jours",
+      "La pipeline rejette automatiquement après 7 jours"
+    ],
+    a: 1,
+    e: "PIÈGE : le timeout d'une action Approval CodePipeline est de 7 jours exactement, non configurable. Après 7 jours → action FAILED, pipeline bloquée. Workarounds : (1) SNS notification avec rappels quotidiens via EventBridge Scheduler. (2) EventBridge Rule sur pipeline state WAITING + SNS + escalade automatique. (3) Lambda qui surveille les approvals en attente et envoie des rappels. Best practices : mettre des approvals uniquement pour les déploiements prod critiques, pas pour staging. Alternative : Deployment Groups avec auto-approval dans les environnements non-prod. Les pipelines en attente d'approval consomment toujours de la capacité — pas de limite sur le nombre de pipelines en attente."
+  },
+  {
+    t: "Piège #9 : CloudFormation stack update rollback",
+    q: "[PIÈGE PRO] Un CloudFormation stack update échoue à mi-chemin. Certaines ressources ont été créées, d'autres modifiées. Que fait CloudFormation par défaut ?",
+    o: [
+      "CloudFormation laisse le stack en état partiel — les ressources modifiées restent dans le nouvel état",
+      "CloudFormation tente de rollback automatiquement vers l'état précédent du stack — si le rollback lui-même échoue, le stack passe en UPDATE_ROLLBACK_FAILED et nécessite une intervention manuelle (ContinueUpdateRollback)",
+      "CloudFormation supprime toutes les ressources créées pendant l'update échoué",
+      "CloudFormation réessaie l'update 3 fois avant d'échouer définitivement"
+    ],
+    a: 1,
+    e: "PIÈGE : CloudFormation rollback automatique en cas d'échec, MAIS le rollback peut aussi échouer. Stack states : UPDATE_ROLLBACK_FAILED → stack inutilisable, bloqué. Solution : aws cloudformation continue-update-rollback (avec SkipResources pour les ressources qui ne peuvent pas rollback). Causes de rollback failure : ressources modifiées manuellement en dehors de CloudFormation (drift), limits dépassées, dépendances circulaires. Stack Drift Detection : détecter les divergences entre template et réalité. Prevent rollback : DisableRollback=true (debugging) → ne pas utiliser en production. Nested stacks : le rollback propage aux stacks parents."
+  },
+  {
+    t: "Piège #10 : EventBridge et SQS ordering",
+    q: "[PIÈGE PRO] Un event EventBridge est routé vers une SQS Standard Queue. L'application consommatrice reçoit les messages dans un ordre différent de l'envoi. Est-ce normal ?",
+    o: [
+      "Non — EventBridge garantit l'ordre de livraison FIFO vers SQS",
+      "Oui — SQS Standard Queue garantit la livraison At-Least-Once mais NE garantit PAS l'ordre (best-effort ordering). Pour l'ordering strict, utiliser SQS FIFO Queue avec un MessageGroupId ; EventBridge supporte SQS FIFO comme target",
+      "EventBridge garantit l'ordre si les events sont émis depuis la même région",
+      "L'ordre peut être garanti avec une Retry Policy EventBridge"
+    ],
+    a: 1,
+    e: "PIÈGE : SQS Standard = At-Least-Once delivery + Best-Effort ordering (pas d'ordre garanti, duplication possible). SQS FIFO = Exactly-Once processing (dans la même Message Group) + ordering strict (dans le même groupe), limité à 3000 msg/sec avec batching ou 300/sec sans. EventBridge → SQS FIFO : nécessite de configurer le MessageGroupId dans la target config. Cas d'usage : idempotence obligatoire avec SQS Standard (gérer les doublons), ordering strict → FIFO avec MessageGroupId logique (ex: par customerId). DLQ : configurer sur toutes les SQS queues (erreurs de traitement). Visibility Timeout : doit être > temps de traitement du consumer."
+  },
+  {
+    t: "Piège #11 : IAM et Action * vs Resource *",
+    q: "[PIÈGE PRO] Quelle est la différence entre Allow {Action: *, Resource: arn:aws:s3:::mybucket/*} et Allow {Action: s3:*, Resource: *} ?",
+    o: [
+      "Les deux policies sont équivalentes — même niveau de permission",
+      "Action:* Resource:mybucket/* = toutes les actions IAM/STS/EC2/etc. sur les OBJETS de mybucket (peut inclure des actions non-S3 qui acceptent ce format ARN). Action:s3:* Resource:* = toutes les actions S3 sur toutes les ressources. La première est plus restrictive sur la ressource, la seconde sur le service",
+      "Action:* sur une ressource S3 n'est jamais permis par IAM",
+      "Action:s3:* Resource:* accorde plus de permissions que Action:* Resource:mybucket/*"
+    ],
+    a: 1,
+    e: "PIÈGE IAM subtil : Action:* Resource:arn:s3:::mybucket/* → IAM évalue toutes les actions possibles (tous services confondus) et vérifie si elles s'appliquent à cet ARN S3. En pratique, seules les actions S3 correspondront à ce format d'ARN, mais c'est une mauvaise pratique (ambigu, risque d'évolution). Best practices : (1) Toujours être explicite : s3:GetObject, s3:PutObject plutôt que s3:*. (2) Action:* = Dieu mode — uniquement pour break-glass emergency roles. (3) Resource:* obligatoire pour certaines actions sans ARN (ex: s3:ListAllMyBuckets, ec2:DescribeInstances). (4) Principe du moindre privilège : scoper au maximum sur Action ET Resource. IAM Policy Simulator : tester avant de déployer."
+  },
+  {
+    t: "Piège #12 : RDS Multi-AZ vs Read Replica",
+    q: "[PIÈGE PRO] Une application utilise RDS Multi-AZ pour la haute disponibilité. L'équipe veut aussi décharger les requêtes de lecture. Quelle architecture est correcte ?",
+    o: [
+      "Multi-AZ gère automatiquement la répartition des lectures — pas de configuration supplémentaire",
+      "Multi-AZ = HA (failover automatique, standby non accessible) ≠ Read Scaling. Pour les lectures : créer des Read Replicas (1 primary + jusqu'à 5 replicas) et pointer les requêtes de lecture vers l'endpoint de read replica",
+      "Le standby Multi-AZ peut être utilisé comme read replica en activant l'option dans la console",
+      "Utiliser ElastiCache à la place de Read Replicas pour toutes les requêtes de lecture"
+    ],
+    a: 1,
+    e: "PIÈGE CLASSIQUE : RDS Multi-AZ standby = NON accessible en lecture (synchronous replication, hidden standby). Multi-AZ résout le HA/failover, pas le read scaling. Read Replicas (asynchronous replication) : accessible en lecture via leur propre endpoint, peuvent être dans une autre région (cross-region replica pour DR + read scaling global), peuvent être promus en primary en cas de besoin (DR). Architecture recommandée : RDS Multi-AZ (HA) + Read Replicas (read scaling) + ElastiCache (cache fréquemment lus). RDS Proxy : pool de connexions devant Multi-AZ + failover plus rapide (< 60s vs typiquement 60-120s). Aurora : différent — Multi-AZ intégré, jusqu'à 15 read replicas partageant le même storage cluster."
+  },
+  {
+    t: "Piège #13 : CDK destroy et stateful resources",
+    q: "[PIÈGE PRO] Un développeur exécute cdk destroy sur une stack CDK contenant un bucket S3 avec des données. Que se passe-t-il ?",
+    o: [
+      "Le bucket S3 et toutes ses données sont supprimés automatiquement",
+      "Par défaut, CDK configure RETAIN (RemovalPolicy.RETAIN) sur les ressources stateful (S3, RDS, DynamoDB) — le bucket est détaché de la stack mais NON supprimé, les données sont préservées. Pour supprimer lors du destroy : removalPolicy: RemovalPolicy.DESTROY + autoDeleteObjects: true",
+      "cdk destroy échoue si le bucket contient des données",
+      "CDK vide automatiquement le bucket avant de le supprimer"
+    ],
+    a: 1,
+    e: "PIÈGE CDK : RemovalPolicy par défaut selon le type de ressource. Ressources stateful (S3 Bucket, RDS, DynamoDB Table, ECR Repository) → RETAIN par défaut (protection contre la perte de données). Ressources stateless (Lambda, API Gateway) → DESTROY par défaut. Changer le comportement : const bucket = new s3.Bucket(this, 'MyBucket', {removalPolicy: RemovalPolicy.DESTROY, autoDeleteObjects: true}). autoDeleteObjects : CDK crée un Custom Resource Lambda qui vide le bucket avant suppression (sinon CloudFormation échoue sur bucket non vide). En production : RETAIN sur tout ce qui est stateful. Pipeline CI/CD : ne jamais autoriser cdk destroy en production sans gate humain. SNAPSHOT policy : CloudFormation crée un snapshot RDS avant suppression."
+  },
+  {
+    t: "Piège #14 : SQS Visibility Timeout",
+    q: "[PIÈGE PRO] Un consumer SQS traite un message en 30 secondes. Le Visibility Timeout est configuré à 20 secondes. Quel est le problème et la solution ?",
+    o: [
+      "Pas de problème — SQS attend automatiquement que le consumer termine",
+      "Le message redevient visible dans la queue après 20s (avant la fin du traitement) → un autre consumer peut traiter le même message → traitement en double. Solution : Visibility Timeout > temps de traitement maximum (ex: 60s), + ChangeMessageVisibility pour étendre si besoin, + idempotence dans le consumer",
+      "SQS supprime automatiquement le message après 20s",
+      "Le consumer reçoit une erreur si le traitement dépasse le Visibility Timeout"
+    ],
+    a: 1,
+    e: "PIÈGE OPÉRATIONNEL SQS : Visibility Timeout = durée pendant laquelle un message est invisible après reception. Si traitement > Visibility Timeout → message redevient visible → traitement en double. Solutions : (1) Visibility Timeout = 6x le temps de traitement moyen (AWS recommande). (2) ChangeMessageVisibility : extension programmatique si le traitement prend plus longtemps que prévu. (3) Idempotence obligatoire : concevoir le consumer pour gérer les duplications (DynamoDB conditional write, check si déjà traité). Max Visibility Timeout : 12 heures. DLQ + maxReceiveCount : après N échecs, message → DLQ pour analyse. Lambda + SQS : Visibility Timeout doit être >= Lambda timeout * 6."
+  },
+  {
+    t: "Piège #15 : CloudFormation Custom Resources",
+    q: "[PIÈGE PRO] Une Custom Resource CloudFormation appelle une Lambda pour provisionner une ressource externe. La Lambda timeout après 15 minutes. Que se passe-t-il avec le stack ?",
+    o: [
+      "CloudFormation détecte le timeout Lambda et rollback immédiatement",
+      "CloudFormation attend indéfiniment la réponse de la Lambda via un pre-signed S3 URL (cfn-response). Si la Lambda timeout sans envoyer de réponse, CloudFormation attend jusqu'à son propre timeout (1 heure par défaut, max 3 heures) puis marque la stack FAILED",
+      "CloudFormation réessaie automatiquement la Lambda après son timeout",
+      "Le stack se met en pause et attend une intervention manuelle"
+    ],
+    a: 1,
+    e: "PIÈGE Custom Resources : le mécanisme est asynchrone via pre-signed S3 URL (cfn-response). La Lambda DOIT envoyer une réponse SUCCESS ou FAILED via cet URL, sinon CloudFormation attend jusqu'à 1 heure (timeout stack par défaut, configurable jusqu'à 3 heures). Si Lambda timeout sans réponse → stack bloqué 1h → FAILED. Solutions : (1) Lambda timeout < 15min, implémenter retry/idempotence. (2) Pour les opérations longues : Lambda step 1 déclenche le travail + step 2 (EventBridge + Lambda) envoie cfn-response quand terminé. (3) Toujours envoyer cfn-response dans le bloc finally (même en cas d'erreur). (4) Idempotence : vérifier si la ressource existe déjà avant de créer (physicalResourceId stable). DeletionPolicy sur Custom Resource : la Lambda est appelée avec RequestType=Delete lors du stack delete."
   }
 ]
 
