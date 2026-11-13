@@ -88,7 +88,7 @@ const Q=(d,i)=>{
   if(r.opts&&!r.o){r.o=r.opts;r.a=r.ans;r.e={};r.o.forEach((_,k)=>{r.e[k]=r.why||"";});r.t=r.t||"";}
   // Nouveau format: choices/answer/exp
   if(r.choices&&!r.o){
-    r.o=r.choices;
+    r.o=r.choices.map(c=>typeof c==="string"?c.replace(/^[A-E]\.\s+/,""):c);
     r.a=Array.isArray(r.answer)?r.answer:[r.answer];
     r.e={};r.o.forEach((_,k)=>{r.e[k]=r.exp||"";});
     r.t=r.t||"";
