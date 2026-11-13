@@ -2991,6 +2991,156 @@ window.QDATA = {
     a: 1,
     e: "Le pattern Config + SSM Automation : (1) AWS Config Rule ec2-instance-detailed-monitoring-enabled détecte les instances non conformes. (2) Systems Manager Automation Remediation : configurer une remédiation automatique qui déclenche le Runbook AWS-InstallAndManageCloudWatchAgent sur les instances non conformes. (3) Ce Runbook installe et configure l'agent CloudWatch via Run Command. Résultat : toute nouvelle instance ou instance modifiée qui ne respecte pas la règle est automatiquement remise en conformité."
   }
+],
+
+8: [
+  // ─── AWS Config ───────────────────────────────────────────────────────────
+  {
+    t: "AWS Config fondamentaux",
+    q: "Qu'est-ce qu'AWS Config et comment diffère-t-il de CloudTrail ?",
+    o: [
+      "AWS Config et CloudTrail font la même chose — AWS Config est simplement plus récent",
+      "AWS Config suit les changements de CONFIGURATION des ressources AWS (état actuel et historique) ; CloudTrail suit les ACTIONS API (qui a fait quoi, quand) — complémentaires",
+      "AWS Config enregistre les logs d'accès ; CloudTrail enregistre les changements de configuration",
+      "CloudTrail est gratuit ; AWS Config est payant — ils sont équivalents"
+    ],
+    a: 1,
+    e: "AWS Config et CloudTrail sont complémentaires : Config répond à 'quel est l'état actuel/historique de ma ressource EC2 ?' (configuration, relations, timeline des changements). CloudTrail répond à 'qui a modifié cette ressource EC2, quand et depuis quelle IP ?' (logs d'API calls). Config maintient un inventaire de configuration et détecte les dérives. Les deux ensemble constituent le socle d'audit et de conformité AWS."
+  },
+  {
+    t: "AWS Config Rules",
+    q: "Qu'est-ce qu'une AWS Config Rule et quelles sont les deux types disponibles ?",
+    o: [
+      "Une Config Rule est une alerte CloudWatch",
+      "Une Config Rule définit la configuration attendue d'une ressource AWS. Deux types : AWS Managed Rules (prédéfinies par AWS) et Custom Rules (Lambda ou Guard personnalisée)",
+      "Une Config Rule est un script SSM Automation",
+      "Une Config Rule est équivalente à une IAM Policy"
+    ],
+    a: 1,
+    e: "AWS Config Rules évaluent la conformité des ressources : (1) AWS Managed Rules : plus de 150 règles prédéfinies (s3-bucket-public-read-prohibited, encrypted-volumes, required-tags, restricted-ssh, etc.) — pas de code à écrire. (2) Custom Rules : via Lambda (code arbitraire) ou AWS CloudFormation Guard (syntaxe déclarative DSL). Évaluation déclenchée : changement de configuration (Configuration change) ou planifiée (périodique toutes les X heures)."
+  },
+  {
+    t: "AWS Config Rules",
+    q: "Une Config Rule détecte que des buckets S3 sont publiquement accessibles. Comment remédier automatiquement ?",
+    o: [
+      "Config Rules supprime automatiquement les ressources non conformes",
+      "Configurer une Remediation Action dans la Config Rule qui déclenche un SSM Automation Document pour corriger la ressource non conforme",
+      "Créer une Lambda déclenchée par CloudTrail qui corrige les buckets publics",
+      "Envoyer une notification SNS et corriger manuellement"
+    ],
+    a: 1,
+    e: "AWS Config supporte les Remediation Actions : chaque règle peut avoir une action de remédiation qui lance un SSM Automation Document (AWS-DisableS3BucketPublicReadWrite pour les buckets S3 publics). Deux modes : (1) Manual — bouton 'Remediate' dans la console pour chaque ressource non conforme. (2) Automatic — remédiation déclenche automatiquement dès qu'une non-conformité est détectée. Les remédiations Automatic sont retentées configurable fois avant abandon."
+  },
+  {
+    t: "AWS Config multi-comptes",
+    q: "Comment centraliser les données AWS Config de plusieurs comptes dans une organisation AWS ?",
+    o: [
+      "Créer un compte AWS séparé pour stocker les données Config",
+      "Utiliser un 'Aggregator' AWS Config dans un compte central ou au niveau de l'organisation — il agrège les données Config de tous les comptes/régions sources",
+      "Exporter les données Config vers S3 et consolider manuellement",
+      "AWS Config ne supporte pas la multi-organisation"
+    ],
+    a: 1,
+    e: "Config Aggregator centralise les données : dans le compte de gestion ou un compte dédié, créer un Aggregator avec source Organizations (tous les comptes de l'org) ou des comptes spécifiques. L'Aggregator collecte les Configuration Items, la Compliance Summary et les Resource Inventories de tous les comptes/régions. Combiné avec AWS Config Conformance Packs (ensemble de règles) pour le reporting de conformité organisationnel."
+  },
+  {
+    t: "AWS Config Conformance Packs",
+    q: "Qu'est-ce qu'un AWS Config Conformance Pack ?",
+    o: [
+      "Un ensemble de Config Rules et actions de remédiation déployables ensemble via un template YAML — permet de standardiser la conformité avec un framework (CIS, NIST, PCI-DSS...)",
+      "Un pack de documentation AWS Config",
+      "Un export de Config vers S3 dans un format structuré",
+      "Un Conformance Pack est équivalent à une Custom Config Rule"
+    ],
+    a: 0,
+    e: "Les Conformance Packs permettent de déployer un ensemble de Config Rules + remédiations en une seule opération. AWS fournit des templates prédéfinis pour les frameworks de compliance : Operational-Best-Practices-for-CIS-AWS-Foundations-Benchmark, Operational-Best-Practices-for-PCI-DSS, NIST-CSF, etc. On peut aussi créer des Conformance Packs personnalisés. Déployables via StackSets dans toute l'organisation pour une conformité centralisée."
+  },
+  // ─── OpsWorks ─────────────────────────────────────────────────────────────
+  {
+    t: "OpsWorks fondamentaux",
+    q: "Qu'est-ce qu'AWS OpsWorks et quels sont les trois modes disponibles ?",
+    o: [
+      "OpsWorks est un service de monitoring — similaire à CloudWatch",
+      "OpsWorks est un service de gestion de configuration basé sur Chef/Puppet. Trois modes : OpsWorks Stacks (Chef maison), OpsWorks for Chef Automate (Chef managé), OpsWorks for Puppet Enterprise (Puppet managé)",
+      "OpsWorks est l'ancien nom de CloudFormation",
+      "OpsWorks est uniquement pour les environnements on-premises"
+    ],
+    a: 1,
+    e: "AWS OpsWorks est un service de gestion de configuration : (1) OpsWorks Stacks — implémentation propriétaire AWS de Chef (Layers, Instances, Recipes, Lifecycle events). (2) OpsWorks for Chef Automate — Chef Automate managé (serveur Chef géré par AWS). (3) OpsWorks for Puppet Enterprise — Puppet Enterprise managé par AWS. Pour l'examen DOP-C02, OpsWorks est moins fréquent que SSM/CloudFormation mais peut apparaître dans des questions de migration ou d'intégration."
+  },
+  {
+    t: "OpsWorks Stacks",
+    q: "Dans OpsWorks Stacks, qu'est-ce qu'un 'Layer' et comment est-il lié aux instances EC2 ?",
+    o: [
+      "Un Layer est un groupe de stacks OpsWorks",
+      "Un Layer définit un rôle fonctionnel (web server, app server, db) avec sa configuration Chef (recipes), ses Security Groups, ses volumes EBS — les instances sont associées à un ou plusieurs Layers",
+      "Un Layer est équivalent à un VPC subnet",
+      "Un Layer contient un seul template CloudFormation"
+    ],
+    a: 1,
+    e: "Dans OpsWorks Stacks, un Layer représente un composant de l'architecture (HAProxy layer, Node.js App layer, MySQL layer). Chaque Layer définit : les Recipes Chef à exécuter lors des lifecycle events (Setup, Configure, Deploy, Undeploy, Shutdown), les packages à installer, les Security Groups, les volumes EBS, le load balancing. Une instance peut appartenir à plusieurs Layers. Les Auto-healing redémarre automatiquement les instances défaillantes."
+  },
+  {
+    t: "OpsWorks lifecycle events",
+    q: "Quels sont les 5 lifecycle events d'OpsWorks Stacks et quand sont-ils déclenchés ?",
+    o: [
+      "Start, Stop, Deploy, Rollback, Monitor",
+      "Setup (instance ready), Configure (topology change), Deploy (app deploy), Undeploy (app remove), Shutdown (instance stop)",
+      "Create, Read, Update, Delete, List",
+      "Boot, Init, Run, Terminate, Error"
+    ],
+    a: 1,
+    e: "Les 5 lifecycle events OpsWorks Stacks : (1) Setup — déclenché une fois quand l'instance est démarrée et prête (installer le serveur web, configurer le service). (2) Configure — déclenché sur TOUTES les instances du stack quand la topologie change (nouvelle instance rejoint/quitte). (3) Deploy — déclenché lors d'un déploiement d'application. (4) Undeploy — lors du retrait d'une application. (5) Shutdown — avant l'arrêt d'une instance (nettoyage). Chaque event peut déclencher des Recipes Chef spécifiques."
+  },
+  // ─── Service Catalog ─────────────────────────────────────────────────────
+  {
+    t: "AWS Service Catalog",
+    q: "Qu'est-ce qu'AWS Service Catalog et quel problème résout-il dans une organisation ?",
+    o: [
+      "Service Catalog est un catalogue de services AWS (documentation)",
+      "Service Catalog permet aux organisations de créer et gérer des catalogues de services IT approuvés (stacks CloudFormation) que les équipes peuvent self-servir — gouvernance sans friction",
+      "Service Catalog est un outil de monitoring des coûts AWS",
+      "Service Catalog remplace CloudFormation pour les déploiements enterprise"
+    ],
+    a: 1,
+    e: "AWS Service Catalog résout la tension entre gouvernance et agilité : (1) L'équipe platform/cloud définit des 'Products' (templates CloudFormation approuvés avec configurations sécurisées) dans des 'Portfolios'. (2) Les développeurs lancent ces Products via Service Catalog sans avoir de permissions IAM directes sur CloudFormation ou les ressources. (3) Gouvernance : seuls les patterns approuvés sont disponibles. Self-service : les équipes déploient sans ticket. Contraintes : limiter les options (taille d'instance, région, etc.)."
+  },
+  {
+    t: "AWS Service Catalog",
+    q: "Comment Service Catalog permet-il de déployer des ressources AWS à des utilisateurs qui n'ont pas de permissions CloudFormation ?",
+    o: [
+      "Service Catalog contourne IAM — les utilisateurs peuvent déployer sans permissions",
+      "Via des 'Launch Constraints' — un rôle IAM attaché au Product qui a les permissions CloudFormation ; Service Catalog assume ce rôle lors du lancement au nom de l'utilisateur",
+      "Via un user IAM dédié partagé entre les équipes",
+      "Service Catalog nécessite toujours des permissions CloudFormation directes"
+    ],
+    a: 1,
+    e: "Le mécanisme de Launch Constraints permet le principe de moindre privilège : un rôle IAM (Launch Constraint Role) avec les permissions CloudFormation et ressources est attaché au Product. Quand un utilisateur (avec seulement des permissions servicecatalog:ProvisionProduct) lance le Product, Service Catalog assume le Launch Constraint Role pour créer les ressources CloudFormation. L'utilisateur ne voit jamais ce rôle et ne peut déployer que les patterns approuvés."
+  },
+  {
+    t: "AWS Config scénario Pro",
+    q: "Une organisation veut s'assurer qu'aucune instance EC2 n'est démarrée dans des régions non autorisées (seulement eu-west-1 et us-east-1). Quelle combinaison AWS utiliser ?",
+    o: [
+      "Config Rule + SNS pour alerter uniquement",
+      "AWS Organizations Service Control Policy (SCP) pour bloquer les actions EC2 hors régions autorisées + Config Rule pour détecter et reporter les non-conformités existantes",
+      "IAM Policy pour chaque utilisateur limitant les régions",
+      "CloudTrail + Lambda pour terminer automatiquement les instances non autorisées"
+    ],
+    a: 1,
+    e: "Défense en profondeur : (1) SCP au niveau Organizations — Deny sur ec2:RunInstances avec condition aws:RequestedRegion ne figurant pas dans [eu-west-1, us-east-1] — PRÉVENTIF, bloque à la source. (2) Config Rule aws-region-restricted-resources — DÉTECTIF, identifie les ressources existantes non conformes (créées avant la SCP ou par des comptes exemptés). (3) Remédiation Config pour les ressources détectées. SCPs + Config forment le duo préventif/détectif recommandé."
+  },
+  {
+    t: "AWS Config scénario Pro",
+    q: "Un rapport d'audit révèle que certains Security Groups ont le port 22 ouvert à 0.0.0.0/0. Comment détecter, alerter et remédier automatiquement avec AWS ?",
+    o: [
+      "Scanner manuellement tous les Security Groups chaque semaine",
+      "Config Rule 'restricted-ssh' pour détecter + EventBridge Rule pour alerter SNS + Config Automatic Remediation (AWS-DisablePublicAccessForSecurityGroup) pour fermer le port 22",
+      "CloudTrail + Lambda pour alerter uniquement",
+      "IAM Policy pour interdire la création de Security Groups avec le port 22 ouvert"
+    ],
+    a: 1,
+    e: "Workflow automatisé complet : (1) Config Rule restricted-ssh détecte les SGs avec 0.0.0.0/0:22. (2) EventBridge Rule sur Config Compliance Change (COMPLIANT → NON_COMPLIANT) → SNS → email/Slack à l'équipe sécurité. (3) Config Automatic Remediation : SSM Automation AWS-DisablePublicAccessForSecurityGroup retire la règle 0.0.0.0/0:22. (4) Config enregistre le retour à COMPLIANT. Résultat : détection < 1 minute, remédiation automatique, audit trail complet."
+  }
 ]
 
 };
