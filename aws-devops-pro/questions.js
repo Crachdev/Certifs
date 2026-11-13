@@ -710,5 +710,648 @@ window.QUIZ_PLAN = [
 ];
 
 // ── Questions ────────────────────────────────────────────────────────────────
-// Format : { t: "thème", q: "question", o: ["A","B","C","D"], a: 0, e: "explication" }
-window.QDATA = {};
+// Format : { t: "thème", q: "question", o: ["A","B","C","D"], a: 0|[0,2], e: "explication" }
+window.QDATA = {
+
+1: [
+  // ─── CodePipeline : structure & stages ────────────────────────────────────
+  {
+    t: "CodePipeline structure",
+    q: "Dans CodePipeline, quel est l'ordre correct des catégories d'actions standard ?",
+    o: [
+      "Build → Source → Test → Deploy → Approval",
+      "Source → Build → Test → Deploy → Approval",
+      "Source → Test → Build → Approval → Deploy",
+      "Approval → Source → Build → Test → Deploy"
+    ],
+    a: 1,
+    e: "Le flux canonique CodePipeline est Source (récupérer le code) → Build (compiler/packager) → Test (valider) → Deploy (déployer). Approval peut s'intercaler entre Deploy ou Test selon le besoin, mais Source est toujours en premier."
+  },
+  {
+    t: "CodePipeline structure",
+    q: "Un pipeline CodePipeline peut-il avoir plusieurs actions dans le même stage qui s'exécutent en parallèle ?",
+    o: [
+      "Non, les actions dans un stage sont toujours séquentielles",
+      "Oui, en ne spécifiant pas d'ordre (runOrder) ou en donnant le même runOrder à plusieurs actions",
+      "Oui, mais uniquement pour les actions de type Build",
+      "Non, le parallélisme n'est possible qu'entre stages"
+    ],
+    a: 1,
+    e: "Dans un stage CodePipeline, les actions avec le même runOrder s'exécutent en parallèle. Par défaut (runOrder=1), toutes les actions du stage tournent en parallèle. Pour les séquencer, on donne des runOrder différents (1, 2, 3…)."
+  },
+  {
+    t: "CodePipeline structure",
+    q: "Qu'est-ce qu'une 'transition' dans CodePipeline et quel est son intérêt opérationnel ?",
+    o: [
+      "Une transition est le déclencheur initial du pipeline depuis la source",
+      "Une transition est le lien entre deux stages ; la désactiver bloque l'exécution sans supprimer le pipeline",
+      "Une transition est une action de type Approval obligatoire entre chaque stage",
+      "Une transition est un webhook vers un service externe pour notifier la progression"
+    ],
+    a: 1,
+    e: "Les transitions relient les stages entre eux. On peut désactiver une transition pour geler le déploiement vers un environnement (ex : gel de prod en fin d'année) sans supprimer ni modifier le pipeline. Les exécutions s'accumulent en attente et reprennent quand on réactive."
+  },
+  {
+    t: "CodePipeline déclencheurs",
+    q: "Une équipe veut déclencher son pipeline CodePipeline automatiquement à chaque push sur la branche 'main' d'un dépôt GitHub. Quelle est la méthode recommandée par AWS ?",
+    o: [
+      "Utiliser l'action Source avec le provider CodeCommit et configurer un miroir GitHub",
+      "Utiliser AWS CodeStar Connections (GitHub v2) avec un webhook géré par EventBridge",
+      "Configurer un webhook GitHub manuel pointant vers l'API CodePipeline",
+      "Utiliser CodePipeline en mode polling (vérification toutes les 60s) sur le repo GitHub"
+    ],
+    a: 1,
+    e: "AWS recommande AWS CodeStar Connections (GitHub v2) : il crée un webhook sécurisé géré par AWS qui déclenche le pipeline via EventBridge dès qu'un push arrive sur la branche configurée. Le polling est l'ancienne méthode, moins réactif et déprécié pour GitHub."
+  },
+  {
+    t: "CodePipeline déclencheurs",
+    q: "Un pipeline CodePipeline doit se déclencher uniquement quand un objet spécifique est mis à jour dans un bucket S3. Comment configurer cela correctement ?",
+    o: [
+      "Configurer le polling S3 dans l'action Source avec le préfixe de l'objet",
+      "Créer une règle EventBridge sur l'événement S3 PutObject avec un filtre sur la clé de l'objet",
+      "Activer les notifications S3 → SNS → CodePipeline directement",
+      "Utiliser une Lambda qui appelle StartPipelineExecution après chaque upload S3"
+    ],
+    a: 1,
+    e: "La méthode recommandée est une règle EventBridge filtrant sur l'événement S3 PutObject avec le préfixe/suffixe de l'objet. EventBridge déclenche le pipeline sans polling. Le polling S3 fonctionne mais est lent (~1 min) et déprécié. La Lambda fonctionne aussi mais c'est une complexité inutile."
+  },
+  {
+    t: "CodePipeline artifact store",
+    q: "Où CodePipeline stocke-t-il les artifacts entre les stages (ex : le package buildé entre Build et Deploy) ?",
+    o: [
+      "Dans un bucket EFS partagé entre les actions",
+      "Dans un bucket S3 configuré comme artifact store, chiffré par défaut",
+      "Dans ECR si c'est une image Docker, sinon dans CodeCommit",
+      "Dans DynamoDB sous forme de métadonnées binaires"
+    ],
+    a: 1,
+    e: "CodePipeline utilise un bucket S3 (artifact store) pour passer les artifacts entre stages. Par défaut il est chiffré avec SSE-S3 ; on peut utiliser une CMK KMS customer-managed pour plus de contrôle (obligatoire pour les pipelines cross-account)."
+  },
+  {
+    t: "CodePipeline artifact store",
+    q: "Pour un pipeline CodePipeline multi-compte (compte A build, compte B deploy), quelle configuration est obligatoire pour que le compte B puisse lire les artifacts du compte A ?",
+    o: [
+      "Activer S3 Cross-Region Replication entre les deux comptes",
+      "Utiliser une CMK KMS customer-managed partagée entre les deux comptes + bucket policy permettant au compte B",
+      "Utiliser uniquement SSE-S3 et ajouter le compte B en tant que membre de l'organisation",
+      "Dupliquer l'artifact store dans chaque compte avec une Lambda de synchronisation"
+    ],
+    a: 1,
+    e: "Le pipeline cross-account nécessite : (1) une CMK KMS customer-managed dans le compte A que le compte B peut utiliser (via key policy), (2) un bucket S3 avec une bucket policy autorisant le compte B à lire. SSE-S3 ne fonctionne pas car les clés ne sont pas partageables cross-account."
+  },
+  // ─── Variables & configuration ────────────────────────────────────────────
+  {
+    t: "CodePipeline variables",
+    q: "Comment référencer une variable produite par une action CodeBuild dans une action Deploy du même pipeline ?",
+    o: [
+      "#{BuildAction.IMAGE_TAG} en utilisant le namespace de l'action source",
+      "$(BuildAction.IMAGE_TAG) en utilisant la syntaxe bash",
+      "{{BuildAction.IMAGE_TAG}} en utilisant la syntaxe Handlebars",
+      "Les variables ne peuvent pas traverser les stages, seulement les actions du même stage"
+    ],
+    a: 0,
+    e: "CodePipeline utilise la syntaxe #{Namespace.Variable} pour les variables. On configure un namespace sur l'action qui produit la variable (ex: namespace='BuildVars'), puis on la consomme avec #{BuildVars.IMAGE_TAG} dans une action ultérieure. Les variables peuvent traverser les stages."
+  },
+  {
+    t: "CodePipeline variables",
+    q: "Quelles sont les sources de variables disponibles nativement dans CodePipeline ? (choisir 2)",
+    o: [
+      "Variables de pipeline définies au niveau du pipeline (PipelineVariables)",
+      "Variables système comme #{codepipeline.PipelineExecutionId}",
+      "Variables Lambda lues depuis Parameter Store automatiquement",
+      "Variables issues de DynamoDB via un connecteur natif CodePipeline"
+    ],
+    a: [0, 1],
+    e: "CodePipeline propose : (1) des variables de pipeline définies par l'utilisateur au lancement (StartPipelineExecution avec variables), (2) des variables système comme #{codepipeline.PipelineExecutionId}, #{codepipeline.PipelineArn}. Les variables d'actions (ex: CodeBuild) sont une troisième source. Parameter Store et DynamoDB nécessitent une Lambda intermédiaire."
+  },
+  {
+    t: "CodePipeline Approval",
+    q: "Une action Approval dans CodePipeline attend une validation manuelle. Que se passe-t-il si personne n'approuve dans le délai configuré (7 jours par défaut) ?",
+    o: [
+      "L'exécution du pipeline est abandonnée (Failed) automatiquement",
+      "Le pipeline recommence depuis la Source",
+      "L'action Approval est ignorée et l'exécution continue",
+      "L'action reste en attente indéfiniment jusqu'à une action manuelle"
+    ],
+    a: 0,
+    e: "Une action Approval expire après 7 jours (configurable via le token d'approbation). À l'expiration, l'exécution du pipeline passe en état Failed. Le pipeline ne recommence pas automatiquement — il faut relancer manuellement ou via une règle EventBridge."
+  },
+  // ─── Sources ──────────────────────────────────────────────────────────────
+  {
+    t: "CodePipeline sources",
+    q: "Quelle différence fondamentale existe-t-il entre l'action Source CodeCommit v1 et la détection de changements via EventBridge pour CodePipeline ?",
+    o: [
+      "CodeCommit v1 utilise le polling toutes les minutes ; EventBridge déclenche le pipeline en temps réel",
+      "CodeCommit v1 déclenche le pipeline en temps réel ; EventBridge utilise le polling",
+      "Les deux sont identiques mais EventBridge coûte plus cher",
+      "EventBridge ne supporte pas CodeCommit comme source"
+    ],
+    a: 0,
+    e: "L'action Source CodeCommit en mode v1 (ancien) utilise le polling CloudWatch Events toutes ~1 minute. La méthode recommandée est de créer une règle EventBridge sur l'événement 'referenceCreated/referenceUpdated' de CodeCommit → déclenchement quasi-instantané et plus fiable."
+  },
+  {
+    t: "CodePipeline sources",
+    q: "Un pipeline CodePipeline utilise S3 comme source. Quelle condition est nécessaire pour que CodePipeline détecte les changements d'objets S3 via EventBridge ?",
+    o: [
+      "Activer S3 Event Notifications vers SNS",
+      "Activer CloudTrail pour le bucket S3 (Data events) afin qu'EventBridge reçoive les événements PutObject",
+      "Configurer le polling S3 dans les paramètres du pipeline",
+      "Activer S3 Versioning uniquement"
+    ],
+    a: 1,
+    e: "EventBridge ne reçoit les événements S3 PutObject que si CloudTrail Data Events est activé pour le bucket. Sans CloudTrail, EventBridge ne voit pas les opérations d'objets S3. S3 Versioning est requis séparément pour que CodePipeline lise la bonne version."
+  },
+  // ─── Notifications & monitoring ───────────────────────────────────────────
+  {
+    t: "CodePipeline monitoring",
+    q: "Comment recevoir une notification Slack quand une exécution CodePipeline échoue ?",
+    o: [
+      "Configurer une règle CloudWatch Logs sur les logs CodePipeline → SNS → Lambda → Slack",
+      "Créer une règle EventBridge sur l'événement 'codepipeline:pipeline:execution:failed' → SNS ou Lambda → Slack",
+      "Activer CodePipeline Insights et configurer une alerte email dans la console",
+      "Utiliser CodePipeline Notifications avec un chatbot AWS Chatbot connecté à Slack"
+    ],
+    a: 3,
+    e: "La méthode la plus directe est CodePipeline Notifications → AWS Chatbot. On crée une règle de notification dans CodePipeline (onglet Notifications) sur l'événement d'échec, on la connecte à un topic SNS, puis AWS Chatbot relie le topic à un canal Slack. EventBridge + Lambda fonctionne aussi mais est plus complexe."
+  },
+  {
+    t: "CodePipeline monitoring",
+    q: "Quels événements CodePipeline peut-on cibler avec une règle EventBridge ? (choisir 2)",
+    o: [
+      "codepipeline:pipeline:execution:started",
+      "codepipeline:action:execution:failed",
+      "codepipeline:artifact:uploaded",
+      "codepipeline:stage:execution:resumed"
+    ],
+    a: [0, 1],
+    e: "EventBridge supporte les événements de niveau pipeline (started, succeeded, failed, superseded), stage (started, succeeded, failed, resumed) et action (started, succeeded, failed, canceled). Il n'y a pas d'événement 'artifact:uploaded' — les artifacts sont gérés en interne. 'stage:execution:resumed' existe bien aussi en option C."
+  },
+  // ─── IAM & sécurité ───────────────────────────────────────────────────────
+  {
+    t: "CodePipeline IAM",
+    q: "Quel rôle IAM CodePipeline utilise-t-il pour accéder aux services cibles (S3, CodeBuild, CodeDeploy) lors de l'exécution d'un pipeline ?",
+    o: [
+      "Le rôle de l'utilisateur qui a créé le pipeline",
+      "Un service role CodePipeline créé/assigné au pipeline avec les permissions nécessaires",
+      "Le rôle AWSCodePipelineFullAccess automatiquement attaché",
+      "Le rôle de la fonction Lambda associée au pipeline"
+    ],
+    a: 1,
+    e: "Chaque pipeline CodePipeline est associé à un service role IAM. Ce rôle doit avoir les permissions pour accéder à l'artifact store S3, appeler les services des actions (CodeBuild, CodeDeploy, ECS, Lambda…). En mode cross-account, ce rôle doit aussi pouvoir assumer des rôles dans les comptes cibles."
+  },
+  {
+    t: "CodePipeline IAM",
+    q: "Pour une action Invoke Lambda dans CodePipeline, quelles permissions le service role du pipeline doit-il avoir ?",
+    o: [
+      "lambda:InvokeFunction uniquement",
+      "lambda:InvokeFunction + s3:GetObject + s3:PutObject pour accéder à l'artifact store",
+      "lambda:InvokeFunction + codepipeline:PutJobSuccessResult + codepipeline:PutJobFailureResult",
+      "lambda:InvokeFunction + iam:PassRole"
+    ],
+    a: 0,
+    e: "Pour une action Invoke, le service role du pipeline a besoin de lambda:InvokeFunction. C'est la Lambda elle-même qui appelle codepipeline:PutJobSuccessResult / PutJobFailureResult pour signaler le résultat — ces permissions sont donc sur le rôle de la Lambda, pas sur le service role du pipeline."
+  },
+  // ─── Exécutions & états ───────────────────────────────────────────────────
+  {
+    t: "CodePipeline exécutions",
+    q: "Que se passe-t-il si un nouveau commit arrive pendant qu'une exécution CodePipeline est déjà en cours ?",
+    o: [
+      "Le pipeline lance immédiatement une deuxième exécution en parallèle",
+      "Le nouveau commit est ignoré et perdu",
+      "Le nouveau commit est mis en attente ; si une troisième exécution arrive, la deuxième en attente est annulée (superseded)",
+      "Le pipeline arrête l'exécution courante et recommence avec le nouveau commit"
+    ],
+    a: 2,
+    e: "CodePipeline ne lance qu'une exécution à la fois par défaut. Le nouveau commit est mis en attente (Queued). Si un autre commit arrive encore, le précédent en attente est marqué 'Superseded' et annulé — seul le commit le plus récent attend. Ce comportement évite les déploiements en rafale."
+  },
+  {
+    t: "CodePipeline exécutions",
+    q: "Comment forcer CodePipeline à traiter chaque commit individuellement sans qu'aucun ne soit 'superseded' ?",
+    o: [
+      "Activer le mode 'QUEUED' dans la configuration ExecutionMode du pipeline",
+      "Créer un pipeline par branche",
+      "Augmenter le MaxConcurrency dans les paramètres avancés du pipeline",
+      "Il est impossible d'éviter le superseded dans CodePipeline"
+    ],
+    a: 0,
+    e: "CodePipeline propose ExecutionMode : SUPERSEDED (défaut — annule les exécutions en attente), QUEUED (traite chaque exécution dans l'ordre sans en annuler), PARALLEL (plusieurs exécutions simultanées). QUEUED garantit qu'aucun commit n'est sauté mais peut créer un backlog important."
+  },
+  {
+    t: "CodePipeline exécutions",
+    q: "Une exécution CodePipeline est bloquée sur une action Deploy depuis 2 heures. L'équipe décide de l'arrêter. Quelle API utiliser ?",
+    o: [
+      "StopPipelineExecution avec le paramètre abandon=true",
+      "DeletePipelineExecution",
+      "DisablePipelineTransition pour bloquer les stages suivants puis attendre le timeout",
+      "PutApprovalResult avec 'Rejected' pour forcer l'arrêt"
+    ],
+    a: 0,
+    e: "StopPipelineExecution permet d'arrêter une exécution en cours. Le paramètre 'abandon' (true/false) détermine si l'action en cours est abandonnée immédiatement (abandon=true) ou si on attend qu'elle termine avant d'arrêter le pipeline (abandon=false)."
+  },
+  // ─── Intégrations & patterns ──────────────────────────────────────────────
+  {
+    t: "CodePipeline intégrations",
+    q: "Une équipe veut ajouter un scan de sécurité (SAST) via un outil tiers non supporté nativement par CodePipeline. Quelle est la meilleure approche ?",
+    o: [
+      "Inclure le scan dans le buildspec.yml de CodeBuild",
+      "Utiliser une action de type 'Invoke' avec une Lambda qui orchestre l'outil tiers",
+      "Créer une action de type Custom Provider en enregistrant le provider tiers",
+      "Les deux premières options A et B sont valides selon le contexte"
+    ],
+    a: 3,
+    e: "Les deux approches sont valides : (A) intégrer l'outil SAST dans le buildspec CodeBuild si l'outil a un CLI (SonarQube, Checkmarx CLI…) — simple mais couplé au Build stage. (B) Lambda Invoke si l'outil a une API REST et qu'on veut un stage dédié. Un Custom Provider tiers (option C) est aussi possible mais plus complexe à maintenir."
+  },
+  {
+    t: "CodePipeline intégrations",
+    q: "CodePipeline doit déployer sur ECS en utilisant une image Docker dont le tag est produit dynamiquement par CodeBuild. Comment passer ce tag à l'action Deploy ECS ?",
+    o: [
+      "Écrire le tag dans un fichier imagedefinitions.json dans les artifacts de CodeBuild",
+      "Utiliser les variables de pipeline : CodeBuild exporte IMAGE_TAG, l'action ECS le lit via #{BuildNS.IMAGE_TAG}",
+      "Hardcoder le tag 'latest' et laisser ECS récupérer la dernière image",
+      "Les options A et B sont toutes les deux correctes selon le type d'action ECS utilisé"
+    ],
+    a: 3,
+    e: "Pour l'action ECS standard, on utilise le fichier imagedefinitions.json dans les artifacts (format [{name, imageUri}]). Pour l'action ECS (Blue/Green) avec CodeDeploy, on utilise imageDetail.json. Les variables de pipeline (option B) peuvent aussi passer le tag si l'action ECS supporte les variables — les deux méthodes coexistent selon le type d'action."
+  },
+  {
+    t: "CodePipeline intégrations",
+    q: "Quelle action CodePipeline permet de déclencher un pipeline dans un autre compte AWS ?",
+    o: [
+      "Une action Source cross-account avec AssumeRole",
+      "Une action Invoke Lambda qui appelle StartPipelineExecution dans le compte cible via AssumeRole",
+      "Une action Deploy de type CloudFormation StackSet cross-account",
+      "CodePipeline ne supporte pas le déclenchement cross-account direct"
+    ],
+    a: 1,
+    e: "Il n'existe pas d'action native 'TriggerPipeline' dans CodePipeline. La méthode courante est une action Invoke Lambda dans le compte A, où la Lambda assume un rôle dans le compte B et appelle StartPipelineExecution. EventBridge cross-account peut aussi router un événement pour déclencher le pipeline cible."
+  },
+  // ─── Scénarios Pro niveau difficile ──────────────────────────────────────
+  {
+    t: "CodePipeline scénario avancé",
+    q: "Un pipeline CodePipeline déploie une Lambda via CloudFormation. L'équipe veut s'assurer que le déploiement est rollback automatiquement si les erreurs CloudWatch Logs dépassent un seuil dans les 10 minutes suivant le déploiement. Quelle combinaison de services utiliser ?",
+    o: [
+      "CodePipeline Approval + CloudWatch Alarm → désactiver la transition manuellement",
+      "CloudFormation rollback triggers : associer une CloudWatch Alarm au stack Update → rollback auto si ALARM",
+      "CodeDeploy Lambda canary avec CloudWatch Alarm configurée comme rollback trigger",
+      "Les options B et C sont toutes les deux valides selon l'architecture"
+    ],
+    a: 3,
+    e: "Les deux approches fonctionnent : (B) CloudFormation rollback triggers permettent d'associer des alarmes CloudWatch au déploiement CFN — si l'alarme se déclenche pendant ou juste après l'update, CFN rollback auto. (C) Si CodeDeploy est utilisé pour la Lambda (canary/linear), les CloudWatch Alarms configurées comme rollback triggers stoppent et rollback le déploiement. Le choix dépend de si on utilise CFN direct ou CodeDeploy."
+  },
+  {
+    t: "CodePipeline scénario avancé",
+    q: "Une entreprise a 50 microservices chacun avec son propre pipeline CodePipeline. Elle veut un tableau de bord central montrant l'état de tous les pipelines. Quelle solution AWS native est la plus appropriée ?",
+    o: [
+      "Amazon CodeGuru Profiler avec l'intégration CodePipeline",
+      "AWS Developer Tools Console — vue 'Pipelines' qui liste tous les pipelines",
+      "Une Lambda qui poll ListPipelines + GetPipelineState → écrit dans DynamoDB → CloudWatch Dashboard",
+      "EventBridge → Kinesis Firehose → S3 → Athena + QuickSight pour visualiser les événements"
+    ],
+    a: 1,
+    e: "La console AWS Developer Tools (console.aws.amazon.com/codesuite) offre une vue centrale de tous les pipelines CodePipeline avec leur état en temps réel — c'est la solution native la plus simple. Pour un dashboard custom enrichi, la Lambda/DynamoDB ou EventBridge/QuickSight sont des options valides mais surdimensionnées pour l'usage de base."
+  },
+  {
+    t: "CodePipeline scénario avancé",
+    q: "Après un déploiement CodePipeline, l'équipe remarque que l'exécution montre 'Superseded' pour plusieurs commits. Quel est le problème et quelle est la solution ?",
+    o: [
+      "Le pipeline est mal configuré ; il faut désactiver le mode SUPERSEDED dans les paramètres avancés",
+      "C'est le comportement normal par défaut — passer en mode QUEUED si on veut traiter tous les commits",
+      "Les commits sont perdus et ne peuvent pas être rejoués ; il faut reconfigurer les webhooks",
+      "Le comportement indique un problème réseau entre GitHub et CodePipeline"
+    ],
+    a: 1,
+    e: "Le mode SUPERSEDED est le comportement par défaut de CodePipeline : si un commit arrive pendant qu'un autre est en attente, l'attente est annulée. Ce n'est pas une erreur — c'est intentionnel pour éviter les backlogs. Si l'équipe veut que chaque commit soit déployé, elle doit passer en mode QUEUED dans la configuration ExecutionMode."
+  },
+  {
+    t: "CodePipeline scénario avancé",
+    q: "Une équipe utilise CodePipeline avec GitHub v2 (Connections). Après un changement de credentials GitHub, les déclenchements de pipeline ont cessé. Quelle est la cause probable ?",
+    o: [
+      "Le webhook S3 a expiré et doit être régénéré",
+      "La connexion AWS CodeStar Connections est passée en état 'PENDING' et doit être réautorisée dans la console",
+      "Le rôle IAM du pipeline n'a plus les permissions GitHub",
+      "EventBridge a perdu la règle de déclenchement et doit être recréée"
+    ],
+    a: 1,
+    e: "AWS CodeStar Connections (GitHub v2) utilise un token OAuth lié à l'installation de l'AWS Connector for GitHub. Si les credentials changent ou si l'application GitHub est révoquée, la connexion passe en état PENDING. Il faut aller dans la console Developer Tools → Connections et réautoriser la connexion GitHub."
+  },
+  {
+    t: "CodePipeline Connections",
+    q: "Une équipe veut connecter CodePipeline à un dépôt GitHub Enterprise Server hébergé on-premises. Quelle solution AWS supporte ce cas ?",
+    o: [
+      "GitHub v1 avec un Personal Access Token stocké dans Secrets Manager",
+      "AWS CodeStar Connections avec un VPC Host créé pour GitHub Enterprise Server",
+      "Mirroring vers CodeCommit via une Lambda déclenchée par webhook",
+      "Ce cas n'est pas supporté nativement — il faut utiliser Jenkins comme intermédiaire"
+    ],
+    a: 1,
+    e: "AWS CodeStar Connections supporte GitHub Enterprise Server via la création d'un 'Host' (un endpoint représentant le serveur GHE on-prem). La connexion transite via AWS et ne nécessite pas d'exposer le serveur publiquement — un VPC et AWS PrivateLink peuvent sécuriser le flux."
+  },
+  // ─── Cas d'erreur & troubleshooting ──────────────────────────────────────
+  {
+    t: "CodePipeline troubleshooting",
+    q: "Une action Source CodeCommit dans un pipeline ne se déclenche plus après une période de fonctionnement normal. Les commits sont bien poussés. Quelle est la première vérification à faire ?",
+    o: [
+      "Vérifier que la branche configurée dans l'action Source n'a pas été supprimée ou renommée",
+      "Vérifier les quotas CodePipeline et demander une augmentation",
+      "Recréer entièrement le pipeline avec les mêmes paramètres",
+      "Vérifier les permissions du rôle CodeBuild"
+    ],
+    a: 0,
+    e: "La cause la plus fréquente est que la branche cible a été renommée (ex: master → main) ou supprimée. L'action Source CodeCommit ne déclenche plus si la branche n'existe plus. La deuxième vérification est l'état de la règle EventBridge associée (elle peut avoir été supprimée ou désactivée accidentellement)."
+  },
+  {
+    t: "CodePipeline troubleshooting",
+    q: "Un pipeline CodePipeline échoue avec l'erreur 'Access Denied' lors de l'accès à l'artifact S3. Quelles sont les deux causes les plus probables ? (choisir 2)",
+    o: [
+      "Le service role du pipeline n'a pas les permissions s3:GetObject / s3:PutObject sur le bucket artifact",
+      "La CMK KMS du bucket n'est pas accessible par le service role du pipeline",
+      "Le bucket S3 artifact est dans une région différente du pipeline",
+      "Le service role a trop de permissions et AWS refuse par précaution"
+    ],
+    a: [0, 1],
+    e: "Les deux causes les plus fréquentes d'Access Denied sur l'artifact store S3 sont : (1) permissions IAM insuffisantes sur le service role (s3:GetObject, s3:PutObject, s3:GetBucketVersioning), (2) si le bucket est chiffré avec une CMK KMS, le service role doit avoir kms:GenerateDataKey + kms:Decrypt. La région différente (option C) n'est pas un blocage — CodePipeline supporte les cross-region artifacts."
+  },
+  {
+    t: "CodePipeline troubleshooting",
+    q: "Après un déploiement bloqué, un ingénieur supprime et recrée le pipeline CodePipeline avec exactement les mêmes paramètres. Le nouveau pipeline ne se déclenche pas automatiquement. Pourquoi ?",
+    o: [
+      "Le webhook GitHub est lié à l'ARN de l'ancien pipeline et doit être recréé manuellement",
+      "La règle EventBridge créée automatiquement pour l'ancien pipeline a été supprimée avec lui et est recrée pour le nouveau",
+      "Le nouveau pipeline est en mode PAUSED par défaut",
+      "CodePipeline impose un délai de 24h avant d'activer un nouveau pipeline"
+    ],
+    a: 1,
+    e: "Quand on crée un pipeline CodePipeline, AWS crée automatiquement une règle EventBridge pour détecter les changements de source. Quand on supprime le pipeline, la règle EventBridge est supprimée aussi. Quand on recrée le pipeline, la règle est recrée — donc le comportement est normal. Si le déclenchement ne fonctionne pas, c'est une autre cause (connexion GitHub, branche…)."
+  },
+  // ─── Multi-région ─────────────────────────────────────────────────────────
+  {
+    t: "CodePipeline multi-région",
+    q: "Comment configurer CodePipeline pour déployer dans plusieurs régions AWS dans le même pipeline ?",
+    o: [
+      "Créer un pipeline par région et les enchaîner via EventBridge",
+      "Ajouter des actions avec un paramètre 'region' spécifique dans le stage Deploy — CodePipeline gère automatiquement les artifact buckets dans chaque région",
+      "Utiliser CloudFormation StackSets depuis une action Deploy dans le pipeline",
+      "Les pipelines CodePipeline sont mono-région par conception"
+    ],
+    a: 1,
+    e: "CodePipeline supporte les déploiements multi-région nativement : on spécifie la région dans les paramètres de l'action. CodePipeline crée automatiquement des 'support buckets' dans chaque région cible pour répliquer les artifacts nécessaires. Pas besoin de créer des pipelines séparés."
+  },
+  {
+    t: "CodePipeline multi-région",
+    q: "Pour une action Deploy CodePipeline dans une région secondaire (ex: eu-west-1) depuis un pipeline principal en us-east-1, que doit contenir la configuration du pipeline ?",
+    o: [
+      "Un paramètre 'crossRegionArtifactBuckets' listant le bucket S3 dans eu-west-1 pour les artifacts",
+      "Une règle EventBridge cross-région pour synchroniser les artifacts",
+      "Un rôle IAM avec AssumeRole vers eu-west-1",
+      "Un stage dédié 'RegionSync' avant le Deploy stage"
+    ],
+    a: 0,
+    e: "Pour les actions cross-region, CodePipeline a besoin d'un bucket S3 dans la région cible pour les artifacts (crossRegionArtifactBuckets dans la définition du pipeline). Ce bucket doit exister avant la création/modification du pipeline. CodePipeline copie automatiquement les artifacts vers ce bucket avant d'exécuter l'action dans la région cible."
+  },
+  // ─── Questions sur les limites & quotas ───────────────────────────────────
+  {
+    t: "CodePipeline limites",
+    q: "Quelle est la limite par défaut du nombre maximum de stages dans un pipeline CodePipeline ?",
+    o: [
+      "5 stages maximum",
+      "10 stages maximum",
+      "50 stages maximum — limite souple augmentable via Support",
+      "Pas de limite documentée sur le nombre de stages"
+    ],
+    a: 2,
+    e: "La limite par défaut est de 50 stages par pipeline (limite souple). Le nombre d'actions par stage est limité à 50 aussi. Ces limites peuvent être augmentées via un ticket AWS Support. Dans la pratique, un pipeline avec plus de 10-15 stages est rare et indique souvent une architecture à revoir."
+  },
+  {
+    t: "CodePipeline limites",
+    q: "CodePipeline peut-il avoir plusieurs pipelines déclenchés par la même source (même repo/branche) ?",
+    o: [
+      "Non, une source ne peut déclencher qu'un seul pipeline",
+      "Oui, plusieurs pipelines peuvent écouter la même source sans conflit",
+      "Oui, mais uniquement avec des filtres de chemin différents",
+      "Non, sauf si on utilise SNS comme intermédiaire"
+    ],
+    a: 1,
+    e: "Plusieurs pipelines peuvent être configurés sur la même source (même repo/branche). Chaque pipeline a sa propre règle EventBridge et son propre artifact store. Il n'y a pas de conflit — AWS déclenche tous les pipelines abonnés à la source en parallèle."
+  },
+  // ─── Comparaisons & choix d'architecture ─────────────────────────────────
+  {
+    t: "CodePipeline vs alternatives",
+    q: "Une startup utilise déjà GitHub Actions pour son CI/CD. Pourquoi pourrait-elle préférer passer à CodePipeline ? (choisir 2)",
+    o: [
+      "Intégration native avec les services AWS (CodeDeploy, ECS, Lambda, CloudFormation) sans tokens",
+      "Mécanisme d'Approval actions intégré pour les gates de déploiement",
+      "Support des workflows YAML plus expressif que GitHub Actions",
+      "CodePipeline est moins cher que GitHub Actions pour tous les cas d'usage"
+    ],
+    a: [0, 1],
+    e: "Les avantages principaux de CodePipeline vs GitHub Actions pour AWS : (1) intégration native sans gestion de tokens/secrets pour accéder aux services AWS — CodePipeline utilise des rôles IAM, (2) les Approval actions permettent des gates humains directement dans le pipeline. GitHub Actions a des workflows YAML plus expressifs (option C est fausse). Le coût (D) dépend du cas d'usage."
+  },
+  {
+    t: "CodePipeline vs alternatives",
+    q: "Quelle est la principale différence entre CodePipeline et AWS Step Functions pour orchestrer un workflow de déploiement ?",
+    o: [
+      "CodePipeline est dédié aux workflows CI/CD avec notion de source/build/deploy ; Step Functions est un orchestrateur généraliste pour workflows complexes avec branchements conditionnels avancés",
+      "Step Functions ne peut pas appeler des services AWS tandis que CodePipeline le peut",
+      "CodePipeline supporte les boucles et retry natifs, Step Functions non",
+      "Les deux sont identiques mais Step Functions est plus récent"
+    ],
+    a: 0,
+    e: "CodePipeline est spécialisé CI/CD : modèle linéaire (stages/actions), intégrations natives Build/Deploy, notion de source code. Step Functions est un orchestrateur généraliste : workflows avec Choice (conditions), Parallel, Map, Retry/Catch sophistiqués — idéal pour des processus métier complexes ou des workflows multi-services. Pour du CI/CD pur, CodePipeline est plus adapté."
+  },
+  // ─── Coûts ────────────────────────────────────────────────────────────────
+  {
+    t: "CodePipeline coûts",
+    q: "Quel est le modèle de facturation de CodePipeline ?",
+    o: [
+      "Facturation à la minute d'exécution du pipeline",
+      "Facturation par pipeline actif par mois (pas de facturation si le pipeline ne tourne pas)",
+      "Facturation par action exécutée dans le pipeline",
+      "CodePipeline est inclus gratuitement dans AWS sans limite"
+    ],
+    a: 1,
+    e: "CodePipeline facture par pipeline actif par mois (1 dollar par pipeline actif). Un pipeline est 'actif' s'il a eu au moins une exécution dans le mois. Les 30 premiers jours sont gratuits pour chaque nouveau pipeline. Il y a aussi un free tier de 1 pipeline gratuit par compte AWS."
+  },
+  // ─── Scénarios complexes supplémentaires ─────────────────────────────────
+  {
+    t: "CodePipeline scénario avancé",
+    q: "Une équipe veut implémenter un pipeline GitOps où les changements d'infrastructure (Terraform) sont d'abord appliqués en 'plan only' pour revue, puis nécessitent une approbation manuelle avant l'apply. Quelle architecture CodePipeline utiliser ?",
+    o: [
+      "Stage 1 (Source) → Stage 2 (Build: terraform plan) → Stage 3 (Approval) → Stage 4 (Build: terraform apply)",
+      "Stage 1 (Source) → Stage 2 (Deploy: terraform plan + apply en une seule action)",
+      "Stage 1 (Source) → Stage 2 (Lambda: terraform plan) → Stage 3 (Approval: afficher le plan) → Stage 4 (Lambda: terraform apply)",
+      "Les options A et C sont valides ; A est plus simple, C affiche le plan dans l'Approval"
+    ],
+    a: 3,
+    e: "Les deux approches fonctionnent : (A) utilise CodeBuild pour plan puis apply dans deux stages séparés avec Approval au milieu — simple et standard. (C) utilise Lambda avec la possibilité de passer le résumé du plan terraform dans le message d'Approval — plus informatif. En pratique, l'option A avec CodeBuild est la plus courante pour Terraform dans CodePipeline."
+  },
+  {
+    t: "CodePipeline scénario avancé",
+    q: "Un pipeline CodePipeline doit déployer séquentiellement sur 3 environnements (dev, staging, prod) avec un Approval obligatoire avant prod uniquement. Quelle est la structure minimale correcte ?",
+    o: [
+      "4 stages : Source → DeployDev → DeployStaging → ApprovalProd+DeployProd (actions parallèles dans le dernier stage)",
+      "5 stages : Source → DeployDev → DeployStaging → ApprovalProd → DeployProd",
+      "3 stages : Source → Deploy(dev+staging parallèle) → Approval+DeployProd",
+      "6 stages : Source → ApprovalDev → DeployDev → ApprovalStaging → DeployStaging → DeployProd"
+    ],
+    a: 1,
+    e: "La structure correcte est 5 stages : Source → DeployDev → DeployStaging → ApprovalProd → DeployProd. L'Approval est un stage dédié (ou une action dans un stage dédié). On ne peut pas mettre Approval et Deploy dans le même stage avec l'Approval en gate — le stage ne commencerait qu'après validation mais les deux actions commenceraient en même temps."
+  },
+  {
+    t: "CodePipeline scénario avancé",
+    q: "Une action Custom dans CodePipeline (custom action type) utilise le modèle 'job worker'. Comment le worker externe sait-il qu'il y a un job à traiter ?",
+    o: [
+      "CodePipeline envoie un webhook HTTP POST vers le worker quand un job est disponible",
+      "Le worker poll CodePipeline via l'API PollForJobs en continu",
+      "CodePipeline publie un message SQS que le worker consomme",
+      "EventBridge notifie le worker via une règle créée automatiquement"
+    ],
+    a: 1,
+    e: "Les custom action workers utilisent le modèle 'poll' : le worker appelle régulièrement l'API PollForJobs pour vérifier si des jobs sont disponibles. Quand CodePipeline renvoie un job, le worker l'exécute puis appelle PutJobSuccessResult ou PutJobFailureResult. Il n'y a pas de push/webhook natif — c'est entièrement pull-based."
+  },
+  {
+    t: "CodePipeline scénario avancé",
+    q: "Un ingénieur DevOps doit auditer tous les changements apportés aux pipelines CodePipeline d'un compte AWS sur les 30 derniers jours. Quel service utiliser ?",
+    o: [
+      "CodePipeline History — onglet 'Pipeline changes' dans la console",
+      "AWS CloudTrail — chercher les événements API CodePipeline (CreatePipeline, UpdatePipeline, DeletePipeline)",
+      "Amazon CodeGuru Reviewer — analyse les modifications de configuration",
+      "AWS Config — règle codepipeline-deployment-required-actions"
+    ],
+    a: 1,
+    e: "CloudTrail enregistre toutes les API calls AWS incluant CodePipeline (CreatePipeline, UpdatePipeline, DeletePipeline, StartPipelineExecution…). Pour auditer les changements de configuration, on filtre sur les événements 'write' de CodePipeline dans CloudTrail. AWS Config peut aussi aider pour l'état actuel des ressources mais CloudTrail est la source d'audit historique."
+  },
+  {
+    t: "CodePipeline scénario avancé",
+    q: "Une entreprise utilise AWS Organizations avec 20 comptes. Elle veut standardiser les pipelines CodePipeline avec une structure commune (mêmes stages, mêmes règles d'approval). Quelle approche est la plus scalable ?",
+    o: [
+      "Créer les pipelines manuellement dans chaque compte avec un document de convention",
+      "Utiliser Service Catalog avec un produit CloudFormation définissant le pipeline standard — les équipes lancent le produit pour créer leur pipeline",
+      "Déployer les pipelines via une Lambda centralisée dans le compte de gestion",
+      "Utiliser AWS CodePipeline Templates (fonctionnalité native de standardisation)"
+    ],
+    a: 1,
+    e: "Service Catalog est la réponse scalable pour standardiser des ressources AWS dans une organisation : l'équipe centrale publie un produit CloudFormation définissant le pipeline standard, les équipes le lancent via le catalogue. Les contraintes Service Catalog peuvent empêcher les modifications non autorisées. Il n'existe pas de 'CodePipeline Templates' en tant que fonctionnalité native (option D)."
+  },
+  {
+    t: "CodePipeline Connections",
+    q: "Une règle EventBridge déclenchant un pipeline CodePipeline depuis Bitbucket Cloud a cessé de fonctionner. Quelle vérification est prioritaire ?",
+    o: [
+      "Vérifier que le webhook Bitbucket pointe toujours vers le bon endpoint CodePipeline",
+      "Vérifier l'état de la connexion AWS CodeStar Connections dans la console Developer Tools",
+      "Vérifier les permissions EventBridge sur le rôle du pipeline",
+      "Recréer la règle EventBridge depuis la console CodePipeline"
+    ],
+    a: 1,
+    e: "Bitbucket Cloud est supporté via AWS CodeStar Connections. Si les déclenchements cessent, la première vérification est l'état de la connexion dans Developer Tools → Connections. Elle peut être en état PENDING (token expiré, révocation OAuth) et nécessiter une réauthorisation. C'est la cause la plus fréquente pour les connexions tierce-partie."
+  },
+  {
+    t: "CodePipeline sécurité",
+    q: "Une équipe de sécurité veut s'assurer qu'aucun pipeline CodePipeline ne peut déployer directement en production sans approbation. Comment implémenter ce contrôle de manière préventive et centralisée pour tous les comptes de l'organisation ?",
+    o: [
+      "Créer une convention de nommage et demander aux équipes de mettre une Approval action",
+      "Créer une SCP AWS Organizations qui empêche StartPipelineExecution sur les pipelines de production",
+      "Utiliser AWS Config avec une règle custom qui détecte les pipelines sans Approval et envoie une alerte",
+      "Utiliser Service Catalog pour imposer des templates de pipeline incluant l'Approval action obligatoire"
+    ],
+    a: 3,
+    e: "Service Catalog avec des contraintes de lancement est l'approche la plus scalable pour imposer une structure de pipeline incluant l'Approval. Une SCP (option B) ne peut pas filtrer finement sur la structure d'un pipeline — elle bloquerait toutes les exécutions ou aucune. Config (option C) est détectif, pas préventif. La convention (option A) n'est pas enforced."
+  },
+  {
+    t: "CodePipeline Webhook",
+    q: "Quelle est la différence entre GitHub v1 (Webhook) et GitHub v2 (Connections) dans CodePipeline ?",
+    o: [
+      "GitHub v1 nécessite un Personal Access Token stocké dans CodePipeline ; GitHub v2 utilise OAuth via AWS CodeStar Connections sans token dans CodePipeline",
+      "GitHub v2 supporte uniquement les organisations GitHub, pas les repos personnels",
+      "GitHub v1 déclenche via EventBridge ; GitHub v2 utilise le polling",
+      "Les deux sont identiques mais GitHub v2 est plus récent et légèrement plus cher"
+    ],
+    a: 0,
+    e: "GitHub v1 stockait un PAT (Personal Access Token) dans CodePipeline et créait un webhook GitHub qui pointait directement vers CodePipeline. GitHub v2 (Connections) utilise OAuth/GitHub App — AWS CodeStar Connections gère l'authentification sans stocker de token dans CodePipeline. GitHub v2 est plus sécurisé, recommandé et supporte GitHub App au niveau organisation."
+  },
+  {
+    t: "CodePipeline notification",
+    q: "Un manager veut recevoir un email de synthèse quotidien de l'état de tous les pipelines (combien ont réussi, échoué, sont en cours). Quelle architecture serverless construire ?",
+    o: [
+      "EventBridge Scheduler → Lambda (liste l'état via ListPipelines + GetPipelineState → envoie SES)",
+      "CloudWatch Dashboard avec widget email configuré sur un schedule quotidien",
+      "CodePipeline Notifications avec SNS en mode digest quotidien",
+      "Amazon CodeGuru Reviewer génère un rapport quotidien des pipelines"
+    ],
+    a: 0,
+    e: "La solution serverless correcte : EventBridge Scheduler crée un trigger quotidien → Lambda appelle ListPipelines puis GetPipelineState pour chaque pipeline → agrège les résultats → envoie l'email via SES. CodePipeline Notifications (option C) envoie des notifications par événement, pas de digest — il faudrait les agréger soi-même. Il n'existe pas de widget email CloudWatch."
+  },
+  {
+    t: "CodePipeline scénario avancé",
+    q: "Un pipeline CodePipeline en mode PARALLEL permet plusieurs exécutions simultanées. Quel risque opérationnel cela introduit-il pour un déploiement sur un environnement partagé ?",
+    o: [
+      "Augmentation des coûts S3 car plusieurs artifact stores sont créés",
+      "Race condition : deux exécutions peuvent déployer simultanément sur le même environnement et se corrompre mutuellement",
+      "CodePipeline refuse automatiquement les exécutions PARALLEL sur les stages Deploy",
+      "Le mode PARALLEL ne s'applique qu'aux stages Build, pas Deploy"
+    ],
+    a: 1,
+    e: "Le mode PARALLEL permet réellement des déploiements simultanés — c'est un risque majeur si les deux exécutions déploient sur le même environnement (même ECS service, même Lambda, même EC2 ASG). Il peut y avoir des race conditions ou des états incohérents. PARALLEL est adapté pour déployer des branches indépendantes sur des envs isolés, pas pour le déploiement sur un environnement partagé."
+  },
+  {
+    t: "CodePipeline fondamentaux",
+    q: "Quel format utilise CodePipeline pour définir un pipeline en Infrastructure as Code (IaC) ?",
+    o: [
+      "Un fichier YAML 'pipeline.yml' à la racine du dépôt source",
+      "La ressource AWS::CodePipeline::Pipeline dans CloudFormation / CDK",
+      "Un fichier JSON 'buildspec.json' similaire à CodeBuild",
+      "Un fichier HCL pour Terraform uniquement — CloudFormation ne supporte pas CodePipeline"
+    ],
+    a: 1,
+    e: "CodePipeline se définit en IaC via la ressource CloudFormation AWS::CodePipeline::Pipeline (ou via CDK avec aws-cdk-lib/aws-codepipeline). Il n'y a pas de fichier de configuration dans le repo (contrairement à GitHub Actions ou GitLab CI). Terraform supporte aussi CodePipeline via aws_codepipeline resource."
+  },
+  {
+    t: "CodePipeline fondamentaux",
+    q: "Dans CodePipeline, qu'est-ce qu'un 'artifact' et comment est-il passé entre les stages ?",
+    o: [
+      "Un artifact est un message JSON échangé via SQS entre les actions du pipeline",
+      "Un artifact est un fichier ou répertoire zippé stocké dans S3, référencé par nom entre les actions",
+      "Un artifact est un conteneur Docker stocké dans ECR entre les stages Build et Deploy",
+      "Un artifact est une entrée DynamoDB contenant les métadonnées de l'exécution"
+    ],
+    a: 1,
+    e: "Dans CodePipeline, un artifact est un fichier ou répertoire compressé (ZIP) stocké dans le bucket S3 artifact store. Chaque action déclare ses InputArtifacts (ce qu'elle consomme) et OutputArtifacts (ce qu'elle produit). Les artifacts sont référencés par nom (ex: 'SourceOutput', 'BuildOutput') et CodePipeline gère automatiquement le transfert S3."
+  },
+  {
+    t: "CodePipeline fondamentaux",
+    q: "Une action Source CodePipeline utilisant CodeCommit produit un artifact. Que contient cet artifact par défaut ?",
+    o: [
+      "Uniquement le fichier modifié par le dernier commit",
+      "Le contenu complet du dépôt CodeCommit à la révision du commit déclencheur, zippé",
+      "Les métadonnées Git du commit (author, message, hash) au format JSON",
+      "Un lien S3 pré-signé vers le code source dans CodeCommit"
+    ],
+    a: 1,
+    e: "L'action Source CodeCommit produit un artifact ZIP contenant le contenu complet du dépôt à la révision du commit qui a déclenché le pipeline. Ce n'est pas un delta — c'est un snapshot complet. CodeBuild peut ensuite dézipper cet artifact pour accéder à tout le code source."
+  },
+  {
+    t: "CodePipeline fondamentaux",
+    q: "Comment CodePipeline gère-t-il les secrets (tokens API, mots de passe) nécessaires aux actions du pipeline ?",
+    o: [
+      "En les stockant chiffrés directement dans la définition JSON du pipeline",
+      "En référençant des paramètres AWS Secrets Manager ou SSM Parameter Store dans la configuration des actions",
+      "En passant les secrets comme variables d'environnement en clair dans les actions CodeBuild",
+      "CodePipeline ne gère pas les secrets — ils doivent être codés en dur dans buildspec.yml"
+    ],
+    a: 1,
+    e: "La meilleure pratique est de stocker les secrets dans AWS Secrets Manager ou SSM Parameter Store (SecureString) et de les référencer depuis les actions (ex: dans CodeBuild via la section 'parameter-store' ou 'secrets-manager' du buildspec.yml). Les secrets ne doivent jamais être dans la définition du pipeline ni en dur dans le code."
+  },
+  {
+    t: "CodePipeline fondamentaux",
+    q: "Un pipeline CodePipeline a 3 stages : Source, Build, Deploy. L'action Build échoue. Que se passe-t-il pour le stage Deploy ?",
+    o: [
+      "Deploy s'exécute quand même avec le dernier artifact valide",
+      "Deploy est ignoré et marqué 'Skipped'",
+      "L'exécution du pipeline s'arrête ; Deploy ne s'exécute pas tant que Build ne réussit pas",
+      "Deploy s'exécute en parallèle avec Build et n'est pas affecté"
+    ],
+    a: 2,
+    e: "Dans CodePipeline, les stages s'exécutent séquentiellement. Si un stage échoue, l'exécution s'arrête et les stages suivants ne s'exécutent pas. L'exécution reste en état 'Failed'. Pour relancer, soit on corrige le code (nouveau commit déclenche une nouvelle exécution), soit on relance manuellement depuis la console ou via RetryStageExecution."
+  }
+]
+
+};
