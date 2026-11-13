@@ -1352,6 +1352,467 @@ window.QDATA = {
     a: 2,
     e: "Dans CodePipeline, les stages s'exécutent séquentiellement. Si un stage échoue, l'exécution s'arrête et les stages suivants ne s'exécutent pas. L'exécution reste en état 'Failed'. Pour relancer, soit on corrige le code (nouveau commit déclenche une nouvelle exécution), soit on relance manuellement depuis la console ou via RetryStageExecution."
   }
+],
+
+2: [
+  // ─── buildspec.yml ─────────────────────────────────────────────────────────
+  {
+    t: "CodeBuild buildspec",
+    q: "Dans un fichier buildspec.yml CodeBuild, quelle section contient les commandes qui compilent le code source ?",
+    o: [
+      "phases.install",
+      "phases.build",
+      "phases.pre_build",
+      "artifacts"
+    ],
+    a: 1,
+    e: "Le buildspec.yml définit 4 phases : install (outils/dépendances), pre_build (login ECR, tests préliminaires), build (compilation réelle), post_build (packaging, push image). La compilation va dans phases.build. install et pre_build sont des étapes préparatoires."
+  },
+  {
+    t: "CodeBuild buildspec",
+    q: "Comment passer une variable d'environnement sensible (mot de passe DB) à un build CodeBuild sans l'exposer en clair dans le buildspec.yml ?",
+    o: [
+      "La définir en clair dans la section 'env.variables' du buildspec",
+      "La référencer via 'env.parameter-store' (SSM) ou 'env.secrets-manager' dans le buildspec",
+      "La passer en argument de la commande docker build --build-arg",
+      "L'encoder en base64 dans les variables d'environnement CodeBuild"
+    ],
+    a: 1,
+    e: "CodeBuild supporte nativement SSM Parameter Store (env.parameter-store) et Secrets Manager (env.secrets-manager) dans le buildspec. CodeBuild récupère la valeur au runtime et l'injecte comme variable d'environnement — la valeur n'apparaît jamais en clair dans le buildspec ou la console (masquée dans les logs si marquée sensible)."
+  },
+  {
+    t: "CodeBuild buildspec",
+    q: "Que contient la section 'artifacts' d'un buildspec.yml CodeBuild ?",
+    o: [
+      "Les logs du build à envoyer vers CloudWatch",
+      "Les fichiers à uploader dans le bucket S3 artifact store après le build",
+      "Les images Docker à pousser vers ECR",
+      "Les rapports de tests générés pendant le build"
+    ],
+    a: 1,
+    e: "La section 'artifacts' définit les fichiers que CodeBuild doit packager et uploader dans l'artifact store S3 après le build (pour transmission à l'étape suivante du pipeline). Les logs vont dans 'reports' ou CloudWatch. Les images ECR sont poussées explicitement dans la phase post_build. Les rapports de tests ont leur propre section 'reports'."
+  },
+  {
+    t: "CodeBuild buildspec",
+    q: "Dans un buildspec.yml, quelle est la différence entre 'finally' et 'post_build' ?",
+    o: [
+      "'finally' s'exécute toujours, même si le build échoue ; 'post_build' ne s'exécute qu'en cas de succès",
+      "'post_build' s'exécute toujours ; 'finally' est un alias de 'post_build'",
+      "Les deux sont identiques — 'finally' est la nouvelle syntaxe de 'post_build'",
+      "'finally' est disponible uniquement dans la phase 'install', pas dans les autres phases"
+    ],
+    a: 0,
+    e: "Chaque phase du buildspec (install, pre_build, build, post_build) peut contenir une section 'finally'. Les commandes dans 'finally' s'exécutent toujours, même si les commandes principales de la phase échouent. Utile pour le nettoyage, l'envoi de notifications ou le reporting — peu importe le résultat du build."
+  },
+  // ─── Images & environnements ───────────────────────────────────────────────
+  {
+    t: "CodeBuild environnement",
+    q: "Une équipe utilise une image Docker custom hébergée dans ECR privé comme environnement CodeBuild. Quelle permission est nécessaire ?",
+    o: [
+      "Le rôle de service CodeBuild doit avoir ecr:GetAuthorizationToken + ecr:BatchGetImage + ecr:GetDownloadUrlForLayer",
+      "Le rôle de service CodeBuild doit avoir ec2:DescribeImages",
+      "L'image ECR doit être en accès public",
+      "Aucune permission spéciale — CodeBuild accède à ECR nativement sans IAM"
+    ],
+    a: 0,
+    e: "Pour utiliser une image ECR privée, le rôle de service CodeBuild doit avoir : ecr:GetAuthorizationToken (pour s'authentifier) + ecr:BatchGetImage + ecr:GetDownloadUrlForLayer (pour puller l'image). Sans ces permissions, le build échoue avec 'Error pulling image'."
+  },
+  {
+    t: "CodeBuild environnement",
+    q: "Quels sont les types d'environnement de compute disponibles dans CodeBuild ? (choisir 2)",
+    o: [
+      "Conteneur Linux (Amazon Linux, Ubuntu)",
+      "Machine virtuelle EC2 dédiée",
+      "Conteneur Windows Server",
+      "Fonction Lambda"
+    ],
+    a: [0, 2],
+    e: "CodeBuild propose des environnements conteneurisés Linux (Amazon Linux 2, Ubuntu) et Windows Server. Il n'y a pas d'EC2 dédié ni de Lambda — le compute CodeBuild est géré et conteneurisé. CodeBuild on Lambda existe (CodeBuild Lambda compute) pour des builds courts et légers."
+  },
+  {
+    t: "CodeBuild environnement",
+    q: "Un build CodeBuild nécessite Docker-in-Docker (construire une image Docker pendant le build). Quelle option doit être activée ?",
+    o: [
+      "Activer le mode 'Privileged' dans la configuration de l'environnement CodeBuild",
+      "Monter le socket Docker /var/run/docker.sock dans le buildspec",
+      "Utiliser une AMI EC2 custom avec Docker pré-installé",
+      "Docker-in-Docker est toujours disponible sans configuration"
+    ],
+    a: 0,
+    e: "Pour utiliser Docker commands (docker build, docker push) dans CodeBuild, il faut activer le mode Privileged dans la configuration de l'environnement. Cela donne accès aux namespaces Linux nécessaires pour Docker. Sans Privileged, 'docker build' échoue avec une erreur de permissions."
+  },
+  // ─── Cache ─────────────────────────────────────────────────────────────────
+  {
+    t: "CodeBuild cache",
+    q: "Quel est l'avantage principal du cache local CodeBuild par rapport au cache S3 ?",
+    o: [
+      "Le cache local persiste entre différents comptes AWS",
+      "Le cache local est plus rapide car il est stocké sur le worker CodeBuild (pas de téléchargement S3)",
+      "Le cache local supporte plus de types de cache (npm, pip, Maven)",
+      "Le cache local est gratuit alors que le cache S3 est facturé"
+    ],
+    a: 1,
+    e: "Le cache local CodeBuild est stocké directement sur l'instance de build — pas d'aller-retour S3. Il est donc beaucoup plus rapide pour les caches lourds (node_modules, .m2). L'inconvénient : il ne persiste que pour les builds sur le même worker (pas garanti). Le cache S3 persiste toujours mais est plus lent."
+  },
+  {
+    t: "CodeBuild cache",
+    q: "Quels types de cache CodeBuild propose-t-il nativement ? (choisir 2)",
+    o: [
+      "Cache S3 — upload/download vers un bucket S3 entre builds",
+      "Cache local source — garde le répertoire source entre builds",
+      "Cache local Docker layers — cache les layers Docker pour accélérer docker build",
+      "Cache ElastiCache Redis — pour les dépendances npm/pip"
+    ],
+    a: [0, 2],
+    e: "CodeBuild propose : (1) Cache S3 : zip les chemins configurés → S3 → restaure au prochain build. (2) Cache local avec plusieurs modes : SOURCE (repo git), DOCKER_LAYER (layers Docker), CUSTOM (chemins arbitraires). ElastiCache n'est pas un type de cache CodeBuild natif."
+  },
+  // ─── Reports & tests ───────────────────────────────────────────────────────
+  {
+    t: "CodeBuild rapports de tests",
+    q: "Comment CodeBuild peut-il afficher les résultats de tests unitaires (JUnit, pytest) directement dans la console AWS ?",
+    o: [
+      "En uploadant les résultats dans S3 et en les liant au projet CodeBuild",
+      "En configurant la section 'reports' dans le buildspec.yml avec le chemin du fichier de résultats XML",
+      "Les résultats de tests ne sont visibles que dans CloudWatch Logs",
+      "En utilisant CodeGuru Reviewer pour analyser les tests"
+    ],
+    a: 1,
+    e: "La section 'reports' du buildspec.yml permet de configurer les rapports de tests. On spécifie le type (JUnit XML, Cucumber JSON, TestNG XML, etc.) et le chemin du fichier généré. CodeBuild parse le fichier et affiche les résultats (tests passés/échoués, durée) directement dans la console sous l'onglet 'Test reports'."
+  },
+  {
+    t: "CodeBuild rapports de tests",
+    q: "Un build CodeBuild génère un rapport de couverture de code. Comment le configurer dans le buildspec.yml ?",
+    o: [
+      "Ajouter une phase 'coverage' dédiée dans le buildspec",
+      "Sous la section 'reports', ajouter un groupe de rapport avec file-format: 'CLOVERXML', 'COBERTURAXML' ou 'JACOCOXML'",
+      "Uploader manuellement le rapport vers CodeGuru Profiler",
+      "La couverture de code n'est pas supportée par CodeBuild nativement"
+    ],
+    a: 1,
+    e: "CodeBuild supporte les rapports de couverture de code dans la section 'reports' avec les formats : CLOVERXML (Clover), COBERTURAXML (Cobertura/Python), JACOCOXML (JaCoCo/Java). Les résultats apparaissent dans la console sous 'Coverage reports' avec le % de lignes/branches couvertes."
+  },
+  // ─── VPC & réseau ─────────────────────────────────────────────────────────
+  {
+    t: "CodeBuild réseau",
+    q: "Un build CodeBuild doit accéder à une base de données RDS dans un VPC privé. Quelle configuration est nécessaire ?",
+    o: [
+      "Rendre la base RDS publique temporairement pendant le build",
+      "Configurer CodeBuild pour s'exécuter dans le VPC en spécifiant le VPC ID, les subnets et les security groups",
+      "Utiliser VPC Peering entre le VPC CodeBuild et le VPC RDS",
+      "CodeBuild accède automatiquement aux VPC du compte — aucune configuration nécessaire"
+    ],
+    a: 1,
+    e: "CodeBuild peut être configuré pour s'exécuter dans un VPC spécifique : on spécifie le VPC ID, les subnets privés (pour l'isolation) et les security groups. CodeBuild crée alors une ENI dans ce VPC, donnant accès aux ressources privées comme RDS, ElastiCache, etc. Les subnets doivent avoir une route NAT pour accéder à internet (packages)."
+  },
+  {
+    t: "CodeBuild réseau",
+    q: "Un build CodeBuild configuré dans un VPC privé ne peut plus télécharger les packages npm. Quelle est la cause probable ?",
+    o: [
+      "npm n'est pas supporté dans un VPC privé",
+      "Les subnets du VPC n'ont pas d'accès internet (pas de NAT Gateway ou route vers internet)",
+      "Le security group CodeBuild bloque le port 443 sortant",
+      "Les options B et C sont toutes les deux des causes probables"
+    ],
+    a: 3,
+    e: "Les deux causes sont fréquentes : (B) un subnet privé sans NAT Gateway n'a pas d'accès internet — npm.registry.com est inaccessible. (C) si le security group bloque le port 443 (HTTPS) sortant, les téléchargements échouent aussi. Pour un build dans un VPC privé, il faut un NAT Gateway dans un subnet public ET un security group autorisant le trafic HTTPS sortant."
+  },
+  // ─── IAM & sécurité ───────────────────────────────────────────────────────
+  {
+    t: "CodeBuild IAM",
+    q: "Quel rôle IAM CodeBuild utilise-t-il pour accéder aux ressources AWS pendant le build (S3, ECR, Secrets Manager…) ?",
+    o: [
+      "Le rôle de l'utilisateur qui a lancé le build",
+      "Un service role CodeBuild créé et assigné au projet avec les permissions nécessaires",
+      "Le rôle AWSCodeBuildAdminAccess attaché automatiquement",
+      "Aucun rôle — CodeBuild utilise des credentials temporaires générés à la volée"
+    ],
+    a: 1,
+    e: "Chaque projet CodeBuild est associé à un service role IAM. Ce rôle définit ce que le build peut faire (lire S3, pousser vers ECR, lire Secrets Manager…). Les credentials de ce rôle sont injectés automatiquement dans l'environnement de build via les variables AWS_DEFAULT_REGION, AWS_ACCESS_KEY_ID, etc."
+  },
+  {
+    t: "CodeBuild IAM",
+    q: "Un build CodeBuild doit pousser une image vers ECR et déployer sur ECS. Quelles permissions minimales le service role doit-il avoir ? (choisir 2)",
+    o: [
+      "ecr:GetAuthorizationToken + ecr:BatchCheckLayerAvailability + ecr:PutImage + ecr:InitiateLayerUpload + ecr:UploadLayerPart + ecr:CompleteLayerUpload",
+      "ecs:RegisterTaskDefinition + ecs:UpdateService (ou ecs:CreateService)",
+      "ec2:RunInstances pour créer les instances ECS",
+      "iam:PassRole pour le rôle d'exécution ECS"
+    ],
+    a: [0, 1],
+    e: "Pour pousser vers ECR : ecr:GetAuthorizationToken + les permissions d'upload (BatchCheckLayerAvailability, PutImage, InitiateLayerUpload, UploadLayerPart, CompleteLayerUpload). Pour déployer sur ECS : ecs:RegisterTaskDefinition + ecs:UpdateService. iam:PassRole peut aussi être nécessaire si le build enregistre une task definition qui référence un nouveau rôle d'exécution."
+  },
+  // ─── Triggers & intégrations ──────────────────────────────────────────────
+  {
+    t: "CodeBuild déclencheurs",
+    q: "Comment déclencher un build CodeBuild automatiquement à chaque push sur une branche GitHub ?",
+    o: [
+      "Configurer une règle EventBridge sur l'événement 'codebuild:build:stateChanged'",
+      "Configurer un webhook dans le projet CodeBuild (Build triggers > Webhook) pour déclencher sur PUSH",
+      "Créer une Lambda qui poll GitHub toutes les minutes",
+      "Utiliser CodePipeline obligatoirement — CodeBuild seul ne supporte pas les webhooks"
+    ],
+    a: 1,
+    e: "CodeBuild supporte les webhooks natifs : dans les paramètres du projet, 'Build triggers' permet de configurer un webhook GitHub/Bitbucket/GitLab. On peut filtrer sur le type d'événement (PUSH, PULL_REQUEST_CREATED, etc.) et les branches. AWS crée le webhook dans GitHub automatiquement via CodeStar Connections ou un PAT."
+  },
+  {
+    t: "CodeBuild déclencheurs",
+    q: "Un projet CodeBuild est déclenché depuis CodePipeline. Comment le build retourne-t-il son résultat (succès/échec) au pipeline ?",
+    o: [
+      "Via une Lambda de callback qui appelle PutJobSuccessResult",
+      "CodeBuild notifie CodePipeline automatiquement via l'intégration native — pas besoin de callback manuel",
+      "Via un message SNS envoyé par le build",
+      "Via un fichier JSON 'result.json' dans le bucket artifact store"
+    ],
+    a: 1,
+    e: "L'intégration CodeBuild-CodePipeline est native : CodePipeline démarre le build via l'API CodeBuild et poll son état. Quand le build se termine (SUCCESS/FAILURE), CodePipeline le détecte automatiquement et fait avancer ou stopper l'exécution du pipeline. Aucun callback manuel n'est nécessaire."
+  },
+  // ─── Scénarios avancés ─────────────────────────────────────────────────────
+  {
+    t: "CodeBuild scénario avancé",
+    q: "Une équipe veut réduire le temps de build de 15 min à moins de 5 min. Le build est lent à cause du téléchargement de dépendances npm. Quelles stratégies adopter ? (choisir 2)",
+    o: [
+      "Activer le cache CodeBuild sur le répertoire node_modules avec cache S3 ou local",
+      "Utiliser une image de build custom ECR avec les dépendances npm pré-installées",
+      "Passer à une instance CodeBuild plus grande (compute type)",
+      "Désactiver les tests unitaires pour accélérer le build"
+    ],
+    a: [0, 1],
+    e: "Les deux stratégies efficaces pour les dépendances npm lentes : (A) Cache CodeBuild sur node_modules — au premier build on télécharge, aux suivants on restaure depuis le cache (S3 ou local). (B) Image ECR custom avec les dépendances communes pré-installées — npm install ne télécharge que les delta. Passer à une instance plus grande (C) n'aide pas si le bottleneck est réseau. Désactiver les tests (D) n'est pas acceptable."
+  },
+  {
+    t: "CodeBuild scénario avancé",
+    q: "Comment exécuter des tests en parallèle dans CodeBuild pour réduire le temps total de test ?",
+    o: [
+      "Utiliser plusieurs phases dans le buildspec (pre_build, build, post_build) en parallèle",
+      "Utiliser CodeBuild Batch Build avec buildType: BUILD_LIST ou BUILD_MATRIX pour lancer plusieurs builds en parallèle",
+      "Utiliser des threads dans le script de test (niveau applicatif)",
+      "Le parallélisme n'est pas possible dans CodeBuild — les tests sont toujours séquentiels"
+    ],
+    a: 1,
+    e: "CodeBuild Batch Build permet d'orchestrer plusieurs builds en parallèle : BUILD_LIST lance une liste de builds indépendants, BUILD_MATRIX lance toutes les combinaisons de variables (ex: Node 16 × Linux + Node 16 × Windows). Chaque build est indépendant. Les phases d'un buildspec s'exécutent séquentiellement (option A est fausse)."
+  },
+  {
+    t: "CodeBuild scénario avancé",
+    q: "Un buildspec.yml doit construire des binaires différents selon l'environnement cible (dev/staging/prod). Comment passer l'environnement cible au build depuis CodePipeline ?",
+    o: [
+      "Créer un projet CodeBuild séparé par environnement",
+      "Utiliser les variables de pipeline CodePipeline passées à l'action CodeBuild, lues dans le buildspec via $CODEBUILD_VAR",
+      "Hardcoder les trois environnements dans le buildspec avec des conditions if/else",
+      "Utiliser des branches Git différentes pour chaque environnement"
+    ],
+    a: 1,
+    e: "CodePipeline peut passer des variables à une action CodeBuild (EnvironmentVariablesOverride). Dans le buildspec, on lit la variable avec $ENV_NAME (ou ${ENV_NAME}). Le même buildspec et le même projet CodeBuild servent les trois environnements — seule la variable change selon le stage du pipeline."
+  },
+  {
+    t: "CodeBuild scénario avancé",
+    q: "Une entreprise veut s'assurer que tous les builds CodeBuild utilisent uniquement des images Docker approuvées (whitelist). Comment implémenter ce contrôle ?",
+    o: [
+      "Créer une SCP qui liste les ARN d'images ECR autorisées",
+      "Utiliser AWS Config avec une règle custom qui vérifie l'image configurée dans chaque projet CodeBuild",
+      "Utiliser Service Catalog avec des templates de projets CodeBuild pré-approuvés",
+      "Les options B et C sont complémentaires — Config pour détecter, Service Catalog pour prévenir"
+    ],
+    a: 3,
+    e: "Les deux approches sont complémentaires : (B) AWS Config avec une règle custom détecte les projets CodeBuild qui utilisent des images non approuvées (détectif). (C) Service Catalog avec des templates pré-approuvés empêche la création de projets non conformes (préventif). En combinaison, on a une couverture complète."
+  },
+  // ─── Monitoring & logs ─────────────────────────────────────────────────────
+  {
+    t: "CodeBuild monitoring",
+    q: "Où CodeBuild envoie-t-il ses logs de build par défaut ?",
+    o: [
+      "Dans S3 uniquement",
+      "Dans CloudWatch Logs (groupe /aws/codebuild/nom-du-projet) et optionnellement dans S3",
+      "Dans CloudTrail uniquement",
+      "Les logs ne sont pas conservés — ils s'affichent dans la console pendant le build uniquement"
+    ],
+    a: 1,
+    e: "Par défaut, CodeBuild envoie les logs vers CloudWatch Logs dans le groupe /aws/codebuild/{project-name}. On peut aussi configurer l'envoi vers S3 (logs.s3Logs dans la config du projet). Les deux destinations peuvent être actives simultanément. Les logs sont visibles en temps réel dans la console pendant le build et consultables après via CloudWatch."
+  },
+  {
+    t: "CodeBuild monitoring",
+    q: "Quelles métriques CodeBuild sont disponibles dans CloudWatch ? (choisir 2)",
+    o: [
+      "Builds — nombre total de builds déclenchés",
+      "FailedBuilds — nombre de builds en échec",
+      "CPUUtilization — utilisation CPU de l'instance de build",
+      "CacheHitRate — taux de réussite du cache"
+    ],
+    a: [0, 1],
+    e: "CodeBuild publie dans CloudWatch : Builds (total déclenchés), SucceededBuilds, FailedBuilds, StoppedBuilds, BuildDuration. CPUUtilization n'est pas une métrique CodeBuild native (l'environnement est géré, pas accessible comme une EC2). CacheHitRate n'existe pas non plus comme métrique CloudWatch standard."
+  },
+  {
+    t: "CodeBuild monitoring",
+    q: "Une équipe veut être alertée si un build dépasse 20 minutes. Quelle architecture utiliser ?",
+    o: [
+      "Configurer le timeout CodeBuild à 20 minutes — le build échouera automatiquement",
+      "Créer une alarme CloudWatch sur la métrique CodeBuild BuildDuration > 1200 secondes → SNS",
+      "Créer une règle EventBridge sur codebuild:build:stateChanged avec un filtre de durée",
+      "Utiliser CodeGuru Profiler pour monitorer la durée des builds"
+    ],
+    a: 1,
+    e: "CloudWatch Metrics publie des métriques CodeBuild dont BuildDuration. On crée une alarme CloudWatch sur BuildDuration > 1200s (20 min) → notification SNS (email, Slack via Chatbot). Le timeout CodeBuild (option A) arrête le build — c'est pour imposer une limite dure, pas pour observer. EventBridge (option C) sur stateChanged ne filtre pas par durée nativement."
+  },
+  // ─── Coûts ────────────────────────────────────────────────────────────────
+  {
+    t: "CodeBuild coûts",
+    q: "Quel est le modèle de facturation de CodeBuild ?",
+    o: [
+      "Facturation par build déclenché (prix fixe par build)",
+      "Facturation à la minute de build, selon le type de compute (small, medium, large, 2xlarge)",
+      "Facturation mensuelle fixe par projet CodeBuild actif",
+      "CodeBuild est gratuit dans la limite du free tier AWS permanent"
+    ],
+    a: 1,
+    e: "CodeBuild facture à la minute de build selon le type de compute : small (moins cher), medium, large, 2xlarge, ARM. Le free tier donne 100 minutes/mois de build sur un general1.small. On paie uniquement pendant l'exécution du build — pas de frais fixes. Les logs CloudWatch et S3 sont facturés séparément."
+  },
+  // ─── Troubleshooting ──────────────────────────────────────────────────────
+  {
+    t: "CodeBuild troubleshooting",
+    q: "Un build CodeBuild échoue avec 'DOWNLOAD_SOURCE failed: Unable to access source'. Quelles sont les causes probables ? (choisir 2)",
+    o: [
+      "Le rôle de service CodeBuild n'a pas les permissions pour accéder au dépôt source (CodeCommit, S3)",
+      "La connexion CodeStar Connections utilisée pour GitHub est en état PENDING",
+      "Le buildspec.yml contient une erreur de syntaxe YAML",
+      "Le projet CodeBuild est dans une région différente de la source"
+    ],
+    a: [0, 1],
+    e: "DOWNLOAD_SOURCE échoue à la récupération du code source : (A) permissions IAM insuffisantes (codecommit:GitPull ou s3:GetObject selon la source). (B) connexion CodeStar Connections PENDING pour GitHub. Les erreurs de syntaxe buildspec.yml (C) provoquent un échec lors de la phase d'exécution, pas au téléchargement. La région (D) n'est pas un blocage — CodeBuild peut sourcer cross-region."
+  },
+  {
+    t: "CodeBuild troubleshooting",
+    q: "Un build CodeBuild réussit en local (docker run) mais échoue en CI avec 'Permission denied' sur un répertoire. Quelle est la cause la plus probable ?",
+    o: [
+      "CodeBuild utilise un utilisateur différent de root et n'a pas accès au répertoire (permissions Unix)",
+      "Le bucket S3 artifact store n'a pas les permissions d'écriture",
+      "Le buildspec.yml n'est pas dans le bon répertoire",
+      "CodeBuild ne supporte pas les commandes qui modifient le filesystem"
+    ],
+    a: 0,
+    e: "En local, le développeur tourne probablement en root ou en tant que l'owner du répertoire. Dans CodeBuild, le processus tourne avec un UID spécifique. Si l'image Docker crée des fichiers appartenant à root (UID 0) et que CodeBuild tourne en non-root, les accès échouent. Solution : vérifier les permissions dans le Dockerfile ou utiliser 'run-as: root' (si justifié)."
+  },
+  // ─── Multi-comptes & intégrations avancées ────────────────────────────────
+  {
+    t: "CodeBuild multi-comptes",
+    q: "Un projet CodeBuild dans le compte de CI doit pousser des images vers ECR dans le compte de production. Quelle configuration est requise ?",
+    o: [
+      "Créer un rôle IAM dans le compte de production, ajouter une politique de confiance pour le service role CodeBuild du compte CI, et laisser CodeBuild assumer ce rôle cross-account",
+      "Activer ECR cross-account replication depuis le compte CI vers le compte prod",
+      "Créer un bucket S3 intermédiaire partagé entre les deux comptes",
+      "Utiliser CodeArtifact comme intermédiaire pour les images Docker"
+    ],
+    a: 0,
+    e: "Pour pousser vers ECR cross-account : (1) créer un rôle IAM dans le compte prod avec les permissions ECR push, (2) ajouter une trust policy permettant au service role CodeBuild du compte CI d'assumer ce rôle, (3) dans le buildspec, appeler aws sts assume-role pour récupérer les credentials temporaires du compte prod, (4) utiliser ces credentials pour docker login et docker push vers ECR prod."
+  },
+  {
+    t: "CodeBuild intégrations",
+    q: "Comment intégrer des scans de sécurité SAST (analyse statique) dans un projet CodeBuild ? (choisir 2)",
+    o: [
+      "Installer et exécuter l'outil SAST (Semgrep, Bandit, ESLint security) dans la phase build ou post_build du buildspec",
+      "Utiliser Amazon CodeGuru Reviewer intégré nativement dans CodeBuild",
+      "Configurer AWS Security Hub pour intercepter les builds CodeBuild",
+      "Utiliser l'action native 'SecurityScan' disponible dans CodeBuild"
+    ],
+    a: [0, 1],
+    e: "Pour les SAST dans CodeBuild : (A) les outils CLI (Semgrep, Bandit, Checkmarx, ESLint security) s'installent dans buildspec.install et s'exécutent dans build/post_build — résultats dans le rapport CodeBuild ou envoyés à un serveur SAST. (B) CodeGuru Reviewer s'intègre avec CodeBuild via une action dédiée pour les projets Java et Python. Il n'y a pas d'action 'SecurityScan' native (D est fausse)."
+  },
+  {
+    t: "CodeBuild intégrations",
+    q: "Dans un pipeline CodePipeline, le stage CodeBuild produit une image Docker. Comment passer le tag exact de l'image au stage Deploy ECS suivant ?",
+    o: [
+      "Le tag est toujours 'latest' — pas besoin de le passer",
+      "CodeBuild exporte le tag via une variable de namespace (exported-variables dans buildspec) consommée par l'action Deploy via #{Namespace.IMAGE_TAG}",
+      "Écrire le tag dans un fichier tag.txt dans les artifacts que CodeDeploy lit",
+      "Le tag est transmis automatiquement via le fichier imagedefinitions.json dans les artifacts"
+    ],
+    a: 1,
+    e: "CodeBuild peut exporter des variables via la section 'exported-variables' du buildspec (sous env). Ces variables sont disponibles dans les actions suivantes du pipeline via la syntaxe #{Namespace.Variable}. Pour ECS, l'approche classique est aussi d'écrire imagedefinitions.json dans les artifacts (option D) — les deux méthodes fonctionnent selon le type d'action ECS utilisé."
+  },
+  // ─── Scénarios Pro niveau difficile ──────────────────────────────────────
+  {
+    t: "CodeBuild scénario Pro",
+    q: "Une équipe veut implémenter un 'Build once, deploy many' : une seule image Docker construite en CI, déployée sur dev/staging/prod sans rebuild. Comment structurer le pipeline CodePipeline ?",
+    o: [
+      "Build stage (CodeBuild → docker build → push ECR avec tag du commit SHA) → Deploy dev → Deploy staging → Approval → Deploy prod (tous utilisent le même tag)",
+      "Build stage (CodeBuild) → Deploy dev (CodeBuild rebuild) → Deploy staging (CodeBuild rebuild) → Deploy prod",
+      "Un pipeline par environnement, chacun avec son propre Build stage",
+      "Utiliser CodeDeploy uniquement — il gère le versionning d'image automatiquement"
+    ],
+    a: 0,
+    e: "Le pattern 'Build once, deploy many' : CodeBuild construit l'image une seule fois et la pousse vers ECR avec le tag du commit SHA (immuable). Chaque stage de déploiement utilise ce tag exact. On évite les rebuilds qui introduiraient des variations. Le tag 'latest' est à proscrire car il n'est pas immuable. Les approches avec rebuild par env (B, C) violent le principe."
+  },
+  {
+    t: "CodeBuild scénario Pro",
+    q: "Une entreprise a des centaines de microservices avec des pipelines CodeBuild. Elle veut une vue centralisée des builds qui échouent en production (branche main). Quelle architecture serverless construire ?",
+    o: [
+      "EventBridge → (filtre: source=codebuild, detail.buildStatus=FAILED, detail.sourceVersion~main) → Lambda → DynamoDB + notification SNS",
+      "CloudWatch Dashboard avec un widget par projet CodeBuild",
+      "CodeBuild Batch Build avec un projet de monitoring central",
+      "AWS Config + règle codebuild-project-environment-check"
+    ],
+    a: 0,
+    e: "La solution optimale : règle EventBridge filtrant les événements CodeBuild (source: 'aws.codebuild', detail.buildStatus: 'FAILED', detail.sourceVersion contenant 'main' ou 'refs/heads/main') → Lambda qui enregistre dans DynamoDB + envoie une notification SNS/Slack. Un dashboard CloudWatch (B) nécessite un widget par projet — pas scalable à des centaines de projets."
+  },
+  // ─── Fondamentaux ─────────────────────────────────────────────────────────
+  {
+    t: "CodeBuild fondamentaux",
+    q: "Qu'est-ce qu'un 'projet CodeBuild' par rapport à un 'build CodeBuild' ?",
+    o: [
+      "Le projet définit la configuration (source, environnement, buildspec, artifacts) ; le build est une exécution du projet",
+      "Le build est la configuration ; le projet est l'exécution",
+      "Les deux termes sont synonymes dans CodeBuild",
+      "Le projet est un groupe de builds liés par un tag commun"
+    ],
+    a: 0,
+    e: "Un projet CodeBuild est la configuration persistante : source du code, type d'environnement, buildspec, artifacts, logs, timeouts, rôle IAM. Un build est une exécution concrète d'un projet à un instant donné. Un projet peut avoir des centaines de builds associés. On modifie le projet pour changer la configuration ; chaque build a son propre log et état."
+  },
+  {
+    t: "CodeBuild fondamentaux",
+    q: "Quelle est la durée maximale d'un build CodeBuild par défaut, et peut-on la modifier ?",
+    o: [
+      "30 minutes, non modifiable",
+      "60 minutes par défaut, configurable de 5 minutes à 480 minutes (8h)",
+      "120 minutes par défaut, configurable jusqu'à 24h",
+      "Il n'y a pas de limite de durée — un build peut durer indéfiniment"
+    ],
+    a: 1,
+    e: "Le timeout par défaut d'un build CodeBuild est 60 minutes. Il est configurable entre 5 minutes et 480 minutes (8 heures) dans la configuration du projet (buildTimeoutInMinutes). Si un build dépasse ce timeout, CodeBuild l'arrête avec l'état FAILED. Penser à adapter le timeout pour les builds longs (compilation C++, builds mobile)."
+  },
+  {
+    t: "CodeBuild fondamentaux",
+    q: "Comment CodeBuild gère-t-il l'isolation entre les builds de différents projets ?",
+    o: [
+      "Chaque build s'exécute dans un conteneur Docker isolé, supprimé après la fin du build",
+      "Les builds partagent le même conteneur mais dans des répertoires séparés",
+      "Chaque build s'exécute dans une VM EC2 dédiée",
+      "CodeBuild n'isole pas les builds — ils partagent l'environnement"
+    ],
+    a: 0,
+    e: "Chaque build CodeBuild s'exécute dans un conteneur Docker frais et isolé, créé au démarrage du build et détruit à sa fin. Les builds ne partagent pas de filesystem, de processus ou de réseau entre eux. Le cache est la seule persistance intentionnelle entre builds d'un même projet."
+  },
+  {
+    t: "CodeBuild fondamentaux",
+    q: "Un buildspec.yml définit la section 'env.exported-variables'. À quoi servent ces variables exportées ?",
+    o: [
+      "Elles sont disponibles dans les builds suivants du même projet (persistance)",
+      "Elles sont disponibles dans les actions CodePipeline suivantes via la syntaxe #{Namespace.Variable}",
+      "Elles sont automatiquement ajoutées aux variables d'environnement du prochain stage Docker",
+      "Elles sont publiées dans Parameter Store automatiquement"
+    ],
+    a: 1,
+    e: "Les variables dans 'exported-variables' du buildspec sont rendues disponibles aux actions suivantes dans le même pipeline CodePipeline. On les consomme avec #{NamespaceAction.VariableName}. Exemple : CodeBuild exporte IMAGE_TAG → l'action Deploy ECS la consomme pour déployer la bonne version. Ces variables ne persistent pas entre exécutions du pipeline."
+  },
+  {
+    t: "CodeBuild vs alternatives",
+    q: "Pourquoi utiliser CodeBuild plutôt que GitHub Actions pour le CI dans un contexte AWS ? (choisir 2)",
+    o: [
+      "Accès IAM natif aux ressources AWS (ECR, S3, Secrets Manager) sans gestion de secrets GitHub",
+      "Intégration native dans CodePipeline comme action Build",
+      "Syntaxe YAML plus simple que GitHub Actions",
+      "CodeBuild supporte plus de langages de programmation que GitHub Actions"
+    ],
+    a: [0, 1],
+    e: "Les avantages de CodeBuild vs GitHub Actions pour AWS : (A) les credentials AWS sont injectés via le service role IAM — pas besoin de stocker des access keys dans GitHub Secrets. (B) CodeBuild s'intègre nativement comme action dans CodePipeline. GitHub Actions a une syntaxe YAML plus riche (C est fausse) et supporte autant de langages (D est fausse)."
+  }
 ]
 
 };
