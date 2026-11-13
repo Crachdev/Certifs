@@ -107,13 +107,13 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const L="ABCDE";
 
 // Module index: day d, module m (0-based) → questions [start..end)
-function modRange(d,m){const start=m*MOD_SIZE;return{start,end:Math.min(start+MOD_SIZE,window.QDATA[d].length)}}
+function modRange(d,m){const start=m*MOD_SIZE;return{start,end:Math.min(start+MOD_SIZE,(window.QDATA[d]||[]).length)}}
 function modStats(d,m){
   const{start,end}=modRange(d,m);let done=0,ok=0;
   for(let i=start;i<end;i++){const v=store.r[d+"-"+i];if(v!==undefined){done++;if(v===1)ok++;}}
   return{n:end-start,done,ok}
 }
-function dayModCount(d){return Math.ceil(window.QDATA[d].length/MOD_SIZE)}
+function dayModCount(d){return Math.ceil((window.QDATA[d]||[]).length/MOD_SIZE)}
 
 function header(){
   const keys=Object.keys(store.r),ok=keys.filter(k=>store.r[k]===1).length;
@@ -145,7 +145,7 @@ function header(){
   updateThemeBtn();
 }
 function dayStats(d){
-  const n=window.QDATA[d].length;let done=0,ok=0;
+  const n=(window.QDATA[d]||[]).length;let done=0,ok=0;
   for(let i=0;i<n;i++){const v=store.r[d+"-"+i];if(v!==undefined){done++;if(v===1)ok++}}
   return{n,done,ok}
 }
@@ -532,12 +532,12 @@ function domainStatsHTML(){
   });
   // Ajouter le total de questions par jour
   PLAN.forEach(p=>{
-    if(!byDay[p.d])byDay[p.d]={done:0,ok:0,n:window.QDATA[p.d].length};
-    else byDay[p.d].n=window.QDATA[p.d].length;
+    if(!byDay[p.d])byDay[p.d]={done:0,ok:0,n:(window.QDATA[p.d]||[]).length};
+    else byDay[p.d].n=(window.QDATA[p.d]||[]).length;
   });
 
   const rows=PLAN.map(p=>{
-    const s=byDay[p.d]||{done:0,ok:0,n:window.QDATA[p.d].length};
+    const s=byDay[p.d]||{done:0,ok:0,n:(window.QDATA[p.d]||[]).length};
     const pct=s.done?Math.round(s.ok/s.done*100):null;
     const cover=Math.round(s.done/s.n*100);
     const col=pct===null?"var(--muted)":pct>=80?"var(--ok)":pct>=50?"var(--accent)":"var(--ko)";
