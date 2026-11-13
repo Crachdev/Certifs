@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#232f3e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Sprint AWS CloudOps Engineer Associate</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🛠%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8; --sheet:#ffffff; --ink:#15202b; --muted:#5b6876; --line:#d9e0e7;
+  --accent:#e07e22; --accent-soft:#fdf0e0; --ok:#1d7a4f; --ok-soft:#e3f3ea; --ko:#b4372f; --ko-soft:#f9e6e4;
+  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body:"Public Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f151c; --sheet:#17202a; --ink:#e5ebf1; --muted:#97a4b2; --line:#2b3744;
+  --accent:#ffaa55; --accent-soft:#3a2200; --ok:#5ccf95; --ok-soft:#163327; --ko:#f08a80; --ko-soft:#3a1d1b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f151c; --sheet:#17202a; --ink:#e5ebf1; --muted:#97a4b2; --line:#2b3744;
+  --accent:#ffaa55; --accent-soft:#3a2200; --ok:#5ccf95; --ok-soft:#163327; --ko:#f08a80; --ko-soft:#3a1d1b; color-scheme:dark}
+:root[data-theme="light"]{
+  --paper:#f4f6f8; --sheet:#ffffff; --ink:#15202b; --muted:#5b6876; --line:#d9e0e7;
+  --accent:#e07e22; --accent-soft:#fdf0e0; color-scheme:light}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;min-height:100vh}
+</style>
+</head>
+<body>
+<script>
+// Thème
+(function(){const t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)})();
+</script>
+<script src="../engine/theme.js"></script>
+<script src="questions.js"></script>
+<script src="../engine/quiz.js"></script>
+</body>
+</html>
