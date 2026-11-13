@@ -3678,6 +3678,143 @@ window.QDATA = {
     a: 1,
     e: "CloudWatch Dimensions : paires clé-valeur qui identifient une métrique de manière unique. Exemple : métrique 'ResponseTime' avec dimensions {Environment=prod, Service=api} vs {Environment=staging, Service=api} = deux séries de métriques séparées. Utilité : (1) Filtrage dans les dashboards et alarmes. (2) Agrégation : alarme sur toutes les instances d'un ASG sans dimension InstanceId (agrège automatiquement). (3) Maximum 10 dimensions par métrique. (4) Combinaison de dimensions = métrique unique. Piège : publier la même métrique avec des dimensions différentes consomme des PutMetricData séparés."
   }
+],
+
+13: [
+  // ─── CloudWatch Logs Insights ─────────────────────────────────────────────
+  {
+    t: "CloudWatch Logs Insights",
+    q: "Qu'est-ce que CloudWatch Logs Insights et comment l'utiliser pour analyser des logs Lambda ?",
+    o: [
+      "Logs Insights nécessite d'abord d'exporter les logs vers S3 puis Athena",
+      "CloudWatch Logs Insights est un moteur de requêtes interactif qui interroge les CloudWatch Log Groups directement avec un langage de requête dédié — pas besoin d'exporter les données",
+      "Logs Insights ne fonctionne qu'avec les logs EC2",
+      "Logs Insights nécessite OpenSearch Service pour fonctionner"
+    ],
+    a: 1,
+    e: "CloudWatch Logs Insights : requêtes interactives sur CloudWatch Log Groups sans extraction préalable. Syntaxe de base : `fields @timestamp, @message | filter @message like /ERROR/ | sort @timestamp desc | limit 20`. Commandes clés : fields (sélectionner champs), filter (filtrer), stats (agréger), sort, limit, parse (extraire des patterns), dedup. Pour Lambda : `fields @timestamp, @message | filter @type = 'REPORT' | stats avg(@duration), max(@duration), count() by bin(5m)` (analyse des performances). Disponible sur plusieurs log groups simultanément. Facturation : par Go de données scannées."
+  },
+  {
+    t: "CloudWatch Logs Insights query",
+    q: "Comment utiliser CloudWatch Logs Insights pour trouver les requêtes API Gateway les plus lentes du dernier jour ?",
+    o: [
+      "API Gateway ne publie pas de logs dans CloudWatch",
+      "Activer les logs d'accès API Gateway (Access Logging) vers un Log Group, puis : `fields @timestamp, requestId, httpMethod, resourcePath, responseLatency | sort responseLatency desc | limit 20`",
+      "Utiliser CloudTrail pour analyser les latences API Gateway",
+      "Logs Insights ne peut pas analyser les logs API Gateway"
+    ],
+    a: 1,
+    e: "API Gateway Access Logs + Logs Insights : (1) Activer Access Logging dans API Gateway (Stage → Logs/Tracing) avec un format de log JSON personnalisé incluant $context.responseLatency, $context.httpMethod, $context.resourcePath, $context.requestId. (2) Logs Insights query : `fields @timestamp, httpMethod, resourcePath, status, responseLatency | filter status >= 400 | stats avg(responseLatency) as avgLatency, count() as count by resourcePath | sort avgLatency desc`. Résultat : tableau des endpoints par latence moyenne. Combiné avec X-Ray pour le tracing bout-en-bout."
+  },
+  {
+    t: "CloudWatch Logs Subscription Filters",
+    q: "Comment streamer des logs CloudWatch en temps réel vers un autre service (Elasticsearch, Lambda) ?",
+    o: [
+      "CloudWatch Logs ne peut pas streamer vers d'autres services",
+      "Utiliser CloudWatch Logs Subscription Filters : filtre qui envoie les log events correspondants en temps quasi-réel vers Kinesis Data Streams, Kinesis Firehose, ou Lambda",
+      "Exporter les logs vers S3 toutes les heures via l'export task",
+      "Utiliser CloudWatch Logs metric filters pour streamer vers Lambda"
+    ],
+    a: 1,
+    e: "CloudWatch Logs Subscription Filters : filtrent les events d'un Log Group et les livrent en temps réel (< 1 seconde) à : (1) Lambda : pour traitement custom, alertes, enrichissement. (2) Kinesis Data Streams : pour ingestion haute performance vers OpenSearch/Elasticsearch, Redshift, etc. (3) Kinesis Firehose : pour livraison vers S3, Redshift, OpenSearch sans gestion. Cross-account : utiliser des destinations Kinesis dans un compte centralisé + policy de destination. Limite : 2 subscription filters par Log Group (standard), 20 avec Logs Insights queries. Différent de Metric Filters (créent des métriques CloudWatch depuis les logs)."
+  },
+  {
+    t: "CloudWatch Logs Metric Filters",
+    q: "Comment créer une alarme CloudWatch basée sur le nombre d'erreurs dans les logs applicatifs ?",
+    o: [
+      "CloudWatch crée automatiquement des alarmes depuis les logs ERROR",
+      "Créer un CloudWatch Logs Metric Filter sur le Log Group (pattern '[ERROR]') → génère une métrique custom → créer une CloudWatch Alarm sur cette métrique avec seuil et notification SNS",
+      "Utiliser CloudWatch Logs Insights pour créer des alarmes directement",
+      "Exporter les logs vers S3 et utiliser Athena pour compter les erreurs"
+    ],
+    a: 1,
+    e: "Pipeline logs → alarmes : (1) Metric Filter : sur le Log Group, créer un filter pattern (ex: '[ERROR]' ou '?Exception ?Error') → crée une métrique custom (namespace, metric name, valeur incrémentiée à chaque match). (2) CloudWatch Alarm sur cette métrique : seuil (ex: > 10 erreurs en 5 minutes), 'Treat missing data as breaching' ou 'good'. (3) SNS Action : notifier PagerDuty, email, Slack (via Lambda). Exemple réel : filter pattern { $.level = ERROR && $.service = payment } pour des logs JSON → alarme si > 5 erreurs payment en 1 minute."
+  },
+  // ─── AWS X-Ray ────────────────────────────────────────────────────────────
+  {
+    t: "X-Ray tracing",
+    q: "Qu'est-ce que AWS X-Ray et comment active-t-il le distributed tracing ?",
+    o: [
+      "X-Ray est un service de logging qui remplace CloudWatch Logs",
+      "X-Ray est un service de distributed tracing : instrumente les requêtes avec des segments/sous-segments, propage un Trace ID via les headers HTTP, permet de visualiser la carte des services et identifier les goulots d'étranglement",
+      "X-Ray fonctionne uniquement avec les applications Java",
+      "X-Ray nécessite de modifier le code pour chaque appel de base de données"
+    ],
+    a: 1,
+    e: "AWS X-Ray : distributed tracing pour applications micro-services. Concepts : (1) Trace : représentation complète d'une requête bout-en-bout. (2) Segment : unité de travail d'un service (ex: Lambda, EC2, ECS task). (3) Sous-segment : appels vers des services externes (DynamoDB, HTTP calls, SQL). (4) Trace ID : header X-Amzn-Trace-Id propagé automatiquement. Instrumentation : X-Ray SDK dans le code (Node.js, Python, Java, .NET, Go, Ruby) + X-Ray Daemon qui collecte et envoie à X-Ray (sauf Lambda qui a le daemon intégré). Service Map : visualisation graphique de l'architecture avec latences."
+  },
+  {
+    t: "X-Ray Lambda",
+    q: "Comment activer X-Ray tracing pour une fonction Lambda et quelles sont les limites ?",
+    o: [
+      "X-Ray n'est pas compatible avec Lambda",
+      "Activer 'Active Tracing' dans la configuration Lambda (ou via SAM/CDK TracingConfig: Active) + ajouter X-Ray SDK dans le code pour les sous-segments custom ; Lambda publie automatiquement les segments sans daemon externe",
+      "X-Ray Lambda nécessite une couche Lambda séparée",
+      "X-Ray trace uniquement les invocations synchrones de Lambda"
+    ],
+    a: 1,
+    e: "X-Ray + Lambda : (1) Activation : TracingConfig.Mode = 'Active' (trace chaque invocation) ou 'PassThrough' (trace si parent trace présent). (2) Lambda inclut le daemon X-Ray intégré — pas de configuration supplémentaire. (3) IAM : Lambda Execution Role doit avoir AWSXRayDaemonWriteAccess. (4) SDK pour sous-segments : `const AWSXRay = require('aws-xray-sdk'); const AWS = AWSXRay.captureAWS(require('aws-sdk'));` → capture automatiquement les appels DynamoDB, S3, etc. Limites : cold starts ne sont pas tracés en détail, connections VPC peuvent manquer. Coût : par trace enregistrée et scanné."
+  },
+  {
+    t: "X-Ray Sampling",
+    q: "Comment contrôler le volume de traces X-Ray pour éviter des coûts excessifs ?",
+    o: [
+      "X-Ray trace 100% des requêtes par défaut sans option de réduction",
+      "Configurer des X-Ray Sampling Rules : définir un taux fixe (% de requêtes tracées), un réservoir (nombre de traces par seconde garanti), et des critères de filtre (host, path, méthode HTTP)",
+      "Désactiver X-Ray sur les endpoints haute fréquence et l'activer manuellement",
+      "X-Ray ne peut pas être configuré pour des taux de sampling différents par endpoint"
+    ],
+    a: 1,
+    e: "X-Ray Sampling Rules (configurer dans la console X-Ray ou via API) : (1) Reservoir : nombre de requêtes par seconde toujours tracées (garantit un minimum). (2) Rate : % des requêtes supplémentaires tracées après le reservoir. Défaut AWS : reservoir=1 req/s + rate=5%. (3) Rules personnalisées : filtrer par service, URL path, host, méthode HTTP, attributs custom. Exemple : tracer 100% des erreurs (HTTP 5xx) et 1% du trafic normal. Les sampling rules se propagent automatiquement à tous les services instrumentés. Sans sampling : coûts proportionnels au trafic → sampling obligatoire en production haute fréquence."
+  },
+  {
+    t: "X-Ray Service Map",
+    q: "Qu'est-ce que la X-Ray Service Map et comment l'utiliser pour diagnostiquer un problème de performance ?",
+    o: [
+      "Service Map est un tableau de bord statique qui nécessite une configuration manuelle",
+      "X-Ray Service Map est une visualisation graphique dynamique des services et leurs connexions, affichant les latences moyennes et taux d'erreur par arête — permet d'identifier visuellement où se produit la dégradation",
+      "Service Map ne montre que les services EC2",
+      "Service Map est uniquement disponible dans AWS Console — pas d'API"
+    ],
+    a: 1,
+    e: "X-Ray Service Map : graphe orienté des services avec sur chaque nœud : latence (percentile configurable : p50, p90, p99), taux de succès/erreur/fault. Sur chaque arête : nombre d'appels, latence de communication. Navigation : cliquer sur un nœud → voir les traces détaillées pour ce service. Identifier bottlenecks : nœud avec latence élevée = point de contention. Traces filtrables par statut (Fault, Error, Throttle), time range, annotation. X-Ray Analytics : analyse en temps réel des traces pour comparer des groupes (ex: traces v1 vs v2 après déploiement). Intégration CloudWatch ServiceLens pour vue unifiée métriques + logs + traces."
+  },
+  {
+    t: "X-Ray ECS/EKS",
+    q: "Comment déployer X-Ray dans un cluster ECS ou EKS ?",
+    o: [
+      "X-Ray se configure uniquement via les variables d'environnement dans les containers",
+      "ECS : déployer le X-Ray Daemon comme sidecar container dans la task definition + configurer le SDK pour envoyer à 127.0.0.1:2000 ; EKS : DaemonSet X-Ray ou sidecar container",
+      "X-Ray n'est pas compatible avec les containers — uniquement EC2",
+      "Le X-Ray Daemon n'est pas nécessaire dans ECS — les containers envoient directement"
+    ],
+    a: 1,
+    e: "X-Ray dans les containers : (1) ECS : ajouter le container x-ray-daemon (image amazon/aws-xray-daemon) comme sidecar dans la Task Definition avec port 2000/udp. Variable d'env AWS_XRAY_DAEMON_ADDRESS=xray-daemon:2000 dans les containers app. IAM Task Role avec AWSXRayDaemonWriteAccess. (2) EKS : Option A — DaemonSet (1 daemon par nœud, communication via service Kubernetes). Option B — Sidecar (1 daemon par pod, isolation totale). (3) Fargate : daemon intégré (activer tracing dans la task definition). CloudWatch Container Insights + X-Ray = visibilité complète sur les microservices."
+  },
+  {
+    t: "X-Ray scénario Pro",
+    q: "Une application microservices présente une latence de 3 secondes sur certaines requêtes. Comment utiliser X-Ray pour diagnostiquer le problème ?",
+    o: [
+      "Augmenter le logging dans chaque microservice et analyser les timestamps manuellement",
+      "Ouvrir X-Ray Service Map → identifier le service avec latence élevée → filtrer les traces avec durée > 2s → analyser le breakdown segment/sous-segment pour trouver quel appel (DynamoDB, RDS, HTTP) est lent",
+      "Utiliser CloudWatch métriques pour comparer les temps de réponse",
+      "Activer CloudWatch Container Insights pour voir les métriques CPU des services"
+    ],
+    a: 1,
+    e: "Workflow diagnostic avec X-Ray : (1) Service Map : identifier visuellement le service avec bande rouge (latence/erreur élevée). (2) Traces : filtrer par `responsetime > 2` ET `annotation.env = 'prod'`. (3) Trace detail : analyser le timeline des segments — identifier quel sous-segment prend le plus de temps (DynamoDB GetItem 2.8s = bottleneck). (4) X-Ray Analytics : comparer distribution latences requêtes normales vs lentes. (5) Action : index DynamoDB manquant ou N+1 queries détectées via sous-segments. Sans X-Ray, ce diagnostic prendrait des heures de corrélation de logs manuelle."
+  },
+  {
+    t: "CloudWatch ServiceLens",
+    q: "Qu'est-ce que CloudWatch ServiceLens et comment unifie-t-il l'observabilité ?",
+    o: [
+      "ServiceLens est un autre nom pour CloudWatch Logs Insights",
+      "CloudWatch ServiceLens intègre X-Ray traces, CloudWatch Métriques, et CloudWatch Logs dans une vue unifiée — permet de naviguer depuis une alarme vers les traces X-Ray et logs corrélés sans changer d'outil",
+      "ServiceLens remplace entièrement X-Ray",
+      "ServiceLens nécessite AWS Managed Grafana pour fonctionner"
+    ],
+    a: 1,
+    e: "CloudWatch ServiceLens : tableau de bord d'observabilité unifiée combinant : (1) Service Map (depuis X-Ray) : visualisation des dépendances. (2) Métriques CloudWatch : latence, taux d'erreur, throughput. (3) Logs CloudWatch : logs corrélés par trace ID. (4) X-Ray Traces : traces détaillées. Navigation : alarme métriques → traces X-Ray associées → logs CloudWatch correspondants (corrélation par request ID). Avantage : réduire le Mean Time To Detect (MTTD) et Mean Time To Resolution (MTTR). Prérequis : X-Ray actif + CloudWatch Agent + logs structurés avec corrélation de IDs. Pattern recommandé DOP-C02 pour observabilité complète."
+  }
 ]
 
 };
