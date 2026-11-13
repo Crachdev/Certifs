@@ -4464,6 +4464,133 @@ window.QDATA = {
     a: 1,
     e: "Delegated Administrator pattern (best practice AWS) : (1) Compte de gestion : aws organizations register-delegated-administrator --account-id SECURITY_ACCOUNT_ID --service-principal securityhub.amazonaws.com. (2) Le compte Security devient admin délégué pour Security Hub — il peut activer/configurer Security Hub pour tous les membres sans toucher au compte de gestion. Services supportant delegated admin : Security Hub, GuardDuty, Config, Access Analyzer, Macie, Detective, Firewall Manager, Inspector, CloudTrail (org trail), Backup. Best practices : séparer compte Log Archive (collecte des logs) et compte Security Tooling (admin délégué des services de sécurité) du compte de gestion — réduction de blast radius si compromis."
   }
+],
+
+19: [
+  // ─── KMS ─────────────────────────────────────────────────────────────────
+  {
+    t: "KMS fondamentaux",
+    q: "Quelles sont les différences entre CMK géré par AWS (aws/s3) et CMK géré par le client (CMK) dans KMS ?",
+    o: [
+      "AWS-managed CMK et Customer-managed CMK sont identiques — même niveau de contrôle",
+      "AWS-managed CMK : rotation automatique annuelle, pas de contrôle sur la key policy, pas de partage cross-account. Customer-managed CMK : rotation configurable, key policy personnalisable, partage cross-account possible, audit via CloudTrail, suppression avec délai de 7-30 jours",
+      "Customer-managed CMK est toujours plus coûteux sans bénéfice supplémentaire",
+      "AWS-managed CMK supporte le partage cross-account"
+    ],
+    a: 1,
+    e: "KMS Key Types : (1) AWS-managed CMK (aws/service) : gratuit, rotation tous les 3 ans (récent), key policy fixe — AWS gère. (2) Customer-managed CMK : 1$/mois/clé, rotation optionnelle (annuelle par défaut si activée), key policy entièrement configurable, usage cross-account, deletion avec waiting period 7-30 jours (protection anti-accidentelle). (3) Imported key material : vous apportez le key material — conformité, mais vous gérez la rotation manuellement. (4) Custom Key Store (CloudHSM) : FIPS 140-2 Level 3, clés ne quittent jamais le HSM — conformité très stricte. API KMS : GenerateDataKey (envelope encryption), Encrypt/Decrypt, GenerateDataKeyWithoutPlaintext. Coûts : 0.03$/10000 requêtes API KMS."
+  },
+  {
+    t: "Envelope Encryption",
+    q: "Expliquez le pattern Envelope Encryption utilisé par S3 SSE-KMS et pourquoi il est plus efficace que chiffrer directement avec KMS.",
+    o: [
+      "Envelope Encryption est moins sécurisé que le chiffrement direct KMS",
+      "Envelope Encryption : KMS génère une Data Encryption Key (DEK) unique par objet → DEK chiffre les données localement (AES-256) → seule la DEK chiffrée est stockée avec les données → KMS ne voit jamais les données en clair ; avantage : réduction des appels KMS et latence pour les grands objets",
+      "Envelope Encryption utilise KMS pour chiffrer chaque bloc de données individuellement",
+      "Envelope Encryption ne peut être utilisé qu'avec S3"
+    ],
+    a: 1,
+    e: "Envelope Encryption pattern : (1) Appel GenerateDataKey → KMS retourne DEK en clair + DEK chiffrée. (2) Chiffrer les données localement avec la DEK en clair (AES-256-GCM). (3) Supprimer la DEK en clair de la mémoire. (4) Stocker les données chiffrées + DEK chiffrée. (5) Déchiffrement : appel Decrypt(DEK chiffrée) → KMS retourne DEK en clair → déchiffrer localement. Avantages : (1) Données jamais envoyées à KMS — limite de 4KB pour l'API KMS direct. (2) Performance : un seul appel KMS par objet, peu importe sa taille. (3) Coût réduit : 0.03$/10000 appels vs un appel par Ko. Services utilisant envelope encryption : S3 SSE-KMS, EBS, RDS, Secrets Manager, Parameter Store (SecureString), Lambda env vars."
+  },
+  {
+    t: "KMS Key Policies",
+    q: "Comment configurer une KMS Key Policy pour permettre à un rôle IAM cross-account de déchiffrer des données ?",
+    o: [
+      "Les Key Policies KMS ne supportent pas l'accès cross-account",
+      "Dans la Key Policy : ajouter un Statement Allow {Principal: {AWS: arn:aws:iam::COMPTE_B:role/mon-role}, Action: [kms:Decrypt, kms:DescribeKey]} ; dans le compte B : IAM policy Allow {kms:Decrypt, kms:DescribeKey} sur l'ARN de la clé du compte A — les deux policies doivent permettre l'action",
+      "Utiliser uniquement des IAM policies dans le compte B suffit pour l'accès cross-account",
+      "Un compte externe ne peut accéder à une CMK que via AWS Marketplace"
+    ],
+    a: 1,
+    e: "KMS Cross-account access : deux steps obligatoires. (1) Key Policy (compte A, propriétaire de la clé) : {Principal: {AWS: arn:aws:iam::COMPTE_B:role/role-name OR arn:aws:iam::COMPTE_B:root}, Action: kms:Decrypt, kms:DescribeKey, kms:GenerateDataKey}. Si Principal = root du compte B → les admins B peuvent déléguer via IAM. (2) IAM Policy (compte B, utilisateur de la clé) : Allow kms:Decrypt sur la clé du compte A. Spécificité KMS : si Key Policy donne accès au root de compte B → IAM policy seule suffit (délégation IAM). Si Key Policy nomme un rôle/user spécifique → IAM policy en plus obligatoire. CloudTrail : chaque appel KMS cross-account est loggué dans les deux comptes (compte A : key usage, compte B : API call)."
+  },
+  // ─── Secrets Manager ─────────────────────────────────────────────────────
+  {
+    t: "Secrets Manager vs Parameter Store",
+    q: "Quand utiliser AWS Secrets Manager plutôt que SSM Parameter Store (SecureString) ?",
+    o: [
+      "Toujours utiliser Parameter Store — Secrets Manager est plus cher sans bénéfice",
+      "Secrets Manager : rotation automatique native (Lambda intégrée pour RDS, Redshift, DocumentDB), versionning de secrets, replica multi-région, audit complet. Parameter Store SecureString : pas de rotation native, moins cher (0.05$/secret/mois vs gratuit pour Standard), intégré au SSM ecosystem",
+      "Secrets Manager ne supporte pas les bases de données RDS",
+      "Parameter Store SecureString chiffre avec un algorithme plus fort que Secrets Manager"
+    ],
+    a: 1,
+    e: "Choix Secrets Manager vs Parameter Store : Secrets Manager (0.40$/secret/mois + 0.05$/10000 appels API) : (1) Rotation automatique native : Lambda intégrée pour RDS MySQL/PostgreSQL, Oracle, SQL Server, Redshift, DocumentDB — zero-downtime rotation via two-phase process. (2) Versioning : AWSCURRENT, AWSPREVIOUS, AWSPENDING — rollback possible. (3) Multi-region replication : replica en lecture dans d'autres régions (DR). (4) Audit granulaire via CloudTrail. Parameter Store SecureString (gratuit Standard, 0.05$/avancé/mois) : (1) Pas de rotation native (Lambda custom possible). (2) Hiérarchie de paramètres (/app/prod/db-password). (3) Idéal pour les configurations non-sensibles + secrets simples. DOP-C02 : Secrets Manager = credentials rotatifs, Parameter Store = configs et secrets statiques."
+  },
+  {
+    t: "Secrets Manager rotation",
+    q: "Comment fonctionne la rotation automatique des credentials RDS dans Secrets Manager et comment l'implémenter sans downtime ?",
+    o: [
+      "La rotation Secrets Manager change le mot de passe et redémarre les applications instantanément",
+      "Rotation à deux phases : createSecret (nouveau password en AWSPENDING) → setSecret (mise à jour dans RDS) → testSecret (vérification connexion) → finishSecret (AWSPENDING devient AWSCURRENT, ancien = AWSPREVIOUS) ; pendant la transition les deux passwords sont valides — zero downtime",
+      "La rotation Secrets Manager nécessite une maintenance window RDS",
+      "Secrets Manager ne peut pas accéder directement à RDS pour changer le password"
+    ],
+    a: 1,
+    e: "Secrets Manager rotation flow : Lambda rotation function (AWS Managed ou custom) exécute 4 étapes : (1) createSecret : génère nouveau password → stocké en AWSPENDING avec VersionStage. (2) setSecret : appelle l'API RDS/database pour changer le password sur la DB (l'ancien est toujours valide). (3) testSecret : tente une connexion avec le nouveau password pour valider. (4) finishSecret : AWSPENDING → AWSCURRENT, ancien AWSCURRENT → AWSPREVIOUS. Zero-downtime garanti car les deux passwords existent pendant la transition. Configuration : rotation schedule (jours ou cron), network config (Lambda dans VPC si RDS dans VPC privé). Activation : aws secretsmanager rotate-secret --secret-id mySecret --rotation-lambda-arn arn:... --rotation-rules AutomaticallyAfterDays=30."
+  },
+  // ─── GuardDuty ───────────────────────────────────────────────────────────
+  {
+    t: "GuardDuty fondamentaux",
+    q: "Quelles sources de données GuardDuty analyse-t-il et quels types de menaces peut-il détecter ?",
+    o: [
+      "GuardDuty analyse uniquement les logs CloudTrail",
+      "GuardDuty analyse VPC Flow Logs, DNS Logs, CloudTrail Events (Management + Data S3), EKS Audit Logs, RDS Login Activity, Lambda Network Activity, EBS volumes — détecte reconnaissance, compromission de credentials, activité malveillante, communication C2, exfiltration",
+      "GuardDuty est un firewall réseau qui bloque activement les menaces",
+      "GuardDuty ne peut analyser que les instances EC2 dans un seul VPC"
+    ],
+    a: 1,
+    e: "GuardDuty : threat detection service managé (ML + threat intelligence). Sources d'analyse : (1) VPC Flow Logs : trafic réseau anormal, port scanning, communication vers IPs malveillantes. (2) DNS Logs : requêtes DNS suspectes, domaines malveillants, DNS data exfiltration. (3) CloudTrail Management Events : API calls inhabituels (ConsoleLoginFailure, GetSecretValue en masse). (4) CloudTrail S3 Data Events (optionnel). (5) EKS Audit Logs : activité Kubernetes suspecte. (6) RDS Login Activity : brute force RDS. (7) Lambda Network Activity : fonctions Lambda contactant IPs malveillantes. Findings types : Recon (port scan, credential brute force), Backdoor (C2 comm), CryptoCurrency (mining), Trojan, UnauthorizedAccess, Stealth (CloudTrail disabled). Réponse : EventBridge → Lambda → isolate instance, revoke credentials."
+  },
+  {
+    t: "GuardDuty multi-comptes",
+    q: "Comment déployer GuardDuty à l'échelle d'une Organisation AWS avec un compte de sécurité centralisé ?",
+    o: [
+      "Activer GuardDuty manuellement sur chaque compte",
+      "Désigner un compte Delegated Administrator GuardDuty → auto-enable sur tous les comptes existants et nouveaux → les findings de tous les membres remontent dans le compte Security centralisé via Organizations integration",
+      "Utiliser CloudFormation StackSets uniquement pour déployer GuardDuty",
+      "GuardDuty ne supporte pas le déploiement organisationnel"
+    ],
+    a: 1,
+    e: "GuardDuty Organizations deployment : (1) Depuis le compte de gestion : aws guardduty enable-organization-admin-account --admin-account-id SECURITY_ACCOUNT_ID. (2) Depuis le compte Security (admin délégué) : UpdateOrganizationConfiguration avec AutoEnable=ALL (ou NEW pour les nouveaux comptes) et AutoEnableOrganizationMembers. (3) Findings centralisés : tous les findings des membres remontent dans le compte Security. (4) Threat intelligence customisée : IP sets, threat lists partagées à toute l'organisation. (5) Suppression rules : filtres centralisés pour réduire le bruit (false positives). Coûts : basé sur le volume de données analysées par compte. Architecture recommandée : GuardDuty findings → EventBridge → SNS → Slack + Lambda → Security Hub (agrégation avec Config findings, Inspector findings, etc.)."
+  },
+  // ─── Security Hub ─────────────────────────────────────────────────────────
+  {
+    t: "Security Hub",
+    q: "Qu'est-ce qu'AWS Security Hub et comment s'intègre-t-il dans une architecture de sécurité DevSecOps ?",
+    o: [
+      "Security Hub est un outil de déploiement similaire à CodeDeploy avec des fonctions de sécurité",
+      "Security Hub agrège les findings de sécurité de multiples services (GuardDuty, Inspector, Macie, Config, Access Analyzer, IAM Access Analyzer, partenaires) dans une vue unifiée avec scoring ASFF (Amazon Security Finding Format) et conformité aux standards (CIS, PCI DSS, NIST)",
+      "Security Hub remplace IAM pour la gestion des permissions",
+      "Security Hub ne peut analyser que les buckets S3"
+    ],
+    a: 1,
+    e: "AWS Security Hub : SIEM-like service managé. Fonctionnalités : (1) Agrégation findings : GuardDuty, Inspector, Macie, Config, Access Analyzer, partenaires (Palo Alto, Splunk, etc.) → format unifié ASFF. (2) Security Standards : CIS AWS Foundations v1.4/v3.0, AWS Foundational Security Best Practices, PCI DSS, NIST 800-53 → score de conformité automatique. (3) Cross-region/cross-account aggregation : un compte Security voit tout. (4) Automated Remediations : EventBridge Rules sur findings → Lambda remédiation automatique. (5) Custom Actions : workflows manuels (envoyer à Jira, PagerDuty). DOP-C02 Architecture : Security Hub (aggregation) → EventBridge → Lambda (auto-remediation critical findings) + SNS (alertes) + Jira (tickets). Insight queries : findings par severity, by account, by check."
+  },
+  {
+    t: "AWS Inspector v2",
+    q: "Comment AWS Inspector v2 s'intègre-t-il dans un pipeline CI/CD pour détecter les vulnérabilités avant la mise en production ?",
+    o: [
+      "Inspector v2 ne peut analyser que les instances EC2 en production — pas d'intégration CI/CD",
+      "Inspector v2 scan les images ECR au push (vulnérabilités OS + packages) + instances EC2 en continu (CVE, network reachability) ; intégration pipeline : bloquer le push ECR si severity CRITICAL + envoyer findings vers Security Hub",
+      "Inspector v2 remplace les tests unitaires dans les pipelines CI/CD",
+      "Inspector v2 analyse uniquement le code source des applications"
+    ],
+    a: 1,
+    e: "AWS Inspector v2 : vulnerability management automatisé. Capacités : (1) EC2 scanning : agents Systems Manager (pas d'agent dédié), CVE dans OS/packages, network reachability (ports exposés). (2) ECR scanning : scan au push d'image, continu pour les images actives, OS + application packages (node_modules, pip, maven). (3) Lambda scanning : fonctions Lambda (code + layers). Integration CI/CD : (1) CodePipeline + Inspector scan sur ECR : EventBridge sur Inspector finding → Lambda → pipeline decision gate (bloquer si CRITICAL). (2) Amazon ECR Image Scanning : basé sur Inspector v2 en Enhanced scanning. (3) SBOM export : Software Bill of Materials pour compliance. Findings vers Security Hub automatiquement. Coût : instance-heure pour EC2, par image pour ECR, par fonction pour Lambda."
+  },
+  {
+    t: "AWS Macie",
+    q: "Dans quel scénario utiliser AWS Macie et comment l'intégrer dans une stratégie de conformité RGPD ?",
+    o: [
+      "Macie est un service de déploiement pour les données S3",
+      "Macie utilise le ML pour découvrir et classifier automatiquement les données sensibles (PII, credentials, données financières) dans S3 — idéal pour RGPD (identifier où sont les données personnelles) et déclencher des workflows de protection ou notification",
+      "Macie ne peut analyser que les buckets S3 dans une seule région",
+      "Macie remplace le chiffrement S3 pour protéger les données sensibles"
+    ],
+    a: 1,
+    e: "AWS Macie : data security et privacy service pour S3. Fonctionnalités : (1) Sensitive data discovery : ML détecte PII (noms, emails, numéros SS, numéros CB), credentials (AWS keys, SSH keys), financial data, PHI dans les objets S3. (2) Findings : rapport par bucket et objet, niveau de confidence. (3) Bucket security findings : public access, chiffrement désactivé, partagé cross-account. RGPD integration : (1) Découverte automatique des buckets contenant des données personnelles → cartographie. (2) Findings → EventBridge → Lambda → notifier DPO, bloquer accès public, chiffrer. (3) Automated sensitive data discovery : scan continu multi-comptes via Organizations. Coûts : par Go de données analysées + par bucket monitored. Architecture : Macie findings → Security Hub → workflow de conformité."
+  }
 ]
 
 };
