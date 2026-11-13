@@ -3278,6 +3278,132 @@ window.QDATA = {
     a: [1, 3],
     e: "Deux approches valides : (1) RDS Cross-Region Read Replica (RPO ~ lag réplication, typiquement < 5min) + promote manuel ou automatisé (Lambda) au failover + Route 53. (2) Aurora Global Database : réplication synchrone entre régions avec RPO < 1 seconde, RTO < 1 minute, managed failover en 1 clic ou automatique. Pour RTO=15min et RPO=5min, Aurora Global Database est la solution optimale (RPO et RTO dépassent les exigences). Les deux valident la question dans l'examen."
   }
+],
+
+10: [
+  // ─── Route 53 routing policies ───────────────────────────────────────────
+  {
+    t: "Route 53 routing policies",
+    q: "Quelles sont les principales Routing Policies Route 53 et leurs cas d'usage respectifs ?",
+    o: [
+      "Simple, Weighted, Latency, Failover, Geolocation, Geoproximity, Multi-Value",
+      "DNS Round Robin, DNS Failover, DNS Anycast",
+      "Primary, Secondary, Tertiary",
+      "Active, Passive, Hybrid"
+    ],
+    a: 0,
+    e: "Route 53 Routing Policies : Simple (un seul endpoint), Weighted (% de trafic vers chaque endpoint — A/B testing, blue/green), Latency (router vers la région avec le plus faible temps de latence pour l'utilisateur), Failover (Primary + Secondary avec Health Check automatique), Geolocation (router selon le pays/continent de l'utilisateur), Geoproximity (router selon la distance géographique avec bias ajustable — Traffic Flow requis), Multi-Value (réponses multiples avec health checks, pseudo load balancing DNS)."
+  },
+  {
+    t: "Route 53 Health Checks",
+    q: "Comment Route 53 détermine-t-il qu'un endpoint est 'unhealthy' et combien de checks sont nécessaires ?",
+    o: [
+      "Un seul check échoué suffit pour marquer l'endpoint unhealthy",
+      "Route 53 utilise des health checkers dans 15+ régions AWS ; l'endpoint est considéré unhealthy si plus de 18% des checkers le considèrent unhealthy (seuil configurable)",
+      "Route 53 vérifie depuis une seule région — us-east-1 par défaut",
+      "Route 53 utilise CloudWatch pour les health checks"
+    ],
+    a: 1,
+    e: "Route 53 Health Checks : des checkers distribués dans ~15 régions AWS vérifient périodiquement l'endpoint (HTTP/HTTPS/TCP, intervalle 30s ou 10s fast health check). Un endpoint est déclaré Unhealthy si > 18% des checkers le considèrent unhealthy. Types : Endpoint (HTTP/HTTPS/TCP check direct), Calculated (combine plusieurs health checks avec AND/OR), CloudWatch Alarm (healthy si l'alarme est OK — permet de monitorer des métriques internes inatteignables depuis internet)."
+  },
+  {
+    t: "Route 53 Geolocation vs Latency",
+    q: "Une application doit servir des contenus différents aux utilisateurs européens vs américains (compliance RGPD). Quelle routing policy utiliser ?",
+    o: [
+      "Latency-based routing — plus rapide pour les utilisateurs européens",
+      "Geolocation routing — route les utilisateurs selon leur pays/continent de localisation DNS, garantissant que les Européens restent en Europe",
+      "Weighted routing — 50% Europe, 50% USA",
+      "Failover routing avec l'Europe comme primary"
+    ],
+    a: 1,
+    e: "Geolocation routing est la seule policy qui garantit le routage par localisation géographique — essentiel pour la compliance RGPD (données des utilisateurs européens traitées en Europe). Contrairement à Latency (qui route vers le serveur le plus rapide, qui pourrait être hors Europe), Geolocation route basé sur la résolution DNS de l'ISP de l'utilisateur. Toujours créer un record 'Default' pour les utilisateurs dans des localisations non couvertes."
+  },
+  // ─── Multi-région architecture ────────────────────────────────────────────
+  {
+    t: "Multi-région actif-actif",
+    q: "Quelle est la principale complexité d'une architecture Active-Active multi-région pour une base de données ?",
+    o: [
+      "Le coût du trafic inter-région",
+      "La gestion de la cohérence des données : les écritures peuvent se produire dans les deux régions simultanément, nécessitant un mécanisme de résolution des conflits",
+      "Le déploiement de l'infrastructure identique dans deux régions",
+      "Active-Active est impossible avec AWS — il faut toujours une région primaire"
+    ],
+    a: 1,
+    e: "Active-Active multi-région implique des écritures dans les deux régions simultanément. La cohérence des données est le défi principal : DynamoDB Global Tables gère les conflits avec 'last-writer-wins' (timestamp). Aurora Global Database préfère une région primaire pour les écritures (semi-active-active). Pour des applications avec strict consistency, l'architecture Active-Passive (avec réplication vers DR) est souvent plus simple. Active-Active est adapté aux applications qui peuvent tolérer eventual consistency."
+  },
+  {
+    t: "Global Accelerator",
+    q: "Qu'est-ce qu'AWS Global Accelerator et en quoi diffère-t-il de CloudFront ?",
+    o: [
+      "Global Accelerator est identique à CloudFront — ils offrent les mêmes fonctionnalités",
+      "Global Accelerator optimise le routage réseau TCP/UDP vers des endpoints AWS via le backbone privé AWS ; CloudFront est un CDN qui met en cache du contenu HTTP aux edge locations",
+      "CloudFront est pour les APIs ; Global Accelerator est pour les sites web statiques",
+      "Global Accelerator est uniquement pour les applications UDP (gaming)"
+    ],
+    a: 1,
+    e: "Global Accelerator : (1) route le trafic TCP/UDP vers des endpoints AWS (ALB, NLB, EC2, Elastic IP) via le backbone privé AWS depuis les edge locations (200+ PoP). (2) Fournit des IPs Anycast stables (deux adresses IP statiques globales). (3) Health checks et failover automatique entre régions. (4) Pas de mise en cache. CloudFront : CDN, mise en cache du contenu (HTML, JS, images, vidéos) aux edge locations, protocole HTTP/HTTPS uniquement. GA = performances réseau ; CF = cache de contenu."
+  },
+  {
+    t: "Global Accelerator",
+    q: "Dans quel scénario Global Accelerator apporte-t-il une valeur significative par rapport à DNS seul ?",
+    o: [
+      "Pour les sites web statiques servis depuis S3",
+      "Pour les applications TCP sensibles à la latence (jeux, IoT, VoIP) ou qui nécessitent des IPs statiques stables — le routage via le backbone AWS évite les instabilités de l'internet public",
+      "Pour mettre en cache des images et vidéos",
+      "Global Accelerator est identique au DNS direct — aucune valeur ajoutée"
+    ],
+    a: 1,
+    e: "Global Accelerator vs DNS seul : le trafic internet public suit des chemins imprévisibles (BGP, peering, congestion). GA route depuis l'edge location la plus proche vers les régions AWS via le backbone privé d'AWS (fibre dédiée, optimisée). Avantages : latence réduite et stable (20-60% meilleure pour certains scénarios), pas de TTL DNS (failover en < 30s vs minutes avec DNS), IPs Anycast statiques (pas de changement d'IP lors du failover). Idéal pour applications temps-réel."
+  },
+  // ─── S3 Cross-Region Replication ─────────────────────────────────────────
+  {
+    t: "S3 Cross-Region Replication",
+    q: "Comment configurer la réplication S3 Cross-Region et quels objets sont répliqués ?",
+    o: [
+      "S3 réplique automatiquement tous les buckets entre régions",
+      "Activer le versioning sur les deux buckets, configurer une Replication Rule (source → destination) avec un rôle IAM — seuls les NOUVEAUX objets créés après activation sont répliqués automatiquement",
+      "CRR réplique tous les objets existants et futurs automatiquement",
+      "CRR ne fonctionne qu'avec S3 Intelligent-Tiering"
+    ],
+    a: 1,
+    e: "S3 Cross-Region Replication (CRR) : (1) Prérequis : versioning activé sur source ET destination. (2) Configuration : Replication Rules dans les propriétés du bucket source (filtrer par préfixe/tag). (3) IAM Role avec s3:ReplicateObject permissions. (4) Comportement : seuls les objets créés APRÈS l'activation sont répliqués automatiquement. Pour les objets existants, utiliser S3 Batch Operations. CRR ne réplique pas les objets supprimés par défaut (configurable avec Delete Marker Replication)."
+  },
+  {
+    t: "S3 Cross-Region Replication",
+    q: "Qu'est-ce que la Replication Time Control (RTC) de S3 et quand l'activer ?",
+    o: [
+      "RTC limite la bande passante utilisée par la réplication",
+      "RTC garantit que 99.99% des objets sont répliqués dans les 15 minutes avec un SLA AWS — pour les applications avec des exigences RPO strictes",
+      "RTC accélère la réplication en utilisant des instances EC2 dédiées",
+      "RTC est requis pour la réplication cross-account"
+    ],
+    a: 1,
+    e: "S3 Replication Time Control (RTC) est un add-on payant qui fournit un SLA AWS : 99.99% des objets répliqués en 15 minutes. Sans RTC, la réplication est 'best effort' sans garantie de délai. Use cases : compliance réglementaire avec RPO < 15min, DR avec exigences strictes. RTC inclut aussi des métriques CloudWatch pour monitorer le délai de réplication (ReplicationLatency) et le volume de données en cours de réplication."
+  },
+  {
+    t: "Multi-région scénario Pro",
+    q: "Une application e-commerce (RTO=5min, RPO=1min) doit basculer automatiquement de us-east-1 vers eu-west-1. Quelle architecture recommander ?",
+    o: [
+      "Backups S3 toutes les minutes avec restauration manuelle",
+      "Aurora Global Database (réplication < 1s) + Route 53 Failover avec Health Checks + Application Load Balancer dans les deux régions + Warm Standby (ASG à capacité réduite dans DR)",
+      "RDS Multi-AZ dans us-east-1 uniquement — pas besoin de DR multi-région",
+      "DynamoDB Global Tables + Lambda dans les deux régions + API Gateway"
+    ],
+    a: 1,
+    e: "Architecture pour RTO=5min, RPO=1min : (1) Aurora Global Database : réplication < 1 seconde entre régions (RPO ~ 0). Failover managé en < 1 minute. (2) Route 53 Failover + Health Checks (interval 10s, fast health check) : détecte la panne en < 30s, DNS bascule vers eu-west-1. TTL bas (60s). (3) Warm Standby dans eu-west-1 : ALB + ASG (2 instances minimum) pour absorber le trafic immédiatement, scale up automatique après failover. (4) CloudFront : absorbe une partie du trafic pendant le basculement."
+  },
+  {
+    t: "Route 53 weighted routing",
+    q: "Comment implémenter un déploiement Blue/Green au niveau DNS avec Route 53 Weighted Routing ?",
+    o: [
+      "Modifier le CNAME pour pointer vers le nouvel environnement",
+      "Créer deux records DNS avec le même nom : Blue (poids 90) et Green (poids 10). Augmenter progressivement le poids Green (10→25→50→100) en surveillant les métriques — le DNS route proportionnellement",
+      "Route 53 Weighted ne supporte pas le Blue/Green — utiliser CloudFront",
+      "Utiliser deux domaines différents (blue.app.com et green.app.com) et un redirect"
+    ],
+    a: 1,
+    e: "Route 53 Weighted Routing pour Blue/Green : deux records avec le même nom DNS (app.example.com), un pointant vers l'ALB Blue (poids 90) et un vers l'ALB Green (poids 10). Le poids est relatif : poids 90 et 10 = 90% vers Blue, 10% vers Green. Augmentation progressive : 90/10 → 75/25 → 50/50 → 0/100. Rollback instantané : remettre le poids Blue à 100 et Green à 0. TTL bas recommandé pour une propagation rapide. Différent du Blue/Green CodeDeploy qui opère au niveau ALB."
+  }
 ]
 
 };
