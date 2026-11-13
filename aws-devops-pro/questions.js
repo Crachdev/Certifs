@@ -2667,6 +2667,179 @@ window.QDATA = {
     a: 1,
     e: "StackSets avec SERVICE_MANAGED (AWS Organizations) supporte les Automatic Deployments : quand un compte rejoint une OU cible, CloudFormation crée automatiquement une Stack Instance dans ce compte. Quand un compte quitte l'OU, la Stack Instance peut être supprimée automatiquement (RetainStacksOnAccountRemoval: false). C'est le pattern standard pour les account vending machines et architectures Landing Zone."
   }
+],
+
+6: [
+  // ─── CloudFormation avancé ────────────────────────────────────────────────
+  {
+    t: "CloudFormation Custom Resources",
+    q: "Qu'est-ce qu'une Custom Resource CloudFormation et quand l'utiliser ?",
+    o: [
+      "Une ressource propriétaire d'un fournisseur tiers",
+      "Un mécanisme permettant d'exécuter du code arbitraire (Lambda) lors des opérations Create/Update/Delete de CloudFormation — pour gérer des ressources non supportées nativement",
+      "Un type de ressource créé par AWS Support",
+      "Une ressource qui nécessite une approbation manuelle avant création"
+    ],
+    a: 1,
+    e: "Les Custom Resources (Type: Custom::NomRessource ou AWS::CloudFormation::CustomResource) délèguent la logique à une Lambda. CloudFormation envoie un événement (RequestType: Create/Update/Delete, StackId, ResourceProperties) à la Lambda via SNS ou directement. La Lambda effectue l'action (créer un cert ACM, configurer un DNS externe, initialiser une DB) et renvoie SUCCESS/FAILED avec un PhysicalResourceId. Indispensable pour des ressources hors AWS ou des opérations custom."
+  },
+  {
+    t: "CloudFormation Custom Resources",
+    q: "Une Custom Resource Lambda doit créer un enregistrement DNS dans un registrar externe. Que doit retourner la Lambda à CloudFormation en cas de succès ?",
+    o: [
+      "HTTP 200 OK",
+      "Un PUT vers le ResponseURL pré-signé S3 fourni dans l'événement avec Status: SUCCESS, PhysicalResourceId et les Data optionnelles",
+      "Un SNS message vers le topic CloudFormation",
+      "Un return statement avec {success: true}"
+    ],
+    a: 1,
+    e: "Le protocole Custom Resource : CloudFormation envoie l'événement avec un ResponseURL (URL S3 pré-signée). La Lambda DOIT faire un HTTP PUT vers ce ResponseURL avec un body JSON : {Status: SUCCESS|FAILED, PhysicalResourceId: 'id-unique', StackId: event.StackId, RequestId: event.RequestId, LogicalResourceId: event.LogicalResourceId, Data: {clé: valeur}}. Si la Lambda ne PUT pas vers le ResponseURL dans le délai (défaut 1h), la stack se bloque en attente."
+  },
+  {
+    t: "CloudFormation macros et Transform",
+    q: "Qu'est-ce que la section 'Transform' dans un template CloudFormation SAM ?",
+    o: [
+      "Une transformation de format entre JSON et YAML",
+      "Une déclaration qui indique à CloudFormation d'appliquer une macro (ex: AWS::Serverless-2016-10-31) pour transformer le template avant déploiement",
+      "Un outil de migration de templates entre régions",
+      "La section Transform remplace la section Resources"
+    ],
+    a: 1,
+    e: "Transform applique des macros CloudFormation avant le déploiement. La plus connue : 'Transform: AWS::Serverless-2016-10-31' (SAM — Serverless Application Model). Cette macro transforme des ressources SAM simplifiées (AWS::Serverless::Function) en ressources CloudFormation complètes (Lambda + IAM Role + Log Group). CloudFormation crée d'abord un Change Set de transformation, puis déploie les ressources résultantes. Les macros personnalisées utilisent une Lambda."
+  },
+  {
+    t: "CloudFormation cfn-init",
+    q: "Comment utiliser CloudFormation pour configurer automatiquement le contenu d'une instance EC2 au démarrage (packages, fichiers, services) ?",
+    o: [
+      "Via des User Data scripts uniquement",
+      "Via AWS::CloudFormation::Init dans les Metadata de l'instance EC2 et cfn-init dans le User Data — permet une configuration déclarative avec packages, files, commands, services",
+      "Via SSM Run Command lancé par CloudFormation",
+      "CloudFormation ne peut pas configurer le contenu interne d'une instance EC2"
+    ],
+    a: 1,
+    e: "Le pattern cfn-init : (1) définir AWS::CloudFormation::Init dans les Metadata de la ressource EC2 avec des configSets (packages, files, commands, services), (2) dans UserData : appeler cfn-init --stack X --resource EC2Instance --configsets default, (3) cfn-signal pour signaler la réussite à CloudFormation. cfn-init est déclaratif et idempotent contrairement aux scripts User Data. cfn-hup permet la re-configuration sur mise à jour de la stack."
+  },
+  {
+    t: "CloudFormation cfn-signal",
+    q: "Qu'est-ce que cfn-signal et pourquoi est-il crucial pour la fiabilité des déploiements EC2 avec CloudFormation ?",
+    o: [
+      "cfn-signal est un outil de monitoring de performance EC2",
+      "cfn-signal permet à l'instance EC2 de signaler à CloudFormation que son initialisation est terminée (ou a échoué) — sans ce signal, CloudFormation ne sait pas si l'application est prête",
+      "cfn-signal gère le scaling automatique des instances",
+      "cfn-signal envoie des alertes CloudWatch quand une instance démarre"
+    ],
+    a: 1,
+    e: "Sans cfn-signal, CloudFormation considère une instance EC2 comme déployée dès que l'API EC2 indique 'running' — mais l'application peut ne pas être encore prête. cfn-signal (combiné avec WaitCondition ou CreationPolicy: ResourceSignal) fait attendre CloudFormation que l'application confirme son état. Si cfn-signal --exit-code $? retourne non-zéro, CloudFormation déclenche un rollback. C'est essentiel pour la fiabilité des bootstrapping d'instances."
+  },
+  // ─── AWS CDK ──────────────────────────────────────────────────────────────
+  {
+    t: "CDK concepts",
+    q: "Qu'est-ce qu'AWS CDK (Cloud Development Kit) et en quoi diffère-t-il de CloudFormation pur ?",
+    o: [
+      "CDK est un outil de monitoring de stacks CloudFormation",
+      "CDK permet de définir l'infrastructure AWS dans un langage de programmation (Python, TypeScript, Java...) qui génère du CloudFormation. Avantage : logique, boucles, abstraction vs le YAML déclaratif",
+      "CDK remplace CloudFormation — les stacks CDK ne passent pas par CloudFormation",
+      "CDK est uniquement disponible pour Python et TypeScript"
+    ],
+    a: 1,
+    e: "CDK est une couche d'abstraction au-dessus de CloudFormation. On écrit du code (TypeScript, Python, Java, C#, Go) avec des Constructs (abstractions de ressources AWS) et CDK synthétise un template CloudFormation ('cdk synth'). Avantages : réutilisation avec des classes, logique conditionnelle native, typage fort, tests unitaires de l'infrastructure. CDK déploie toujours via CloudFormation ('cdk deploy' = cdk synth + cfn deploy)."
+  },
+  {
+    t: "CDK concepts",
+    q: "Qu'est-ce qu'un 'Construct' dans AWS CDK et quels sont les trois niveaux de constructs ?",
+    o: [
+      "Un Construct est un déploiement CDK ; il n'y a que deux niveaux",
+      "Un Construct est un composant d'infrastructure réutilisable. L3 (L1: ressource CloudFormation brute, L2: ressource avec defaults sensés, L3: pattern multi-ressources)",
+      "Un Construct est équivalent à une stack CloudFormation",
+      "Les Constructs ne sont disponibles que pour les ressources de compute (EC2, Lambda)"
+    ],
+    a: 1,
+    e: "Les trois niveaux de Constructs CDK : (L1) Cfn Constructs (CfnBucket) : mapping direct 1:1 avec CloudFormation, propriétés identiques — généré automatiquement depuis les schemas CFN. (L2) Constructs de haut niveau (s3.Bucket) : ressources avec des valeurs par défaut sensées, méthodes pratiques (bucket.grantRead(role)) et logique intégrée. (L3/Patterns) : patterns multi-ressources comme ApplicationLoadBalancedFargateService qui crée ECS, ALB, Security Groups, IAM en une ligne."
+  },
+  {
+    t: "CDK workflow",
+    q: "Quelles sont les étapes du workflow CDK pour déployer une infrastructure ?",
+    o: [
+      "cdk init → code → cdk push",
+      "cdk init → écrire les Constructs → cdk synth (génère CFN) → cdk diff (preview) → cdk deploy (déploie via CFN)",
+      "cdk init → cdk build → cdk release",
+      "cdk template → cdk validate → cdk apply"
+    ],
+    a: 1,
+    e: "Workflow CDK complet : (1) cdk init app --language typescript (initialise le projet). (2) Écrire les Constructs dans le code. (3) cdk synth : génère le template CloudFormation dans cdk.out/. (4) cdk diff : compare l'état actuel de la stack avec les changements (équivalent Change Set). (5) cdk deploy : synthétise + déploie via CloudFormation. (6) cdk destroy : supprime la stack. cdk bootstrap est requis une fois par compte/région pour créer les ressources CDK (bucket S3 pour les assets)."
+  },
+  {
+    t: "CDK bootstrap",
+    q: "Qu'est-ce que 'cdk bootstrap' et pourquoi est-il nécessaire ?",
+    o: [
+      "Une commande pour initialiser un nouveau projet CDK",
+      "Une commande qui crée des ressources d'infrastructure CDK (CDKToolkit stack) dans un compte/région — bucket S3 pour les assets, ECR repository, IAM roles — nécessaire avant le premier déploiement",
+      "Une commande pour mettre à jour la version de CDK",
+      "Bootstrap initialise la connexion entre CDK et CloudFormation"
+    ],
+    a: 1,
+    e: "cdk bootstrap crée la CDKToolkit stack dans le compte/région cible : un bucket S3 (cdk-bootstrap-...) pour stocker les assets (Lambda zip, Docker images), un ECR repository pour les images Docker, et des IAM roles pour les opérations CDK. Sans bootstrap, cdk deploy échoue si l'app a des assets (fichiers, images). Le bootstrap est requis une fois par combinaison compte+région. Les organisations peuvent personnaliser le bootstrap template."
+  },
+  {
+    t: "CDK aspects",
+    q: "Qu'est-ce que les 'Aspects' dans CDK et comment les utiliser pour appliquer des politiques de tagging à toute une stack ?",
+    o: [
+      "Les Aspects sont des métadonnées CDK",
+      "Les Aspects permettent d'appliquer une opération (visit) à tous les Constructs d'un scope — utilisés pour le tagging automatique, les vérifications de conformité, ou la modification en masse de propriétés",
+      "Les Aspects sont des décorateurs TypeScript uniquement",
+      "Les Aspects remplacent les CloudFormation Conditions"
+    ],
+    a: 1,
+    e: "Les Aspects CDK implémentent le pattern Visitor : ils itèrent sur tous les Constructs d'un scope (Stack, App). Le cas d'usage le plus courant : Tags.of(app).add('Projet', 'mon-projet') qui ajoute le tag à TOUTES les ressources de l'app. Autres utilisations : vérification de conformité (s'assurer que tous les buckets ont le chiffrement activé), modification en masse de propriétés. Les Aspects s'exécutent lors du 'synth' avant la génération du template."
+  },
+  {
+    t: "CDK testing",
+    q: "Comment tester une infrastructure CDK avant de la déployer ?",
+    o: [
+      "Le testing n'est pas supporté par CDK — utiliser la console AWS pour valider",
+      "Via les assertions CDK (aws-cdk-lib/assertions) : fine-grained assertions (vérifier une propriété spécifique), snapshot tests (comparer le template généré) et matchers (correspondance partielle)",
+      "Via des tests d'intégration uniquement — déployer dans un compte de test",
+      "Via CloudFormation Linter uniquement"
+    ],
+    a: 1,
+    e: "CDK fournit un framework de test basé sur Jest (TS) ou pytest (Python) : (1) Fine-grained assertions : template.hasResourceProperties('AWS::S3::Bucket', {VersioningConfiguration: {Status: 'Enabled'}}) — vérifie des propriétés spécifiques dans le template généré. (2) Snapshot tests : template.toJSON() comparé à un snapshot précédent — détecte les changements inattendus. (3) Match matchers pour des correspondances partielles. Les tests s'exécutent en ms sans déploiement réel."
+  },
+  {
+    t: "CDK vs Terraform",
+    q: "Quelles sont les principales différences entre AWS CDK et Terraform pour la gestion de l'infrastructure AWS ?",
+    o: [
+      "Terraform est uniquement pour GCP ; CDK est uniquement pour AWS",
+      "CDK utilise des langages de programmation (TS, Python) et génère du CloudFormation (AWS uniquement) ; Terraform utilise HCL, est multi-cloud, maintient son propre state file et dispose d'un plus grand ecosystème de providers",
+      "CDK est open source ; Terraform est propriétaire",
+      "Terraform est plus rapide à déployer que CDK"
+    ],
+    a: 1,
+    e: "CDK vs Terraform : CDK avantages : vrais langages de prog (TypeScript/Python/Java), intégration native AWS (L2/L3 Constructs), CI/CD native avec CDK Pipelines, state géré par CloudFormation. Terraform avantages : multi-cloud (AWS + GCP + Azure + providers personnalisés), HCL plus lisible pour certains, state file (terraform.tfstate) flexible (S3 remote backend), plus grand écosystème de modules. Pour AWS uniquement : CDK est souvent préféré ; multi-cloud : Terraform."
+  },
+  {
+    t: "CDK Pipelines",
+    q: "Qu'est-ce que CDK Pipelines et quelle est sa valeur ajoutée ?",
+    o: [
+      "CDK Pipelines est un alias pour CodePipeline",
+      "CDK Pipelines est un Construct L3 qui crée un pipeline CI/CD self-mutating — le pipeline se met à jour automatiquement quand le code CDK change",
+      "CDK Pipelines déploie uniquement vers un seul environnement",
+      "CDK Pipelines remplace CodeBuild pour les builds"
+    ],
+    a: 1,
+    e: "CDK Pipelines (aws-cdk-lib/pipelines.CodePipeline) est un Construct L3 qui crée un pipeline CodePipeline complet avec : source (CodeCommit/GitHub), build (CodeBuild : cdk synth), et stages de déploiement vers plusieurs environnements. La propriété clé : self-mutating — si on ajoute un stage au pipeline en code CDK, le pipeline se met à jour lui-même lors du prochain run avant de déployer les autres changements. Idéal pour le GitOps d'infrastructure."
+  },
+  {
+    t: "CDK scénario Pro",
+    q: "Un équipe veut partager des Constructs CDK réutilisables entre plusieurs équipes dans une organisation. Quelle approche recommander ?",
+    o: [
+      "Copier-coller le code CDK entre les projets",
+      "Créer une bibliothèque de Constructs CDK publiée dans CodeArtifact (ou npm) que les équipes installent comme dépendance npm/pip — permet la versioning et la maintenance centralisée",
+      "Utiliser des snippets CloudFormation partagés",
+      "CDK ne supporte pas le partage de Constructs entre équipes"
+    ],
+    a: 1,
+    e: "Le pattern recommandé : (1) créer une lib CDK (cdk init lib) avec les Constructs réutilisables (VpcConstruct, DatabaseConstruct, etc.), (2) packager avec jsii (permet d'utiliser en TypeScript, Python, Java, C# depuis un seul code TS), (3) publier dans CodeArtifact (npm pour TS, pip pour Python), (4) les équipes consommatrices installent la lib comme dépendance. Projen automatise la gestion de ce type de projet. AWS Construct Hub répertorie les Constructs publics."
+  }
 ]
 
 };
