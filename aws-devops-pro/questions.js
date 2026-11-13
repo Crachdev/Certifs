@@ -4215,6 +4215,131 @@ window.QDATA = {
     a: 1,
     e: "Investigation combinée Config + CloudTrail : (1) AWS Config → Configuration History du Security Group : configuration avant (sans 0.0.0.0/0) et après (avec 0.0.0.0/0), timestamp exact du changement, diff visuel. (2) CloudTrail → chercher l'event AuthorizeSecurityGroupIngress à ce timestamp : UserIdentity (arn:aws:iam::123456:user/john), SourceIPAddress, UserAgent, requestParameters. (3) IAM Access Analyzer : vérifier si d'autres ressources sont exposées. (4) GuardDuty : aurait pu alerter si le port 22 ouvert a été exploité. Config Rule + Remediation : si restricted-ssh rule était active → auto-remediation aurait révoqué la règle immédiatement."
   }
+],
+
+17: [
+  // ─── CloudTrail avancé ────────────────────────────────────────────────────
+  {
+    t: "CloudTrail fondamentaux",
+    q: "Qu'est-ce qu'AWS CloudTrail et quelle est la durée de rétention par défaut des logs ?",
+    o: [
+      "CloudTrail conserve les logs indéfiniment dans la console",
+      "CloudTrail enregistre tous les appels API AWS (Management Events) ; rétention 90 jours dans la console. Pour une rétention plus longue, envoyer les trails vers un S3 bucket (rétention illimitée configurable)",
+      "CloudTrail conserve les logs 30 jours seulement",
+      "CloudTrail ne peut logger que les actions EC2"
+    ],
+    a: 1,
+    e: "AWS CloudTrail : audit des appels API AWS. Types d'events : (1) Management Events (control plane) : CreateBucket, RunInstances, AuthorizeSecurityGroupIngress — activés par défaut. (2) Data Events (data plane) : S3 GetObject/PutObject, Lambda Invoke, DynamoDB GetItem — désactivés par défaut (coût supplémentaire). (3) Insights Events : détecte les patterns inhabituels d'API calls. Rétention console : 90 jours. Pour audit long terme : Trail vers S3 (rétention par S3 Lifecycle Policy). Logs chiffrés KMS. CloudTrail Digest : fichiers d'intégrité pour prouver que les logs n'ont pas été modifiés. Organisation Trail : un trail pour tous les comptes members."
+  },
+  {
+    t: "CloudTrail multi-comptes",
+    q: "Comment centraliser les logs CloudTrail de 50 comptes AWS dans un compte d'audit central ?",
+    o: [
+      "Configurer CloudTrail manuellement sur chaque compte avec le même S3 bucket",
+      "Créer un Organization Trail depuis le compte de gestion AWS Organizations : capture automatiquement les events de tous les comptes membres (existants et futurs) vers un S3 bucket dans le compte Log Archive",
+      "Utiliser AWS Config pour centraliser les logs CloudTrail",
+      "CloudTrail ne supporte pas le déploiement organisationnel"
+    ],
+    a: 1,
+    e: "Organization Trail : (1) Créer dans le compte de gestion (root) ou compte délégué. (2) Type: Organization Trail. (3) Destination : S3 bucket dans le compte Log Archive (avec bucket policy permettant cloudtrail.amazonaws.com de livrer). (4) Coverage : tous les comptes membres, toutes les régions automatiquement. (5) Nouveaux comptes : capturés automatiquement. (6) Members ne peuvent pas modifier ou supprimer l'Organization Trail. S3 bucket structure : AWSLogs/<account-id>/CloudTrail/<region>/<year>/<month>/<day>/. Analyse : Athena sur S3 pour queries SQL ou CloudTrail Lake (data lake intégré avec SQL queries jusqu'à 7 ans)."
+  },
+  {
+    t: "CloudTrail Lake",
+    q: "Qu'est-ce que CloudTrail Lake et en quoi est-il différent du CloudTrail classique vers S3 ?",
+    o: [
+      "CloudTrail Lake est identique à CloudTrail avec S3",
+      "CloudTrail Lake est un data lake managé qui stocke les events CloudTrail dans un format optimisé pour les queries SQL (jusqu'à 7 ans), sans besoin d'Athena ni de S3 — queries directes dans CloudTrail Lake avec SQL",
+      "CloudTrail Lake ne supporte que les Management Events",
+      "CloudTrail Lake est uniquement disponible avec Enterprise Support"
+    ],
+    a: 1,
+    e: "CloudTrail Lake : data store d'audit managé. Avantages vs CloudTrail → S3 → Athena : (1) Setup simplifié : pas de partitionnement S3, pas de tables Athena, pas de Glue. (2) SQL queries directes : dans CloudTrail Lake, jusqu'à 7 ans de rétention. (3) Organisation intégrée : queries cross-account. (4) Coût : facturation par Go de données ingérées + scannées lors des queries. Use case : investigation forensique, audit de compliance, analyse de comportements. Exemple query : SELECT userIdentity.arn, eventName, COUNT(*) FROM cloudtrail_logs WHERE eventName LIKE 'Delete%' GROUP BY 1,2 ORDER BY 3 DESC."
+  },
+  // ─── AWS Support ──────────────────────────────────────────────────────────
+  {
+    t: "AWS Support plans",
+    q: "Quelles sont les différences entre les plans AWS Support (Basic, Developer, Business, Enterprise) ?",
+    o: [
+      "Tous les plans AWS Support sont identiques — même niveau de service",
+      "Basic : gratuit, documentation + forums. Developer : cas 1 dev, response 12-24h. Business : cas prod, response 1h critiques, Trusted Advisor complet, API. Enterprise : TAM dédié, response 15min critiques, Well-Architected Review",
+      "Enterprise Support est requis pour utiliser AWS en production",
+      "Business et Enterprise sont identiques — même délais de réponse"
+    ],
+    a: 1,
+    e: "AWS Support Plans : (1) Basic (gratuit) : documentation, forums, Trusted Advisor (7 checks), Personal Health Dashboard. (2) Developer (29$/mois) : 1 contact, response business hours, Générique guidance. (3) Business (100$/mois minimum) : unlimited contacts, production system down = 1h, Trusted Advisor complet, API Support, Infrastructure Event Management optionnel. (4) Enterprise On-Ramp (5500$/mois) : response 30min critiques, pool de TAMs. (5) Enterprise (15000$/mois) : TAM dédié, response 15min critiques, Well-Architected Review inclus, Concierge support, Operational Reviews. DOP-C02 : Business minimum pour production, Enterprise pour workloads critiques."
+  },
+  {
+    t: "Trusted Advisor avancé",
+    q: "Comment automatiser les notifications Trusted Advisor quand un check passe en Warning ou Error ?",
+    o: [
+      "Trusted Advisor ne peut pas envoyer de notifications automatiques",
+      "EventBridge Rule sur aws.trustedadvisor events → SNS → email/Slack ; alternativement, Lambda qui appelle l'API Trusted Advisor toutes les heures et envoie des alertes sur les changements de statut",
+      "Utiliser CloudWatch Alarms pour monitorer Trusted Advisor",
+      "Trusted Advisor envoie automatiquement des emails hebdomadaires sans configuration"
+    ],
+    a: 1,
+    e: "Trusted Advisor automation : (1) EventBridge : Rule sur source aws.trustedadvisor, detail-type Trusted Advisor Check Item Refresh Notification → Target SNS. (2) AWS Health EventBridge : les checks Trusted Advisor en error/warning génèrent aussi des AWS Health events. (3) API Lambda : pour Business/Enterprise — appel toutes les heures à describe-trusted-advisor-check-results, comparaison avec état précédent stocké en DynamoDB, notification si changement. (4) AWS Config + Lambda : certains checks Trusted Advisor peuvent être répliqués avec des Config Rules. Exemple alert : Trusted Advisor détecte un S3 public + EventBridge → Lambda → SNS → Slack."
+  },
+  {
+    t: "AWS Well-Architected Tool",
+    q: "Qu'est-ce que l'AWS Well-Architected Tool et comment l'utiliser dans un cycle DevOps ?",
+    o: [
+      "Well-Architected Tool est un outil de déploiement similaire à CloudFormation",
+      "AWS Well-Architected Tool évalue les workloads selon les 6 pilliers (Operational Excellence, Security, Reliability, Performance, Cost, Sustainability), identifie les risques élevés et propose des plans d'amélioration",
+      "Well-Architected Tool est uniquement disponible avec Enterprise Support",
+      "L'outil ne peut évaluer qu'un workload par compte AWS"
+    ],
+    a: 1,
+    e: "AWS Well-Architected Framework Tool : (1) 6 pilliers : Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, Sustainability. (2) Process : questionnaire de 50-100 questions par pillier → identification des risques (HRI : High Risk Issues). (3) Improvement Plan : actions priorisées par pilier. (4) Milestones : tracker l'amélioration dans le temps. (5) Custom Lenses : ajouter des questions spécifiques à votre domaine (fintech, healthcare). (6) Integration DevOps : revue trimestrielle des workloads, action items dans les sprints. Gratuit pour tous les plans Support. Well-Architected Review avec TAM (Enterprise) = analyse approfondie avec un AWS Solution Architect."
+  },
+  {
+    t: "AWS Service Quotas",
+    q: "Comment surveiller et anticiper les Service Limits AWS avant d'atteindre les quotas ?",
+    o: [
+      "AWS prévient automatiquement par email avant d'atteindre les limites",
+      "Trusted Advisor Service Limits check + Service Quotas console + CloudWatch métriques de quotas → alarmes CloudWatch quand usage > 80% du quota + demandes d'augmentation proactives",
+      "Les Service Limits ne peuvent pas être augmentées — elles sont fixes",
+      "Utiliser uniquement le Support Center pour gérer les quotas"
+    ],
+    a: 1,
+    e: "Service Quotas monitoring : (1) Service Quotas console : voir tous les quotas par service, usage actuel, demander des augmentations (avec notifications de statut). (2) CloudWatch métriques : certains services publient des métriques de quota utilization (ex: EC2 vCPU quota). Alarme si > 80%. (3) Trusted Advisor Service Limits check (Business+) : alerte si usage > 80% d'un quota important. (4) Service Quotas API : intégrable dans des scripts de monitoring. (5) Augmentation proactive : demander AVANT d'en avoir besoin (délais de 1-5 jours pour certains quotas). (6) AWS Organizations : quota demandes peuvent être consolidées. DOP-C02 : identifier les quotas critiques pour votre workload et les monitorer."
+  },
+  {
+    t: "AWS Personal Health Dashboard automatisation",
+    q: "Comment automatiser la réponse aux événements AWS Health pour maintenir la disponibilité ?",
+    o: [
+      "AWS Health ne génère pas d'événements automatisables",
+      "EventBridge Rule sur aws.health events → Lambda ou SSM Automation → actions (migration instances, failover, notification équipe) avant que l'événement n'impacte la production",
+      "Utiliser CloudTrail pour détecter les événements de maintenance",
+      "Les événements Health ne peuvent être traités que manuellement"
+    ],
+    a: 1,
+    e: "AWS Health automation patterns : (1) EC2 Scheduled Maintenance : {source: aws.health, detail.service: EC2, detail.eventTypeCategory: scheduledChange} → Lambda : identifier instances affectées → snapshot EBS → si dans ASG: terminer (ASG recrée) → sinon: AMI + nouvelle instance. (2) RDS Maintenance : {detail.service: RDS} → Lambda : vérifier si Multi-AZ (failover automatique) → sinon: notifier + planifier maintenance window. (3) ECS Task Retirement : {detail.service: ECS} → Lambda : forcer nouveau déploiement ECS. (4) AZ Outage : {detail.eventTypeCode: AWS_EC2_OPERATIONAL_ISSUE} → Lambda : scale instances dans AZs saines. Best practice : toujours tester les automations Health en staging."
+  },
+  {
+    t: "AWS Support Cases",
+    q: "Comment créer un cas de support AWS efficace pour un problème de production critique ?",
+    o: [
+      "Envoyer un email à support@amazon.com avec une description générale",
+      "Dans Support Center : choisir type Produit, préciser le service AWS + la région, décrire le comportement observé vs attendu, inclure les IDs de ressources, logs CloudWatch, timestamps, et choisir severity appropriée (Production down = Urgent)",
+      "Ouvrir un cas de support en sélectionnant uniquement la severité Critical",
+      "Contacter uniquement le TAM pour les problèmes de production"
+    ],
+    a: 1,
+    e: "Best practices Support Case : (1) Choisir le bon type : Technical Support (problème AWS), Account (facturation). (2) Severity : General guidance (1 semaine), System impaired (12h), Production impaired (4h), Production down (1h Business/15min Enterprise). (3) Informations essentielles : Region, service AWS exact, Resource IDs (Instance ID, ARN), timestamps précis des incidents, logs CloudWatch/X-Ray snippets, messages d'erreur complets, étapes déjà tentées. (4) Langue : English pour accès aux agents les plus expérimentés. (5) Suivi : vérifier régulièrement, répondre rapidement aux demandes d'info. (6) AWS Account Team : pour Business/Enterprise → contacter TAM/SA en parallèle pour les crises."
+  },
+  {
+    t: "Incidents et communication",
+    q: "Comment communiquer efficacement pendant un incident de production avec les stakeholders ?",
+    o: [
+      "Envoyer un email détaillé toutes les heures avec les causes techniques profondes",
+      "Status Page externe (simple, haut niveau) : impact utilisateur + ETA + mises à jour régulières (toutes les 30min). Communication interne : canal Slack incident + bridge audio pour l'équipe technique. Séparer communication technique (détaillée) et business (impact/ETA seulement)",
+      "Attendre la résolution complète avant de communiquer",
+      "Communiquer uniquement quand la cause racine est identifiée"
+    ],
+    a: 1,
+    e: "Communication incident efficace : (1) Status Page : Atlassian Statuspage, AWS Service Health Dashboard custom → mise à jour toutes les 30 min min. Message type : 'Nous avons identifié un problème affectant X% des utilisateurs dans la région eu-west-1. Nos équipes travaillent activement. Prochaine mise à jour dans 30 minutes.' (2) Internal bridge : Slack channel #incident-prod + call Zoom/Meet + Incident Commander désigné. (3) Niveaux de communication : exécutif (impact business, ETA), technique (cause racine, actions). (4) Incident Commander : unique point de coordination, évite la cacophonie. (5) Post-incident : communication de résolution + post-mortem partagé. DOP-C02 : incident communication = process, pas improvisation."
+  }
 ]
 
 };
