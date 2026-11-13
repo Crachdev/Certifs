@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#2496ED">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche Docker DCA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🐳%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f0f6ff;--sheet:#ffffff;--ink:#0a1a2e;--muted:#3a5a80;--line:#c8ddf5;
+  --accent:#2496ED;--accent-soft:#e8f4ff;
+  --dk:#2496ED;--dk-mid:#4db0f7;--dk-light:#e8f4ff;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --tag-containers:#e8f4ff;--tag-containers-ink:#1a5296;
+  --tag-images:#fce7f3;--tag-images-ink:#9d174d;
+  --tag-network:#dcfce7;--tag-network-ink:#166534;
+  --tag-storage:#fef9c3;--tag-storage-ink:#854d0e;
+  --tag-swarm:#ede9fe;--tag-swarm-ink:#5b21b6;
+  --tag-security:#ffe4e6;--tag-security-ink:#9f1239;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#020e1c;--sheet:#081525;--ink:#ddeeff;--muted:#6090c0;--line:#0e2a48;
+  --accent:#4db0f7;--accent-soft:#051428;
+  --dk:#4db0f7;--dk-mid:#80c8fa;--dk-light:#051428;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#f5c542;--warn-soft:#2e2400;
+  --tag-containers:#0a2448;--tag-containers-ink:#93c5fd;
+  --tag-images:#4a1040;--tag-images-ink:#f9a8d4;
+  --tag-network:#14432a;--tag-network-ink:#86efac;
+  --tag-storage:#3f2d00;--tag-storage-ink:#fde68a;
+  --tag-swarm:#2e1a6b;--tag-swarm-ink:#c4b5fd;
+  --tag-security:#4c0519;--tag-security-ink:#fda4af;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#020e1c;--sheet:#081525;--ink:#ddeeff;--muted:#6090c0;--line:#0e2a48;
+  --accent:#4db0f7;--accent-soft:#051428;
+  --dk:#4db0f7;--dk-mid:#80c8fa;--dk-light:#051428;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#f5c542;--warn-soft:#2e2400;
+  --tag-containers:#0a2448;--tag-containers-ink:#93c5fd;
+  --tag-images:#4a1040;--tag-images-ink:#f9a8d4;
+  --tag-network:#14432a;--tag-network-ink:#86efac;
+  --tag-storage:#3f2d00;--tag-storage-ink:#fde68a;
+  --tag-swarm:#2e1a6b;--tag-swarm-ink:#c4b5fd;
+  --tag-security:#4c0519;--tag-security-ink:#fda4af;
+  color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--f-body);background:var(--paper);color:var(--ink);
+  line-height:1.6;font-size:15px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.hero{
+  background:linear-gradient(135deg,#011a38 0%,#2496ED 60%,#4db0f7 100%);
+  color:#fff;padding:48px max(24px,env(safe-area-inset-left,0px));
+  margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));
+}
+.hero-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:8px}
+.hero-nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:.85rem;font-weight:500;letter-spacing:.02em}
+.hero-nav a:hover{color:#fff}
+.hero h1{font-family:var(--f-display);font-size:clamp(1.8rem,5vw,2.8rem);font-weight:700;line-height:1.1;text-wrap:balance;margin-bottom:8px}
+.hero-sub{font-size:1rem;opacity:.85;margin-bottom:28px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:10px}
+.badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 14px;font-size:.8rem;font-weight:600;letter-spacing:.03em}
+.exam-rules{background:var(--dk-light);border-left:4px solid var(--dk);padding:16px 20px;margin:28px 0;border-radius:0 8px 8px 0}
+.exam-rules strong{color:var(--dk);font-size:.9rem;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px}
+.exam-rules ul{list-style:none;display:flex;flex-wrap:wrap;gap:12px 24px}
+.exam-rules li{font-size:.88rem;color:var(--muted)}
+.exam-rules li::before{content:"✦ ";color:var(--dk)}
+.domains{margin:28px 0}
+.domains h2{font-family:var(--f-display);font-size:1.1rem;font-weight:700;margin-bottom:16px;color:var(--dk)}
+.dw-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.dw-label{font-size:.82rem;font-weight:600;min-width:220px;color:var(--ink)}
+.dw-bar-wrap{flex:1;background:var(--line);border-radius:4px;height:10px;min-width:0}
+.dw-bar{height:10px;border-radius:4px;background:var(--dk);transition:width .4s ease}
+.dw-pct{font-size:.8rem;font-weight:700;color:var(--dk);min-width:38px;text-align:right}
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h2{font-family:var(--f-display);font-size:1rem;font-weight:700;margin-bottom:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.toc ol{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px 24px}
+.toc li a{color:var(--dk);text-decoration:none;font-size:.88rem;font-weight:500}
+.toc li a:hover{text-decoration:underline}
+section{margin:40px 0}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--line)}
+.section-num{background:var(--dk);color:#fff;font-family:var(--f-display);font-weight:700;font-size:.9rem;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-header h2{font-family:var(--f-display);font-size:1.3rem;font-weight:700;line-height:1.2}
+.section-tag{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:12px;letter-spacing:.04em;text-transform:uppercase;margin-left:auto}
+.tag-containers{background:var(--tag-containers);color:var(--tag-containers-ink)}
+.tag-images{background:var(--tag-images);color:var(--tag-images-ink)}
+.tag-network{background:var(--tag-network);color:var(--tag-network-ink)}
+.tag-storage{background:var(--tag-storage);color:var(--tag-storage-ink)}
+.tag-swarm{background:var(--tag-swarm);color:var(--tag-swarm-ink)}
+.tag-security{background:var(--tag-security);color:var(--tag-security-ink)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin:20px 0}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.card h3{font-family:var(--f-display);font-size:1rem;font-weight:700;margin-bottom:8px;color:var(--dk)}
+.card p{font-size:.87rem;color:var(--muted);line-height:1.55}
+.card code{font-family:var(--f-mono);font-size:.8rem;background:var(--accent-soft);color:var(--dk);padding:1px 5px;border-radius:4px}
+.card ul{font-size:.87rem;color:var(--muted);line-height:1.6;padding-left:16px;margin-top:6px}
+pre{background:#011428;color:#c8e8f8;font-family:var(--f-mono);font-size:.8rem;line-height:1.6;padding:16px 20px;border-radius:10px;overflow-x:auto;margin:16px 0;border:1px solid #0e2a48}
+pre .c{color:#507090;font-style:italic}
+pre .k{color:#4db0f7}
+pre .s{color:#90e090}
+pre .v{color:#f8d060}
+pre .r{color:#f09060}
+pre .fn{color:#80d8ff}
+pre .kw{color:#ff8fa0}
+pre .flag{color:#ffb060}
+.ok-box{background:var(--ok-soft);border-left:4px solid var(--ok);border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;font-size:.88rem}
+.ok-box strong{color:var(--ok);display:block;margin-bottom:4px}
+.warn-box{background:var(--warn-soft);border-left:4px solid var(--warn);border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;font-size:.88rem}
+.warn-box strong{color:var(--warn);display:block;margin-bottom:4px}
+.info-box{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;font-size:.88rem}
+.info-box strong{color:var(--accent);display:block;margin-bottom:4px}
+.tbl-wrap{overflow-x:auto;margin:16px 0;border-radius:10px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+thead th{background:var(--dk);color:#fff;padding:10px 14px;text-align:left;font-weight:600;font-size:.82rem;white-space:nowrap}
+tbody tr:nth-child(even){background:var(--accent-soft)}
+tbody td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+td code,th code{font-family:var(--f-mono);font-size:.78rem;background:var(--accent-soft);color:var(--dk);padding:1px 5px;border-radius:3px}
+.warn-card{background:var(--ko-soft);border:1px solid #e09090;border-radius:12px;padding:16px 18px;font-size:.87rem}
+.warn-card h3{color:var(--ko);font-family:var(--f-display);font-weight:700;font-size:.95rem;margin-bottom:6px}
+.warn-card p{color:var(--ink);line-height:1.5}
+.warn-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin:20px 0}
+.resources{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:28px 0}
+.resources h3{font-family:var(--f-display);font-size:1rem;font-weight:700;margin-bottom:14px;color:var(--dk)}
+.resources ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.resources a{color:var(--dk);font-weight:500;text-decoration:none;font-size:.88rem}
+.resources a:hover{text-decoration:underline}
+.theme-toggle{position:fixed;bottom:20px;right:20px;background:var(--sheet);border:1px solid var(--line);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:100;transition:box-shadow .2s}
+.theme-toggle:hover{box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.page-wrap{max-width:900px;margin:0 auto;padding-block:0 48px}
+.quiz-link{display:inline-flex;align-items:center;gap:8px;background:var(--dk);color:#fff;padding:10px 20px;border-radius:24px;text-decoration:none;font-weight:600;font-size:.9rem;margin-top:12px;transition:opacity .2s}
+.quiz-link:hover{opacity:.88}
+h3.subsection{font-family:var(--f-display);font-size:1.05rem;font-weight:700;margin:24px 0 12px;color:var(--ink);border-bottom:1px solid var(--line);padding-bottom:6px}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<!-- ══════════ HERO ══════════ -->
+<div class="hero">
+  <nav class="hero-nav">
+    <a href="../index.html">← Dashboard</a>
+    <a href="index.html">🐳 Quiz Docker →</a>
+  </nav>
+  <h1>Docker DCA</h1>
+  <p class="hero-sub">Docker Certified Associate · Fiche de révision complète</p>
+  <div class="hero-badges">
+    <span class="badge">90 min</span>
+    <span class="badge">55 questions</span>
+    <span class="badge">Score min. 65%</span>
+    <span class="badge">2 ans validité</span>
+    <span class="badge">195 $</span>
+  </div>
+</div>
+
+<!-- ══════════ EXAM RULES ══════════ -->
+<div class="exam-rules">
+  <strong>Modalités d'examen</strong>
+  <ul>
+    <li>55 questions QCM + réponses multiples</li>
+    <li>90 minutes</li>
+    <li>Score minimum 65%</li>
+    <li>En ligne (Pearson VUE)</li>
+    <li>Renouvellement tous les 2 ans</li>
+    <li>Docker Engine 20+ / Docker Desktop</li>
+  </ul>
+</div>
+
+<!-- ══════════ DOMAIN WEIGHTS ══════════ -->
+<div class="domains">
+  <h2>Pondération des domaines</h2>
+  <div class="dw-row"><span class="dw-label">1 — Orchestration</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:25%"></div></div><span class="dw-pct">25%</span></div>
+  <div class="dw-row"><span class="dw-label">2 — Image Creation, Management &amp; Registry</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:20%"></div></div><span class="dw-pct">20%</span></div>
+  <div class="dw-row"><span class="dw-label">3 — Installation &amp; Configuration</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:15%"></div></div><span class="dw-pct">15%</span></div>
+  <div class="dw-row"><span class="dw-label">4 — Networking</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:15%"></div></div><span class="dw-pct">15%</span></div>
+  <div class="dw-row"><span class="dw-label">5 — Security</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:15%"></div></div><span class="dw-pct">15%</span></div>
+  <div class="dw-row"><span class="dw-label">6 — Storage &amp; Volumes</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:10%"></div></div><span class="dw-pct">10%</span></div>
+</div>
+
+<!-- ══════════ TOC ══════════ -->
+<div class="toc">
+  <h2>Sommaire</h2>
+  <ol>
+    <li><a href="#s1">Orchestration — Swarm (25%)</a></li>
+    <li><a href="#s2">Images &amp; Registry (20%)</a></li>
+    <li><a href="#s3">Installation &amp; Config (15%)</a></li>
+    <li><a href="#s4">Networking (15%)</a></li>
+    <li><a href="#s5">Security (15%)</a></li>
+    <li><a href="#s6">Storage &amp; Volumes (10%)</a></li>
+    <li><a href="#s7">Docker CLI — commandes clés</a></li>
+    <li><a href="#s8">Pièges &amp; erreurs fréquentes</a></li>
+  </ol>
+</div>
+
+<!-- ══════════ S1 — Orchestration ══════════ -->
+<section id="s1">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2>Orchestration — Docker Swarm <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 25%</small></h2>
+    <span class="section-tag tag-swarm">Swarm</span>
+  </div>
+
+  <h3 class="subsection">Architecture Swarm</h3>
+  <div class="cards">
+    <div class="card">
+      <h3>Manager Nodes</h3>
+      <p>Maintiennent l'état du cluster (Raft consensus). Reçoivent les commandes <code>docker service</code>. Peuvent aussi exécuter des tasks (par défaut). Recommandé : 3 ou 5 managers pour la HA.</p>
+    </div>
+    <div class="card">
+      <h3>Worker Nodes</h3>
+      <p>Exécutent les containers (tasks). Ne participent pas aux décisions Raft. Peuvent être promus managers avec <code>docker node promote</code>.</p>
+    </div>
+    <div class="card">
+      <h3>Quorum Raft</h3>
+      <p>Nombre de managers requis pour maintenir le quorum : <strong>(N/2)+1</strong>. 3 managers → 2 requis. 5 managers → 3 requis. Sans quorum, le cluster est en lecture seule.</p>
+    </div>
+    <div class="card">
+      <h3>Services vs Tasks</h3>
+      <p><strong>Service</strong> : définition déclarative (image, replicas, ports, contraintes). <strong>Task</strong> : unité d'exécution = 1 container sur 1 nœud. 1 service → N tasks.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection">Service Modes</h3>
+  <div class="cards">
+    <div class="card">
+      <h3>Replicated (défaut)</h3>
+      <p>Nombre exact de réplicas distribués sur les nœuds. <code>--replicas N</code>. Swarm décide de la distribution. Peut avoir plusieurs tasks sur le même nœud.</p>
+    </div>
+    <div class="card">
+      <h3>Global</h3>
+      <p>Une task par nœud, automatiquement. Idéal pour les agents de monitoring, log collectors. <code>--mode global</code>. Pas de <code>--replicas</code> avec global.</p>
+    </div>
+    <div class="card">
+      <h3>Update Policy</h3>
+      <ul>
+        <li><code>--update-parallelism</code> : tasks mises à jour en parallèle</li>
+        <li><code>--update-delay</code> : pause entre les batchs</li>
+        <li><code>--update-failure-action</code> : pause/continue/rollback</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Rollback</h3>
+      <ul>
+        <li><code>docker service rollback SERVICE</code></li>
+        <li><code>--rollback-parallelism</code></li>
+        <li><code>--rollback-delay</code></li>
+        <li>Historique : 2 versions max par défaut</li>
+      </ul>
+    </div>
+  </div>
+
+  <pre><span class="c"># Initialiser un Swarm</span>
+<span class="fn">docker swarm init</span> <span class="flag">--advertise-addr</span> 192.168.1.10
+
+<span class="c"># Rejoindre le Swarm (affiche le token)</span>
+<span class="fn">docker swarm join-token</span> worker
+<span class="fn">docker swarm join-token</span> manager
+
+<span class="c"># Nœuds</span>
+<span class="fn">docker node ls</span>
+<span class="fn">docker node inspect</span> NODE_ID
+<span class="fn">docker node update</span> <span class="flag">--availability drain</span> NODE_ID  <span class="c"># vider un nœud</span>
+<span class="fn">docker node promote</span> NODE_ID
+<span class="fn">docker node demote</span>  NODE_ID
+
+<span class="c"># Créer un service</span>
+<span class="fn">docker service create</span> \
+  <span class="flag">--name</span> web \
+  <span class="flag">--replicas</span> 3 \
+  <span class="flag">--publish</span> 80:80 \
+  <span class="flag">--network</span> overlay-net \
+  <span class="flag">--update-parallelism</span> 1 \
+  <span class="flag">--update-delay</span> 10s \
+  nginx:alpine
+
+<span class="c"># Mettre à jour un service</span>
+<span class="fn">docker service update</span> <span class="flag">--image</span> nginx:1.25 web
+<span class="fn">docker service scale</span>  web=5
+
+<span class="c"># Inspecter</span>
+<span class="fn">docker service ls</span>
+<span class="fn">docker service ps</span>  web         <span class="c"># liste des tasks</span>
+<span class="fn">docker service logs</span> web
+
+<span class="c"># Stack (Compose pour Swarm)</span>
+<span class="fn">docker stack deploy</span> <span class="flag">-c</span> docker-compose.yml mystack
+<span class="fn">docker stack ls</span>
+<span class="fn">docker stack services</span> mystack
+<span class="fn">docker stack rm</span>      mystack</pre>
+
+  <h3 class="subsection">Placement Constraints &amp; Preferences</h3>
+  <pre><span class="c"># Contrainte de placement</span>
+<span class="fn">docker service create</span> \
+  <span class="flag">--constraint</span> <span class="s">'node.role==manager'</span> \
+  <span class="flag">--constraint</span> <span class="s">'node.labels.env==prod'</span> \
+  nginx
+
+<span class="c"># Ajouter un label à un nœud</span>
+<span class="fn">docker node update</span> <span class="flag">--label-add</span> env=prod NODE_ID
+
+<span class="c"># Préférence de répartition (spread)</span>
+<span class="fn">docker service create</span> \
+  <span class="flag">--placement-pref</span> <span class="s">'spread=node.labels.az'</span> \
+  nginx</pre>
+
+  <h3 class="subsection">Secrets &amp; Configs Swarm</h3>
+  <div class="cards">
+    <div class="card">
+      <h3>Secrets</h3>
+      <p>Données sensibles chiffrées au repos et en transit (TLS mutual). Montés en <code>/run/secrets/NOM</code>. Accessibles uniquement aux containers du service qui y ont accès.</p>
+      <pre style="margin:8px 0;padding:10px"><code>echo "mypass" | docker secret create db_pass -
+docker service create \
+  --secret db_pass \
+  myapp</code></pre>
+    </div>
+    <div class="card">
+      <h3>Configs</h3>
+      <p>Similaires aux secrets mais <strong>non chiffrés</strong>. Pour les fichiers de configuration (nginx.conf, etc.). Montés à l'emplacement choisi dans le container.</p>
+      <pre style="margin:8px 0;padding:10px"><code>docker config create nginx_conf nginx.conf
+docker service create \
+  --config source=nginx_conf,target=/etc/nginx/nginx.conf \
+  nginx</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S2 — Images & Registry ══════════ -->
+<section id="s2">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2>Images &amp; Registry <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 20%</small></h2>
+    <span class="section-tag tag-images">Images</span>
+  </div>
+
+  <h3 class="subsection">Dockerfile — instructions clés</h3>
+  <pre><span class="c"># Dockerfile de référence</span>
+<span class="k">FROM</span>        node:20-alpine <span class="k">AS</span> builder     <span class="c"># Multi-stage build</span>
+<span class="k">WORKDIR</span>     /app
+<span class="k">COPY</span>        package*.json ./
+<span class="k">RUN</span>         npm ci --only=production       <span class="c"># layer cache optimisé</span>
+<span class="k">COPY</span>        . .
+<span class="k">RUN</span>         npm run build
+
+<span class="k">FROM</span>        node:20-alpine                 <span class="c"># image finale plus légère</span>
+<span class="k">WORKDIR</span>     /app
+<span class="k">COPY</span>        --from=builder /app/dist ./dist
+<span class="k">COPY</span>        --from=builder /app/node_modules ./node_modules
+
+<span class="k">EXPOSE</span>      3000
+<span class="k">ENV</span>         NODE_ENV=production
+<span class="k">ARG</span>         VERSION=latest                 <span class="c"># disponible uniquement au build</span>
+<span class="k">LABEL</span>       maintainer="team@example.com" \
+            version=<span class="s">"${VERSION}"</span>
+
+<span class="k">USER</span>        node                           <span class="c"># ne pas rester root !</span>
+<span class="k">HEALTHCHECK</span> --interval=30s --timeout=3s \
+            CMD curl -f http://localhost:3000/health || exit 1
+<span class="k">ENTRYPOINT</span>  [<span class="s">"node"</span>]                       <span class="c"># forme exec (préférée)</span>
+<span class="k">CMD</span>         [<span class="s">"dist/server.js"</span>]             <span class="c"># arguments par défaut</span></pre>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instruction</th><th>Description</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>FROM</code></td><td>Image de base</td><td><code>FROM scratch</code> pour images minimales</td></tr>
+        <tr><td><code>RUN</code></td><td>Exécute au build, crée un layer</td><td>Chaîner avec <code>&amp;&amp;</code> pour réduire les layers</td></tr>
+        <tr><td><code>CMD</code></td><td>Commande par défaut au démarrage</td><td>Remplaçable via <code>docker run ... CMD</code></td></tr>
+        <tr><td><code>ENTRYPOINT</code></td><td>Point d'entrée fixe</td><td>Non remplaçable sauf <code>--entrypoint</code></td></tr>
+        <tr><td><code>COPY</code></td><td>Copie fichiers locaux</td><td>Préférer à ADD (sauf archives)</td></tr>
+        <tr><td><code>ADD</code></td><td>COPY + extraction tar + URLs</td><td>Éviter sauf cas particuliers</td></tr>
+        <tr><td><code>ENV</code></td><td>Variable d'environnement</td><td>Persiste à l'exécution</td></tr>
+        <tr><td><code>ARG</code></td><td>Variable de build</td><td>Disparaît après le build</td></tr>
+        <tr><td><code>VOLUME</code></td><td>Déclare un point de montage</td><td>Crée un volume anonyme</td></tr>
+        <tr><td><code>EXPOSE</code></td><td>Documentation du port</td><td>Ne publie pas le port réellement</td></tr>
+        <tr><td><code>USER</code></td><td>Utilisateur pour RUN/CMD/ENTRYPOINT</td><td>Sécurité : éviter root</td></tr>
+        <tr><td><code>WORKDIR</code></td><td>Répertoire de travail</td><td>Crée le répertoire si absent</td></tr>
+        <tr><td><code>HEALTHCHECK</code></td><td>Vérifie l'état du container</td><td>États : starting/healthy/unhealthy</td></tr>
+        <tr><td><code>ONBUILD</code></td><td>Trigger pour images dérivées</td><td>Pour images de base réutilisables</td></tr>
+        <tr><td><code>STOPSIGNAL</code></td><td>Signal d'arrêt du container</td><td>Défaut : SIGTERM</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="subsection">Build &amp; Registry</h3>
+  <pre><span class="c"># Build</span>
+<span class="fn">docker build</span> <span class="flag">-t</span> myapp:1.0 .
+<span class="fn">docker build</span> <span class="flag">-t</span> myapp:1.0 <span class="flag">--no-cache</span> .
+<span class="fn">docker build</span> <span class="flag">--build-arg</span> VERSION=1.2 <span class="flag">-t</span> myapp:1.2 .
+<span class="fn">docker build</span> <span class="flag">--target</span> builder <span class="flag">-t</span> myapp:builder .  <span class="c"># multi-stage partiel</span>
+
+<span class="c"># Tag &amp; push</span>
+<span class="fn">docker tag</span>  myapp:1.0 registry.example.com/myapp:1.0
+<span class="fn">docker push</span> registry.example.com/myapp:1.0
+<span class="fn">docker pull</span> registry.example.com/myapp:1.0
+
+<span class="c"># Registry privé local</span>
+<span class="fn">docker run</span> <span class="flag">-d</span> <span class="flag">-p</span> 5000:5000 <span class="flag">--name</span> registry registry:2
+
+<span class="c"># Authentification</span>
+<span class="fn">docker login</span>  registry.example.com
+<span class="fn">docker logout</span> registry.example.com
+
+<span class="c"># Inspecter une image</span>
+<span class="fn">docker inspect</span>   myapp:1.0
+<span class="fn">docker history</span>   myapp:1.0        <span class="c"># layers et leurs tailles</span>
+<span class="fn">docker image ls</span>  <span class="flag">--filter</span> dangling=true  <span class="c"># images "dangling" (sans tag)</span>
+
+<span class="c"># Nettoyage</span>
+<span class="fn">docker image prune</span>               <span class="c"># supprime les dangling</span>
+<span class="fn">docker system prune</span> <span class="flag">-a</span>           <span class="c"># tout nettoyer (containers, images, volumes)</span>
+
+<span class="c"># Save/load (sans registry)</span>
+<span class="fn">docker save</span>  myapp:1.0 | gzip > myapp.tar.gz
+<span class="fn">docker load</span>  &lt; myapp.tar.gz
+
+<span class="c"># Export/import (container → image, perd l'historique)</span>
+<span class="fn">docker export</span> CONTAINER_ID | gzip > container.tar.gz
+<span class="fn">docker import</span> container.tar.gz myapp:imported</pre>
+
+  <div class="ok-box">
+    <strong>✓ Multi-stage builds</strong>
+    Réduit drastiquement la taille des images finales en séparant les outils de build (compilateurs, dépendances de dev) de l'image de production. L'image finale ne contient que le strict nécessaire.
+  </div>
+
+  <h3 class="subsection">Layers &amp; Cache</h3>
+  <div class="cards">
+    <div class="card">
+      <h3>Union Filesystem</h3>
+      <p>Les images sont des stacks de layers en lecture seule. Le container ajoute un layer R/W au-dessus. OverlayFS est le driver par défaut sur Linux.</p>
+    </div>
+    <div class="card">
+      <h3>Optimiser le cache</h3>
+      <p>Placer les instructions qui changent rarement en premier (FROM, RUN apt-get). Copier les fichiers de dépendances avant le code source pour profiter du cache npm/pip.</p>
+    </div>
+    <div class="card">
+      <h3>Réduire la taille</h3>
+      <ul>
+        <li>Utiliser des images Alpine</li>
+        <li>Multi-stage builds</li>
+        <li>Nettoyer dans le même RUN : <code>apt-get clean &amp;&amp; rm -rf /var/lib/apt/lists/*</code></li>
+        <li>Fichier <code>.dockerignore</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Content Trust (DCT)</h3>
+      <p>Docker Content Trust avec Notary : signe et vérifie les images. <code>DOCKER_CONTENT_TRUST=1</code> force la vérification des signatures avant pull/run.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S3 — Installation & Config ══════════ -->
+<section id="s3">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2>Installation &amp; Configuration <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 15%</small></h2>
+    <span class="section-tag tag-containers">Config</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Docker Engine Architecture</h3>
+      <ul>
+        <li><strong>dockerd</strong> : daemon Docker</li>
+        <li><strong>containerd</strong> : runtime de containers</li>
+        <li><strong>runc</strong> : OCI runtime (crée les containers)</li>
+        <li><strong>docker CLI</strong> → parle au daemon via socket Unix <code>/var/run/docker.sock</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>daemon.json</h3>
+      <p>Configuration du daemon Docker : <code>/etc/docker/daemon.json</code></p>
+      <pre style="margin:8px 0;padding:10px"><code>{
+  "log-driver": "json-file",
+  "log-opts": {"max-size": "10m"},
+  "storage-driver": "overlay2",
+  "insecure-registries": ["192.168.1.5:5000"],
+  "registry-mirrors": ["https://mirror.example.com"]
+}</code></pre>
+    </div>
+    <div class="card">
+      <h3>Logging Drivers</h3>
+      <ul>
+        <li><code>json-file</code> (défaut) — local, rotatif</li>
+        <li><code>syslog</code> — syslog/rsyslog</li>
+        <li><code>journald</code> — systemd journal</li>
+        <li><code>awslogs</code> — CloudWatch Logs</li>
+        <li><code>fluentd</code> — Fluentd/Fluent Bit</li>
+        <li><code>splunk</code> — Splunk HEC</li>
+        <li><code>gelf</code> — Graylog</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Storage Drivers</h3>
+      <ul>
+        <li><strong>overlay2</strong> : recommandé, Linux kernel ≥4.0</li>
+        <li><strong>devicemapper</strong> : ancien, déprécié</li>
+        <li><strong>btrfs / zfs</strong> : filesystems spécifiques</li>
+        <li><strong>vfs</strong> : lent, test uniquement</li>
+      </ul>
+    </div>
+  </div>
+
+  <pre><span class="c"># Vérifier la configuration</span>
+<span class="fn">docker info</span>                      <span class="c"># infos système complètes</span>
+<span class="fn">docker version</span>                   <span class="c"># version client + daemon</span>
+<span class="fn">docker system df</span>                 <span class="c"># utilisation disque Docker</span>
+
+<span class="c"># Context (remote Docker daemons)</span>
+<span class="fn">docker context create</span> prod <span class="flag">--docker</span> <span class="s">"host=ssh://user@prod-server"</span>
+<span class="fn">docker context use</span>    prod
+<span class="fn">docker context ls</span>
+
+<span class="c"># Resource limits sur un container</span>
+<span class="fn">docker run</span> \
+  <span class="flag">--memory</span>     512m \
+  <span class="flag">--memory-swap</span> 512m \          <span class="c"># égal à --memory pour désactiver le swap</span>
+  <span class="flag">--cpus</span>       0.5 \            <span class="c"># 0.5 CPU</span>
+  <span class="flag">--cpu-shares</span> 512 \            <span class="c"># poids relatif (défaut 1024)</span>
+  <span class="flag">--pids-limit</span> 100 \            <span class="c"># limite PIDs (anti fork bomb)</span>
+  nginx
+
+<span class="c"># cgroups v2 requis pour certaines limites</span></pre>
+
+  <div class="ok-box">
+    <strong>✓ Universal Control Plane (UCP) &amp; Docker Trusted Registry (DTR)</strong>
+    Composants de Docker Enterprise (MKE/MTR depuis Mirantis). UCP = interface de gestion Swarm. DTR = registry privé avec scanning, signatures et RBAC. À connaître pour l'exam même si moins présents en 2024.
+  </div>
+</section>
+
+<!-- ══════════ S4 — Networking ══════════ -->
+<section id="s4">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <h2>Networking <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 15%</small></h2>
+    <span class="section-tag tag-network">Réseau</span>
+  </div>
+
+  <h3 class="subsection">Drivers réseau</h3>
+  <div class="cards">
+    <div class="card">
+      <h3>bridge (défaut)</h3>
+      <p>Réseau isolé sur un seul hôte. Les containers sur le même bridge se parlent par nom (DNS Docker interne). La bridge par défaut (<code>docker0</code>) ne supporte pas le DNS par nom — créer une bridge custom.</p>
+    </div>
+    <div class="card">
+      <h3>overlay</h3>
+      <p>Réseau multi-hôtes pour Docker Swarm. Chiffrement optionnel (<code>--opt encrypted</code>). Utilise VXLAN pour encapsuler les paquets. Requis pour les services Swarm inter-nœuds.</p>
+    </div>
+    <div class="card">
+      <h3>host</h3>
+      <p>Le container partage le namespace réseau de l'hôte. Pas d'isolation réseau. Performances maximales. Linux uniquement. Pas de <code>-p</code> nécessaire.</p>
+    </div>
+    <div class="card">
+      <h3>macvlan</h3>
+      <p>Assigne une adresse MAC physique à un container. Le container apparaît comme un device physique sur le réseau. Utile pour les applications legacy qui nécessitent une IP sur le réseau physique.</p>
+    </div>
+    <div class="card">
+      <h3>ipvlan</h3>
+      <p>Similaire à macvlan mais partage l'adresse MAC de l'interface parent. Mode L2 (switch) ou L3 (routeur). Contourne les limitations MAC sur les switchs managés.</p>
+    </div>
+    <div class="card">
+      <h3>none</h3>
+      <p>Pas de réseau. Container totalement isolé. Utile pour les jobs batch qui n'ont pas besoin du réseau.</p>
+    </div>
+  </div>
+
+  <pre><span class="c"># Réseau bridge custom (DNS par nom activé)</span>
+<span class="fn">docker network create</span> <span class="flag">--driver</span> bridge \
+  <span class="flag">--subnet</span>  172.20.0.0/16 \
+  <span class="flag">--gateway</span> 172.20.0.1 \
+  my-network
+
+<span class="c"># Réseau overlay (Swarm)</span>
+<span class="fn">docker network create</span> <span class="flag">--driver</span> overlay \
+  <span class="flag">--attachable</span> \          <span class="c"># permet aux containers standalone de s'attacher</span>
+  <span class="flag">--opt</span> encrypted \     <span class="c"># chiffrement data-plane</span>
+  my-overlay
+
+<span class="c"># Inspecter</span>
+<span class="fn">docker network ls</span>
+<span class="fn">docker network inspect</span> my-network
+<span class="fn">docker network connect</span>    my-network CONTAINER   <span class="c"># connecter à chaud</span>
+<span class="fn">docker network disconnect</span> my-network CONTAINER
+
+<span class="c"># Publication de ports</span>
+<span class="fn">docker run</span> <span class="flag">-p</span> 8080:80           <span class="c"># host:container</span>
+<span class="fn">docker run</span> <span class="flag">-p</span> 127.0.0.1:8080:80 <span class="c"># bind sur une IP spécifique</span>
+<span class="fn">docker run</span> <span class="flag">-P</span>                   <span class="c"># publie tous les EXPOSE sur ports aléatoires</span></pre>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Driver</th><th>Hôtes</th><th>Isolation</th><th>DNS</th><th>Cas d'usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>bridge</code></td><td>1</td><td>Oui</td><td>Custom uniquement</td><td>Dev, containers standalone</td></tr>
+        <tr><td><code>overlay</code></td><td>Multi</td><td>Oui</td><td>✅</td><td>Services Swarm</td></tr>
+        <tr><td><code>host</code></td><td>1</td><td>❌</td><td>Hôte</td><td>Performance, monitoring</td></tr>
+        <tr><td><code>macvlan</code></td><td>1</td><td>Oui</td><td>Externe</td><td>Legacy apps, IP physique</td></tr>
+        <tr><td><code>none</code></td><td>1</td><td>Total</td><td>❌</td><td>Batch isolé</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ok-box">
+    <strong>✓ Service Discovery Swarm</strong>
+    Dans un réseau overlay Swarm, les services sont accessibles par leur nom via le DNS interne. Load balancing intégré (VIP ou DNSRR). <code>--endpoint-mode vip</code> (défaut) = adresse virtuelle unique. <code>--endpoint-mode dnsrr</code> = round-robin DNS.
+  </div>
+</section>
+
+<!-- ══════════ S5 — Security ══════════ -->
+<section id="s5">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <h2>Security <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 15%</small></h2>
+    <span class="section-tag tag-security">Sécurité</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Namespaces Linux</h3>
+      <p>Isolation des containers via les namespaces kernel : <strong>PID</strong>, <strong>NET</strong>, <strong>MNT</strong>, <strong>UTS</strong>, <strong>IPC</strong>, <strong>USER</strong>. Chaque container a ses propres namespaces isolés.</p>
+    </div>
+    <div class="card">
+      <h3>cgroups</h3>
+      <p>Control Groups limitent les ressources : CPU, mémoire, I/O, réseau, PIDs. Empêchent qu'un container monopolise les ressources de l'hôte (fork bomb, etc.).</p>
+    </div>
+    <div class="card">
+      <h3>Seccomp</h3>
+      <p>Secure Computing Mode : filtre les appels système. Docker applique un profil seccomp par défaut qui bloque ~44 syscalls dangereux. Profil custom avec <code>--security-opt seccomp=profile.json</code>.</p>
+    </div>
+    <div class="card">
+      <h3>AppArmor / SELinux</h3>
+      <p><strong>AppArmor</strong> (Ubuntu/Debian) et <strong>SELinux</strong> (RHEL/CentOS) : MAC (Mandatory Access Control). Docker applique un profil AppArmor par défaut. <code>--security-opt apparmor=PROFILE</code>.</p>
+    </div>
+    <div class="card">
+      <h3>Capabilities Linux</h3>
+      <p>Docker retire la plupart des capabilities root. <code>--cap-drop ALL</code> + <code>--cap-add</code> uniquement ce qui est nécessaire. <code>--privileged</code> à éviter absolument en production.</p>
+    </div>
+    <div class="card">
+      <h3>Rootless Docker</h3>
+      <p>Docker daemon et containers s'exécutent sans privilèges root. Réduit la surface d'attaque. Limitations : certains drivers réseau/stockage non disponibles. Activé avec <code>dockerd-rootless.sh</code>.</p>
+    </div>
+  </div>
+
+  <pre><span class="c"># Sécuriser un container</span>
+<span class="fn">docker run</span> \
+  <span class="flag">--read-only</span> \                   <span class="c"># filesystem en lecture seule</span>
+  <span class="flag">--tmpfs</span> /tmp \                  <span class="c"># tmpfs pour les écritures temporaires</span>
+  <span class="flag">--cap-drop</span> ALL \                <span class="c"># supprimer toutes les capabilities</span>
+  <span class="flag">--cap-add</span>  NET_BIND_SERVICE \   <span class="c"># rajouter uniquement ce qui est nécessaire</span>
+  <span class="flag">--security-opt</span> no-new-privileges \  <span class="c"># empêche l'escalade de privilèges</span>
+  <span class="flag">--user</span>     1000:1000 \          <span class="c"># utilisateur non-root</span>
+  <span class="flag">--pids-limit</span> 50 \               <span class="c"># limite fork bomb</span>
+  nginx
+
+<span class="c"># Vérifier les capabilities</span>
+<span class="fn">docker inspect</span> CONTAINER | grep -A5 CapAdd
+
+<span class="c"># Scan de vulnérabilités (Docker Scout)</span>
+<span class="fn">docker scout cves</span> myimage:latest
+<span class="fn">docker scout quickview</span> myimage:latest</pre>
+
+  <div class="warn-box">
+    <strong>⚠ Montage du socket Docker</strong>
+    Monter <code>/var/run/docker.sock</code> dans un container donne un accès root effectif à l'hôte. À éviter absolument en production. Si nécessaire, utiliser un proxy autorisant uniquement les opérations requises.
+  </div>
+
+  <div class="ok-box">
+    <strong>✓ Docker Content Trust (DCT)</strong>
+    <code>export DOCKER_CONTENT_TRUST=1</code> force la vérification des signatures Notary avant tout push/pull. Garantit l'intégrité et l'authenticité des images. Clés gérées par <code>docker trust</code>.
+  </div>
+</section>
+
+<!-- ══════════ S6 — Storage & Volumes ══════════ -->
+<section id="s6">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <h2>Storage &amp; Volumes <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 10%</small></h2>
+    <span class="section-tag tag-storage">Storage</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Volumes (recommandés)</h3>
+      <p>Gérés par Docker dans <code>/var/lib/docker/volumes/</code>. Indépendants du cycle de vie du container. Partageables entre containers. Supportent les drivers de volume (NFS, AWS EFS, etc.).</p>
+    </div>
+    <div class="card">
+      <h3>Bind Mounts</h3>
+      <p>Monte un chemin absolu de l'hôte dans le container. Utile en développement pour le live reload. Dépendant de la structure de l'hôte. Moins portables que les volumes.</p>
+    </div>
+    <div class="card">
+      <h3>tmpfs Mounts</h3>
+      <p>Stockage en mémoire RAM. Données perdues à l'arrêt du container. Utile pour les données sensibles temporaires (tokens, caches) qui ne doivent pas persister sur disque.</p>
+    </div>
+    <div class="card">
+      <h3>Volume Drivers</h3>
+      <ul>
+        <li><code>local</code> (défaut)</li>
+        <li><code>nfs</code> — NFS v3/v4</li>
+        <li><code>rexray</code> — multi-cloud (EBS, EFS…)</li>
+        <li><code>vieux/sshfs</code> — SSHFS</li>
+        <li>Plugins cloud natifs (AWS, Azure, GCP)</li>
+      </ul>
+    </div>
+  </div>
+
+  <pre><span class="c"># Volumes</span>
+<span class="fn">docker volume create</span> my-vol
+<span class="fn">docker volume ls</span>
+<span class="fn">docker volume inspect</span> my-vol
+<span class="fn">docker volume rm</span>      my-vol
+<span class="fn">docker volume prune</span>              <span class="c"># supprime les volumes non utilisés</span>
+
+<span class="c"># Monter un volume</span>
+<span class="fn">docker run</span> <span class="flag">-v</span>      my-vol:/data nginx          <span class="c"># syntaxe courte</span>
+<span class="fn">docker run</span> <span class="flag">--mount</span> type=volume,src=my-vol,dst=/data nginx <span class="c"># syntaxe longue</span>
+
+<span class="c"># Bind mount</span>
+<span class="fn">docker run</span> <span class="flag">-v</span>      /host/path:/container/path nginx
+<span class="fn">docker run</span> <span class="flag">--mount</span> type=bind,src=/host/path,dst=/container/path,readonly nginx
+
+<span class="c"># tmpfs</span>
+<span class="fn">docker run</span> <span class="flag">--tmpfs</span> /tmp:size=100m,mode=1777 nginx
+<span class="fn">docker run</span> <span class="flag">--mount</span> type=tmpfs,dst=/tmp,tmpfs-size=100m nginx
+
+<span class="c"># Volume NFS (driver local avec opts)</span>
+<span class="fn">docker volume create</span> <span class="flag">--driver</span> local \
+  <span class="flag">--opt</span> type=nfs \
+  <span class="flag">--opt</span> <span class="s">o=addr=nfs-server.example.com,rw</span> \
+  <span class="flag">--opt</span> device=:/exports/data \
+  nfs-vol
+
+<span class="c"># Volume dans Swarm (service)</span>
+<span class="fn">docker service create</span> \
+  <span class="flag">--mount</span> type=volume,src=my-vol,dst=/data \
+  nginx</pre>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Type</th><th>Localisation</th><th>Persistance</th><th>Partage</th><th>Cas d'usage</th></tr></thead>
+      <tbody>
+        <tr><td>Volume</td><td><code>/var/lib/docker/volumes/</code></td><td>✅</td><td>✅</td><td>Bases de données, production</td></tr>
+        <tr><td>Bind mount</td><td>Chemin hôte</td><td>✅</td><td>Hôte uniquement</td><td>Dev, config files</td></tr>
+        <tr><td>tmpfs</td><td>RAM</td><td>❌</td><td>❌</td><td>Secrets temporaires, cache</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ S7 — CLI ══════════ -->
+<section id="s7">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <h2>Docker CLI — commandes clés</h2>
+    <span class="section-tag tag-containers">CLI</span>
+  </div>
+
+  <pre><span class="c"># === CONTAINERS ===</span>
+<span class="fn">docker run</span>  <span class="flag">-d</span> <span class="flag">--name</span> web <span class="flag">-p</span> 80:80 nginx         <span class="c"># démarre en arrière-plan</span>
+<span class="fn">docker run</span>  <span class="flag">-it</span> <span class="flag">--rm</span> ubuntu bash                 <span class="c"># interactif, supprimé à la sortie</span>
+<span class="fn">docker run</span>  <span class="flag">--restart</span> always nginx               <span class="c"># restart policy</span>
+<span class="fn">docker run</span>  <span class="flag">--env-file</span> .env nginx                <span class="c"># variables depuis fichier</span>
+<span class="fn">docker ps</span>                                         <span class="c"># containers actifs</span>
+<span class="fn">docker ps</span>   <span class="flag">-a</span>                                     <span class="c"># tous les containers</span>
+<span class="fn">docker ps</span>   <span class="flag">-q</span>                                     <span class="c"># IDs uniquement</span>
+<span class="fn">docker stop</span> web                                   <span class="c"># SIGTERM puis SIGKILL après 10s</span>
+<span class="fn">docker kill</span> web                                   <span class="c"># SIGKILL immédiat</span>
+<span class="fn">docker rm</span>   web
+<span class="fn">docker rm</span>   <span class="flag">-f</span> $(docker ps -aq)                  <span class="c"># supprimer tous les containers</span>
+<span class="fn">docker exec</span> <span class="flag">-it</span> web bash                          <span class="c"># shell dans un container en cours</span>
+<span class="fn">docker exec</span> web env                               <span class="c"># afficher les variables d'env</span>
+<span class="fn">docker cp</span>   web:/etc/nginx/nginx.conf ./           <span class="c"># copier depuis container</span>
+<span class="fn">docker cp</span>   ./nginx.conf web:/etc/nginx/           <span class="c"># copier vers container</span>
+<span class="fn">docker logs</span> web                                   <span class="c"># afficher les logs</span>
+<span class="fn">docker logs</span> <span class="flag">-f</span> <span class="flag">--tail</span> 100 web                     <span class="c"># suivre les logs</span>
+<span class="fn">docker top</span>  web                                   <span class="c"># processus dans le container</span>
+<span class="fn">docker stats</span>                                      <span class="c"># métriques temps réel</span>
+<span class="fn">docker diff</span> web                                   <span class="c"># changements filesystem</span>
+<span class="fn">docker commit</span> web myimage:snapshot                <span class="c"># créer image depuis container</span>
+<span class="fn">docker wait</span>  web                                  <span class="c"># attendre la sortie du container</span>
+<span class="fn">docker pause</span>  web                                 <span class="c"># suspendre (cgroups freezer)</span>
+<span class="fn">docker unpause</span> web
+
+<span class="c"># Restart policies</span>
+<span class="c"># no (défaut) | on-failure[:N] | always | unless-stopped</span>
+
+<span class="c"># === DOCKER COMPOSE ===</span>
+<span class="fn">docker compose up</span>   <span class="flag">-d</span>                            <span class="c"># démarre les services</span>
+<span class="fn">docker compose down</span> <span class="flag">-v</span>                            <span class="c"># arrête + supprime volumes</span>
+<span class="fn">docker compose logs</span> <span class="flag">-f</span>
+<span class="fn">docker compose ps</span>
+<span class="fn">docker compose exec</span> service bash
+<span class="fn">docker compose build</span> <span class="flag">--no-cache</span>
+<span class="fn">docker compose scale</span> service=3                   <span class="c"># (ou --scale dans up)</span>
+<span class="fn">docker compose config</span>                            <span class="c"># valide et affiche la config</span>
+
+<span class="c"># === IMAGES ===</span>
+<span class="fn">docker images</span>
+<span class="fn">docker rmi</span>  myimage:1.0
+<span class="fn">docker pull</span> nginx:alpine
+<span class="fn">docker search</span> nginx <span class="flag">--filter</span> stars=100
+
+<span class="c"># === SYSTEM ===</span>
+<span class="fn">docker info</span>
+<span class="fn">docker events</span>                                    <span class="c"># stream d'événements temps réel</span>
+<span class="fn">docker system df</span>
+<span class="fn">docker system prune</span> <span class="flag">-a</span> <span class="flag">--volumes</span></pre>
+</section>
+
+<!-- ══════════ S8 — Pièges ══════════ -->
+<section id="s8">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <h2>Pièges &amp; erreurs fréquentes</h2>
+    <span class="section-tag tag-containers">Exam</span>
+  </div>
+
+  <div class="warn-cards">
+    <div class="warn-card">
+      <h3>🚫 CMD vs ENTRYPOINT</h3>
+      <p><code>CMD</code> est remplacé par les arguments de <code>docker run</code>. <code>ENTRYPOINT</code> reste fixe (sauf <code>--entrypoint</code>). Pour une image avec un binaire fixe, utiliser ENTRYPOINT + CMD pour les args par défaut.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 EXPOSE ne publie pas le port</h3>
+      <p><code>EXPOSE</code> est documentation uniquement. Il faut <code>-p host:container</code> ou <code>-P</code> pour publier réellement. Sans publication, le port n'est accessible qu'entre containers sur le même réseau.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 Bridge default vs custom</h3>
+      <p>Le réseau <code>bridge</code> par défaut (<code>docker0</code>) ne supporte pas la résolution DNS par nom. Créer un réseau bridge personnalisé active automatiquement le DNS par nom de container.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 Nombre de managers Swarm</h3>
+      <p>Toujours impair : 3 ou 5. Avec 2 managers, perte d'un manager = pas de quorum. Avec 4 managers, même tolérance que 3. Maximum recommandé : 7 managers.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 docker commit en production</h3>
+      <p><code>docker commit</code> crée une image depuis un container modifié mais sans Dockerfile reproductible. Résultat opaque, non versionnable. À éviter en production — toujours reconstruire depuis un Dockerfile.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 Layers et secrets dans les images</h3>
+      <p>Un <code>RUN apt-get install SECRET</code> suivi de <code>RUN rm SECRET</code> ne supprime pas le secret de l'image — il reste dans le layer précédent. Utiliser <code>--secret</code> avec BuildKit ou des multi-stage builds.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 docker service vs docker run</h3>
+      <p><code>docker run</code> ne fonctionne que localement. <code>docker service create</code> est la commande Swarm. Les services sont gérés par Swarm et redémarrés automatiquement. <code>docker run</code> ne gère pas la haute disponibilité.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 --mode global vs replicated</h3>
+      <p>En mode <code>global</code>, <code>--replicas</code> n'est pas accepté. 1 task par nœud automatiquement. En mode <code>replicated</code>, <code>--replicas</code> est requis (défaut : 1).</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 Volumes vs Bind mounts</h3>
+      <p>Avec un bind mount, si le chemin hôte n'existe pas, Docker le crée comme répertoire. Avec un volume nommé, Docker initialise le volume avec le contenu de l'image (si le répertoire existe). Comportement différent !</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 --privileged en production</h3>
+      <p><code>--privileged</code> désactive toute isolation de sécurité (seccomp, AppArmor, capabilities). Équivaut à donner un accès root complet à l'hôte. Jamais en production — utiliser des capabilities spécifiques à la place.</p>
+    </div>
+  </div>
+
+  <!-- Architecture recap -->
+  <details style="margin-top:28px">
+    <summary style="cursor:pointer;font-family:var(--f-display);font-weight:700;font-size:1rem;padding:12px 0;color:var(--dk)">🐳 Archi Docker Swarm complète (commentée)</summary>
+    <pre><span class="c">######################################################################
+# DOCKER DCA — Architecture Swarm de référence
+######################################################################
+#
+#  CLIENT                MANAGER NODES (3 ou 5)         WORKER NODES
+#  ──────                ─────────────────────          ────────────
+#  docker CLI ──────→   Manager 1 (Leader Raft)    →   Worker 1
+#  docker compose        Manager 2 (Follower)       →   Worker 2
+#  Portainer             Manager 3 (Follower)        →   Worker 3
+#                             │
+#                        RAFT CONSENSUS
+#                        (état du cluster)
+#
+#  RÉSEAU OVERLAY (VXLAN)
+#  ┌─────────────────────────────────────────────┐
+#  │  Service A (3 réplicas)                     │
+#  │  ├── Task → Container [Worker 1]            │
+#  │  ├── Task → Container [Worker 2]            │
+#  │  └── Task → Container [Worker 3]            │
+#  │                                             │
+#  │  Routing Mesh : port 80 exposé sur TOUS     │
+#  │  les nœuds, même sans container actif       │
+#  └─────────────────────────────────────────────┘
+#
+#  STOCKAGE
+#  ├── Volumes locaux (/var/lib/docker/volumes/)
+#  ├── Volumes NFS (partagés entre nœuds)
+#  └── Secrets/Configs (chiffrés dans Raft)
+#
+#  SÉCURITÉ
+#  ├── TLS mutuel entre tous les nœuds (auto-géré)
+#  ├── Secrets montés en tmpfs dans /run/secrets/
+#  └── RBAC via UCP (Docker Enterprise)
+#
+#  COMMANDES ESSENTIELLES EXAM :
+#  docker swarm init / join / leave
+#  docker node ls / update / promote / demote
+#  docker service create / update / scale / rollback
+#  docker stack deploy -c compose.yml STACK
+#  docker secret create / ls / rm
+#  docker config create / ls / rm
+######################################################################</span></pre>
+  </details>
+
+  <!-- Resources -->
+  <div class="resources" style="margin-top:28px">
+    <h3>Ressources officielles</h3>
+    <ul>
+      <li><a href="https://training.mirantis.com/certification/dca-certification-exam/" target="_blank">Mirantis — DCA Exam Study Guide ↗</a></li>
+      <li><a href="https://docs.docker.com" target="_blank">Documentation officielle Docker ↗</a></li>
+      <li><a href="https://www.udemy.com/course/docker-certified-associate/" target="_blank">Bret Fisher — Udemy DCA course ↗</a></li>
+      <li><a href="https://www.whizlabs.com/docker-certified-associate/" target="_blank">Whizlabs Practice Exams ↗</a></li>
+      <li><a href="https://github.com/Evalle/DCA" target="_blank">Evalle — DCA Study Guide GitHub ↗</a></li>
+    </ul>
+  </div>
+
+  <a href="index.html" class="quiz-link">🐳 Passer au Quiz Docker →</a>
+</section>
+
+</div><!-- /page-wrap -->
+
+<!-- ══════════ THEME TOGGLE ══════════ -->
+<button class="theme-toggle" id="themeBtn" title="Basculer thème" aria-label="Basculer thème clair/sombre">🌙</button>
+
+<script>
+(function(){
+  const btn = document.getElementById('themeBtn');
+  const root = document.documentElement;
+  const KEY = 'docker-theme';
+
+  function apply(t){
+    root.setAttribute('data-theme', t);
+    btn.textContent = t === 'dark' ? '☀️' : '🌙';
+  }
+
+  try {
+    const saved = localStorage.getItem(KEY);
+    if(saved) apply(saved);
+  } catch(e){}
+
+  btn.addEventListener('click', function(){
+    const cur = root.getAttribute('data-theme');
+    const next = (cur === 'dark') ? 'light' : 'dark';
+    apply(next);
+    try { localStorage.setItem(KEY, next); } catch(e){}
+  });
+})();
+</script>
+</body>
+</html>
