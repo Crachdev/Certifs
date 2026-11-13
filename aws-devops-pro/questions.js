@@ -3404,6 +3404,144 @@ window.QDATA = {
     a: 1,
     e: "Route 53 Weighted Routing pour Blue/Green : deux records avec le même nom DNS (app.example.com), un pointant vers l'ALB Blue (poids 90) et un vers l'ALB Green (poids 10). Le poids est relatif : poids 90 et 10 = 90% vers Blue, 10% vers Green. Augmentation progressive : 90/10 → 75/25 → 50/50 → 0/100. Rollback instantané : remettre le poids Blue à 100 et Green à 0. TTL bas recommandé pour une propagation rapide. Différent du Blue/Green CodeDeploy qui opère au niveau ALB."
   }
+],
+
+11: [
+  // ─── RDS Multi-AZ ─────────────────────────────────────────────────────────
+  {
+    t: "RDS Multi-AZ",
+    q: "Comment fonctionne RDS Multi-AZ et quelle est la différence avec une Read Replica ?",
+    o: [
+      "Multi-AZ = réplication asynchrone pour les lectures ; Read Replica = failover automatique",
+      "Multi-AZ = réplication synchrone vers un standby passif dans une autre AZ, failover automatique (~1-2min), pas d'accès en lecture au standby ; Read Replica = réplication asynchrone, accessible en lecture, pas de failover automatique",
+      "Multi-AZ et Read Replica sont identiques — les deux servent du trafic de lecture",
+      "Multi-AZ est uniquement disponible pour MySQL et PostgreSQL"
+    ],
+    a: 1,
+    e: "RDS Multi-AZ : réplication synchrone vers un standby dans une AZ différente. Le standby est PASSIF (aucune connexion ni lecture possible). Failover automatique si la primaire tombe : AWS met à jour le DNS endpoint en ~1-2 minutes (avec Multi-AZ Cluster : ~35s). Read Replica : réplication asynchrone, accessible en lecture (scale out), peut être promu manuellement en primaire mais pas de failover automatique. Multi-AZ = HA (haute disponibilité) ; Read Replica = scalabilité lecture et DR avec promotion manuelle."
+  },
+  {
+    t: "RDS Multi-AZ Cluster",
+    q: "Qu'est-ce que RDS Multi-AZ Cluster (différent du Multi-AZ classique) et quels en sont les avantages ?",
+    o: [
+      "RDS Multi-AZ Cluster est identique au Multi-AZ classique — même fonctionnement",
+      "RDS Multi-AZ Cluster = 1 writer + 2 reader instances dans 3 AZ différentes, réplication semi-synchrone, failover en ~35s, les readers servent du trafic de lecture",
+      "RDS Multi-AZ Cluster = réplication multi-région automatique",
+      "RDS Multi-AZ Cluster est uniquement disponible pour Aurora"
+    ],
+    a: 1,
+    e: "RDS Multi-AZ Cluster (disponible MySQL 8.0+, PostgreSQL 13+) : 1 writer + 2 reader instances dans 3 AZ. Différences clés vs Multi-AZ classique : (1) Readers actifs et accessibles en lecture (via endpoint reader). (2) Réplication semi-synchrone : confirmation d'au moins 1 reader avant acknowledge. (3) Failover plus rapide (~35s vs ~60-120s pour Multi-AZ standard). (4) Meilleur throughput en lecture. Coût : ~2.5x plus cher que Multi-AZ. Idéal pour applications avec charge lecture importante et HA requise."
+  },
+  {
+    t: "Aurora Global Database",
+    q: "Un DevOps ingénieur doit choisir entre Aurora Multi-AZ et Aurora Global Database. Quand utiliser chacun ?",
+    o: [
+      "Toujours utiliser Aurora Global Database — plus performant",
+      "Aurora Multi-AZ = HA dans une région (3 AZ, réplication synchrone) ; Aurora Global Database = réplication < 1s entre régions, RPO < 1s, RTO < 1min — pour DR multi-région ou servir des utilisateurs globaux",
+      "Aurora Multi-AZ est pour les petites charges ; Aurora Global Database pour les grandes",
+      "Aurora Multi-AZ ne supporte pas le failover automatique"
+    ],
+    a: 1,
+    e: "Aurora Multi-AZ : HA dans une région, réplication via un cluster de stockage partagé dans 3 AZ (6 copies de données). Failover automatique entre instances dans la même région (~30s). Aurora Global Database : étend le cluster sur jusqu'à 5 régions secondaires. Réplication < 1 seconde. RPO ~ 0 (réplication quasi-synchrone). RTO < 1 minute (failover managé). Coût supplémentaire mais indispensable pour : DR multi-région strict, réduction latence lecture pour utilisateurs globaux, compliance géographique."
+  },
+  // ─── ElastiCache ──────────────────────────────────────────────────────────
+  {
+    t: "ElastiCache Redis vs Memcached",
+    q: "Quelles sont les différences clés entre ElastiCache Redis et ElastiCache Memcached pour le choix Pro ?",
+    o: [
+      "Redis et Memcached sont identiques — même fonctionnalités",
+      "Redis : persistance, pub/sub, structures de données avancées, réplication, clustering, Multi-AZ ; Memcached : simple, multi-threading, pas de persistence, pas de réplication",
+      "Memcached est plus rapide que Redis pour toutes les opérations",
+      "Redis ne supporte pas le clustering"
+    ],
+    a: 1,
+    e: "Redis vs Memcached — critères de choix : Redis : (1) Persistance AOF/RDB (survie aux redémarrages). (2) Structures de données : strings, hashes, lists, sets, sorted sets, streams. (3) Pub/Sub, Lua scripting. (4) Réplication et Multi-AZ automatic failover. (5) Cluster mode (sharding). (6) Transactions. Memcached : (1) Architecture multi-thread (meilleur CPU utilization pour opérations simples). (2) Pas de persistence. (3) Pas de réplication. (4) Idéal pour cache objet simple à grande échelle. Choisir Redis pour 99% des nouveaux projets AWS."
+  },
+  {
+    t: "ElastiCache Cluster Mode",
+    q: "Qu'est-ce que le ElastiCache Redis Cluster Mode et quel problème résout-il ?",
+    o: [
+      "Cluster Mode permet d'avoir plusieurs régions",
+      "Cluster Mode (Enabled) = sharding des données sur plusieurs node groups (jusqu'à 500 nœuds) pour scaler le stockage et le throughput write ; sans Cluster Mode, toutes les données sont sur un seul shard",
+      "Cluster Mode est requis pour activer la réplication",
+      "Cluster Mode désactive la persistance pour améliorer les performances"
+    ],
+    a: 1,
+    e: "ElastiCache Redis Cluster Mode Enabled : les données sont shardées (partitionnées) sur plusieurs 'node groups' (shard = 1 primary + jusqu'à 5 replicas). Avantages : (1) Scale horizontal du storage (jusqu'à 500 nœuds, 500GB+ de RAM). (2) Scale du throughput write (chaque shard accepte des écritures). (3) Failover par shard. Cluster Mode Disabled (1 seul shard) : toutes les données sur un nœud primary + replicas (lecture seule). Scaling vertical uniquement. Pour les très grands datasets ou haute charge write → Cluster Mode Enabled."
+  },
+  {
+    t: "ElastiCache scénario Pro",
+    q: "Une application web connaît des pics de charge qui saturent RDS. Comment implémenter une stratégie de caching optimale avec ElastiCache ?",
+    o: [
+      "Mettre toutes les requêtes SQL en cache automatiquement",
+      "Cache-aside (lazy loading) : l'application vérifie le cache avant RDS, écrit en cache après un miss ; Write-through pour les données critiques ; TTL adapté par type de donnée — invalider le cache lors des mises à jour",
+      "Cache-through : ElastiCache gère automatiquement la synchronisation avec RDS",
+      "Utiliser uniquement le Write-through pour toutes les données"
+    ],
+    a: 1,
+    e: "Stratégie de caching multi-pattern : (1) Cache-aside (Lazy Loading) : app vérifie cache → si miss : lit RDS + écrit dans cache. Avantage : cache ne contient que les données demandées. Inconvénient : 3 appels au premier accès (cache miss penalty). (2) Write-through : écriture simultanée cache + RDS. Données toujours fraîches mais overhead sur chaque écriture. (3) TTL : indispensable pour éviter des données obsolètes. Courtes (minutes) pour données volatiles, longues (heures) pour données stables. (4) Write-around + invalidation explicite : écrire en DB, invalider la clé cache. Pattern recommandé pour DOP-C02."
+  },
+  // ─── DynamoDB Global Tables ───────────────────────────────────────────────
+  {
+    t: "DynamoDB Global Tables",
+    q: "Comment fonctionnent les DynamoDB Global Tables et quel modèle de cohérence utilisent-elles ?",
+    o: [
+      "Global Tables = réplication synchrone entre régions, strong consistency partout",
+      "Global Tables = réplication multi-master active-active asynchrone entre régions ; eventual consistency par défaut entre régions ; conflits résolus par last-writer-wins (timestamp)",
+      "Global Tables = réplication active-passive avec une région primaire pour les écritures",
+      "Global Tables ne supportent pas les écritures simultanées dans plusieurs régions"
+    ],
+    a: 1,
+    e: "DynamoDB Global Tables : tables répliquées dans plusieurs régions AWS avec réplication active-active asynchrone (latence typique < 1 seconde). Modèle de cohérence : (1) Eventually consistent entre régions (écriture en us-east-1 sera visible en eu-west-1 après quelques millisecondes). (2) Résolution de conflits : last-writer-wins basé sur le timestamp DynamoDB (pas l'horloge applicative). (3) Conditional writes recommandés pour éviter les conflits. (4) Lecture locale toujours possible (faible latence). Idéal pour applications globales à faible latence et haute disponibilité multi-région."
+  },
+  {
+    t: "DynamoDB Global Tables",
+    q: "Quelles sont les conditions préalables pour activer DynamoDB Global Tables ?",
+    o: [
+      "Aucune condition — Global Tables peut être activé sur n'importe quelle table existante immédiatement",
+      "La table doit utiliser DynamoDB Streams (new and old images) + être dans la même région AWS source ; Global Tables version 2019.11.21 s'active automatiquement sur les nouvelles tables avec streams",
+      "Global Tables nécessite un accord de support AWS Enterprise",
+      "Global Tables ne fonctionne qu'avec les tables en mode On-Demand"
+    ],
+    a: 1,
+    e: "Prérequis DynamoDB Global Tables (version 2019.11.21) : (1) DynamoDB Streams doit être activé avec StreamViewType = NEW_AND_OLD_IMAGES (AWS l'active automatiquement lors de l'ajout d'une région). (2) Table vide recommandée pour l'ajout initial d'une nouvelle région (sinon une réplication complète se produit). (3) Pas de triggers Lambda sur les streams de Global Tables (conflits possibles). (4) TTL doit être configuré de la même façon dans toutes les régions. (5) Table en mode Provisioned ou On-Demand — les deux supportés."
+  },
+  {
+    t: "DynamoDB scénario Pro multi-région",
+    q: "Une application mobile globale doit stocker les sessions utilisateur avec accès < 10ms partout dans le monde et survive à une panne régionale. Architecture recommandée ?",
+    o: [
+      "RDS Aurora Global Database pour les sessions — faible latence garantie",
+      "DynamoDB Global Tables dans toutes les régions cibles + DAX (DynamoDB Accelerator) pour le cache en mémoire dans chaque région + Route 53 Latency routing vers l'API régionale la plus proche",
+      "ElastiCache Redis Global Datastore — spécialement conçu pour les sessions globales",
+      "S3 Cross-Region Replication avec accès depuis CloudFront pour les sessions"
+    ],
+    a: 1,
+    e: "Architecture sessions globales < 10ms : (1) DynamoDB Global Tables : réplication active-active dans toutes les régions cibles (Americas, Europe, APAC). TTL sur les sessions pour expiration automatique. (2) DAX (DynamoDB Accelerator) : cache en mémoire devant DynamoDB, latence < 1ms pour les reads. Par région. (3) Route 53 Latency Routing : dirige l'utilisateur vers l'API régionale la plus proche. (4) Résilience : si une région tombe, Route 53 failover vers une autre région (health checks). Les données de session sont déjà répliquées — pas de perte de session. DynamoDB + DAX = pattern standard examen DOP-C02 pour sessions globales."
+  },
+  {
+    t: "DynamoDB DAX",
+    q: "Dans quels cas DAX (DynamoDB Accelerator) n'apporte-t-il PAS de bénéfice significatif ?",
+    o: [
+      "DAX est toujours bénéfique — utiliser systématiquement avec DynamoDB",
+      "DAX n'aide pas pour les applications write-heavy (DAX ne cache pas les écritures), les queries fortement cache-miss (données très diverses), et les applications qui nécessitent strongly consistent reads",
+      "DAX ne fonctionne pas avec DynamoDB Global Tables",
+      "DAX n'aide pas pour les tables avec GSI (Global Secondary Index)"
+    ],
+    a: 1,
+    e: "DAX limitations et cas défavorables : (1) Write-heavy workloads : DAX offre write-through (écrit en DynamoDB + cache), mais le bénéfice est surtout sur les reads. Les writes ne sont pas plus rapides. (2) Applications avec read patterns très diversifiés : faible taux de cache hit → overhead sans bénéfice. (3) Strongly consistent reads : DAX retourne des données du cache (eventually consistent). Si strongly consistent est requis, les requêtes passent directement à DynamoDB sans bénéficier du cache DAX. (4) Applications avec accès séquentiel unique par item : pas de réutilisation du cache. Use DAX pour read-heavy workloads avec données répétées."
+  },
+  {
+    t: "RDS vs DynamoDB scénario Pro",
+    q: "Un DevOps doit choisir entre RDS Aurora et DynamoDB pour un nouveau service. Quels critères guident le choix ?",
+    o: [
+      "DynamoDB est toujours meilleur car serverless",
+      "Aurora si : relations complexes (JOINs), transactions ACID multi-tables, schéma fixe, SQL existant, queries ad-hoc complexes ; DynamoDB si : scalabilité illimitée, accès key-value/document, latence < 10ms à n'importe quelle échelle, pas de relations complexes",
+      "Aurora si budget illimité ; DynamoDB si contrainte de coût",
+      "DynamoDB uniquement pour les données JSON ; Aurora pour tous les autres types"
+    ],
+    a: 1,
+    e: "Critères de choix Aurora vs DynamoDB : Aurora (relationnelle) : (1) Données avec relations (FK, JOINs fréquents). (2) Transactions complexes multi-tables (ACID). (3) Schéma fixe avec ALTER TABLE. (4) Queries ad-hoc, rapports complexes. (5) Migration depuis MySQL/PostgreSQL existant. DynamoDB (NoSQL) : (1) Scale quasi-illimité (throughput et storage). (2) Latence constante < 10ms quelle que soit la taille. (3) Access patterns connus et fixes (pas de requêtes ad-hoc complexes). (4) Données key-value, documents JSON, time-series. (5) Serverless et pas de gestion d'instances. Pour DOP-C02 : répondre selon les requirements (latence, relations, scale)."
+  }
 ]
 
 };
