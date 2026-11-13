@@ -2163,6 +2163,278 @@ window.QDATA = {
     a: [0, 1],
     e: "Deux rôles IAM sont essentiels : (A) Service role CodeDeploy (attaché à l'application) : permet à CodeDeploy d'accéder aux instances EC2, ALB, ASG, ECS — policy AWSCodeDeployRole. (B) Instance profile EC2 (attaché aux instances) : permet à l'agent CodeDeploy sur l'instance de lire l'artifact depuis S3 et d'appeler les APIs CodeDeploy pour le reporting. Sans l'un ou l'autre, le déploiement échoue."
   }
+],
+
+4: [
+  // ─── CodeGuru Reviewer ────────────────────────────────────────────────────
+  {
+    t: "CodeGuru Reviewer",
+    q: "Qu'est-ce qu'Amazon CodeGuru Reviewer et quel est son rôle dans le SDLC ?",
+    o: [
+      "Un outil de profilage des performances à l'exécution (runtime)",
+      "Un service d'analyse statique de code (SAST) ML qui détecte bugs, vulnérabilités et déviations des best practices lors des code reviews",
+      "Un outil de génération de code automatique basé sur l'IA",
+      "Un service de monitoring des métriques applicatives en production"
+    ],
+    a: 1,
+    e: "CodeGuru Reviewer utilise le ML pour analyser le code Java et Python soumis via Pull Requests (CodeCommit, GitHub, Bitbucket) ou associations de repos. Il identifie : vulnérabilités de sécurité (OWASP), fuites de ressources, problèmes de concurrence, déviations des best practices AWS, secrets hardcodés. Les recommandations apparaissent directement dans la PR comme commentaires."
+  },
+  {
+    t: "CodeGuru Reviewer",
+    q: "Comment intégrer CodeGuru Reviewer dans un workflow GitHub/CodeCommit ?",
+    o: [
+      "Installer l'agent CodeGuru sur chaque machine de développeur",
+      "Associer le repo à CodeGuru Reviewer — il analysera automatiquement chaque nouvelle Pull Request",
+      "Exécuter codeGuruReviewer analyze dans le CI pipeline",
+      "CodeGuru Reviewer nécessite un accès direct au code source chiffré"
+    ],
+    a: 1,
+    e: "L'intégration se fait en deux étapes : (1) Associer le repo dans la console CodeGuru (CodeCommit natif, GitHub/Bitbucket via CodeConnections). (2) À chaque PR créée/mise à jour, CodeGuru analyse automatiquement les changements et poste ses recommandations comme commentaires de code review dans la PR. Pas d'agent à installer, pas de modification du pipeline CI."
+  },
+  {
+    t: "CodeGuru Reviewer",
+    q: "CodeGuru Reviewer détecte des 'hard-coded credentials' dans une PR. Quel type de détecteur utilise-t-il pour cela ?",
+    o: [
+      "Secrets detector — analyse les patterns de secrets (AWS keys, passwords, API tokens) dans le code",
+      "OWASP detector — règles OWASP A2:Broken Authentication",
+      "Dependency checker — vérifie les dépendances pour des vulnérabilités connues",
+      "Network detector — analyse les endpoints hardcodés"
+    ],
+    a: 0,
+    e: "CodeGuru Reviewer inclut un détecteur de secrets qui scanne le code pour des patterns de credentials hardcodés : AWS access keys, API tokens, mots de passe en clair, certificats. Il utilise des modèles ML entraînés pour détecter ces patterns et fait partie des Security Detectors de CodeGuru. C'est un contrôle complémentaire à AWS Secrets Manager."
+  },
+  // ─── CodeGuru Profiler ────────────────────────────────────────────────────
+  {
+    t: "CodeGuru Profiler",
+    q: "Quelle est la différence entre CodeGuru Reviewer et CodeGuru Profiler ?",
+    o: [
+      "Reviewer analyse le code statiquement pendant les PRs ; Profiler analyse les performances à l'exécution (runtime)",
+      "Reviewer est pour Java ; Profiler est pour Python",
+      "Reviewer est gratuit ; Profiler est payant",
+      "Les deux font la même chose — Profiler est l'ancien nom de Reviewer"
+    ],
+    a: 0,
+    e: "CodeGuru est composé de deux services distincts : (1) Reviewer — analyse STATIQUE du code pendant les code reviews, détecte bugs et vulnérabilités avant le déploiement. (2) Profiler — analyse DYNAMIQUE des performances à l'exécution (CPU, latence, coûts), identifie les hotspots de code en production. Les deux sont complémentaires : Reviewer avant déploiement, Profiler après."
+  },
+  {
+    t: "CodeGuru Profiler",
+    q: "Comment CodeGuru Profiler collecte-t-il les données de performance d'une application ?",
+    o: [
+      "Via des sondes instrumentées manuellement dans le code",
+      "Via un agent léger ajouté à l'application (JAR pour Java/JVM, bibliothèque Python) qui échantillonne la pile d'exécution",
+      "Via les métriques CloudWatch de l'instance EC2",
+      "Via les traces X-Ray de l'application"
+    ],
+    a: 1,
+    e: "CodeGuru Profiler utilise un agent de profiling léger : pour Java/JVM, le JAR agent est ajouté en JVM argument (-javaagent:codeguru-profiler-java-agent.jar) ; pour Python, la bibliothèque est importée. L'agent échantillonne périodiquement la call stack à faible overhead (< 5% CPU). Les données sont envoyées vers le service CodeGuru Profiler pour analyse."
+  },
+  // ─── CodeArtifact ─────────────────────────────────────────────────────────
+  {
+    t: "CodeArtifact fondamentaux",
+    q: "Qu'est-ce qu'Amazon CodeArtifact et quel problème résout-il ?",
+    o: [
+      "Un service de stockage de fichiers statiques comme S3",
+      "Un gestionnaire de packages entièrement géré qui centralise et contrôle les dépendances (npm, Maven, pip, NuGet…) pour les équipes de développement",
+      "Un service de déploiement de packages comme CodeDeploy",
+      "Un registre de containers Docker pour remplacer ECR"
+    ],
+    a: 1,
+    e: "CodeArtifact est un référentiel d'artefacts managé qui permet de : (1) stocker et partager des packages internes (bibliothèques maison), (2) proxifier les registres publics (npm, PyPI, Maven Central) avec mise en cache, (3) contrôler quels packages sont autorisés (gouvernance), (4) auditer les accès. Formats supportés : npm, pip, Maven, NuGet, Cargo, RubyGems, SwiftPM."
+  },
+  {
+    t: "CodeArtifact fondamentaux",
+    q: "Dans CodeArtifact, quelle est la différence entre un 'domain' et un 'repository' ?",
+    o: [
+      "Un domain est un compte AWS ; un repository est une région",
+      "Un domain est un conteneur organisationnel regroupant plusieurs repositories ; un repository est un référentiel de packages spécifique à un format ou une équipe",
+      "Un repository contient plusieurs domains",
+      "Les deux termes sont synonymes dans CodeArtifact"
+    ],
+    a: 1,
+    e: "Hiérarchie CodeArtifact : (1) Domain — container de haut niveau pour une organisation, peut regrouper des repositories de plusieurs comptes AWS. (2) Repository — référentiel de packages pour un format ou une équipe spécifique (ex: npm-internal, python-team-a). Un domain peut contenir de nombreux repositories. Le domain permet une gestion centralisée des permissions et des politiques."
+  },
+  {
+    t: "CodeArtifact fondamentaux",
+    q: "Comment CodeArtifact peut-il proxifier npm pour mettre en cache les packages publics ?",
+    o: [
+      "Configurer un 'upstream repository' pointant vers npmjs.com dans les paramètres du repository CodeArtifact",
+      "Créer une règle DNS qui redirige npm.registry vers CodeArtifact",
+      "Les packages npm doivent être uploadés manuellement dans CodeArtifact",
+      "CodeArtifact ne supporte pas le proxy pour npm — uniquement Maven"
+    ],
+    a: 0,
+    e: "CodeArtifact supporte les 'upstream repositories' — des connexions vers des registres publics externes (npmjs.com, PyPI, Maven Central). Quand un package est demandé et n'est pas dans le repo local, CodeArtifact le récupère depuis l'upstream, le met en cache, et le retourne. Les builds suivants utilisent le cache local. Cela résout les problèmes de disponibilité des registres publics en production CI."
+  },
+  {
+    t: "CodeArtifact IAM",
+    q: "Comment authentifier une commande 'npm install' pour qu'elle utilise CodeArtifact ?",
+    o: [
+      "Configurer npm avec un token AWS permanent dans ~/.npmrc",
+      "Exécuter 'aws codeartifact login --tool npm' qui génère un token temporaire et configure automatiquement ~/.npmrc",
+      "Créer un IAM user dédié avec un access key pour npm",
+      "npm ne supporte pas CodeArtifact directement — utiliser un wrapper Python"
+    ],
+    a: 1,
+    e: "La commande 'aws codeartifact login --tool npm --domain mondomaine --repository mon-repo' : (1) appelle l'API GetAuthorizationToken de CodeArtifact pour obtenir un token temporaire (valide 12h par défaut, max 12h), (2) configure automatiquement ~/.npmrc avec le registry URL et le token d'authentification. Les builds CI doivent exécuter cette commande avant npm install."
+  },
+  {
+    t: "CodeArtifact gouvernance",
+    q: "Une organisation veut que toutes les équipes utilisent uniquement des packages approuvés (allowlist). Comment implémenter cela avec CodeArtifact ?",
+    o: [
+      "Créer des bucket policies S3 qui bloquent l'accès aux registres publics",
+      "Configurer des repository policies CodeArtifact qui refusent les actions non autorisées, et utiliser des Security Groups pour bloquer l'accès aux registres publics depuis les instances de build",
+      "Utiliser AWS Firewall Manager pour bloquer npm.registry et PyPI",
+      "Les deux approches B sont complémentaires pour une défense en profondeur"
+    ],
+    a: 1,
+    e: "La stratégie complète : (1) repository policies CodeArtifact contrôlent qui peut publier/consommer des packages (defense au niveau packages), (2) bloquer l'accès direct aux registres publics au niveau réseau (NACLs/Security Groups pour les instances de build dans VPC, ou AWS Network Firewall) force le passage par CodeArtifact. Les deux couches ensemble créent une allowlist effective."
+  },
+  {
+    t: "CodeArtifact multi-comptes",
+    q: "Comment partager un repository CodeArtifact entre plusieurs comptes AWS d'une organisation ?",
+    o: [
+      "Dupliquer le repository dans chaque compte",
+      "Configurer une resource policy sur le domain CodeArtifact pour autoriser les autres comptes, puis créer des repositories dans les comptes consommateurs avec un upstream vers le compte central",
+      "Utiliser VPC Peering entre les comptes pour accéder au repository",
+      "Exporter les packages vers S3 et partager le bucket cross-account"
+    ],
+    a: 1,
+    e: "Le pattern multi-comptes CodeArtifact : (1) compte central maintient le domain et les repositories 'sources' (packages internes), (2) resource policy sur le domain autorise les autres comptes à se connecter, (3) chaque compte consommateur crée ses propres repositories avec un upstream vers le compte central. Les packages circulent via les connexions upstream. AWS RAM peut aussi être utilisé pour partager des domains."
+  },
+  // ─── CodeCommit avancé ───────────────────────────────────────────────────
+  {
+    t: "CodeCommit avancé",
+    q: "Comment implémenter des protections de branches dans CodeCommit (bloquer les push directs sur main) ?",
+    o: [
+      "Via les paramètres 'Branch protection' dans la console CodeCommit",
+      "Via les IAM policies — refuser codecommit:GitPush sur la ressource branche main pour les développeurs, forcer les Pull Requests",
+      "Via un hook pre-receive sur le serveur Git CodeCommit",
+      "CodeCommit ne supporte pas les protections de branches"
+    ],
+    a: 1,
+    e: "CodeCommit n'a pas de feature native de 'branch protection' (contrairement à GitHub). La solution IAM : créer une policy qui permet codecommit:GitPush sur toutes les branches SAUF main, et refuser explicitement codecommit:GitPush sur arn:aws:codecommit:region:account:repo/*/branch/main. Les développeurs doivent alors passer par des Pull Requests pour merger sur main."
+  },
+  {
+    t: "CodeCommit avancé",
+    q: "Comment CodeCommit peut-il déclencher automatiquement une action (Lambda, SNS) sur un événement (push, PR créée) ?",
+    o: [
+      "Via des webhooks HTTP configurés dans CodeCommit",
+      "Via des 'triggers' CodeCommit (notification vers SNS ou invocation Lambda) ou des règles EventBridge sur les événements CodeCommit",
+      "Via des hooks Git (pre-commit, post-commit) stockés dans le repo",
+      "CodeCommit ne supporte pas les événements automatiques"
+    ],
+    a: 1,
+    e: "CodeCommit propose deux mécanismes d'événements : (1) Triggers natifs (simple, configurés dans le repo) : notifient un topic SNS ou invoquent une Lambda sur push, création de branche, etc. (2) EventBridge : tous les événements CodeCommit (push, PR create/update/merge, commentaires, etc.) sont publiés vers EventBridge. EventBridge est plus flexible et supporte plus d'événements."
+  },
+  {
+    t: "CodeCommit avancé",
+    q: "Une équipe veut que les commits soient signés GPG pour garantir l'authenticité. CodeCommit supporte-t-il la vérification des signatures GPG ?",
+    o: [
+      "Oui, CodeCommit vérifie automatiquement les signatures GPG",
+      "Non, CodeCommit ne vérifie pas les signatures GPG nativement — les commits non-signés sont acceptés",
+      "Oui, mais uniquement pour les branches protégées",
+      "Oui, via une option dans la configuration du repo CodeCommit"
+    ],
+    a: 1,
+    e: "CodeCommit accepte les commits GPG-signés (git stocke la signature dans le commit) mais ne vérifie pas leur validité nativement. Pour enforcer la signature GPG, il faut : (1) une Lambda déclenchée par un trigger CodeCommit qui vérifie la signature avant d'accepter, ou (2) une CodePipeline avec une étape de vérification. C'est une lacune connue de CodeCommit vs GitHub (qui a la feature native)."
+  },
+  {
+    t: "CodeCommit avancé",
+    q: "Comment auditer tous les accès et modifications à un repo CodeCommit (qui a pushé quoi, quand) ?",
+    o: [
+      "Consulter les logs Git (git log) directement dans le repo",
+      "Activer CloudTrail pour capturer toutes les API calls CodeCommit (GitPush, GetBlob, MergePullRequest…) avec l'identité IAM de l'appelant",
+      "Utiliser CodeGuru Reviewer pour l'audit des accès",
+      "Les accès CodeCommit ne sont pas auditables"
+    ],
+    a: 1,
+    e: "CloudTrail enregistre toutes les API calls CodeCommit : GitPush (qui a pushé), GitPull (qui a cloné/pullé), MergePullRequestByFastForward (qui a mergé), CreatePullRequest, DeleteBranch, etc. Chaque événement inclut l'identité IAM (user/role ARN), l'IP source, la date/heure. Ces logs sont essentiels pour la conformité et l'investigation forensique."
+  },
+  {
+    t: "CodeCommit avancé",
+    q: "Un développeur distant veut cloner un repo CodeCommit. Quelles méthodes d'authentification sont disponibles ? (choisir 2)",
+    o: [
+      "HTTPS avec credentials Git générées depuis la console IAM (nom d'utilisateur/mot de passe spécifiques à CodeCommit)",
+      "SSH avec une clé SSH publique uploadée dans le profil IAM",
+      "OAuth via un fournisseur d'identité externe (GitHub SSO)",
+      "HTTPS avec username/password du compte root AWS"
+    ],
+    a: [0, 1],
+    e: "CodeCommit supporte deux méthodes d'authentification : (1) HTTPS — credentials Git générées par IAM (console IAM → Security credentials → HTTPS Git credentials for CodeCommit). (2) SSH — clé SSH publique uploadée dans le profil IAM, utilisée avec git@git-codecommit.region.amazonaws.com. Les deux sont spécifiques à CodeCommit. Pour les scripts/CI, HTTPS avec git-remote-codecommit (utilise les credentials AWS) est préféré."
+  },
+  {
+    t: "CodeCommit avancé",
+    q: "Comment configurer des notifications de Pull Request dans CodeCommit pour alerter les reviewers ?",
+    o: [
+      "CodeCommit envoie automatiquement des emails aux reviewers",
+      "Via AWS Chatbot ou SNS : créer une règle de notification dans CodeCommit → SNS → email/Slack",
+      "Via des webhooks GitHub connectés à CodeCommit",
+      "Les notifications de PR ne sont pas supportées dans CodeCommit"
+    ],
+    a: 1,
+    e: "CodeCommit intègre les notifications via le service AWS Notifications : dans la console CodeCommit, 'Notify' → créer une règle qui connecte les événements CodeCommit (PR created, PR updated, PR comment) vers un topic SNS. SNS peut envoyer des emails, des notifications Slack (via AWS Chatbot), ou déclencher d'autres automations. Alternative : règle EventBridge sur les événements PR CodeCommit."
+  },
+  {
+    t: "CodeCommit avancé",
+    q: "Une organisation utilise CodeCommit avec plusieurs équipes. Comment implémenter le principe de moindre privilège pour l'accès aux repos ?",
+    o: [
+      "Créer un IAM user par repo",
+      "Utiliser des IAM policies basées sur les ressources (ARN de repo) et des tags pour contrôler finement l'accès read/write par équipe et par repo",
+      "Tous les développeurs doivent avoir accès à tous les repos — CodeCommit ne supporte pas les permissions granulaires",
+      "Utiliser des KMS keys différentes par équipe pour chiffrer les repos"
+    ],
+    a: 1,
+    e: "CodeCommit supporte des permissions IAM granulaires par repo via l'ARN (arn:aws:codecommit:region:account:repo-name). On peut créer des policies qui accordent codecommit:GitPull sur les repos d'une équipe spécifique, codecommit:GitPush uniquement sur certaines branches, etc. L'utilisation de tags de repos avec des conditions IAM (aws:ResourceTag) permet une gestion dynamique."
+  },
+  // ─── Cross-service patterns ───────────────────────────────────────────────
+  {
+    t: "CodeCommit + CodePipeline",
+    q: "Comment CodePipeline détecte-t-il les nouveaux commits sur CodeCommit pour déclencher le pipeline ?",
+    o: [
+      "CodePipeline poll CodeCommit toutes les minutes",
+      "Via une règle EventBridge automatiquement créée par CodePipeline qui détecte les push sur la branche configurée",
+      "Via un webhook HTTP que CodePipeline enregistre dans CodeCommit",
+      "Via CloudTrail — chaque GitPush déclenche CodePipeline"
+    ],
+    a: 1,
+    e: "Quand on crée un pipeline CodePipeline avec CodeCommit comme source, CodePipeline crée automatiquement une règle EventBridge sur l'événement 'CodeCommit Repository State Change' (référence mise à jour). Ce mécanisme est quasi-temps réel (quelques secondes). L'ancien mécanisme de polling est toujours disponible mais déprécié en faveur d'EventBridge."
+  },
+  {
+    t: "CodeCommit + CodeArtifact",
+    q: "Une équipe veut publier automatiquement une bibliothèque interne dans CodeArtifact à chaque merge sur main dans CodeCommit. Quelle architecture proposer ?",
+    o: [
+      "CodeCommit → EventBridge (merge sur main) → CodePipeline (Build + Publish) → CodeArtifact",
+      "CodeCommit → S3 → CodeArtifact (upload direct)",
+      "CodeCommit → CodeDeploy → CodeArtifact",
+      "Un cron CloudWatch Events qui vérifie les commits CodeCommit toutes les heures"
+    ],
+    a: 0,
+    e: "Le pipeline recommandé : CodeCommit trigger → CodePipeline source (détection de merge sur main via EventBridge) → CodeBuild (compile, exécute les tests, construit le package : npm pack, mvn package, python setup.py sdist) → CodeBuild (publish : aws codeartifact login + npm publish / mvn deploy / twine upload). CodeArtifact reçoit et stocke le nouveau package versionné."
+  },
+  {
+    t: "CodeGuru Security",
+    q: "Quelle est la différence entre CodeGuru Reviewer et Amazon CodeGuru Security ?",
+    o: [
+      "CodeGuru Security est l'ancien nom de CodeGuru Reviewer",
+      "CodeGuru Security est un service dédié à la détection de vulnérabilités (SAST) basé sur ML avec scoring CVSS ; CodeGuru Reviewer est plus large (style, bugs, sécurité)",
+      "CodeGuru Security est pour les applications en production ; Reviewer est pour le développement",
+      "CodeGuru Security est gratuit ; Reviewer est payant"
+    ],
+    a: 1,
+    e: "Amazon CodeGuru Security est un service autonome (né du détecteur de sécurité de Reviewer) focalisé sur la détection de vulnérabilités avec scoring CVSS, remédiation guidée et tracking des findings. Il supporte plus de langages et s'intègre dans le CI/CD. CodeGuru Reviewer couvre la sécurité mais aussi la qualité de code, les best practices, les performance issues. Pour l'examen DOP-C02, les deux peuvent être mentionnés."
+  },
+  {
+    t: "CodeArtifact scénario Pro",
+    q: "Un build CI télécharge 500 packages npm à chaque exécution (20 min de téléchargement). L'équipe veut réduire ce temps. CodeArtifact peut-il aider ?",
+    o: [
+      "Non — CodeArtifact est plus lent que npm.registry car il ajoute un layer de proxy",
+      "Oui — CodeArtifact met en cache les packages npm dans la même région que le build (CodeBuild). Le premier download est depuis npmjs.com, les suivants depuis le cache CodeArtifact (intra-région, plus rapide)",
+      "Oui — CodeArtifact pré-installe les packages sur les instances de build",
+      "Non — CodeArtifact ne supporte que les packages internes, pas le proxy npm"
+    ],
+    a: 1,
+    e: "CodeArtifact avec un upstream npmjs.com : le premier build télécharge les packages depuis npm public et les met en cache dans CodeArtifact (même région AWS que le build CodeBuild). Les builds suivants téléchargent depuis CodeArtifact via le réseau intra-région AWS (très rapide, pas de latence internet). En pratique, cela peut réduire le temps de téléchargement de 80-90% pour des builds fréquents."
+  }
 ]
 
 };
