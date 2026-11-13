@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#7B42BC">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche Terraform Associate — TA-C03</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🏗️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f0fa;--sheet:#ffffff;--ink:#1a1030;--muted:#5c4a7a;--line:#ddd5ef;
+  --accent:#7B42BC;--accent-soft:#ede8f7;
+  --tf:#7B42BC;--tf-mid:#9b6dd4;--tf-light:#ede8f7;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --tag-iac:#ede8f7;--tag-iac-ink:#5b21b6;
+  --tag-state:#fce7f3;--tag-state-ink:#9d174d;
+  --tag-modules:#dcfce7;--tag-modules-ink:#166534;
+  --tag-cloud:#dbeafe;--tag-cloud-ink:#1e40af;
+  --tag-cli:#fef9c3;--tag-cli-ink:#854d0e;
+  --tag-workflow:#ffe4e6;--tag-workflow-ink:#9f1239;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0d0918;--sheet:#160f24;--ink:#ece6f8;--muted:#9078c0;--line:#2a1f42;
+  --accent:#a070e0;--accent-soft:#2a1448;
+  --tf:#a070e0;--tf-mid:#c090f0;--tf-light:#2a1448;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#f5c542;--warn-soft:#2e2400;
+  --tag-iac:#2e1a6b;--tag-iac-ink:#c4b5fd;
+  --tag-state:#4a1040;--tag-state-ink:#f9a8d4;
+  --tag-modules:#14432a;--tag-modules-ink:#86efac;
+  --tag-cloud:#1e3a6b;--tag-cloud-ink:#93c5fd;
+  --tag-cli:#3f2d00;--tag-cli-ink:#fde68a;
+  --tag-workflow:#4c0519;--tag-workflow-ink:#fda4af;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0d0918;--sheet:#160f24;--ink:#ece6f8;--muted:#9078c0;--line:#2a1f42;
+  --accent:#a070e0;--accent-soft:#2a1448;
+  --tf:#a070e0;--tf-mid:#c090f0;--tf-light:#2a1448;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#f5c542;--warn-soft:#2e2400;
+  --tag-iac:#2e1a6b;--tag-iac-ink:#c4b5fd;
+  --tag-state:#4a1040;--tag-state-ink:#f9a8d4;
+  --tag-modules:#14432a;--tag-modules-ink:#86efac;
+  --tag-cloud:#1e3a6b;--tag-cloud-ink:#93c5fd;
+  --tag-cli:#3f2d00;--tag-cli-ink:#fde68a;
+  --tag-workflow:#4c0519;--tag-workflow-ink:#fda4af;
+  color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--f-body);background:var(--paper);color:var(--ink);
+  line-height:1.6;font-size:15px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+/* ── Hero ── */
+.hero{
+  background:linear-gradient(135deg,#3d1070 0%,#7B42BC 60%,#a070e0 100%);
+  color:#fff;padding:48px max(24px,env(safe-area-inset-left,0px));
+  margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));
+}
+.hero-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:8px}
+.hero-nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:.85rem;font-weight:500;letter-spacing:.02em}
+.hero-nav a:hover{color:#fff}
+.hero h1{font-family:var(--f-display);font-size:clamp(1.8rem,5vw,2.8rem);font-weight:700;line-height:1.1;text-wrap:balance;margin-bottom:8px}
+.hero-sub{font-size:1rem;opacity:.85;margin-bottom:28px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:10px}
+.badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 14px;font-size:.8rem;font-weight:600;letter-spacing:.03em}
+/* ── Exam rules ── */
+.exam-rules{background:var(--tf-light);border-left:4px solid var(--tf);padding:16px 20px;margin:28px 0;border-radius:0 8px 8px 0}
+.exam-rules strong{color:var(--tf);font-size:.9rem;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px}
+.exam-rules ul{list-style:none;display:flex;flex-wrap:wrap;gap:12px 24px}
+.exam-rules li{font-size:.88rem;color:var(--muted)}
+.exam-rules li::before{content:"✦ ";color:var(--tf)}
+/* ── Domain weights ── */
+.domains{margin:28px 0}
+.domains h2{font-family:var(--f-display);font-size:1.1rem;font-weight:700;margin-bottom:16px;color:var(--tf)}
+.dw-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.dw-label{font-size:.82rem;font-weight:600;min-width:220px;color:var(--ink)}
+.dw-bar-wrap{flex:1;background:var(--line);border-radius:4px;height:10px;min-width:0}
+.dw-bar{height:10px;border-radius:4px;background:var(--tf);transition:width .4s ease}
+.dw-pct{font-size:.8rem;font-weight:700;color:var(--tf);min-width:38px;text-align:right}
+/* ── TOC ── */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:28px 0}
+.toc h2{font-family:var(--f-display);font-size:1rem;font-weight:700;margin-bottom:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.toc ol{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px 24px}
+.toc li a{color:var(--tf);text-decoration:none;font-size:.88rem;font-weight:500}
+.toc li a:hover{text-decoration:underline}
+/* ── Sections ── */
+section{margin:40px 0}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--line)}
+.section-num{background:var(--tf);color:#fff;font-family:var(--f-display);font-weight:700;font-size:.9rem;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-header h2{font-family:var(--f-display);font-size:1.3rem;font-weight:700;line-height:1.2}
+.section-tag{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:12px;letter-spacing:.04em;text-transform:uppercase;margin-left:auto}
+.tag-iac{background:var(--tag-iac);color:var(--tag-iac-ink)}
+.tag-state{background:var(--tag-state);color:var(--tag-state-ink)}
+.tag-modules{background:var(--tag-modules);color:var(--tag-modules-ink)}
+.tag-cloud{background:var(--tag-cloud);color:var(--tag-cloud-ink)}
+.tag-cli{background:var(--tag-cli);color:var(--tag-cli-ink)}
+.tag-workflow{background:var(--tag-workflow);color:var(--tag-workflow-ink)}
+/* ── Concept cards ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin:20px 0}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.card h3{font-family:var(--f-display);font-size:1rem;font-weight:700;margin-bottom:8px;color:var(--tf)}
+.card p{font-size:.87rem;color:var(--muted);line-height:1.55}
+.card code{font-family:var(--f-mono);font-size:.8rem;background:var(--accent-soft);color:var(--tf);padding:1px 5px;border-radius:4px}
+.card ul{font-size:.87rem;color:var(--muted);line-height:1.6;padding-left:16px;margin-top:6px}
+/* ── Code blocks ── */
+pre{background:#1e1535;color:#e8d8f8;font-family:var(--f-mono);font-size:.8rem;line-height:1.6;padding:16px 20px;border-radius:10px;overflow-x:auto;margin:16px 0;border:1px solid #3a2a60}
+pre .c{color:#9070b0;font-style:italic}
+pre .k{color:#c090f0}
+pre .s{color:#98e0a0}
+pre .v{color:#f0d080}
+pre .r{color:#f09060}
+pre .fn{color:#80c0f8}
+pre .kw{color:#ff8fa0}
+/* ── OK / WARN / INFO boxes ── */
+.ok-box{background:var(--ok-soft);border-left:4px solid var(--ok);border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;font-size:.88rem}
+.ok-box strong{color:var(--ok);display:block;margin-bottom:4px}
+.warn-box{background:var(--warn-soft);border-left:4px solid var(--warn);border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;font-size:.88rem}
+.warn-box strong{color:var(--warn);display:block;margin-bottom:4px}
+.info-box{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0;font-size:.88rem}
+.info-box strong{color:var(--accent);display:block;margin-bottom:4px}
+/* ── Tables ── */
+.tbl-wrap{overflow-x:auto;margin:16px 0;border-radius:10px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+thead th{background:var(--tf);color:#fff;padding:10px 14px;text-align:left;font-weight:600;font-size:.82rem;white-space:nowrap}
+tbody tr:nth-child(even){background:var(--accent-soft)}
+tbody td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+td code,th code{font-family:var(--f-mono);font-size:.78rem;background:var(--accent-soft);color:var(--tf);padding:1px 5px;border-radius:3px}
+/* ── Warn cards (pièges) ── */
+.warn-card{background:var(--ko-soft);border:1px solid #e09090;border-radius:12px;padding:16px 18px;font-size:.87rem}
+.warn-card h3{color:var(--ko);font-family:var(--f-display);font-weight:700;font-size:.95rem;margin-bottom:6px}
+.warn-card p{color:var(--ink);line-height:1.5}
+.warn-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin:20px 0}
+/* ── Resources ── */
+.resources{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:28px 0}
+.resources h3{font-family:var(--f-display);font-size:1rem;font-weight:700;margin-bottom:14px;color:var(--tf)}
+.resources ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.resources a{color:var(--tf);font-weight:500;text-decoration:none;font-size:.88rem}
+.resources a:hover{text-decoration:underline}
+/* ── Theme toggle ── */
+.theme-toggle{position:fixed;bottom:20px;right:20px;background:var(--sheet);border:1px solid var(--line);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:100;transition:box-shadow .2s}
+.theme-toggle:hover{box-shadow:0 4px 16px rgba(0,0,0,.18)}
+/* ── Layout ── */
+.page-wrap{max-width:900px;margin:0 auto;padding-block:0 48px}
+/* ── Quiz link ── */
+.quiz-link{display:inline-flex;align-items:center;gap:8px;background:var(--tf);color:#fff;padding:10px 20px;border-radius:24px;text-decoration:none;font-weight:600;font-size:.9rem;margin-top:12px;transition:opacity .2s}
+.quiz-link:hover{opacity:.88}
+h3.subsection{font-family:var(--f-display);font-size:1.05rem;font-weight:700;margin:24px 0 12px;color:var(--ink);border-bottom:1px solid var(--line);padding-bottom:6px}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<!-- ══════════ HERO ══════════ -->
+<div class="hero">
+  <nav class="hero-nav">
+    <a href="../index.html">← Dashboard</a>
+    <a href="index.html">🏗️ Quiz Terraform →</a>
+  </nav>
+  <h1>Terraform Associate</h1>
+  <p class="hero-sub">TA-C03 · Fiche de révision complète</p>
+  <div class="hero-badges">
+    <span class="badge">60 min</span>
+    <span class="badge">57 questions</span>
+    <span class="badge">Score min. 700/1000</span>
+    <span class="badge">2 ans validité</span>
+    <span class="badge">70,50 $</span>
+  </div>
+</div>
+
+<!-- ══════════ EXAM RULES ══════════ -->
+<div class="exam-rules">
+  <strong>Modalités d'examen</strong>
+  <ul>
+    <li>57 questions QCM + réponses multiples</li>
+    <li>60 minutes</li>
+    <li>Score minimum 700/1000</li>
+    <li>En ligne (Pearson VUE) ou en centre</li>
+    <li>Renouvellement tous les 2 ans</li>
+    <li>Terraform v1.x</li>
+  </ul>
+</div>
+
+<!-- ══════════ DOMAIN WEIGHTS ══════════ -->
+<div class="domains">
+  <h2>Pondération des domaines</h2>
+  <div class="dw-row"><span class="dw-label">1 — IaC Concepts</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:7%"></div></div><span class="dw-pct">7%</span></div>
+  <div class="dw-row"><span class="dw-label">2 — Purpose of Terraform</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:8%"></div></div><span class="dw-pct">8%</span></div>
+  <div class="dw-row"><span class="dw-label">3 — Terraform Basics</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:24%"></div></div><span class="dw-pct">24%</span></div>
+  <div class="dw-row"><span class="dw-label">4 — Terraform CLI</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:16%"></div></div><span class="dw-pct">16%</span></div>
+  <div class="dw-row"><span class="dw-label">5 — Terraform Modules</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:12%"></div></div><span class="dw-pct">12%</span></div>
+  <div class="dw-row"><span class="dw-label">6 — Core Workflow</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:11%"></div></div><span class="dw-pct">11%</span></div>
+  <div class="dw-row"><span class="dw-label">7 — Implement &amp; Maintain State</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:16%"></div></div><span class="dw-pct">16%</span></div>
+  <div class="dw-row"><span class="dw-label">8 — Read/Generate/Modify Config</span><div class="dw-bar-wrap"><div class="dw-bar" style="width:6%"></div></div><span class="dw-pct">6%</span></div>
+</div>
+
+<!-- ══════════ TOC ══════════ -->
+<div class="toc">
+  <h2>Sommaire</h2>
+  <ol>
+    <li><a href="#s1">IaC Concepts (7%)</a></li>
+    <li><a href="#s2">Purpose of Terraform (8%)</a></li>
+    <li><a href="#s3">Terraform Basics (24%)</a></li>
+    <li><a href="#s4">Terraform CLI (16%)</a></li>
+    <li><a href="#s5">Modules (12%)</a></li>
+    <li><a href="#s6">Core Workflow (11%)</a></li>
+    <li><a href="#s7">State Management (16%)</a></li>
+    <li><a href="#s8">Configuration avancée (6%)</a></li>
+    <li><a href="#s9">Terraform Cloud</a></li>
+    <li><a href="#s10">Pièges &amp; erreurs fréquentes</a></li>
+  </ol>
+</div>
+
+<!-- ══════════ S1 — IaC Concepts ══════════ -->
+<section id="s1">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2>IaC Concepts <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 7%</small></h2>
+    <span class="section-tag tag-iac">IaC</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Infrastructure as Code</h3>
+      <p>L'IaC permet de provisionner et gérer l'infrastructure via des fichiers de configuration versionnables. Avantages : <strong>idempotence</strong>, reproductibilité, auditabilité, collaboration.</p>
+    </div>
+    <div class="card">
+      <h3>Approches IaC</h3>
+      <p><strong>Déclarative</strong> (Terraform, CloudFormation) : on décrit l'état désiré, l'outil trouve le chemin.<br><strong>Impérative</strong> (scripts Bash, Ansible) : on décrit les étapes à exécuter.</p>
+    </div>
+    <div class="card">
+      <h3>Idempotence</h3>
+      <p>Appliquer la même configuration plusieurs fois produit toujours le même résultat. Terraform compare l'état actuel au desired state avant d'agir.</p>
+    </div>
+    <div class="card">
+      <h3>Mutable vs Immutable</h3>
+      <p><strong>Mutable</strong> : on modifie les ressources existantes (Ansible). <strong>Immutable</strong> : on recrée les ressources à chaque changement (Terraform recommande ce pattern via <code>create_before_destroy</code>).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S2 — Purpose of Terraform ══════════ -->
+<section id="s2">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2>Purpose of Terraform <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 8%</small></h2>
+    <span class="section-tag tag-cloud">Cloud</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Multi-cloud & Provider agnostic</h3>
+      <p>Terraform gère AWS, Azure, GCP, Kubernetes, et +3000 providers via le <strong>Terraform Registry</strong>. Un seul outil, tous les clouds.</p>
+    </div>
+    <div class="card">
+      <h3>HashiCorp Configuration Language</h3>
+      <p>HCL est lisible par l'humain et par la machine. Syntaxe JSON aussi supportée. Les fichiers <code>.tf</code> contiennent resources, variables, outputs, providers.</p>
+    </div>
+    <div class="card">
+      <h3>Terraform vs Outils similaires</h3>
+      <p><strong>vs Ansible</strong> : Terraform = provisioning IaC, Ansible = configuration management.<br><strong>vs CloudFormation</strong> : CFN = AWS only, Terraform = multi-cloud.<br><strong>vs Pulumi</strong> : langage général vs HCL.</p>
+    </div>
+    <div class="card">
+      <h3>Terraform Registry</h3>
+      <p>Dépôt officiel de providers et modules : <code>registry.terraform.io</code>. Les providers officiels (AWS, Azure, GCP) sont maintenus par HashiCorp ou les cloud vendors.</p>
+    </div>
+  </div>
+
+  <div class="ok-box">
+    <strong>✓ Terraform Open Source vs Enterprise</strong>
+    Terraform CLI = open source (MPL 2.0). Terraform Cloud = SaaS avec workspace remote, collaboration. Terraform Enterprise = version auto-hébergée pour grandes entreprises.
+  </div>
+</section>
+
+<!-- ══════════ S3 — Terraform Basics ══════════ -->
+<section id="s3">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2>Terraform Basics <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 24%</small></h2>
+    <span class="section-tag tag-iac">IaC</span>
+  </div>
+
+  <h3 class="subsection">Blocs fondamentaux</h3>
+  <div class="cards">
+    <div class="card">
+      <h3>terraform block</h3>
+      <p>Configure le comportement de Terraform lui-même : version requise, providers requis, backend.</p>
+      <ul>
+        <li><code>required_version</code></li>
+        <li><code>required_providers</code></li>
+        <li><code>backend</code></li>
+        <li><code>cloud</code> (Terraform Cloud)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>provider block</h3>
+      <p>Configure un provider spécifique. Plusieurs instances possibles via <code>alias</code>. Les credentials proviennent de variables env ou fichiers de config.</p>
+      <ul>
+        <li><code>provider "aws" { region = "..." }</code></li>
+        <li>Alias multi-région</li>
+        <li>version constraints</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>resource block</h3>
+      <p>Déclare une ressource d'infrastructure. Syntaxe : <code>resource "type" "nom_local" { ... }</code>. Référence : <code>type.nom.attribut</code>.</p>
+      <ul>
+        <li><code>depends_on</code></li>
+        <li><code>count</code> / <code>for_each</code></li>
+        <li><code>lifecycle</code></li>
+        <li><code>provisioner</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>data block</h3>
+      <p>Lit des données existantes depuis un provider sans les gérer. Utile pour référencer des ressources créées hors Terraform.</p>
+      <ul>
+        <li><code>data "aws_ami" "ubuntu" { ... }</code></li>
+        <li>Référence : <code>data.type.nom.attribut</code></li>
+        <li>Lecture seule, jamais modifié</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="subsection">Variables</h3>
+  <div class="cards">
+    <div class="card">
+      <h3>variable block</h3>
+      <p>Paramétrise la configuration. Types : <code>string</code>, <code>number</code>, <code>bool</code>, <code>list</code>, <code>map</code>, <code>object</code>, <code>tuple</code>, <code>set</code>.</p>
+      <ul>
+        <li><code>default</code> (optionnel)</li>
+        <li><code>description</code></li>
+        <li><code>type</code> constraint</li>
+        <li><code>sensitive = true</code></li>
+        <li><code>validation</code> blocks</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Priorité des variables</h3>
+      <p>Ordre croissant de priorité :</p>
+      <ul>
+        <li>1. <code>default</code> dans le bloc variable</li>
+        <li>2. Fichier <code>terraform.tfvars</code></li>
+        <li>3. Fichiers <code>*.auto.tfvars</code></li>
+        <li>4. Option <code>-var-file</code></li>
+        <li>5. Option <code>-var</code></li>
+        <li>6. Variables d'env <code>TF_VAR_*</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>locals block</h3>
+      <p>Définit des expressions réutilisables localement. Ne sont pas configurables depuis l'extérieur (contrairement aux variables).</p>
+      <pre style="margin:8px 0;padding:10px"><code>locals {
+  common_tags = {
+    env  = var.env
+    team = "platform"
+  }
+}</code></pre>
+    </div>
+    <div class="card">
+      <h3>output block</h3>
+      <p>Expose des valeurs après <code>apply</code>. Utilisé pour passer des infos entre modules ou afficher des résultats.</p>
+      <ul>
+        <li><code>value</code> (requis)</li>
+        <li><code>description</code></li>
+        <li><code>sensitive = true</code></li>
+        <li><code>depends_on</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="subsection">Expressions & Fonctions</h3>
+  <pre><span class="c"># Expressions courantes</span>
+<span class="c"># count</span>
+<span class="k">resource</span> <span class="s">"aws_instance"</span> <span class="s">"web"</span> {
+  <span class="v">count</span> = <span class="v">3</span>
+  <span class="v">ami</span>   = <span class="s">"ami-0abc123"</span>
+  <span class="v">tags</span> = {
+    <span class="v">Name</span> = <span class="s">"web-${count.index}"</span>
+  }
+}
+
+<span class="c"># for_each (préféré à count pour des maps)</span>
+<span class="k">resource</span> <span class="s">"aws_s3_bucket"</span> <span class="s">"buckets"</span> {
+  <span class="v">for_each</span> = <span class="fn">toset</span>([<span class="s">"logs"</span>, <span class="s">"data"</span>, <span class="s">"backup"</span>])
+  <span class="v">bucket</span>   = <span class="s">"myapp-${each.key}"</span>
+}
+
+<span class="c"># Expressions conditionnelles</span>
+<span class="v">instance_type</span> = <span class="v">var.env</span> == <span class="s">"prod"</span> ? <span class="s">"t3.large"</span> : <span class="s">"t3.micro"</span>
+
+<span class="c"># Fonctions utiles</span>
+<span class="fn">length</span>(<span class="v">var.subnets</span>)        <span class="c"># nombre d'éléments</span>
+<span class="fn">toset</span>(<span class="v">var.list</span>)            <span class="c"># convertit liste en set</span>
+<span class="fn">tomap</span>({<span class="v">a</span>=<span class="v">1</span>})               <span class="c"># convertit en map</span>
+<span class="fn">lookup</span>(<span class="v">map</span>, <span class="v">key</span>, <span class="v">default</span>)  <span class="c"># lookup dans une map</span>
+<span class="fn">merge</span>(<span class="v">map1</span>, <span class="v">map2</span>)          <span class="c"># fusionne des maps</span>
+<span class="fn">flatten</span>(<span class="v">list_of_lists</span>)     <span class="c"># aplatit des listes</span>
+<span class="fn">file</span>(<span class="s">"./script.sh"</span>)        <span class="c"># lit un fichier</span>
+<span class="fn">templatefile</span>(<span class="s">"tpl"</span>, <span class="v">vars</span>) <span class="c"># template avec variables</span>
+<span class="fn">jsonencode</span>(<span class="v">object</span>)         <span class="c"># encode en JSON</span>
+<span class="fn">base64encode</span>(<span class="v">string</span>)       <span class="c"># encode en base64</span>
+<span class="fn">cidrsubnet</span>(<span class="s">"10.0.0.0/16"</span>, <span class="v">8</span>, <span class="v">1</span>) <span class="c"># calcule un sous-réseau</span></pre>
+
+  <h3 class="subsection">Lifecycle meta-arguments</h3>
+  <div class="cards">
+    <div class="card">
+      <h3>create_before_destroy</h3>
+      <p>Crée la nouvelle ressource avant de détruire l'ancienne. Évite les interruptions lors des remplacements. Essentiel pour les ressources sans downtime.</p>
+    </div>
+    <div class="card">
+      <h3>prevent_destroy</h3>
+      <p>Empêche la destruction de la ressource via <code>terraform destroy</code> ou lors d'un plan qui détruirait la ressource. Protège les ressources critiques (bases de données).</p>
+    </div>
+    <div class="card">
+      <h3>ignore_changes</h3>
+      <p>Ignore les changements sur certains attributs. Utile pour des attributs gérés en dehors de Terraform (ex: tags ajoutés manuellement).</p>
+      <pre style="margin:8px 0;padding:10px"><code>lifecycle {
+  ignore_changes = [tags]
+}</code></pre>
+    </div>
+    <div class="card">
+      <h3>replace_triggered_by</h3>
+      <p>Remplace la ressource si une autre ressource ou attribut change. Depuis Terraform 1.2.</p>
+      <pre style="margin:8px 0;padding:10px"><code>lifecycle {
+  replace_triggered_by = [
+    aws_instance.web
+  ]
+}</code></pre>
+    </div>
+  </div>
+
+  <h3 class="subsection">Provisioners</h3>
+  <div class="warn-box">
+    <strong>⚠ Utilisation déconseillée</strong>
+    Les provisioners sont un dernier recours. Préférer des outils dédiés (Ansible, cloud-init, user_data). Ils rendent les configurations fragiles et non idempotentes.
+  </div>
+  <div class="cards">
+    <div class="card">
+      <h3>local-exec</h3>
+      <p>Exécute une commande sur la machine qui lance Terraform (pas sur la ressource créée).</p>
+      <pre style="margin:8px 0;padding:10px"><code>provisioner "local-exec" {
+  command = "ansible-playbook ..."
+}</code></pre>
+    </div>
+    <div class="card">
+      <h3>remote-exec</h3>
+      <p>Se connecte en SSH/WinRM à la ressource et exécute des commandes. Nécessite <code>connection</code> block.</p>
+    </div>
+    <div class="card">
+      <h3>file</h3>
+      <p>Copie des fichiers ou répertoires locaux vers la ressource créée. Nécessite <code>connection</code> block.</p>
+    </div>
+    <div class="card">
+      <h3>null_resource</h3>
+      <p>Ressource virtuelle sans infra réelle. Utile pour exécuter des provisioners liés à d'autres ressources via <code>triggers</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S4 — Terraform CLI ══════════ -->
+<section id="s4">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <h2>Terraform CLI <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 16%</small></h2>
+    <span class="section-tag tag-cli">CLI</span>
+  </div>
+
+  <h3 class="subsection">Commandes principales</h3>
+  <pre><span class="c"># === Workflow principal ===</span>
+<span class="fn">terraform init</span>          <span class="c"># initialise, télécharge providers + modules</span>
+<span class="fn">terraform validate</span>      <span class="c"># valide la syntaxe HCL</span>
+<span class="fn">terraform fmt</span>           <span class="c"># formate les fichiers .tf</span>
+<span class="fn">terraform plan</span>          <span class="c"># aperçu des changements (dry run)</span>
+<span class="fn">terraform apply</span>         <span class="c"># applique les changements</span>
+<span class="fn">terraform destroy</span>       <span class="c"># détruit toutes les ressources gérées</span>
+
+<span class="c"># === Flags importants ===</span>
+<span class="fn">terraform plan</span> -out=tfplan      <span class="c"># sauvegarde le plan</span>
+<span class="fn">terraform apply</span> tfplan          <span class="c"># applique le plan sauvegardé</span>
+<span class="fn">terraform apply</span> -auto-approve   <span class="c"># sans confirmation (CI/CD)</span>
+<span class="fn">terraform plan</span> -var="env=prod"  <span class="c"># passe une variable</span>
+<span class="fn">terraform plan</span> -target=aws_instance.web <span class="c"># cible une ressource</span>
+<span class="fn">terraform plan</span> -refresh=false   <span class="c"># ne rafraîchit pas le state</span>
+
+<span class="c"># === State ===</span>
+<span class="fn">terraform state list</span>              <span class="c"># liste les ressources dans le state</span>
+<span class="fn">terraform state show</span> aws_instance.web <span class="c"># détails d'une ressource</span>
+<span class="fn">terraform state mv</span> old.name new.name  <span class="c"># renomme sans recréer</span>
+<span class="fn">terraform state rm</span> aws_instance.web   <span class="c"># retire du state (sans détruire)</span>
+<span class="fn">terraform state pull</span>              <span class="c"># télécharge le state distant</span>
+<span class="fn">terraform state push</span> terraform.tfstate <span class="c"># pousse le state</span>
+
+<span class="c"># === Import ===</span>
+<span class="fn">terraform import</span> aws_instance.web i-1234567890 <span class="c"># importe une ressource existante</span>
+<span class="c"># Depuis Terraform 1.5 : bloc import{} dans la config</span>
+
+<span class="c"># === Inspection ===</span>
+<span class="fn">terraform output</span>                  <span class="c"># affiche les outputs</span>
+<span class="fn">terraform output</span> instance_ip      <span class="c"># output spécifique</span>
+<span class="fn">terraform output</span> -json            <span class="c"># format JSON</span>
+<span class="fn">terraform show</span>                    <span class="c"># affiche le state actuel</span>
+<span class="fn">terraform show</span> tfplan              <span class="c"># affiche un plan sauvegardé</span>
+<span class="fn">terraform graph</span>                   <span class="c"># graphe des dépendances (DOT)</span>
+
+<span class="c"># === Workspaces ===</span>
+<span class="fn">terraform workspace list</span>
+<span class="fn">terraform workspace new</span> staging
+<span class="fn">terraform workspace select</span> prod
+<span class="fn">terraform workspace show</span>
+<span class="fn">terraform workspace delete</span> staging
+
+<span class="c"># === Autres ===</span>
+<span class="fn">terraform console</span>                 <span class="c"># REPL pour évaluer des expressions</span>
+<span class="fn">terraform taint</span> aws_instance.web  <span class="c"># marque pour recréation (deprecated → use -replace)</span>
+<span class="fn">terraform apply -replace=aws_instance.web</span> <span class="c"># remplace une ressource</span>
+<span class="fn">terraform providers</span>               <span class="c"># liste les providers requis</span>
+<span class="fn">terraform providers lock</span>          <span class="c"># crée/met à jour .terraform.lock.hcl</span>
+<span class="fn">terraform force-unlock</span> LOCK_ID    <span class="c"># déverrouille le state manuellement</span></pre>
+
+  <div class="ok-box">
+    <strong>✓ terraform init en détail</strong>
+    <code>terraform init</code> télécharge les providers dans <code>.terraform/providers/</code>, initialise le backend, et installe les modules. Le fichier <code>.terraform.lock.hcl</code> verrouille les versions des providers. À commiter dans Git.
+  </div>
+
+  <h3 class="subsection">Variables d'environnement CLI</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Variable</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>TF_VAR_name</code></td><td>Définit la variable <code>name</code> (priorité haute)</td></tr>
+        <tr><td><code>TF_LOG</code></td><td>Niveau de log : TRACE, DEBUG, INFO, WARN, ERROR</td></tr>
+        <tr><td><code>TF_LOG_PATH</code></td><td>Chemin du fichier de log</td></tr>
+        <tr><td><code>TF_INPUT</code></td><td><code>=0</code> pour désactiver les prompts interactifs</td></tr>
+        <tr><td><code>TF_IN_AUTOMATION</code></td><td>Mode CI/CD — ajuste les messages</td></tr>
+        <tr><td><code>TF_CLI_ARGS</code></td><td>Arguments supplémentaires pour toutes les commandes</td></tr>
+        <tr><td><code>TF_DATA_DIR</code></td><td>Répertoire alternatif pour <code>.terraform/</code></td></tr>
+        <tr><td><code>TF_WORKSPACE</code></td><td>Workspace actif</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ S5 — Modules ══════════ -->
+<section id="s5">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <h2>Terraform Modules <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 12%</small></h2>
+    <span class="section-tag tag-modules">Modules</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Root Module</h3>
+      <p>Le répertoire courant où Terraform est invoqué. Contient la configuration principale. Tous les fichiers <code>.tf</code> du répertoire courant forment le root module.</p>
+    </div>
+    <div class="card">
+      <h3>Child Module</h3>
+      <p>Module appelé depuis un autre module via un bloc <code>module</code>. Peut provenir du système de fichiers local, du Registry Terraform ou d'un dépôt Git.</p>
+    </div>
+    <div class="card">
+      <h3>Module Sources</h3>
+      <ul>
+        <li>Local : <code>./modules/vpc</code></li>
+        <li>Registry : <code>hashicorp/consul/aws</code></li>
+        <li>GitHub : <code>github.com/org/repo</code></li>
+        <li>Git : <code>git::https://...</code></li>
+        <li>S3 : <code>s3::https://...</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Module Versioning</h3>
+      <p>Contraintes de version via <code>version = "~> 3.0"</code>. <code>~> 3.0</code> = ≥ 3.0 et < 4.0. <code>~> 3.1.0</code> = ≥ 3.1.0 et < 3.2.0. Uniquement pour les modules du Registry.</p>
+    </div>
+  </div>
+
+  <pre><span class="c"># Appel d'un module</span>
+<span class="k">module</span> <span class="s">"vpc"</span> {
+  <span class="v">source</span>  = <span class="s">"terraform-aws-modules/vpc/aws"</span>
+  <span class="v">version</span> = <span class="s">"~> 5.0"</span>
+
+  <span class="v">name</span> = <span class="s">"my-vpc"</span>
+  <span class="v">cidr</span> = <span class="s">"10.0.0.0/16"</span>
+
+  <span class="v">azs</span>             = [<span class="s">"eu-west-1a"</span>, <span class="s">"eu-west-1b"</span>]
+  <span class="v">private_subnets</span> = [<span class="s">"10.0.1.0/24"</span>, <span class="s">"10.0.2.0/24"</span>]
+  <span class="v">public_subnets</span>  = [<span class="s">"10.0.101.0/24"</span>, <span class="s">"10.0.102.0/24"</span>]
+}
+
+<span class="c"># Accès aux outputs du module</span>
+<span class="v">vpc_id</span> = <span class="v">module.vpc.vpc_id</span>
+
+<span class="c"># Structure recommandée d'un module</span>
+<span class="c"># modules/my-module/</span>
+<span class="c">#   main.tf       — ressources principales</span>
+<span class="c">#   variables.tf  — inputs</span>
+<span class="c">#   outputs.tf    — outputs</span>
+<span class="c">#   versions.tf   — required_providers</span>
+<span class="c">#   README.md     — documentation</span></pre>
+
+  <div class="ok-box">
+    <strong>✓ Bonnes pratiques modules</strong>
+    Un module doit avoir des <code>variables.tf</code>, <code>outputs.tf</code> et <code>versions.tf</code> séparés. Pas de configuration de provider dans les modules enfants (ils héritent du root). Utiliser <code>terraform init</code> après chaque ajout/modification de module.
+  </div>
+</section>
+
+<!-- ══════════ S6 — Core Workflow ══════════ -->
+<section id="s6">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <h2>Core Workflow <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 11%</small></h2>
+    <span class="section-tag tag-workflow">Workflow</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Write → Plan → Apply</h3>
+      <p>Le workflow de base : <strong>Write</strong> (écrire la config HCL), <strong>Plan</strong> (vérifier les changements prévus), <strong>Apply</strong> (appliquer). Toujours relire le plan avant d'appliquer.</p>
+    </div>
+    <div class="card">
+      <h3>terraform plan</h3>
+      <p>Génère un plan d'exécution. Symboles :<br><code>+</code> création<br><code>-</code> destruction<br><code>~</code> modification in-place<br><code>-/+</code> destroy + create (replacement)</p>
+    </div>
+    <div class="card">
+      <h3>Refresh</h3>
+      <p>Par défaut, <code>plan</code>/<code>apply</code> rafraîchissent le state depuis l'API du provider. <code>-refresh=false</code> désactive ce comportement pour accélérer. <code>terraform refresh</code> est deprecated → utiliser <code>terraform apply -refresh-only</code>.</p>
+    </div>
+    <div class="card">
+      <h3>Drift Detection</h3>
+      <p><code>terraform apply -refresh-only</code> détecte les changements fait hors Terraform (drift) et propose de mettre à jour le state sans modifier l'infra.</p>
+    </div>
+  </div>
+
+  <div class="ok-box">
+    <strong>✓ terraform plan -out et apply</strong>
+    Sauvegarder le plan avec <code>-out=tfplan</code> garantit que l'apply exécute exactement ce qui a été approuvé, sans surprise si la config a changé entre les deux commandes. Pratique recommandée en CI/CD.
+  </div>
+
+  <h3 class="subsection">Dépendances</h3>
+  <div class="cards">
+    <div class="card">
+      <h3>Dépendances implicites</h3>
+      <p>Terraform détecte automatiquement les dépendances via les références entre ressources. Si ressource B référence un attribut de ressource A, A sera créée en premier.</p>
+    </div>
+    <div class="card">
+      <h3>depends_on</h3>
+      <p>Dépendance explicite pour les cas où les références ne suffisent pas (ex: politiques IAM qui doivent exister avant la ressource). À utiliser avec parcimonie.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S7 — State Management ══════════ -->
+<section id="s7">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <h2>State Management <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 16%</small></h2>
+    <span class="section-tag tag-state">State</span>
+  </div>
+
+  <h3 class="subsection">terraform.tfstate</h3>
+  <div class="cards">
+    <div class="card">
+      <h3>Rôle du State</h3>
+      <p>Terraform stocke les mappings entre ressources HCL et ressources réelles dans le <code>terraform.tfstate</code> (JSON). C'est la source de vérité pour ce que Terraform gère.</p>
+    </div>
+    <div class="card">
+      <h3>State Locking</h3>
+      <p>Prévient les opérations concurrentes qui corromprait le state. Supporté par S3+DynamoDB, Terraform Cloud, GCS, etc. Local state = pas de locking.</p>
+    </div>
+    <div class="card">
+      <h3>Sensitive Data</h3>
+      <p>Le state peut contenir des données sensibles en clair (mots de passe, clés). Chiffrer le backend (S3 avec SSE, Terraform Cloud). Ne jamais commiter le state dans Git.</p>
+    </div>
+    <div class="card">
+      <h3>State Versioning</h3>
+      <p>Activer le versioning S3 sur le bucket qui stocke le state pour permettre les rollbacks. Terraform Cloud conserve l'historique automatiquement.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection">Remote Backends</h3>
+  <pre><span class="c"># Backend S3 (le plus courant pour AWS)</span>
+<span class="k">terraform</span> {
+  <span class="k">backend</span> <span class="s">"s3"</span> {
+    <span class="v">bucket</span>         = <span class="s">"my-terraform-state"</span>
+    <span class="v">key</span>            = <span class="s">"prod/terraform.tfstate"</span>
+    <span class="v">region</span>         = <span class="s">"eu-west-1"</span>
+    <span class="v">encrypt</span>        = <span class="kw">true</span>
+    <span class="v">dynamodb_table</span> = <span class="s">"terraform-lock"</span>  <span class="c"># table avec LockID (string)</span>
+  }
+}
+
+<span class="c"># Backend Terraform Cloud</span>
+<span class="k">terraform</span> {
+  <span class="k">cloud</span> {
+    <span class="v">organization</span> = <span class="s">"my-org"</span>
+    <span class="k">workspaces</span> {
+      <span class="v">name</span> = <span class="s">"my-workspace"</span>
+    }
+  }
+}
+
+<span class="c"># Partial configuration (credentials en dehors du code)</span>
+<span class="k">terraform</span> {
+  <span class="k">backend</span> <span class="s">"s3"</span> {}  <span class="c"># vide</span>
+}
+<span class="c"># terraform init -backend-config="bucket=my-bucket"</span>
+<span class="c"># terraform init -backend-config=backend.hcl</span></pre>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Backend</th><th>Locking</th><th>Encryption</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>local</code></td><td>❌</td><td>❌</td><td>Dev uniquement</td></tr>
+        <tr><td><code>s3</code></td><td>DynamoDB requis</td><td>SSE-S3/KMS</td><td>Le plus utilisé AWS</td></tr>
+        <tr><td><code>azurerm</code></td><td>✅ Blob lease</td><td>✅</td><td>Azure</td></tr>
+        <tr><td><code>gcs</code></td><td>✅</td><td>✅</td><td>GCP</td></tr>
+        <tr><td>Terraform Cloud</td><td>✅</td><td>✅</td><td>Historique inclus</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="subsection">Workspaces</h3>
+  <div class="cards">
+    <div class="card">
+      <h3>Concept</h3>
+      <p>Les workspaces permettent d'avoir plusieurs states indépendants dans le même backend pour la même configuration. Utile pour dev/staging/prod avec la même config.</p>
+      <ul>
+        <li>Workspace par défaut : <code>default</code></li>
+        <li>Variable : <code>terraform.workspace</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Usage</h3>
+      <pre style="margin:8px 0;padding:10px"><code>resource "aws_instance" "web" {
+  instance_type = (
+    terraform.workspace == "prod"
+    ? "t3.large"
+    : "t3.micro"
+  )
+}</code></pre>
+    </div>
+    <div class="card">
+      <h3>Limitations</h3>
+      <p>Les workspaces partagent la même configuration HCL. Pour des environnements vraiment différents, considérer des répertoires séparés ou <code>terragrunt</code>.</p>
+    </div>
+    <div class="card">
+      <h3>State dans S3</h3>
+      <p>Avec le backend S3, les workspaces stockent les states dans : <code>env:/WORKSPACE_NAME/KEY</code>. Le workspace <code>default</code> reste à la racine <code>KEY</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S8 — Configuration avancée ══════════ -->
+<section id="s8">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <h2>Configuration avancée <small style="font-weight:400;font-size:.85rem;color:var(--muted)">— 6%</small></h2>
+    <span class="section-tag tag-iac">IaC</span>
+  </div>
+
+  <h3 class="subsection">Dynamic Blocks</h3>
+  <pre><span class="c"># Génère des blocs répétitifs dynamiquement</span>
+<span class="k">resource</span> <span class="s">"aws_security_group"</span> <span class="s">"sg"</span> {
+  <span class="v">name</span> = <span class="s">"web-sg"</span>
+
+  <span class="k">dynamic</span> <span class="s">"ingress"</span> {
+    <span class="v">for_each</span> = <span class="v">var.ingress_rules</span>
+    <span class="k">content</span> {
+      <span class="v">from_port</span>   = <span class="v">ingress.value.from_port</span>
+      <span class="v">to_port</span>     = <span class="v">ingress.value.to_port</span>
+      <span class="v">protocol</span>    = <span class="v">ingress.value.protocol</span>
+      <span class="v">cidr_blocks</span> = <span class="v">ingress.value.cidr_blocks</span>
+    }
+  }
+}</pre>
+
+  <h3 class="subsection">moved block (Terraform 1.1+)</h3>
+  <pre><span class="c"># Renommer une ressource sans la détruire/recréer</span>
+<span class="k">moved</span> {
+  <span class="v">from</span> = <span class="v">aws_instance.web</span>
+  <span class="v">to</span>   = <span class="v">aws_instance.app_server</span>
+}
+
+<span class="c"># Équivaut à terraform state mv, mais déclaratif</span></pre>
+
+  <h3 class="subsection">check block (Terraform 1.5+)</h3>
+  <pre><span class="c"># Validation post-apply via assertions</span>
+<span class="k">check</span> <span class="s">"health_check"</span> {
+  <span class="k">data</span> <span class="s">"http"</span> <span class="s">"endpoint"</span> {
+    <span class="v">url</span> = <span class="s">"https://${aws_lb.web.dns_name}/health"</span>
+  }
+
+  <span class="k">assert</span> {
+    <span class="v">condition</span>     = <span class="v">data.http.endpoint.status_code</span> == <span class="v">200</span>
+    <span class="v">error_message</span> = <span class="s">"Health check failed!"</span>
+  }
+}</pre>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Expressions for</h3>
+      <pre style="margin:8px 0;padding:10px"><code># for expression (liste)
+[for s in var.list : upper(s)]
+
+# for expression (map)
+{for k, v in var.map : k => upper(v)}
+
+# avec filtre
+[for s in var.list : s if s != ""]</code></pre>
+    </div>
+    <div class="card">
+      <h3>Splat Expressions</h3>
+      <pre style="margin:8px 0;padding:10px"><code># Legacy splat
+aws_instance.web.*.id
+
+# Full splat (préféré)
+aws_instance.web[*].id
+
+# Accès à attributs imbriqués
+var.users[*].name</code></pre>
+    </div>
+    <div class="card">
+      <h3>Sensitive Variables</h3>
+      <p>Marquer une variable <code>sensitive = true</code> masque sa valeur dans les logs/plan. Les outputs qui référencent des valeurs sensibles doivent aussi être marqués <code>sensitive = true</code>.</p>
+    </div>
+    <div class="card">
+      <h3>precondition / postcondition</h3>
+      <pre style="margin:8px 0;padding:10px"><code>lifecycle {
+  precondition {
+    condition = var.env != "prod" || var.instance_type == "t3.large"
+    error_message = "Prod needs t3.large"
+  }
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S9 — Terraform Cloud ══════════ -->
+<section id="s9">
+  <div class="section-header">
+    <div class="section-num">9</div>
+    <h2>Terraform Cloud &amp; Enterprise</h2>
+    <span class="section-tag tag-cloud">Cloud</span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Workspaces Terraform Cloud</h3>
+      <p>Unité de déploiement dans TFC. Contient : state, variables, historique des runs. Différent des workspaces CLI — chaque workspace TFC a son propre state.</p>
+    </div>
+    <div class="card">
+      <h3>Remote Operations</h3>
+      <p>Les plans et apply s'exécutent sur les runners de Terraform Cloud. Logs centralisés, notifications, approbations. Les credentials sont stockés dans TFC, pas en local.</p>
+    </div>
+    <div class="card">
+      <h3>Sentinel</h3>
+      <p>Framework de policy-as-code d'HashiCorp (Terraform Enterprise/Cloud). Permet d'écrire des politiques pour valider/bloquer des configurations avant apply. Ex: interdire des instances coûteuses.</p>
+    </div>
+    <div class="card">
+      <h3>Private Registry</h3>
+      <p>Terraform Cloud héberge un registry privé pour partager modules et providers en interne. Supporte le versioning et la documentation automatique depuis README.</p>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Feature</th><th>CLI local</th><th>Terraform Cloud Free</th><th>Terraform Cloud Paid</th><th>Enterprise</th></tr></thead>
+      <tbody>
+        <tr><td>Remote state</td><td>Configurable</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>Remote runs</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>VCS integration</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>Sentinel policies</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>Audit logs</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>Auto-hébergé</td><td>✅</td><td>❌</td><td>❌</td><td>✅</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ok-box">
+    <strong>✓ Agent Terraform Cloud</strong>
+    Les Terraform Cloud Agents permettent d'exécuter des plans/apply dans des réseaux privés inaccessibles depuis internet (VPC privés, on-premise). L'agent poll TFC, pas l'inverse.
+  </div>
+</section>
+
+<!-- ══════════ S10 — Pièges ══════════ -->
+<section id="s10">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <h2>Pièges &amp; erreurs fréquentes</h2>
+    <span class="section-tag tag-workflow">Exam</span>
+  </div>
+
+  <div class="warn-cards">
+    <div class="warn-card">
+      <h3>🚫 count vs for_each</h3>
+      <p><code>count</code> crée des ressources indexées par numéro. Si on supprime un élément du milieu, Terraform recrée toutes les suivantes. <strong>Préférer <code>for_each</code> avec des maps/sets</strong> pour éviter les destructions non désirées.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 Ne pas versionner le state</h3>
+      <p>Ne jamais stocker <code>terraform.tfstate</code> dans Git. Il contient des secrets en clair et les conflits de merge corrompent le state. Utiliser un remote backend.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 terraform taint (deprecated)</h3>
+      <p><code>terraform taint</code> est déprécié depuis 0.15.2. Utiliser <code>terraform apply -replace=resource.name</code> à la place.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 provider dans les modules enfants</h3>
+      <p>Ne pas configurer de provider dans les modules enfants (sauf alias explicite). Les modules héritent de la configuration du root module. Passer les providers explicitement si nécessaire.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 terraform refresh (deprecated)</h3>
+      <p><code>terraform refresh</code> est déprécié. Utiliser <code>terraform apply -refresh-only</code> pour détecter le drift et mettre à jour le state sans modifier l'infra.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 Modifier le state manuellement</h3>
+      <p>Ne jamais éditer directement <code>terraform.tfstate</code> à la main. Utiliser les commandes <code>terraform state mv</code>, <code>terraform state rm</code>, <code>terraform import</code>.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 Contraintes de version trop souples</h3>
+      <p><code>version = ">= 1.0"</code> peut provoquer des mises à jour non désirées. Utiliser <code>~></code> (pessimistic constraint) : <code>~> 1.2</code> = ≥1.2 et &lt;2.0.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 Lock file absent</h3>
+      <p><code>.terraform.lock.hcl</code> doit être committé dans Git. Il verrouille les versions exactes des providers pour garantir la reproductibilité entre membres de l'équipe.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 Sensitive outputs non marqués</h3>
+      <p>Si un output référence une variable <code>sensitive</code>, il faut aussi marquer l'output <code>sensitive = true</code>. Sinon Terraform lèvera une erreur.</p>
+    </div>
+    <div class="warn-card">
+      <h3>🚫 terraform destroy en prod</h3>
+      <p>Protéger avec <code>prevent_destroy = true</code> dans le lifecycle. En CI/CD, ne jamais donner accès à <code>terraform destroy</code> sans double validation humaine.</p>
+    </div>
+  </div>
+
+  <!-- Architecture recap -->
+  <details style="margin-top:28px">
+    <summary style="cursor:pointer;font-family:var(--f-display);font-weight:700;font-size:1rem;padding:12px 0;color:var(--tf)">🏗️ Archi Terraform complète (commentée)</summary>
+    <pre><span class="c">######################################################################
+# TERRAFORM ASSOCIATE — Architecture de référence TA-C03
+######################################################################
+#
+#  ┌─────────────────────────────────────────────────────────┐
+#  │               GIT REPO (Terraform config)               │
+#  │  main.tf  variables.tf  outputs.tf  versions.tf         │
+#  │  modules/ .terraform.lock.hcl  terraform.tfvars.example │
+#  └──────────────────────┬──────────────────────────────────┘
+#                         │  terraform init / plan / apply
+#                         ▼
+#  ┌─────────────────────────────────────────────────────────┐
+#  │               TERRAFORM CORE                            │
+#  │  1. Load config → build dependency graph                │
+#  │  2. Refresh state from providers                        │
+#  │  3. Diff desired vs actual → execution plan             │
+#  │  4. Apply: call providers API                           │
+#  └──────────┬──────────────────────────────────────────────┘
+#             │                        │
+#             ▼                        ▼
+#  ┌──────────────────┐    ┌────────────────────────────────┐
+#  │ PROVIDERS        │    │ REMOTE BACKEND (State)         │
+#  │ aws ~> 5.0       │    │ S3 bucket + DynamoDB table     │
+#  │ azurerm ~> 3.0   │    │ ─────────────────────────────  │
+#  │ kubernetes ~> 2.0│    │ terraform.tfstate (JSON)       │
+#  │ ...              │    │ ├── resource mappings          │
+#  └──────────────────┘    │ ├── metadata                  │
+#                           │ └── sensitive data (chiffrés) │
+#  ┌──────────────────┐    └────────────────────────────────┘
+#  │ MODULES          │
+#  │ root/            │    Workspaces CLI : même config,
+#  │ ├── modules/vpc/ │    state différent par env
+#  │ ├── modules/ec2/ │    (default / staging / prod)
+#  │ └── modules/rds/ │
+#  └──────────────────┘
+#
+#  CYCLE DE VIE DES RESSOURCES :
+#  terraform init → validate → fmt → plan → apply → destroy
+#
+#  HIÉRARCHIE DE PRIORITÉ DES VARIABLES :
+#  default < tfvars < auto.tfvars < -var-file < -var < TF_VAR_*
+######################################################################</span></pre>
+  </details>
+
+  <!-- Resources -->
+  <div class="resources" style="margin-top:28px">
+    <h3>Ressources officielles</h3>
+    <ul>
+      <li><a href="https://developer.hashicorp.com/terraform/tutorials/certification-003" target="_blank">HashiCorp — Study Guide TA-C03 ↗</a></li>
+      <li><a href="https://developer.hashicorp.com/terraform/docs" target="_blank">Documentation officielle Terraform ↗</a></li>
+      <li><a href="https://registry.terraform.io" target="_blank">Terraform Registry ↗</a></li>
+      <li><a href="https://www.udemy.com/course/terraform-beginner-to-advanced/" target="_blank">Zeal Vora — Udemy Terraform course ↗</a></li>
+      <li><a href="https://www.whizlabs.com/terraform-associate-certification/" target="_blank">Whizlabs Practice Exams ↗</a></li>
+    </ul>
+  </div>
+
+  <a href="index.html" class="quiz-link">🏗️ Passer au Quiz Terraform →</a>
+</section>
+
+</div><!-- /page-wrap -->
+
+<!-- ══════════ THEME TOGGLE ══════════ -->
+<button class="theme-toggle" id="themeBtn" title="Basculer thème" aria-label="Basculer thème clair/sombre">🌙</button>
+
+<script>
+(function(){
+  const btn = document.getElementById('themeBtn');
+  const root = document.documentElement;
+  const KEY = 'terraform-theme';
+
+  function apply(t){
+    root.setAttribute('data-theme', t);
+    btn.textContent = t === 'dark' ? '☀️' : '🌙';
+  }
+
+  try {
+    const saved = localStorage.getItem(KEY);
+    if(saved) apply(saved);
+  } catch(e){}
+
+  btn.addEventListener('click', function(){
+    const cur = root.getAttribute('data-theme');
+    const next = (cur === 'dark') ? 'light' : 'dark';
+    apply(next);
+    try { localStorage.setItem(KEY, next); } catch(e){}
+  });
+})();
+</script>
+</body>
+</html>
