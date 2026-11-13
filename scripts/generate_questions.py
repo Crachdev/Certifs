@@ -208,14 +208,18 @@ def call_claude(api_key: str, prompt: str, day_num: int) -> list | None:
             raw = body["content"][0]["text"].strip()
 
             # Extraire le JSON même si Claude ajoute du texte autour
-            json_match = re.search(r'\[\s*\{.*\}\s*\]', raw, re.DOTALL)
-            if not json_match:
+            # 1) Supprimer les balises markdown ```json ... ``` si présentes
+            raw_clean = re.sub(r'```(?:json)?\s*', '', raw).strip()
+            # 2) Chercher le premier '[' et le dernier ']'
+            start = raw_clean.find('[')
+            end   = raw_clean.rfind(']')
+            if start == -1 or end == -1 or end <= start:
                 print(f"    ⚠️  Tentative {attempt}/{MAX_RETRIES} : pas de JSON trouvé")
                 if attempt < MAX_RETRIES:
                     time.sleep(2)
                 continue
 
-            questions = json.loads(json_match.group())
+            questions = json.loads(raw_clean[start:end+1])
 
             # Validation minimale
             for q in questions:
@@ -294,10 +298,11 @@ def update_total_q(content: str, total: int) -> str:
 
 def validate(path: Path) -> bool:
     """Valide la syntaxe Node.js du fichier."""
+    # json.dumps gère l'échappement des backslashes Windows et des guillemets
     js_code = f"""
 const window = {{}};
 try {{
-  eval(require('fs').readFileSync('{path}', 'utf8'));
+  eval(require('fs').readFileSync({json.dumps(str(path))}, 'utf8'));
   const days = Object.keys(window.QDATA || {{}});
   let total = 0;
   for (const d of days) {{
@@ -381,17 +386,17 @@ def main():
 
     # Filtrer les jours déjà remplis (sauf --regen)
     if not args.regen:
-        already_done = []
-        to_skip = []
+        days_empty = []    # jours sans questions → à générer
+        days_filled = []   # jours déjà remplis → à ignorer
         for d in days_to_generate:
             existing = existing_qdata.get(str(d)) or existing_qdata.get(d) or []
             if existing and len(existing) > 0:
-                to_skip.append(d)
+                days_filled.append(d)
             else:
-                already_done.append(d)
-        days_to_generate = already_done
-        if to_skip:
-            print(f"  ℹ️  Jours déjà remplis (ignorés) : {to_skip}")
+                days_empty.append(d)
+        days_to_generate = days_empty
+        if days_filled:
+            print(f"  ℹ️  Jours déjà remplis (ignorés) : {days_filled}")
             print(f"     Utilise --regen pour les regénérer.\n")
 
     if not days_to_generate:
