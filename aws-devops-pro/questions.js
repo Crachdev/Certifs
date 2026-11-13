@@ -4340,6 +4340,130 @@ window.QDATA = {
     a: 1,
     e: "Communication incident efficace : (1) Status Page : Atlassian Statuspage, AWS Service Health Dashboard custom → mise à jour toutes les 30 min min. Message type : 'Nous avons identifié un problème affectant X% des utilisateurs dans la région eu-west-1. Nos équipes travaillent activement. Prochaine mise à jour dans 30 minutes.' (2) Internal bridge : Slack channel #incident-prod + call Zoom/Meet + Incident Commander désigné. (3) Niveaux de communication : exécutif (impact business, ETA), technique (cause racine, actions). (4) Incident Commander : unique point de coordination, évite la cacophonie. (5) Post-incident : communication de résolution + post-mortem partagé. DOP-C02 : incident communication = process, pas improvisation."
   }
+],
+
+18: [
+  // ─── IAM avancé ──────────────────────────────────────────────────────────
+  {
+    t: "IAM Policy evaluation",
+    q: "Un utilisateur IAM appartient au groupe A (Allow s3:GetObject sur *) et groupe B (Deny s3:GetObject sur arn:aws:s3:::secret-bucket/*). Que se passe-t-il quand il tente d'accéder à secret-bucket/file.txt ?",
+    o: [
+      "L'accès est accordé car le Allow du groupe A est plus spécifique",
+      "L'accès est refusé : un Deny explicite l'emporte toujours sur un Allow, peu importe l'ordre d'évaluation ou la source de la policy",
+      "L'accès dépend de l'ordre des groups dans IAM",
+      "Les deux policies s'annulent et l'accès est refusé par défaut implicite"
+    ],
+    a: 1,
+    e: "IAM Policy Evaluation Logic : (1) Deny explicite → STOP, refusé. (2) Allow explicite → accordé (sauf si SCP ou Resource Policy refusent). (3) Pas de Allow → refusé implicitement. Ordre de priorité absolu : Explicit Deny > Allow > Implicit Deny. Les Deny explicites l'emportent TOUJOURS sur les Allow, même cross-account ou cross-service. Cas d'usage : blacklist de ressources sensibles via Deny. Attention : un Deny dans une SCP bloque même les admins IAM du compte member. Contrairement aux ACLs réseau, l'évaluation IAM n'est pas stateful — chaque requête est évaluée indépendamment."
+  },
+  {
+    t: "Permission Boundaries",
+    q: "Qu'est-ce qu'une Permission Boundary IAM et quel problème résout-elle ?",
+    o: [
+      "Une Permission Boundary est une politique qui accorde des permissions supplémentaires à un rôle IAM",
+      "Une Permission Boundary définit le maximum de permissions qu'une entité IAM peut avoir — les permissions effectives sont l'intersection entre les identity policies et la boundary ; elle empêche l'escalade de privilèges (un développeur ne peut pas créer un rôle plus puissant que ses propres permissions)",
+      "Une Permission Boundary remplace les SCPs pour les comptes AWS Organizations",
+      "Les Permission Boundaries ne s'appliquent qu'aux rôles de service AWS"
+    ],
+    a: 1,
+    e: "Permission Boundaries : mécanisme anti-escalade de privilèges. Fonctionnement : permissions effectives = identity_policy INTERSECT permission_boundary. Exemple : boundary Allow {EC2:*, S3:*} + policy Allow {IAM:CreateRole, EC2:*} → effectif Allow {EC2:*} seulement. Use cases : (1) Déléguer la création de rôles IAM aux développeurs sans qu'ils puissent créer des rôles admin. (2) Contraindre les permissions d'un Lambda function role créé par un pipeline CI/CD. (3) Principe du moindre privilège dans les environnements multi-équipes. Important : une boundary ne substitue pas les identity policies — les deux doivent Allow pour qu'une action soit permise."
+  },
+  {
+    t: "SCPs AWS Organizations",
+    q: "Comment les Service Control Policies (SCP) interagissent-elles avec les policies IAM dans les comptes members ?",
+    o: [
+      "Les SCPs remplacent complètement les policies IAM dans les comptes members",
+      "Les SCPs définissent les permissions maximales disponibles dans un compte member — même un admin IAM du compte ne peut pas dépasser les limites SCPs ; les permissions effectives sont l'intersection SCP ET identity policy",
+      "Les SCPs s'appliquent uniquement aux utilisateurs IAM, pas aux rôles",
+      "Un Allow dans une SCP accorde directement des permissions aux entités IAM"
+    ],
+    a: 1,
+    e: "Service Control Policies (SCP) : guardrails organisationnels. Points clés : (1) Les SCPs ne donnent PAS de permissions — elles définissent le plafond. (2) Permissions effectives = SCP INTERSECT identity_policy (et Permission Boundary si présente). (3) Le compte de gestion (root) est exempt des SCPs. (4) FullAWSAccess SCP par défaut : sans SCP permissive, tout est bloqué. (5) Héritage : OUs héritent des parents (OU imbriquées). (6) Deny vs Allow SCPs : Deny SCPs pour interdire des services ou régions (ex: bloquer tous les services sauf eu-west-1) ; Allow SCPs pour whitelister les services autorisés. Exemple guardrail : SCP Deny {ec2:*, rds:*} Condition {aws:RequestedRegion NotIn [eu-west-1, eu-central-1]} → empêche tout déploiement hors Europe."
+  },
+  {
+    t: "IAM Roles cross-account",
+    q: "Comment configurer un accès cross-account sécurisé entre un compte Dev et un compte Prod dans AWS Organizations ?",
+    o: [
+      "Créer des utilisateurs IAM identiques dans les deux comptes avec les mêmes credentials",
+      "Créer un IAM Role dans le compte Prod avec une Trust Policy autorisant le compte Dev à assume-role ; dans le compte Dev, créer une policy permettant sts:AssumeRole vers ce rôle Prod ; utiliser ExternalId pour les accès tiers",
+      "Utiliser VPC Peering pour accéder aux ressources cross-account",
+      "Partager les Access Keys entre les comptes via Parameter Store"
+    ],
+    a: 1,
+    e: "Cross-account IAM Role pattern : (1) Compte Prod : créer rôle ProdReadOnly avec Trust Policy : {Principal: {AWS: arn:aws:iam::DEV_ACCOUNT_ID:root}, Action: sts:AssumeRole, Condition: {StringEquals: {sts:ExternalId: uniqueId}}}. (2) Compte Dev : policy permettant sts:AssumeRole vers arn:aws:iam::PROD:role/ProdReadOnly. (3) Code Dev : aws sts assume-role → credentials temporaires (15min-12h). Sécurité renforcée : MFA conditionnel (aws:MultiFactorAuthPresent: true), IP restriction, ExternalId pour accès tiers (Confused Deputy Problem). Best practices : rotation automatique pas nécessaire (credentials temporaires STS), audit via CloudTrail AssumeRole events."
+  },
+  {
+    t: "IAM Identity Center (SSO)",
+    q: "Quelle est la différence entre AWS IAM Identity Center (ex-SSO) et les IAM Users classiques pour une organisation multi-comptes ?",
+    o: [
+      "IAM Identity Center et IAM Users sont équivalents — même niveau de sécurité",
+      "IAM Identity Center centralise l'authentification (IdP unique : Okta, Azure AD, ou AWS directory) et l'autorisation (Permission Sets) pour tous les comptes Organizations, éliminant les IAM Users locaux et leurs long-lived credentials",
+      "IAM Identity Center ne supporte que les utilisateurs AWS natifs",
+      "IAM Identity Center ne peut gérer qu'un seul compte AWS"
+    ],
+    a: 1,
+    e: "IAM Identity Center (SSO) : gestion d'accès centralisée pour Organizations. Architecture : (1) Identity Source : AWS SSO directory, Active Directory (AWS Managed AD / AD Connector), ou IdP externe (Okta, Azure AD via SAML 2.0 / SCIM). (2) Permission Sets : ensemble de policies IAM mappées à un compte + utilisateur/groupe. (3) Credentials : temporaires, via AWS CLI --profile sso ou console SSO portal. Avantages vs IAM Users : pas de long-lived access keys, audit centralisé, SCIM pour provisioning/deprovisioning automatique, MFA centralisé. DOP-C02 : IAM Identity Center = best practice pour multi-comptes ; IAM Users = exception pour les service accounts et cas spéciaux."
+  },
+  {
+    t: "Conditions IAM avancées",
+    q: "Comment utiliser les conditions IAM pour restreindre l'accès S3 à une VPC spécifique uniquement ?",
+    o: [
+      "Les conditions IAM ne peuvent pas restreindre l'accès par VPC",
+      "S3 Bucket Policy avec Condition {StringNotEquals: {aws:SourceVpc: vpc-xxxxxx}} → Deny ; combiné avec une VPC Endpoint Policy pour S3 et un Route Table pointant le trafic S3 vers le VPC Endpoint",
+      "Utiliser Security Groups pour restreindre l'accès S3",
+      "Utiliser un NAT Gateway avec ACL réseau pour bloquer S3 hors VPC"
+    ],
+    a: 1,
+    e: "S3 VPC-only access pattern : (1) VPC Endpoint (Gateway type) : créer dans le VPC, associer aux Route Tables. (2) S3 Bucket Policy : {Effect: Deny, Principal: *, Action: s3:*, Condition: {StringNotEquals: {aws:SourceVpc: vpc-id}}} — bloque tout accès hors VPC. (3) VPC Endpoint Policy : contrôle quels S3 buckets sont accessibles depuis le VPC. Conditions IAM clés : aws:SourceVpc (VPC ID), aws:SourceVpce (endpoint ID), aws:SourceIp (CIDR), aws:PrincipalOrgID (Organizations), aws:RequestedRegion, aws:SecureTransport (HTTPS only), s3:prefix, s3:ExistingObjectTag. Use case sécurité : données confidentielles accessibles uniquement depuis les instances EC2 internes, jamais depuis Internet."
+  },
+  {
+    t: "IAM Roles for Service Accounts (IRSA)",
+    q: "Comment configurer l'accès AWS depuis des pods Kubernetes (EKS) avec le principe du moindre privilège ?",
+    o: [
+      "Monter les Access Keys AWS directement dans les pods Kubernetes via des secrets K8s",
+      "IRSA (IAM Roles for Service Accounts) : associer un IAM Role à un Service Account K8s via OIDC — chaque pod assume automatiquement le rôle IAM via un token web (credentials temporaires, rotation automatique, isolation par namespace)",
+      "Attacher un Instance Profile IAM au node group EC2 avec toutes les permissions nécessaires",
+      "Utiliser un sidecar proxy pour intercepter les appels AWS API"
+    ],
+    a: 1,
+    e: "IRSA (IAM Roles for Service Accounts) : (1) Activer OIDC provider sur le cluster EKS. (2) Créer IAM Role avec Trust Policy : {Principal: {Federated: oidc-provider-arn}, Condition: {StringEquals: {oidc:sub: system:serviceaccount:namespace:sa-name}}}. (3) Annoter le Service Account K8s : eks.amazonaws.com/role-arn: arn:aws:iam::xxx:role/my-role. (4) Pod → credentials STS temporaires automatiques via le webhook EKS. Avantages : isolation par pod (pas de blast radius si compromis), rotation automatique, audit granulaire via CloudTrail. Alternative : EKS Pod Identity (nouvelle approche, simplifiée). Éviter absolument : Node IAM Role avec toutes les permissions (accès partagé entre tous les pods du node)."
+  },
+  {
+    t: "Resource-based policies",
+    q: "Quelle est la différence entre une Identity Policy et une Resource-based Policy en IAM, et quand utiliser l'une ou l'autre ?",
+    o: [
+      "Identity Policies et Resource-based Policies sont identiques — même fonctionnement",
+      "Identity Policy : attachée à une entité IAM (user/role/group), définit CE QUE l'entité peut faire. Resource-based Policy : attachée à une ressource (S3, SQS, KMS), définit QUI peut accéder à la ressource et comment — permet l'accès cross-account direct sans assume-role",
+      "Resource-based Policies remplacent les Identity Policies pour les services AWS",
+      "Resource-based Policies ne supportent pas les conditions IAM"
+    ],
+    a: 1,
+    e: "Identity vs Resource-based Policies : Identity Policies (attachées à IAM entities) : contrôlent ce que l'entité peut faire sur quelle ressource. Resource-based Policies (inline sur ressource) : contrôlent qui peut accéder à la ressource. Deux types d'accès : (1) Same-account : Identity Policy ONLY, ou Resource Policy ONLY, ou les deux — l'une suffit pour accorder l'accès. (2) Cross-account : BOTH identity policy (dans le compte appelant) AND resource policy (dans le compte cible) doivent Allow — ou assume-role + identity policy. Services supportant resource policies : S3, SQS, SNS, KMS, Lambda (resource-based = function policy), API Gateway, ECR, Secrets Manager. Use case : S3 cross-account direct (pas de assume-role nécessaire), Lambda invocation depuis d'autres services."
+  },
+  {
+    t: "IAM Access Analyzer",
+    q: "Qu'est-ce qu'AWS IAM Access Analyzer et comment l'utiliser dans une stratégie de sécurité proactive ?",
+    o: [
+      "IAM Access Analyzer est uniquement un outil de reporting — il ne peut pas détecter les accès en temps réel",
+      "IAM Access Analyzer identifie les ressources partagées avec des entités externes (hors Organizations), génère des findings exploitables, et peut valider les policies IAM avant déploiement — intégrable dans les pipelines CI/CD",
+      "IAM Access Analyzer ne fonctionne que sur les buckets S3",
+      "IAM Access Analyzer remplace CloudTrail pour l'audit des accès"
+    ],
+    a: 1,
+    e: "IAM Access Analyzer : trois modes. (1) External Access Analyzer : détecte les ressources partagées outside the zone of trust (compte ou Organization) — S3 buckets, IAM roles, KMS keys, Lambda functions, SQS queues. Findings : accès externe inattendu → review + archive ou remediate. (2) Unused Access Analyzer : identifie les permissions IAM accordées mais jamais utilisées (sur 90 jours) → aide à appliquer le principe du moindre privilège. (3) Policy Validation : avant de déployer une policy (terraform plan, CloudFormation changeset), valider via l'API Access Analyzer → erreurs de syntaxe, security warnings, suggestions. Integration CI/CD : aws accessanalyzer validate-policy dans les pipelines. DOP-C02 : Access Analyzer = shift-left security pour IAM."
+  },
+  {
+    t: "AWS Organizations et délégation d'admin",
+    q: "Comment déléguer l'administration de certains services AWS à un compte membre dans AWS Organizations ?",
+    o: [
+      "Il est impossible de déléguer l'administration — seul le compte de gestion peut administrer tous les services",
+      "Delegated Administrator : désigner un compte membre comme admin délégué pour des services spécifiques (Security Hub, GuardDuty, Config, Access Analyzer, etc.) — le compte délégué peut gérer ce service pour toute l'organisation sans accès au compte de gestion",
+      "Utiliser des cross-account roles depuis le compte de gestion vers les membres",
+      "Créer un compte de management secondaire avec les mêmes permissions"
+    ],
+    a: 1,
+    e: "Delegated Administrator pattern (best practice AWS) : (1) Compte de gestion : aws organizations register-delegated-administrator --account-id SECURITY_ACCOUNT_ID --service-principal securityhub.amazonaws.com. (2) Le compte Security devient admin délégué pour Security Hub — il peut activer/configurer Security Hub pour tous les membres sans toucher au compte de gestion. Services supportant delegated admin : Security Hub, GuardDuty, Config, Access Analyzer, Macie, Detective, Firewall Manager, Inspector, CloudTrail (org trail), Backup. Best practices : séparer compte Log Archive (collecte des logs) et compte Security Tooling (admin délégué des services de sécurité) du compte de gestion — réduction de blast radius si compromis."
+  }
 ]
 
 };
