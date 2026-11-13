@@ -1,1 +1,864 @@
-<!doctype html><html lang='fr'><head><meta charset='utf-8'><title>Fiche AWS CloudOps Engineer Associate</title></head><body><h1>Fiche AWS CloudOps Engineer Associate (SOA-C03)</h1><p>À compléter.</p></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche Révision — AWS SOA-C03</title>
+<style>
+  :root {
+    --bg: #f8f9fa; --bg2: #ffffff; --fg: #1a1a2e; --fg2: #4a4a6a;
+    --accent: #ff9900; --accent2: #232f3e; --border: #e0e0ee;
+    --d1: #0ea5e9; --d2: #22c55e; --d3: #a855f7; --d4: #ef4444; --d5: #f97316;
+    --d1bg: #e0f2fe; --d2bg: #dcfce7; --d3bg: #f3e8ff; --d4bg: #fee2e2; --d5bg: #ffedd5;
+    --success: #16a34a; --warn: #d97706;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f0f1a; --bg2: #1a1a2e; --fg: #e8e8f0; --fg2: #9999bb;
+      --accent: #ff9900; --accent2: #ff9900; --border: #2a2a3e;
+      --d1bg: #0c2340; --d2bg: #0a2a15; --d3bg: #1e0a3a; --d4bg: #2a0a0a; --d5bg: #2a1500;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f0f1a; --bg2: #1a1a2e; --fg: #e8e8f0; --fg2: #9999bb;
+    --accent: #ff9900; --accent2: #ff9900; --border: #2a2a3e;
+    --d1bg: #0c2340; --d2bg: #0a2a15; --d3bg: #1e0a3a; --d4bg: #2a0a0a; --d5bg: #2a1500;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px; line-height: 1.6;
+    padding: 0 max(16px, env(safe-area-inset-left,0px));
+    padding-right: max(16px, env(safe-area-inset-right,0px));
+  }
+
+  /* ── HEADER ── */
+  .hero {
+    background: var(--accent2);
+    color: #fff;
+    padding: 24px max(24px, env(safe-area-inset-left,0px));
+    margin: 0 calc(-1 * max(16px, env(safe-area-inset-left,0px)));
+    margin-right: calc(-1 * max(16px, env(safe-area-inset-right,0px)));
+    display: flex; flex-wrap: wrap; gap: 16px; align-items: center;
+  }
+  .hero-logo { font-size: 2rem; }
+  .hero-title h1 { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+  .hero-title p { font-size: .9rem; opacity: .8; margin-top: 2px; }
+  .hero-badges { margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge {
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25);
+    padding: 4px 10px; border-radius: 20px; font-size: .78rem; white-space: nowrap;
+  }
+  .badge strong { color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding-block: 24px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px,1fr)); gap: 16px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 16px; margin-bottom: 24px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px; overflow: hidden;
+  }
+  .card-title {
+    font-size: .78rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--fg2); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    background: var(--accent);
+  }
+
+  /* ── DOMAIN SECTION HEADERS ── */
+  .domain-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 8px; margin-bottom: 14px;
+    font-weight: 700; font-size: .95rem;
+  }
+  .domain-header .pct {
+    margin-left: auto; font-size: .82rem; opacity: .75; font-weight: 400;
+  }
+  .d1 { background: var(--d1bg); color: var(--d1); }
+  .d2 { background: var(--d2bg); color: var(--d2); }
+  .d3 { background: var(--d3bg); color: var(--d3); }
+  .d4 { background: var(--d4bg); color: var(--d4); }
+  .d5 { background: var(--d5bg); color: var(--d5); }
+
+  /* ── KV LISTS ── */
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: start; }
+  .kv dt { font-weight: 600; white-space: nowrap; color: var(--fg2); font-size: .83rem; }
+  .kv dd { color: var(--fg); font-size: .85rem; }
+
+  /* ── COMPARE TABLE ── */
+  .compare { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  .compare th {
+    background: var(--accent2); color: var(--accent);
+    padding: 7px 10px; text-align: left; font-size: .75rem; letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .compare td { padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .compare tr:last-child td { border-bottom: none; }
+  .compare tr:hover td { background: rgba(255,153,0,.06); }
+  .compare td:first-child { font-weight: 600; white-space: nowrap; color: var(--fg2); }
+  .compare .yes { color: #16a34a; }
+  .compare .no  { color: #dc2626; }
+  .compare .partial { color: var(--warn); }
+  .overflow { overflow-x: auto; }
+
+  /* ── TIPS / BULLET LISTS ── */
+  .tips { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .tips li {
+    padding: 7px 10px; background: rgba(255,153,0,.07); border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0; font-size: .84rem;
+  }
+  .tips li strong { color: var(--accent2); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tips li strong { color: var(--accent); } }
+  :root[data-theme="dark"] .tips li strong { color: var(--accent); }
+
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .checklist li { font-size: .83rem; padding-left: 20px; position: relative; }
+  .checklist li::before { content: "✓"; position: absolute; left: 0; color: var(--success); font-weight: 700; }
+
+  /* ── TAGS ── */
+  .tag {
+    display: inline-block; padding: 2px 7px; border-radius: 4px;
+    font-size: .72rem; font-weight: 600; margin: 2px 2px 2px 0;
+  }
+  .tag-blue  { background: var(--d1bg); color: var(--d1); }
+  .tag-green { background: var(--d2bg); color: var(--d2); }
+  .tag-purple{ background: var(--d3bg); color: var(--d3); }
+  .tag-red   { background: var(--d4bg); color: var(--d4); }
+  .tag-orange{ background: var(--d5bg); color: var(--d5); }
+  .tag-gray  { background: var(--border); color: var(--fg2); }
+
+  /* ── ALERT ── */
+  .alert {
+    border-radius: 8px; padding: 12px 14px; font-size: .84rem;
+    display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px;
+  }
+  .alert-warn { background: #fef3c7; color: #92400e; border-left: 4px solid #d97706; }
+  .alert-info { background: var(--d1bg); color: var(--d1); border-left: 4px solid var(--d1); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .alert-warn { background: #2d1a00; color: #fbbf24; }
+  }
+  :root[data-theme="dark"] .alert-warn { background: #2d1a00; color: #fbbf24; }
+
+  /* ── PROGRESS BAR ── */
+  .prog-wrap { margin-bottom: 10px; }
+  .prog-label { display: flex; justify-content: space-between; font-size: .78rem; color: var(--fg2); margin-bottom: 3px; }
+  .prog { height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .prog-bar { height: 100%; border-radius: 4px; transition: width .3s; }
+
+  /* ── CODE ── */
+  code {
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: .8rem; background: var(--border); padding: 1px 5px; border-radius: 3px;
+    color: var(--d3);
+  }
+
+  /* ── TOC ── */
+  .toc { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; }
+  .toc h3 { font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--fg2); margin-bottom: 8px; }
+  .toc-links { display: flex; flex-wrap: wrap; gap: 6px; }
+  .toc-links a {
+    text-decoration: none; padding: 4px 10px; border-radius: 20px; font-size: .78rem;
+    font-weight: 600; border: 1px solid var(--border); color: var(--fg2);
+    transition: all .15s;
+  }
+  .toc-links a:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── SECTION HEADINGS ── */
+  .sec-title {
+    font-size: 1.1rem; font-weight: 700; margin-bottom: 14px;
+    padding-bottom: 8px; border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sec-title .icon { font-size: 1.2rem; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .hero { padding: 16px; }
+    .hero-logo { font-size: 1.5rem; }
+    .hero-title h1 { font-size: 1.2rem; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .hero { background: #232f3e !important; -webkit-print-color-adjust: exact; }
+    .card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-logo">☁️</div>
+  <div class="hero-title">
+    <h1>AWS SOA-C03 — Fiche de Révision</h1>
+    <p>AWS Certified SysOps Administrator – Associate · Sprint 15 jours</p>
+  </div>
+  <div class="hero-badges">
+    <span class="badge"><strong>50+15</strong> questions</span>
+    <span class="badge"><strong>130</strong> minutes</span>
+    <span class="badge">Score min <strong>720/1000</strong></span>
+    <span class="badge"><strong>5</strong> domaines</span>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="container">
+<div class="toc">
+  <h3>Navigation rapide</h3>
+  <div class="toc-links">
+    <a href="#exam">📋 Examen</a>
+    <a href="#d1">D1 Monitoring</a>
+    <a href="#d2">D2 Reliability</a>
+    <a href="#d3">D3 Deployment</a>
+    <a href="#d4">D4 Security</a>
+    <a href="#d5">D5 Networking</a>
+    <a href="#compares">⚖️ Comparatifs</a>
+    <a href="#piege">⚠️ Pièges</a>
+    <a href="#plan">🗓️ Plan 15j</a>
+  </div>
+</div>
+
+<!-- ── SECTION : EXAM INFO ── -->
+<section id="exam">
+<div class="sec-title"><span class="icon">📋</span> Informations sur l'examen</div>
+<div class="grid-3">
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Format</div>
+    <dl class="kv">
+      <dt>Type</dt><dd>QCM + scénarios (choix multiples)</dd>
+      <dt>Questions</dt><dd>65 total (50 notées + 15 non notées)</dd>
+      <dt>Durée</dt><dd>130 minutes</dd>
+      <dt>Score min</dt><dd>720 / 1000</dd>
+      <dt>Langue</dt><dd>Français disponible</dd>
+      <dt>Repassage</dt><dd>14 jours d'attente minimum</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Répartition des domaines</div>
+    <div class="prog-wrap">
+      <div class="prog-label"><span>D1 — Monitoring &amp; Reporting</span><span>22%</span></div>
+      <div class="prog"><div class="prog-bar" style="width:22%;background:var(--d1)"></div></div>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-label"><span>D2 — Reliability &amp; Continuité</span><span>22%</span></div>
+      <div class="prog"><div class="prog-bar" style="width:22%;background:var(--d2)"></div></div>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-label"><span>D3 — Deployment &amp; Provisioning</span><span>22%</span></div>
+      <div class="prog"><div class="prog-bar" style="width:22%;background:var(--d3)"></div></div>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-label"><span>D4 — Security &amp; Compliance</span><span>16%</span></div>
+      <div class="prog"><div class="prog-bar" style="width:16%;background:var(--d4)"></div></div>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-label"><span>D5 — Networking &amp; Content Delivery</span><span>18%</span></div>
+      <div class="prog"><div class="prog-bar" style="width:18%;background:var(--d5)"></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Conseils stratégiques</div>
+    <ul class="tips">
+      <li>Lire <strong>toutes les options</strong> avant de répondre</li>
+      <li>Chercher le mot <strong>"le plus"</strong> ou <strong>"automatique"</strong></li>
+      <li>Éliminer les options <strong>manuelles/complexes</strong> d'abord</li>
+      <li>Questions SysOps = <strong>opérationnel</strong>, pas architecture pure</li>
+      <li>Marquer et <strong>revenir sur</strong> les questions douteuses</li>
+      <li>Lire les <strong>explications</strong> après chaque quiz</li>
+    </ul>
+  </div>
+
+</div>
+</section>
+
+<!-- ── DOMAINE 1 : MONITORING ── -->
+<section id="d1">
+<div class="sec-title"><span class="icon">📊</span> Domaine 1 — Monitoring &amp; Reporting <span style="font-size:.8rem;color:var(--d1);font-weight:400">(22%)</span></div>
+<div class="grid-2">
+
+  <div class="card">
+    <div class="domain-header d1">☁️ CloudWatch — Concepts clés <span class="pct">J1–J3</span></div>
+    <dl class="kv">
+      <dt>Namespace</dt><dd>Conteneur isolé de métriques (ex: <code>AWS/EC2</code>)</dd>
+      <dt>Dimension</dt><dd>Clé/valeur pour filtrer (ex: <code>InstanceId=i-xxx</code>)</dd>
+      <dt>Standard</dt><dd>Métriques toutes les 5 min (gratuit)</dd>
+      <dt>Detailed</dt><dd>Métriques toutes les 1 min (payant)</dd>
+      <dt>High-Res</dt><dd>Métriques jusqu'à 1s (custom metrics)</dd>
+      <dt>Rétention</dt><dd>15 mois max (granularité diminue avec le temps)</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d1">🔔 Alarmes &amp; Actions</div>
+    <dl class="kv">
+      <dt>États</dt><dd>OK · ALARM · INSUFFICIENT_DATA</dd>
+      <dt>Composite</dt><dd>Combine plusieurs alarmes avec AND/OR/NOT</dd>
+      <dt>Anomaly</dt><dd>Machine learning → bande de tolérance automatique</dd>
+      <dt>Math</dt><dd>Expressions sur métriques (ex: <code>m1/m2*100</code>)</dd>
+      <dt>Actions</dt><dd>SNS · ASG scaling · EC2 actions · SSM OpsItem</dd>
+      <dt>Cooldown</dt><dd>Période après scaling avant nouvelle évaluation</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d1">📝 CloudWatch Logs</div>
+    <dl class="kv">
+      <dt>Log Group</dt><dd>Conteneur logique de flux (ex: <code>/aws/lambda/my-fn</code>)</dd>
+      <dt>Log Stream</dt><dd>Séquence d'événements (une instance = un stream)</dd>
+      <dt>Metric Filter</dt><dd>Pattern → métrique custom → alarme possible</dd>
+      <dt>Insights</dt><dd>Requêtes SQL-like sur les logs (interactif)</dd>
+      <dt>Subscriptions</dt><dd>Kinesis / Lambda / OpenSearch en temps réel</dd>
+      <dt>Agent</dt><dd>CloudWatch Agent = métriques custom + logs sur EC2</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d1">🔍 Autres outils de monitoring</div>
+    <dl class="kv">
+      <dt>CloudTrail</dt><dd>Audit API calls (qui a fait quoi, quand)</dd>
+      <dt>X-Ray</dt><dd>Tracing distribué (latence, erreurs par service)</dd>
+      <dt>EventBridge</dt><dd>Events → targets (serverless bus d'événements)</dd>
+      <dt>Config</dt><dd>Historique des changements de ressources</dd>
+      <dt>Container Insights</dt><dd>EKS/ECS → CloudWatch (CPU, mémoire, réseau)</dd>
+      <dt>Application Insights</dt><dd>Détection auto des problèmes applicatifs</dd>
+    </dl>
+  </div>
+
+</div>
+</section>
+
+<!-- ── DOMAINE 2 : RELIABILITY ── -->
+<section id="d2">
+<div class="sec-title"><span class="icon">🔄</span> Domaine 2 — Reliability &amp; Business Continuity <span style="font-size:.8rem;color:var(--d2);font-weight:400">(22%)</span></div>
+<div class="grid-2">
+
+  <div class="card">
+    <div class="domain-header d2">📈 Auto Scaling Group (ASG)</div>
+    <dl class="kv">
+      <dt>Simple/Step</dt><dd>CloudWatch alarm → ajouter/supprimer N instances</dd>
+      <dt>Target Tracking</dt><dd>Maintenir une métrique à un niveau cible (ex: CPU=70%)</dd>
+      <dt>Scheduled</dt><dd>Scale à des horaires prédéfinis</dd>
+      <dt>Predictive</dt><dd>ML prédictif basé sur l'historique</dd>
+      <dt>Warmup</dt><dd>Délai avant comptabilisation dans les métriques</dd>
+      <dt>Grace Period</dt><dd>Délai avant health check après lancement</dd>
+      <dt>Lifecycle Hooks</dt><dd>Pause pending/terminating → actions customs</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d2">⚖️ Elastic Load Balancing</div>
+    <dl class="kv">
+      <dt>ALB (L7)</dt><dd>HTTP/HTTPS, path/host routing, WAF, Lambda targets</dd>
+      <dt>NLB (L4)</dt><dd>TCP/UDP, IP statique, préserve IP source, ultra-faible latence</dd>
+      <dt>GLB (L3)</dt><dd>Inspection réseau, appliances virtuelles</dd>
+      <dt>Health Check</dt><dd>Retire automatiquement les instances non saines</dd>
+      <dt>Stickiness</dt><dd>Session cookies → même instance cible</dd>
+      <dt>X-Forwarded-For</dt><dd>IP client réelle (ALB uniquement)</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d2">🗄️ RDS &amp; Haute Disponibilité</div>
+    <dl class="kv">
+      <dt>Multi-AZ</dt><dd>Réplique synchrone → failover automatique (~1 min)</dd>
+      <dt>Read Replica</dt><dd>Réplique asynchrone → lecture seule, peut être promu</dd>
+      <dt>Automated Backup</dt><dd>Rétention 1–35 jours, PITR (point-in-time recovery)</dd>
+      <dt>Snapshot</dt><dd>Manuel, cross-region, chiffrement possible</dd>
+      <dt>Aurora</dt><dd>Stockage distribué, jusqu'à 15 répliques, failover &lt;30s</dd>
+      <dt>ElastiCache</dt><dd>Redis (HA, persistence) · Memcached (simple, sharding)</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d2">🌍 DNS, CDN &amp; Disaster Recovery</div>
+    <dl class="kv">
+      <dt>Route 53</dt><dd>Simple · Failover · Weighted · Latency · Geolocation · Multi-value</dd>
+      <dt>Health Checks</dt><dd>Monitore endpoint → failover DNS automatique</dd>
+      <dt>CloudFront</dt><dd>CDN mondial, cache edge, Origin Shield</dd>
+      <dt>Backup</dt><dd>Centralisé multi-services (EC2, RDS, EFS, DynamoDB…)</dd>
+      <dt>RTO/RPO</dt><dd>Recovery Time/Point Objective → choix de la stratégie DR</dd>
+      <dt>DR Strategies</dt><dd>Backup&amp;Restore → Pilot Light → Warm Standby → Multi-Site</dd>
+    </dl>
+  </div>
+
+</div>
+</section>
+
+<!-- ── DOMAINE 3 : DEPLOYMENT ── -->
+<section id="d3">
+<div class="sec-title"><span class="icon">🚀</span> Domaine 3 — Deployment, Provisioning &amp; Automation <span style="font-size:.8rem;color:var(--d3);font-weight:400">(22%)</span></div>
+<div class="grid-2">
+
+  <div class="card">
+    <div class="domain-header d3">📦 CloudFormation</div>
+    <dl class="kv">
+      <dt>Change Set</dt><dd>Prévisualiser les changements avant d'appliquer</dd>
+      <dt>Drift Detection</dt><dd>Détecter les modifications manuelles hors-stack</dd>
+      <dt>DeletionPolicy</dt><dd>Retain · Delete · Snapshot à la suppression</dd>
+      <dt>StackSets</dt><dd>Déployer multi-comptes/multi-régions</dd>
+      <dt>Nested Stacks</dt><dd>Réutiliser des stacks (templates modulaires)</dd>
+      <dt>SSM/Secrets Ref</dt><dd><code>{{resolve:ssm:/param}}</code> dans les templates</dd>
+      <dt>CF Hooks</dt><dd>Validation pre/post opérations sur les ressources</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d3">🏗️ AWS CDK</div>
+    <dl class="kv">
+      <dt>L1 Constructs</dt><dd>Cfn-prefixed = mapping 1:1 avec CloudFormation</dd>
+      <dt>L2 Constructs</dt><dd>Abstractions haut niveau avec defaults sensibles</dd>
+      <dt>L3 Constructs</dt><dd>Patterns complets (ex: ApplicationLoadBalancedFargate)</dd>
+      <dt>Bootstrap</dt><dd><code>cdk bootstrap</code> = crée les ressources CDK dans le compte</dd>
+      <dt>Synth</dt><dd>CDK → CloudFormation template JSON/YAML</dd>
+      <dt>Output</dt><dd>CloudFormation template → déploiement standard</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d3">🔧 Systems Manager (SSM)</div>
+    <dl class="kv">
+      <dt>Session Manager</dt><dd>Shell sécurisé sans SSH/bastion (audit CloudTrail)</dd>
+      <dt>Run Command</dt><dd>Scripts one-shot sur flotte d'instances</dd>
+      <dt>State Manager</dt><dd>Association = état cible désiré (idempotent)</dd>
+      <dt>Patch Manager</dt><dd>Patch Baselines + Patch Groups + Maintenance Windows</dd>
+      <dt>Parameter Store</dt><dd>Config/secrets versionnés (Standard gratuit, Advanced payant)</dd>
+      <dt>Automation</dt><dd>Runbooks multi-étapes (incident remediation)</dd>
+      <dt>Inventory</dt><dd>Collecte de métadonnées d'instances</dd>
+      <dt>Hybrid</dt><dd>Activations = étend SSM aux serveurs on-prem</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d3">🎯 Stratégies de déploiement</div>
+    <dl class="kv">
+      <dt>In-Place</dt><dd>Remplace l'app sur les instances existantes</dd>
+      <dt>Rolling</dt><dd>Mise à jour progressive par batches</dd>
+      <dt>Blue/Green</dt><dd>Bascule de trafic entre ancien et nouveau (CodeDeploy)</dd>
+      <dt>Canary</dt><dd>Petit % du trafic vers la nouvelle version en premier</dd>
+      <dt>Immutable</dt><dd>Nouvelles instances = nouvelle version (Elastic Beanstalk)</dd>
+      <dt>All-at-once</dt><dd>Rapide mais risqué (non-prod uniquement)</dd>
+    </dl>
+  </div>
+
+</div>
+</section>
+
+<!-- ── DOMAINE 4 : SECURITY ── -->
+<section id="d4">
+<div class="sec-title"><span class="icon">🔒</span> Domaine 4 — Security &amp; Compliance <span style="font-size:.8rem;color:var(--d4);font-weight:400">(16%)</span></div>
+<div class="grid-2">
+
+  <div class="card">
+    <div class="domain-header d4">👤 IAM &amp; Organizations</div>
+    <dl class="kv">
+      <dt>Évaluation</dt><dd>Deny explicit &gt; Allow explicit (jamais Deny implicit)</dd>
+      <dt>Boundaries</dt><dd>Permission Boundaries = max permissions possibles</dd>
+      <dt>SCP</dt><dd>Service Control Policies = guardrails sur les OU/comptes</dd>
+      <dt>Identity Center</dt><dd>SSO centralisé (ex-AWS SSO) + ABAC</dd>
+      <dt>AssumeRole</dt><dd>STS cross-account → credentials temporaires</dd>
+      <dt>Access Analyzer</dt><dd>Détecte les accès non intentionnels (externe/inutilisé)</dd>
+      <dt>Instance Profile</dt><dd>IAM Role pour EC2 → jamais de clés d'accès sur l'instance</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d4">🔑 Chiffrement &amp; Secrets</div>
+    <dl class="kv">
+      <dt>KMS CMK</dt><dd>Clé gérée par le client (audit CloudTrail, rotation annuelle)</dd>
+      <dt>AWS Managed</dt><dd>Clé gérée par AWS par service (moins de contrôle)</dd>
+      <dt>SSE-S3</dt><dd>Chiffrement côté serveur (clé AWS, transparent)</dd>
+      <dt>SSE-KMS</dt><dd>Chiffrement S3 avec CMK (audit + contrôle d'accès)</dd>
+      <dt>SSE-C</dt><dd>Client fournit la clé à chaque requête S3</dd>
+      <dt>Secrets Manager</dt><dd>Rotation automatique (Lambda) + versioning</dd>
+      <dt>ACM</dt><dd>Certificats TLS gérés (ALB, CloudFront ← us-east-1)</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d4">🛡️ Services de sécurité</div>
+    <dl class="kv">
+      <dt>GuardDuty</dt><dd>Détection des menaces (ML) sur CloudTrail/VPC Flow/DNS</dd>
+      <dt>Inspector</dt><dd>Scan de vulnérabilités EC2/ECR (CVE, exposures réseau)</dd>
+      <dt>Macie</dt><dd>Détection PII/données sensibles dans S3</dd>
+      <dt>Security Hub</dt><dd>Vue centralisée des findings (CIS, AWS Best Practices)</dd>
+      <dt>Detective</dt><dd>Investigation forensique des incidents (graphe de comportement)</dd>
+      <dt>CloudHSM</dt><dd>HSM dédié (FIPS 140-2 L3) → plus de contrôle que KMS</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d4">📋 Conformité &amp; Audit</div>
+    <dl class="kv">
+      <dt>AWS Config</dt><dd>Enregistrement continu des changements de ressources</dd>
+      <dt>Config Rules</dt><dd>Évaluation continue (Managed ou Lambda custom)</dd>
+      <dt>Conformance Packs</dt><dd>Ensemble de rules + remédiations (CIS, PCI-DSS…)</dd>
+      <dt>CloudTrail</dt><dd>Multi-region trail + log file validation + chiffrement KMS</dd>
+      <dt>AWS Artifact</dt><dd>Rapports de conformité AWS (SOC, PCI, ISO)</dd>
+      <dt>Responsibility</dt><dd>AWS: infra physique/hyperviseur · Client: OS, app, IAM, data</dd>
+    </dl>
+  </div>
+
+</div>
+</section>
+
+<!-- ── DOMAINE 5 : NETWORKING ── -->
+<section id="d5">
+<div class="sec-title"><span class="icon">🌐</span> Domaine 5 — Networking &amp; Content Delivery <span style="font-size:.8rem;color:var(--d5);font-weight:400">(18%)</span></div>
+<div class="grid-2">
+
+  <div class="card">
+    <div class="domain-header d5">🏗️ VPC — Fondamentaux</div>
+    <dl class="kv">
+      <dt>CIDR</dt><dd>/16 (65 536) à /28 (16) — 5 IPs réservées par sous-réseau</dd>
+      <dt>Security Groups</dt><dd>Stateful (retour auto), niveau instance, Allow uniquement</dd>
+      <dt>NACLs</dt><dd>Stateless (règles entrée ET sortie), niveau sous-réseau, numérotées</dd>
+      <dt>NAT Gateway</dt><dd>Sous-réseau public, Elastic IP, managed, AZ-specific</dd>
+      <dt>VPC Endpoint</dt><dd>Gateway (S3/DynamoDB, gratuit) · Interface (PrivateLink, payant)</dd>
+      <dt>Flow Logs</dt><dd>Trafic réseau → CloudWatch Logs ou S3 (ACCEPT/REJECT)</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d5">🔗 Connectivité Hybride</div>
+    <dl class="kv">
+      <dt>Site-to-Site VPN</dt><dd>IPSec chiffré, rapide à déployer, variable (~100 Mbps)</dd>
+      <dt>Direct Connect</dt><dd>Lien dédié 1/10/100 Gbps, latence constante, sans internet</dd>
+      <dt>Transit Gateway</dt><dd>Hub régional → connecte VPCs + VPN + DX (non-transitif → transitif)</dd>
+      <dt>TGW Peering</dt><dd>Inter-région (via backbone AWS)</dd>
+      <dt>VPN CloudHub</dt><dd>Connecte sites on-prem entre eux via TGW/VGW</dd>
+      <dt>DX Gateway</dt><dd>DX → plusieurs VPCs dans plusieurs régions</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d5">🛡️ Protection réseau</div>
+    <dl class="kv">
+      <dt>WAF</dt><dd>L7 (HTTP) · Web ACLs · Rules · Rule Groups · Managed Rules</dd>
+      <dt>Shield Standard</dt><dd>L3/L4 DDoS gratuit (automatique pour tous)</dd>
+      <dt>Shield Advanced</dt><dd>L7 DDoS + SRT + protection coûts + $3000/mois</dd>
+      <dt>Network Firewall</dt><dd>L3-L7 stateful/IPS/DNS, déployé dans VPC subnet</dd>
+      <dt>Firewall Manager</dt><dd>Gestion centralisée WAF/Shield/NF via Organizations</dd>
+      <dt>DNS Firewall</dt><dd>Route 53 Resolver → bloquer domaines malveillants</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="domain-header d5">⚡ Performance &amp; Coûts réseau</div>
+    <dl class="kv">
+      <dt>Global Accelerator</dt><dd>IPs Anycast → backbone AWS → latence réduite (TCP/UDP)</dd>
+      <dt>CloudFront vs GA</dt><dd>CloudFront = cache HTTP · GA = pas de cache, tous protocoles</dd>
+      <dt>PrivateLink</dt><dd>Expose service privément via NLB + Interface Endpoint</dd>
+      <dt>Intra-VPC</dt><dd>Trafic gratuit dans la même AZ (IPs privées)</dd>
+      <dt>Inter-AZ</dt><dd>$0.01/GB aller-retour dans le même VPC</dd>
+      <dt>NAT Gateway</dt><dd>$0.045/h + $0.045/GB → préférer VPC Endpoints S3</dd>
+    </dl>
+  </div>
+
+</div>
+</section>
+
+<!-- ── SECTION : COMPARATIFS ── -->
+<section id="compares">
+<div class="sec-title"><span class="icon">⚖️</span> Comparatifs essentiels</div>
+
+<div class="grid-2">
+
+<div class="card">
+  <div class="card-title"><span class="dot"></span>Parameter Store vs Secrets Manager</div>
+  <div class="overflow">
+  <table class="compare">
+    <thead><tr><th>Critère</th><th>SSM Parameter Store</th><th>Secrets Manager</th></tr></thead>
+    <tbody>
+      <tr><td>Coût</td><td>Standard : gratuit · Advanced : payant</td><td>$0.40/secret/mois</td></tr>
+      <tr><td>Rotation auto</td><td class="no">✗ Non native</td><td class="yes">✓ Lambda native (RDS, etc.)</td></tr>
+      <tr><td>Versioning</td><td>Partiel (labels)</td><td class="yes">✓ AWSCURRENT/AWSPREVIOUS</td></tr>
+      <tr><td>Cross-account</td><td class="partial">Limité</td><td class="yes">✓ Resource Policy</td></tr>
+      <tr><td>Use case</td><td>Config, non-sensible</td><td>Credentials, DB passwords</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="dot"></span>CloudWatch vs CloudTrail vs Config</div>
+  <div class="overflow">
+  <table class="compare">
+    <thead><tr><th>Service</th><th>Question répondue</th><th>Use case principal</th></tr></thead>
+    <tbody>
+      <tr><td>CloudWatch</td><td>Comment se comporte <em>la ressource</em> ?</td><td>Métriques, logs, alarmes</td></tr>
+      <tr><td>CloudTrail</td><td>Qui a fait <em>cette action</em> API ?</td><td>Audit, compliance, forensics</td></tr>
+      <tr><td>AWS Config</td><td>Comment <em>la config</em> a-t-elle changé ?</td><td>Compliance, drift, historique</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="dot"></span>GuardDuty vs Inspector vs Macie</div>
+  <div class="overflow">
+  <table class="compare">
+    <thead><tr><th>Service</th><th>Cible</th><th>Détecte</th></tr></thead>
+    <tbody>
+      <tr><td>GuardDuty</td><td>Compte AWS</td><td>Comportements malveillants (ML sur logs)</td></tr>
+      <tr><td>Inspector</td><td>EC2 / ECR</td><td>Vulnérabilités CVE, expositions réseau</td></tr>
+      <tr><td>Macie</td><td>S3</td><td>Données PII / sensibles</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="dot"></span>ALB vs NLB vs GLB</div>
+  <div class="overflow">
+  <table class="compare">
+    <thead><tr><th>Critère</th><th>ALB (L7)</th><th>NLB (L4)</th><th>GLB (L3)</th></tr></thead>
+    <tbody>
+      <tr><td>Protocoles</td><td>HTTP/HTTPS/gRPC</td><td>TCP/UDP/TLS</td><td>IP (tous)</td></tr>
+      <tr><td>IP statique</td><td class="no">✗</td><td class="yes">✓ (Elastic IP)</td><td class="yes">✓</td></tr>
+      <tr><td>IP source client</td><td>X-Forwarded-For</td><td class="yes">✓ native</td><td class="yes">✓</td></tr>
+      <tr><td>WAF support</td><td class="yes">✓</td><td class="no">✗</td><td class="no">✗</td></tr>
+      <tr><td>Use case</td><td>Web apps, microservices</td><td>Gaming, IoT, NFS</td><td>Appliances firewall</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="dot"></span>VPC Peering vs Transit Gateway vs PrivateLink</div>
+  <div class="overflow">
+  <table class="compare">
+    <thead><tr><th>Critère</th><th>VPC Peering</th><th>Transit Gateway</th><th>PrivateLink</th></tr></thead>
+    <tbody>
+      <tr><td>Transitif</td><td class="no">✗</td><td class="yes">✓</td><td class="no">✗ (direct)</td></tr>
+      <tr><td>CIDR overlap</td><td class="no">✗</td><td class="no">✗</td><td class="yes">✓ (IP unique)</td></tr>
+      <tr><td>Scale</td><td>Petit (maillage)</td><td>Grand (hub)</td><td>Partage de service</td></tr>
+      <tr><td>On-prem</td><td class="no">✗</td><td class="yes">✓ (VPN/DX)</td><td class="no">✗</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="dot"></span>KMS vs CloudHSM</div>
+  <div class="overflow">
+  <table class="compare">
+    <thead><tr><th>Critère</th><th>KMS</th><th>CloudHSM</th></tr></thead>
+    <tbody>
+      <tr><td>Gestion</td><td>AWS managed service</td><td>Dédié, géré par client</td></tr>
+      <tr><td>FIPS 140-2</td><td>Level 2</td><td class="yes">Level 3</td></tr>
+      <tr><td>Coût</td><td>$1/mois/CMK</td><td>~$1.45/h/HSM</td></tr>
+      <tr><td>Intégration AWS</td><td class="yes">✓ native (S3, EBS…)</td><td>Via KMS custom store</td></tr>
+      <tr><td>Performance</td><td>Standard</td><td>Très haute</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+</div>
+</section>
+
+<!-- ── SECTION : PIÈGES ── -->
+<section id="piege">
+<div class="sec-title"><span class="icon">⚠️</span> Pièges classiques de l'examen</div>
+
+<div class="alert alert-warn">
+  <span>⚡</span>
+  <span>Ces points font trébucher le plus de candidats. Mémorisez-les en priorité.</span>
+</div>
+
+<div class="grid-3">
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--d4)"></span>IAM &amp; Permissions</div>
+    <ul class="tips">
+      <li><strong>Deny explicit TOUJOURS</strong> gagne sur Allow</li>
+      <li><strong>SCP ne donne pas de permissions</strong> — elles restreignent seulement</li>
+      <li><strong>Root ne peut PAS être restreint</strong> par SCPs dans le management account</li>
+      <li><strong>Pas d'accès cross-account</strong> sans AssumeRole ET Trust Policy</li>
+      <li><strong>Permission Boundary ≠ SCP</strong> — boundary limite l'identité, SCP limite le compte</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--d1)"></span>CloudWatch &amp; Monitoring</div>
+    <ul class="tips">
+      <li><strong>Métriques EC2 de base</strong> = CPU, Network, Status — PAS la mémoire RAM !</li>
+      <li><strong>RAM</strong> requiert l'agent CloudWatch custom</li>
+      <li><strong>Alarme Composite</strong> peut être ALARM si ses enfants satisfont la règle</li>
+      <li><strong>CloudTrail</strong> ≠ temps réel (délai 15 min)</li>
+      <li><strong>EventBridge</strong> = quasi temps réel pour les événements AWS</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--d5)"></span>Réseau</div>
+    <ul class="tips">
+      <li><strong>VPC Peering non-transitif</strong> — A↔B et B↔C ≠ A↔C</li>
+      <li><strong>NACL numéros</strong> évalués du plus petit au plus grand (100, 200…)</li>
+      <li><strong>NAT Gateway ≠ Bastion</strong> — sortant seulement, pas d'accès SSH entrant</li>
+      <li><strong>5 IPs réservées</strong> par subnet (0, 1, 2, 3, dernier)</li>
+      <li><strong>ACM pour CloudFront</strong> → certificat OBLIGATOIREMENT en us-east-1</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--d3)"></span>CloudFormation</div>
+    <ul class="tips">
+      <li><strong>Change Set</strong> = prévisualisation seulement, ne déploie pas</li>
+      <li><strong>Drift Detection</strong> = détection seulement, pas de correction auto</li>
+      <li><strong>DeletionPolicy: Retain</strong> = la ressource reste même si le stack est supprimé</li>
+      <li><strong>StackSets service-managed</strong> = nécessite AWS Organizations</li>
+      <li><strong>!Ref sur ressource</strong> = ID/ARN · sur paramètre = valeur du paramètre</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--d2)"></span>ASG &amp; HA</div>
+    <ul class="tips">
+      <li><strong>Health check grace period</strong> = délai avant le PREMIER health check</li>
+      <li><strong>Cooldown</strong> = délai après scaling avant une nouvelle évaluation</li>
+      <li><strong>Target Tracking</strong> scale in ET out automatiquement</li>
+      <li><strong>Multi-AZ RDS</strong> = HA (failover), pas de performances supplémentaires</li>
+      <li><strong>Read Replica</strong> = performances (lectures), pas de failover auto</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--accent)"></span>S3 &amp; Storage</div>
+    <ul class="tips">
+      <li><strong>Block Public Access au niveau compte</strong> remplace toute policy publique</li>
+      <li><strong>SSE-KMS</strong> = coût KMS par requête GET/PUT</li>
+      <li><strong>S3 Standard vs Intelligent-Tiering</strong> → monitoring fee sur Intelligent-T.</li>
+      <li><strong>Cross-Region Replication</strong> = uniquement les nouveaux objets après activation</li>
+      <li><strong>Presigned URL</strong> = expire selon le délai défini (pas la durée de la session)</li>
+    </ul>
+  </div>
+
+</div>
+</section>
+
+<!-- ── SECTION : PLAN 15J ── -->
+<section id="plan">
+<div class="sec-title"><span class="icon">🗓️</span> Plan d'étude 15 jours</div>
+
+<div class="grid-3">
+  <!-- D1 -->
+  <div class="card">
+    <div class="domain-header d1">D1 — Monitoring (J1–J3)</div>
+    <ul class="checklist">
+      <li>J1 : CloudWatch métriques, alarmes, dashboards, Anomaly Detection</li>
+      <li>J2 : CloudWatch Logs, Metric Filters, Insights, Subscriptions</li>
+      <li>J3 : CloudTrail, EventBridge, X-Ray, Container Insights, optimisation</li>
+    </ul>
+  </div>
+  <!-- D2 -->
+  <div class="card">
+    <div class="domain-header d2">D2 — Reliability (J4–J6)</div>
+    <ul class="checklist">
+      <li>J4 : ASG (policies, lifecycle hooks), ELB, ElastiCache</li>
+      <li>J5 : RDS (Multi-AZ, Read Replica, Aurora), Route 53</li>
+      <li>J6 : CloudFront, AWS Backup, DR strategies (RTO/RPO)</li>
+    </ul>
+  </div>
+  <!-- D3 -->
+  <div class="card">
+    <div class="domain-header d3">D3 — Deployment (J7–J9)</div>
+    <ul class="checklist">
+      <li>J7 : AMIs, Containers (ECS/ECR/EKS), déploiement stratégies</li>
+      <li>J8 : CloudFormation (Change Sets, Drift, StackSets, CDK)</li>
+      <li>J9 : Systems Manager (Session Manager, Patch, Automation, AppConfig)</li>
+    </ul>
+  </div>
+  <!-- D4 -->
+  <div class="card">
+    <div class="domain-header d4">D4 — Security (J10–J11)</div>
+    <ul class="checklist">
+      <li>J10 : IAM (évaluation, SCPs, Identity Center, AssumeRole, Analyzer)</li>
+      <li>J11 : KMS, CloudHSM, Secrets Manager, CloudTrail, Config, Security Hub</li>
+    </ul>
+  </div>
+  <!-- D5 -->
+  <div class="card">
+    <div class="domain-header d5">D5 — Networking (J12–J14)</div>
+    <ul class="checklist">
+      <li>J12 : VPC fondamentaux (SG, NACL, NAT GW, VPC Endpoints, Flow Logs)</li>
+      <li>J13 : TGW, VPN, Direct Connect, PrivateLink, Shared VPCs, Route 53 Resolver</li>
+      <li>J14 : WAF, Shield, Network Firewall, CloudFront OAC, Firewall Manager</li>
+    </ul>
+  </div>
+  <!-- J15 -->
+  <div class="card">
+    <div class="domain-header" style="background:linear-gradient(135deg,var(--d1bg),var(--d5bg));color:var(--accent)">🏆 Révision Finale (J15)</div>
+    <ul class="checklist">
+      <li>Revoir les points faibles identifiés (quiz J1–J14)</li>
+      <li>Mock exam : 20 questions multi-domaines chronométrées</li>
+      <li>Réviser les comparatifs (Parameter Store vs Secrets Manager…)</li>
+      <li>Relire les pièges classiques de cette fiche</li>
+      <li>Vérifier la logistique de l'examen (ID, heure, lieu)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Checklist finale -->
+<div class="card" style="margin-top:16px">
+  <div class="card-title"><span class="dot" style="background:#16a34a"></span>Checklist J-1 avant l'examen</div>
+  <div class="grid-3" style="margin:0">
+    <div>
+      <p style="font-size:.8rem;font-weight:700;color:var(--fg2);margin-bottom:8px">MAÎTRISÉ ✓</p>
+      <ul class="checklist">
+        <li>CloudWatch métriques natives EC2 (CPU, Network, Disk)</li>
+        <li>Évaluation des policies IAM (Deny &gt; Allow)</li>
+        <li>VPC Peering non-transitif</li>
+        <li>Multi-AZ RDS vs Read Replica</li>
+        <li>Target Tracking vs Step Scaling</li>
+      </ul>
+    </div>
+    <div>
+      <p style="font-size:.8rem;font-weight:700;color:var(--fg2);margin-bottom:8px">VÉRIFIER ✓</p>
+      <ul class="checklist">
+        <li>ACM + CloudFront = us-east-1 obligatoire</li>
+        <li>NACL stateless (aller + retour requis)</li>
+        <li>SCP ne donne pas de permissions, restreint seulement</li>
+        <li>Drift Detection = détection seulement</li>
+        <li>RAM EC2 = agent CloudWatch nécessaire</li>
+      </ul>
+    </div>
+    <div>
+      <p style="font-size:.8rem;font-weight:700;color:var(--fg2);margin-bottom:8px">FOCUS EXAM ✓</p>
+      <ul class="checklist">
+        <li>Transit Gateway = hub multi-VPCs transitif</li>
+        <li>Secrets Manager = rotation auto Lambda</li>
+        <li>CloudFormation Change Set = preview seulement</li>
+        <li>Shield Standard = gratuit + automatique</li>
+        <li>Session Manager = pas de SSH, pas de bastion</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</section>
+
+<!-- FOOTER -->
+<div style="text-align:center;padding:24px 0 16px;color:var(--fg2);font-size:.78rem">
+  AWS Certified SysOps Administrator – Associate · SOA-C03 · Fiche de révision
+  <br>Score minimum : <strong>720/1000</strong> · 300 questions de pratique disponibles
+</div>
+
+</div><!-- /container -->
+</body>
+</html>
