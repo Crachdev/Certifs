@@ -10,7 +10,7 @@ window.QUIZ_META = {
   exam: "AWS Certified DevOps Engineer – Professional",
   passScore: 75,
   examMins: 180,
-  fiche: null,
+  fiche: "fiche.html",
   rules: [
     ["75 q · 180 min", "QCM/réponses multiples"],
     ["750 / 1000", "score de réussite"],
