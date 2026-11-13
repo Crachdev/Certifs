@@ -3542,6 +3542,142 @@ window.QDATA = {
     a: 1,
     e: "Critères de choix Aurora vs DynamoDB : Aurora (relationnelle) : (1) Données avec relations (FK, JOINs fréquents). (2) Transactions complexes multi-tables (ACID). (3) Schéma fixe avec ALTER TABLE. (4) Queries ad-hoc, rapports complexes. (5) Migration depuis MySQL/PostgreSQL existant. DynamoDB (NoSQL) : (1) Scale quasi-illimité (throughput et storage). (2) Latence constante < 10ms quelle que soit la taille. (3) Access patterns connus et fixes (pas de requêtes ad-hoc complexes). (4) Données key-value, documents JSON, time-series. (5) Serverless et pas de gestion d'instances. Pour DOP-C02 : répondre selon les requirements (latence, relations, scale)."
   }
+],
+
+12: [
+  // ─── CloudWatch fondamentaux ──────────────────────────────────────────────
+  {
+    t: "CloudWatch métriques",
+    q: "Quelle est la granularité minimale des métriques CloudWatch et comment obtenir des métriques plus fréquentes ?",
+    o: [
+      "CloudWatch collecte toutes les métriques toutes les secondes automatiquement",
+      "La granularité standard est 1 point de données par minute (Standard Resolution) ; pour des métriques toutes les secondes, utiliser High Resolution (--storage-resolution 1) avec un coût supplémentaire",
+      "CloudWatch collecte des métriques toutes les 5 minutes par défaut, 1 minute en mode détaillé",
+      "La granularité minimale est 1 heure pour les métriques EC2"
+    ],
+    a: 1,
+    e: "CloudWatch Metrics Resolution : (1) Standard Resolution : 1 donnée par minute (60 secondes). Par défaut pour les métriques custom PutMetricData. (2) High Resolution : 1, 5, 10 ou 30 secondes. Option '--storage-resolution 1' dans PutMetricData. Coût ~1.5x plus élevé. Rétention : données 1s conservées 3h, données 60s conservées 15 jours, données 1h conservées 455 jours. EC2 : métriques de base = 5 minutes (gratuit) ; métriques détaillées = 1 minute (payant, via 'Enable Detailed Monitoring'). Note : la mémoire RAM n'est PAS une métrique EC2 native — nécessite CloudWatch Agent."
+  },
+  {
+    t: "CloudWatch métriques custom",
+    q: "Comment publier des métriques custom dans CloudWatch depuis une instance EC2 ?",
+    o: [
+      "CloudWatch collecte automatiquement toutes les métriques applicatives depuis EC2",
+      "Utiliser l'AWS CLI (aws cloudwatch put-metric-data) ou le CloudWatch Agent configuré avec un fichier JSON — spécifier Namespace, MetricName, Value, Dimensions",
+      "Les métriques custom nécessitent CloudWatch Events pour être publiées",
+      "Utiliser uniquement le SDK AWS dans le code applicatif — pas d'autre méthode"
+    ],
+    a: 1,
+    e: "Publication de métriques custom : (1) CLI : `aws cloudwatch put-metric-data --namespace 'MyApp' --metric-name 'ActiveConnections' --value 150 --unit Count --dimensions Server=web1`. (2) CloudWatch Agent : fichier metrics_config.json avec 'metrics_collected' pour collecter des métriques système avancées (RAM, disk I/O, processes) + métriques applicatives depuis des fichiers de log. (3) SDK (Python boto3, Java, etc.) : `cloudwatch.put_metric_data(...)`. IAM Role nécessaire sur l'instance avec cloudwatch:PutMetricData. Les métriques custom apparaissent dans le Namespace configuré."
+  },
+  {
+    t: "CloudWatch Agent",
+    q: "Quel est le rôle du CloudWatch Agent et pourquoi est-il nécessaire pour certaines métriques ?",
+    o: [
+      "CloudWatch Agent est optionnel — CloudWatch collecte tout automatiquement",
+      "CloudWatch Agent collecte des métriques non disponibles nativement : RAM, swap, disk usage par partition, processus actifs ; il collecte aussi les logs applicatifs et système vers CloudWatch Logs",
+      "CloudWatch Agent remplace entièrement les métriques EC2 standard",
+      "CloudWatch Agent est uniquement pour Windows — Linux utilise une autre méthode"
+    ],
+    a: 1,
+    e: "CloudWatch Agent est nécessaire car AWS n'a pas accès à l'intérieur de l'instance EC2. Métriques collectées par Agent (non disponibles sans) : (1) Memory utilization (RAM) — métrique la plus importante manquante. (2) Swap utilization. (3) Disk space per partition. (4) Nombre de processus. (5) Métriques custom applicatives. Configuration : fichier JSON (généré via wizard `amazon-cloudwatch-agent-config-wizard` ou SSM Parameter Store). Prérequis : IAM Role avec CloudWatchAgentServerPolicy. Installation via Systems Manager (recommandé pour la gestion à grande échelle)."
+  },
+  {
+    t: "CloudWatch Alarms",
+    q: "Une alarme CloudWatch est en état INSUFFICIENT_DATA plutôt qu'OK ou ALARM. Qu'est-ce que cela signifie ?",
+    o: [
+      "INSUFFICIENT_DATA signifie que la ressource est en panne",
+      "INSUFFICIENT_DATA signifie que CloudWatch n'a pas assez de données pour évaluer l'alarme : la ressource vient d'être créée, les métriques sont arrivées en retard, ou l'alarme est trop récente",
+      "INSUFFICIENT_DATA est un état d'alarme qui déclenche des actions comme ALARM",
+      "INSUFFICIENT_DATA signifie que le seuil de l'alarme est mal configuré"
+    ],
+    a: 1,
+    e: "CloudWatch Alarm states : (1) OK : métrique dans le seuil défini. (2) ALARM : métrique dépasse le seuil. (3) INSUFFICIENT_DATA : pas assez de données pour évaluer. Causes : ressource récemment créée (pas encore de métriques), métriques discontinues (instance arrêtée), période d'évaluation plus courte que l'intervalle de publication des métriques. Configuration important : 'treat missing data as' — breaching (compte comme alarme), notBreaching (compte comme OK), ignore, missing (maintient l'état précédent). Pour les instances EC2 arrêtées : utiliser 'treat missing data as breaching' pour détecter un arrêt non planifié."
+  },
+  {
+    t: "CloudWatch composite alarms",
+    q: "Qu'est-ce qu'une Composite Alarm CloudWatch et quel problème résout-elle ?",
+    o: [
+      "Une Composite Alarm est une alarme avec plusieurs seuils",
+      "Une Composite Alarm combine plusieurs alarmes individuelles avec des expressions logiques AND/OR pour réduire les fausses alertes et créer des alertes de haut niveau basées sur plusieurs métriques",
+      "Une Composite Alarm envoie automatiquement des notifications à plusieurs endpoints",
+      "Composite Alarm est identique à une alarme multi-metric"
+    ],
+    a: 1,
+    e: "Composite Alarms CloudWatch : combinent plusieurs alarmes avec des opérateurs logiques (AND, OR, NOT). Use case principal : réduire les 'alarm storms' (cascades d'alertes). Exemple : ALARM si 'CPU > 90% AND ErrorRate > 5% AND (Latency > 1000ms OR RequestCount < 100)'. Avantages : (1) Une seule notification pour un incident complexe plutôt que 10 alarmes séparées. (2) Logique métier dans le monitoring. (3) Réduction des faux positifs. (4) Hiérarchisation : alarme de haut niveau (service down) basée sur alarmes granulaires. Idéal pour les dashboards opérationnels."
+  },
+  {
+    t: "CloudWatch métriques EC2",
+    q: "Quelles métriques EC2 sont disponibles SANS CloudWatch Agent et lesquelles nécessitent l'agent ?",
+    o: [
+      "Toutes les métriques EC2 sont disponibles nativement",
+      "Sans agent (hyperviseur) : CPU utilization, Network in/out, Disk read/write (I/O), Status checks. Avec agent uniquement : Memory (RAM), Swap, Disk space utilization par partition, processus",
+      "Avec agent uniquement : CPU et Network. Sans agent : RAM et Disk",
+      "CloudWatch Agent est requis pour toutes les métriques EC2"
+    ],
+    a: 1,
+    e: "Métriques EC2 native (hyperviseur, sans agent) : CPUUtilization, NetworkIn/Out, NetworkPacketsIn/Out, DiskReadBytes/WriteBytes (instance store uniquement), StatusCheckFailed (instance et system). NON disponibles sans agent (AWS n'a pas accès à l'intérieur de l'OS) : MemoryUtilization (RAM), SwapUtilization, DiskSpaceUtilization (EBS), nombre de processus. Méga-piège examen : 'une alarme se déclenche quand la RAM dépasse 80%' → nécessite obligatoirement CloudWatch Agent. EBS Volumes : leurs métriques (VolumeReadOps, VolumeWriteOps, etc.) sont disponibles nativement sans agent."
+  },
+  {
+    t: "CloudWatch Dashboards",
+    q: "Comment partager un CloudWatch Dashboard entre comptes AWS ou avec des utilisateurs sans accès AWS Console ?",
+    o: [
+      "Les dashboards CloudWatch ne peuvent être partagés qu'au sein du même compte",
+      "Utiliser CloudWatch Dashboard Sharing : (1) partage public (URL sans authentification), (2) partage avec email/mot de passe, (3) partage SSO avec un fournisseur d'identité — générer un lien de partage dans les paramètres du dashboard",
+      "Exporter le dashboard en PNG et l'envoyer par email",
+      "Utiliser CloudWatch Cross-Account Observability pour le partage inter-comptes"
+    ],
+    a: 1,
+    e: "CloudWatch Dashboard Sharing : (1) Public sharing : URL publique sans authentification (attention aux données sensibles). (2) Email + password : lien partageable protégé par mot de passe. (3) SSO (Single Sign-On) : partage avec un fournisseur d'identité (Cognito, Okta, etc.) pour des utilisateurs avec comptes. Pour le partage inter-comptes : CloudWatch Cross-Account Observability permet de créer un compte de monitoring central qui consolide métriques, logs et traces de plusieurs comptes AWS sans accès direct à la console. Alternative : IAM Cross-Account access avec rôles assumés."
+  },
+  {
+    t: "CloudWatch anomaly detection",
+    q: "Qu'est-ce que CloudWatch Anomaly Detection et comment l'utiliser pour des alertes intelligentes ?",
+    o: [
+      "CloudWatch Anomaly Detection nécessite de définir manuellement des seuils haut et bas",
+      "CloudWatch Anomaly Detection utilise le machine learning pour créer automatiquement un modèle de comportement normal d'une métrique (tenant compte des patterns journaliers, hebdomadaires) et alerte quand la métrique s'en écarte",
+      "Anomaly Detection est disponible uniquement pour les métriques EC2",
+      "Anomaly Detection remplace les CloudWatch Alarms classiques"
+    ],
+    a: 1,
+    e: "CloudWatch Anomaly Detection : ML-based, entraîné sur 2 semaines de données historiques. Crée une 'bande' (band) de comportement normal dynamique qui s'adapte aux patterns cycliques (heure de la journée, jour de la semaine, saisonnalité). Avantages vs seuils statiques : (1) S'adapte au trafic naturellement variable (moins d'alertes à 3h du matin pour un pic normal de 15%). (2) Détecte les anomalies relatives (trafic 20% sous la normale un lundi matin = anormal). (3) Pas besoin de recalibrer manuellement. Configuration : choisir une métrique, créer un 'Anomaly Detection Model', créer une alarme basée sur le modèle avec un paramètre de sensibilité."
+  },
+  {
+    t: "CloudWatch Synthetics Canaries",
+    q: "Qu'est-ce que CloudWatch Synthetics Canaries et comment les utiliser pour le monitoring proactif ?",
+    o: [
+      "Canaries sont des scripts qui testent les endpoints uniquement depuis une seule région",
+      "CloudWatch Synthetics Canaries = scripts Node.js/Python qui simulent des utilisateurs réels (UI, API, parcours complets) exécutés à intervalles réguliers depuis CloudWatch — détectent les problèmes avant les vrais utilisateurs",
+      "Canaries nécessitent du trafic utilisateur réel pour fonctionner",
+      "Canaries sont uniquement pour les APIs REST — pas pour les applications web"
+    ],
+    a: 1,
+    e: "CloudWatch Synthetics Canaries : scripts automatisés qui simulent des interactions utilisateur. Types : (1) API Canary : teste des endpoints API (GET/POST avec assertions). (2) Broken Link Checker : vérifie tous les liens d'une page. (3) Visual Monitoring : compare des screenshots (détecte les régressions visuelles). (4) Workflow Canary : simule un parcours complet (login → recherche → checkout). (5) Heartbeat : simple ping HTTP. Configuration : S3 bucket pour les scripts, IAM Role, CloudWatch Log Group pour les résultats. Alertes via CloudWatch Alarms sur les métriques canary (SuccessPercent, Duration). Idéal pour détecter les incidents avant les utilisateurs."
+  },
+  {
+    t: "CloudWatch Container Insights",
+    q: "Comment monitorer un cluster ECS/EKS avec CloudWatch Container Insights ?",
+    o: [
+      "CloudWatch Container Insights est activé automatiquement sur tous les clusters ECS/EKS",
+      "Activer Container Insights sur le cluster (ECS : paramètre containerInsights=enabled ; EKS : installer l'agent CloudWatch) — collecte CPU, mémoire, réseau, stockage par cluster/service/task/pod avec dashboards préconstruits",
+      "Container Insights nécessite X-Ray pour fonctionner",
+      "Container Insights est uniquement pour EKS — ECS utilise CloudWatch Agent"
+    ],
+    a: 1,
+    e: "CloudWatch Container Insights : (1) ECS : activer `--settings containerInsights=enabled` via CLI ou console sur le cluster. Collecte automatiquement métriques par cluster, service, task. (2) EKS : installer le Fluent Bit DaemonSet + CloudWatch Agent DaemonSet via un manifest Kubernetes. Métriques collectées : CPU/Memory par pod, namespace, node ; réseau, storage. (3) Dashboards préconstruits dans CloudWatch. (4) Métriques détaillées : ressources par container, CPU throttling. Coût : supplémentaire par rapport aux métriques standard CloudWatch. Combiné avec Container Insights + CloudWatch Alarms : alertes automatiques sur CPU des pods critiques."
+  },
+  {
+    t: "CloudWatch métriques custom dimensions",
+    q: "Pourquoi les Dimensions sont-elles importantes dans les métriques custom CloudWatch ?",
+    o: [
+      "Les Dimensions sont optionnelles et n'affectent pas les métriques",
+      "Les Dimensions permettent de filtrer et segmenter les métriques : une même métrique publiée avec des Dimensions différentes est stockée séparément — permet de monitorer par instance, environnement, service, etc.",
+      "Les Dimensions sont uniquement pour les métriques EC2 standard",
+      "On ne peut avoir qu'une seule Dimension par métrique custom"
+    ],
+    a: 1,
+    e: "CloudWatch Dimensions : paires clé-valeur qui identifient une métrique de manière unique. Exemple : métrique 'ResponseTime' avec dimensions {Environment=prod, Service=api} vs {Environment=staging, Service=api} = deux séries de métriques séparées. Utilité : (1) Filtrage dans les dashboards et alarmes. (2) Agrégation : alarme sur toutes les instances d'un ASG sans dimension InstanceId (agrège automatiquement). (3) Maximum 10 dimensions par métrique. (4) Combinaison de dimensions = métrique unique. Piège : publier la même métrique avec des dimensions différentes consomme des PutMetricData séparés."
+  }
 ]
 
 };
