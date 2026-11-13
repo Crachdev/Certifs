@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#e07e22">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche AWS DevOps Pro — DOP-C02</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🚀%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f5f0eb;--sheet:#ffffff;--ink:#1a1208;--muted:#6b5c48;--line:#e0d5c8;
+  --accent:#e07e22;--accent-soft:#fdf0e3;
+  --aws:#e07e22;--aws-mid:#f0a050;--aws-light:#fdf0e3;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --tag-sdlc:#dbeafe;--tag-sdlc-ink:#1e40af;
+  --tag-iac:#fce7f3;--tag-iac-ink:#9d174d;
+  --tag-resilience:#dcfce7;--tag-resilience-ink:#166534;
+  --tag-monitoring:#fef9c3;--tag-monitoring-ink:#854d0e;
+  --tag-incident:#ffe4e6;--tag-incident-ink:#9f1239;
+  --tag-security:#ede9fe;--tag-security-ink:#5b21b6;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#120d08;--sheet:#1c1510;--ink:#f0e8dc;--muted:#a08870;--line:#332a20;
+  --accent:#f5a050;--accent-soft:#2e1a05;
+  --aws:#f5a050;--aws-mid:#f7ba80;--aws-light:#2e1a05;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#f5c542;--warn-soft:#2e2400;
+  --tag-sdlc:#1e3a6b;--tag-sdlc-ink:#93c5fd;
+  --tag-iac:#4a1040;--tag-iac-ink:#f9a8d4;
+  --tag-resilience:#14432a;--tag-resilience-ink:#86efac;
+  --tag-monitoring:#3f2d00;--tag-monitoring-ink:#fde68a;
+  --tag-incident:#4c0519;--tag-incident-ink:#fda4af;
+  --tag-security:#2e1a6b;--tag-security-ink:#c4b5fd;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#120d08;--sheet:#1c1510;--ink:#f0e8dc;--muted:#a08870;--line:#332a20;
+  --accent:#f5a050;--accent-soft:#2e1a05;
+  --aws:#f5a050;--aws-mid:#f7ba80;--aws-light:#2e1a05;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#f5c542;--warn-soft:#2e2400;
+  --tag-sdlc:#1e3a6b;--tag-sdlc-ink:#93c5fd;
+  --tag-iac:#4a1040;--tag-iac-ink:#f9a8d4;
+  --tag-resilience:#14432a;--tag-resilience-ink:#86efac;
+  --tag-monitoring:#3f2d00;--tag-monitoring-ink:#fde68a;
+  --tag-incident:#4c0519;--tag-incident-ink:#fda4af;
+  --tag-security:#2e1a6b;--tag-security-ink:#c4b5fd;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:20px 64px}
+.wrap{max-width:900px;margin:0 auto}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:2rem;font-weight:700;letter-spacing:-.02em}
+h2{font-size:1.35rem;font-weight:700;margin-bottom:4px}
+h3{font-size:1rem;font-weight:700;margin-bottom:2px}
+h4{font-size:.88rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+a{color:var(--accent)}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+code,kbd{font-family:var(--f-mono);font-size:.82em;background:var(--accent-soft);color:var(--accent);padding:.1em .4em;border-radius:4px}
+kbd{background:var(--sheet);border:1px solid var(--line);color:var(--ink)}
+
+/* Nav */
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:10px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.back-quiz{float:right;font:600 .8rem var(--f-mono);color:var(--accent);text-decoration:none;padding:6px 12px;border:1px solid var(--accent);border-radius:6px;transition:background .15s}
+.back-quiz:hover{background:var(--accent-soft)}
+
+/* TOC */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:20px 0 28px;display:grid;gap:8px}
+.toc-title{font:700 .78rem var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 20px}
+.toc-grid a{font-size:.85rem;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:6px;padding:2px 0}
+.toc-grid a:hover{text-decoration:underline}
+.toc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Exam banner */
+.exam-banner{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:20px;margin-bottom:28px;display:grid;gap:14px}
+.exam-rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.exam-rules div{background:var(--sheet);padding:10px 12px}
+.exam-rules b{display:block;font:600 1rem var(--f-mono)}
+.exam-rules span{font-size:.76rem;color:var(--muted)}
+
+/* Domain weight bars */
+.domain-weights{display:grid;gap:8px;margin-top:8px}
+.dw-row{display:grid;grid-template-columns:1fr 36px;align-items:center;gap:8px}
+.dw-label{font-size:.82rem;font-weight:600}
+.dw-bar-wrap{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.dw-bar{height:100%;background:var(--accent);border-radius:3px}
+.dw-pct{font:.82rem var(--f-mono);color:var(--muted);text-align:right}
+
+/* Section */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:12px;margin-bottom:20px;overflow:hidden}
+.section-head{padding:18px 20px 14px;border-bottom:1px solid var(--line)}
+.section-body{padding:16px 20px}
+.section-tag{display:inline-block;font:.75rem var(--f-mono);font-weight:600;padding:2px 9px;border-radius:20px;margin-bottom:10px}
+.tag-sdlc{background:var(--tag-sdlc);color:var(--tag-sdlc-ink)}
+.tag-iac{background:var(--tag-iac);color:var(--tag-iac-ink)}
+.tag-resilience{background:var(--tag-resilience);color:var(--tag-resilience-ink)}
+.tag-monitoring{background:var(--tag-monitoring);color:var(--tag-monitoring-ink)}
+.tag-incident{background:var(--tag-incident);color:var(--tag-incident-ink)}
+.tag-security{background:var(--tag-security);color:var(--tag-security-ink)}
+
+/* Concept cards */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:14px 0}
+.concept-card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;border-left:3px solid var(--accent)}
+.concept-card h4{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-family:var(--f-mono);margin-bottom:6px}
+.concept-card p{font-size:.87rem;margin:0;line-height:1.5;color:var(--ink)}
+.concept-card.warn{border-left-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+.concept-card.ok{border-left-color:var(--ok)}
+.concept-card.ok h4{color:var(--ok)}
+
+/* Tables */
+.table-wrap{overflow-x:auto;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:.87rem}
+th{background:var(--accent-soft);color:var(--accent);font:600 .78rem var(--f-mono);text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;text-align:left;border-bottom:2px solid var(--accent)}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:var(--paper)}
+
+/* Code blocks */
+pre{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow-x:auto;font:500 .82rem var(--f-mono);line-height:1.6;margin:14px 0}
+pre code{background:none;padding:0;color:inherit;font-size:1em}
+.cmd-comment{color:var(--muted)}
+.cmd-flag{color:var(--ok)}
+.cmd-val{color:var(--warn)}
+
+/* Lists */
+ul.bullets{padding-left:18px;margin:8px 0;font-size:.9rem;line-height:1.6}
+ul.bullets li{margin-bottom:3px}
+
+/* Info/warn boxes */
+.info-box{padding:12px 16px;border-radius:8px;font-size:.88rem;line-height:1.55;margin:12px 0;border-left:3px solid var(--accent);background:var(--accent-soft)}
+.warn-box{padding:12px 16px;border-radius:8px;font-size:.88rem;line-height:1.55;margin:12px 0;border-left:3px solid var(--warn);background:var(--warn-soft)}
+.ok-box{padding:12px 16px;border-radius:8px;font-size:.88rem;line-height:1.55;margin:12px 0;border-left:3px solid var(--ok);background:var(--ok-soft)}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#8b3a00 0%,#e07e22 60%,#f5a050 100%);color:#fff;border-radius:12px;padding:28px 24px 24px;margin-bottom:24px;position:relative;overflow:hidden}
+.hero::after{content:"🚀";position:absolute;right:-10px;top:-20px;font-size:140px;opacity:.08;line-height:1;pointer-events:none}
+.hero .eyebrow{color:rgba(255,255,255,.75)}
+.hero h1{color:#fff;margin:6px 0 10px}
+.hero p{color:rgba(255,255,255,.85);margin:0;font-size:.95rem}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.hero-badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;font:.75rem var(--f-mono);padding:3px 10px;border-radius:20px}
+
+/* Theme toggle */
+.theme-btn{position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--sheet);color:var(--ink);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:10;transition:background .2s}
+.theme-btn:hover{background:var(--accent-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="../index.html" class="home-link">← Dashboard</a>
+  <a href="index.html" class="back-quiz">🚀 Quiz DevOps →</a>
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="eyebrow">Amazon Web Services · DOP-C02</p>
+    <h1>Fiche AWS DevOps Pro</h1>
+    <p>Examen avancé — 3h · 75 questions · Score min. 750/1000</p>
+    <div class="hero-badges">
+      <span class="hero-badge">Associate requis</span>
+      <span class="hero-badge">QCM + multi-réponses</span>
+      <span class="hero-badge">Scénarios pratiques</span>
+      <span class="hero-badge">3 ans validité</span>
+      <span class="hero-badge">300 USD</span>
+    </div>
+  </div>
+
+  <!-- EXAM BANNER -->
+  <div class="exam-banner">
+    <div>
+      <h4>Domaines &amp; pondérations</h4>
+      <div class="domain-weights">
+        <div class="dw-row">
+          <div>
+            <div class="dw-label">SDLC Automation</div>
+            <div class="dw-bar-wrap"><div class="dw-bar" style="width:22%"></div></div>
+          </div>
+          <div class="dw-pct">22 %</div>
+        </div>
+        <div class="dw-row">
+          <div>
+            <div class="dw-label">Configuration Management &amp; IaC</div>
+            <div class="dw-bar-wrap"><div class="dw-bar" style="width:17%"></div></div>
+          </div>
+          <div class="dw-pct">17 %</div>
+        </div>
+        <div class="dw-row">
+          <div>
+            <div class="dw-label">Security &amp; Compliance</div>
+            <div class="dw-bar-wrap"><div class="dw-bar" style="width:17%"></div></div>
+          </div>
+          <div class="dw-pct">17 %</div>
+        </div>
+        <div class="dw-row">
+          <div>
+            <div class="dw-label">Monitoring &amp; Logging</div>
+            <div class="dw-bar-wrap"><div class="dw-bar" style="width:15%"></div></div>
+          </div>
+          <div class="dw-pct">15 %</div>
+        </div>
+        <div class="dw-row">
+          <div>
+            <div class="dw-label">Resilient Cloud Solutions</div>
+            <div class="dw-bar-wrap"><div class="dw-bar" style="width:15%"></div></div>
+          </div>
+          <div class="dw-pct">15 %</div>
+        </div>
+        <div class="dw-row">
+          <div>
+            <div class="dw-label">Incident &amp; Event Response</div>
+            <div class="dw-bar-wrap"><div class="dw-bar" style="width:14%"></div></div>
+          </div>
+          <div class="dw-pct">14 %</div>
+        </div>
+      </div>
+    </div>
+    <div class="exam-rules">
+      <div><b>3h</b><span>durée</span></div>
+      <div><b>75</b><span>questions</span></div>
+      <div><b>750</b><span>score min.</span></div>
+      <div><b>3 ans</b><span>validité</span></div>
+      <div><b>QCM</b><span>format</span></div>
+      <div><b>300 $</b><span>tarif</span></div>
+    </div>
+    <div class="info-box">💡 <strong>Stratégie :</strong> cet examen teste des scénarios architecturaux complexes, pas des commandes CLI. Comprendre <em>pourquoi</em> choisir un service (CodePipeline vs Jenkins, CloudFormation vs CDK…) est plus important que les syntaxes exactes.</div>
+  </div>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="toc-title">Sommaire</div>
+    <div class="toc-grid">
+      <a href="#s1"><span class="toc-dot" style="background:#1e40af"></span>SDLC Automation — CI/CD</a>
+      <a href="#s2"><span class="toc-dot" style="background:#9d174d"></span>Configuration &amp; IaC</a>
+      <a href="#s3"><span class="toc-dot" style="background:#5b21b6"></span>Security &amp; Compliance</a>
+      <a href="#s4"><span class="toc-dot" style="background:#854d0e"></span>Monitoring &amp; Logging</a>
+      <a href="#s5"><span class="tw-dot" style="background:#166534"></span>Resilient Cloud Solutions</a>
+      <a href="#s6"><span class="toc-dot" style="background:#9f1239"></span>Incident &amp; Event Response</a>
+      <a href="#s7"><span class="toc-dot" style="background:#e07e22"></span>AWS CLI — commandes clés</a>
+      <a href="#s8"><span class="toc-dot" style="background:#8a5a00"></span>Pièges &amp; astuces exam</a>
+    </div>
+  </nav>
+
+  <!-- S1 : SDLC AUTOMATION -->
+  <section class="section" id="s1">
+    <div class="section-head">
+      <span class="section-tag tag-sdlc">SDLC Automation · 22 %</span>
+      <h2>SDLC Automation — CI/CD</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">CodeCommit, CodeBuild, CodeDeploy, CodePipeline — le cœur du DevOps AWS</p>
+    </div>
+    <div class="section-body">
+
+      <h3 style="margin-bottom:10px">Les 4 services Code*</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>CodeCommit</h4>
+          <p>Dépôt Git managé AWS. Intègre IAM pour les accès, SNS/EventBridge pour les triggers. Supporte les hooks Git. Alternative à GitHub/GitLab dans l'écosystème AWS.</p>
+        </div>
+        <div class="concept-card">
+          <h4>CodeBuild</h4>
+          <p>Build serveur managé (pas d'infra à gérer). Exécute <code>buildspec.yml</code>. Charge les artefacts dans S3. Supporte Docker nativement. Facturation à la minute.</p>
+        </div>
+        <div class="concept-card">
+          <h4>CodeDeploy</h4>
+          <p>Déploiement automatisé sur EC2, Lambda, ECS. Strategies : <strong>AllAtOnce</strong>, <strong>HalfAtATime</strong>, <strong>OneAtATime</strong>, <strong>Canary</strong>, <strong>Linear</strong>.</p>
+        </div>
+        <div class="concept-card">
+          <h4>CodePipeline</h4>
+          <p>Orchestrateur CI/CD : enchaîne Source → Build → Test → Deploy. Intègre CodeCommit, GitHub, S3 (source), CodeBuild (build), CodeDeploy/ECS/Beanstalk (deploy).</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">buildspec.yml — structure</h3>
+      <pre><code><span class="cmd-comment"># buildspec.yml — fichier à la racine du dépôt</span>
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - npm install
+
+  pre_build:
+    commands:
+      - <span class="cmd-comment"># Login ECR</span>
+      - aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_URI
+
+  build:
+    commands:
+      - npm test
+      - docker build -t $IMAGE_TAG .
+      - docker push $IMAGE_TAG
+
+  post_build:
+    commands:
+      - printf '[{"name":"app","imageUri":"%s"}]' $IMAGE_TAG > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
+    - appspec.yml</code></pre>
+
+      <h3 style="margin:16px 0 10px">Stratégies de déploiement CodeDeploy</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Stratégie</th><th>Comportement</th><th>Risque</th></tr>
+          <tr><td><code>AllAtOnce</code></td><td>Toutes les instances simultanément</td><td>Downtime si échec</td></tr>
+          <tr><td><code>HalfAtATime</code></td><td>50% d'abord, puis 50%</td><td>Capacité réduite pendant le déploiement</td></tr>
+          <tr><td><code>OneAtATime</code></td><td>Instance par instance</td><td>Plus lent, risque minimal</td></tr>
+          <tr><td><code>Canary10Percent5Minutes</code></td><td>10% → attente 5min → 90%</td><td>Faible, rollback auto si alarme</td></tr>
+          <tr><td><code>Linear10PercentEvery1Minute</code></td><td>+10% toutes les minutes</td><td>Très progressif, idéal Lambda</td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Blue/Green avec CodeDeploy + ECS</h3>
+      <pre><code><span class="cmd-comment"># appspec.yml pour ECS Blue/Green</span>
+version: 0.0
+Resources:
+  - TargetService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: &lt;TASK_DEFINITION&gt;
+        LoadBalancerInfo:
+          ContainerName: "app"
+          ContainerPort: 80
+
+Hooks:
+  - BeforeAllowTraffic: "arn:aws:lambda:us-east-1:123:function:smoke-test"
+  - AfterAllowTraffic: "arn:aws:lambda:us-east-1:123:function:integration-test"</code></pre>
+
+      <h3 style="margin:16px 0 10px">CodePipeline — intégrations clés</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Source Actions</h4>
+          <p>CodeCommit, GitHub (via CodeStar Connections), S3, ECR. Chaque push déclenche le pipeline via EventBridge.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Approval manuelle</h4>
+          <p>Action d'approbation humaine entre stages. Envoie une notification SNS. Le pipeline attend jusqu'à l'approbation ou le timeout (7 jours).</p>
+        </div>
+        <div class="concept-card">
+          <h4>Cross-account deploy</h4>
+          <p>Pipeline dans compte A, déploiement dans compte B. Nécessite un rôle IAM cross-account et une clé KMS partagée pour les artefacts S3.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Notifications</h4>
+          <p>CodeStar Notifications → SNS/Slack/Teams pour les événements pipeline (succès, échec, approbation en attente).</p>
+        </div>
+      </div>
+
+      <div class="ok-box">
+        ✅ <strong>Elastic Beanstalk</strong> comme cible de déploiement : supporte les mêmes stratégies (AllAtOnce, Rolling, Rolling with additional batch, Immutable, Traffic splitting). <strong>Immutable</strong> = meilleur pour la production, sans downtime et rollback rapide.
+      </div>
+
+    </div>
+  </section>
+
+  <!-- S2 : CONFIGURATION & IAC -->
+  <section class="section" id="s2">
+    <div class="section-head">
+      <span class="section-tag tag-iac">Config &amp; IaC · 17 %</span>
+      <h2>Configuration Management &amp; Infrastructure as Code</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">CloudFormation, CDK, Systems Manager, OpsWorks, Elastic Beanstalk</p>
+    </div>
+    <div class="section-body">
+
+      <h3 style="margin-bottom:10px">CloudFormation — concepts avancés</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>StackSets</h4>
+          <p>Déploie un stack CloudFormation dans <strong>plusieurs comptes et régions</strong> simultanément depuis un compte administrateur. Idéal pour les organisations AWS.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Change Sets</h4>
+          <p>Aperçu des modifications avant application. Montre les ressources créées, modifiées, supprimées. Obligatoire en prod pour éviter les suppressions accidentelles.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Drift Detection</h4>
+          <p>Détecte les ressources modifiées manuellement hors CloudFormation. Permet de resynchroniser l'état réel avec le template.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Custom Resources</h4>
+          <p>Lambda ou SNS invoqués par CloudFormation pour des ressources non natives. Utile pour configurer des services tiers ou des logiques custom lors du déploiement.</p>
+        </div>
+        <div class="concept-card">
+          <h4>cfn-init / cfn-signal</h4>
+          <p>Bootstrap d'instances EC2 : <code>cfn-init</code> applique la config depuis les métadonnées, <code>cfn-signal</code> notifie CloudFormation que l'instance est prête (CreationPolicy).</p>
+        </div>
+        <div class="concept-card">
+          <h4>Nested Stacks</h4>
+          <p>Stacks imbriqués pour découper en modules réutilisables (réseau, IAM, app). Le parent référence l'enfant via <code>AWS::CloudFormation::Stack</code>.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">CloudFormation — exemple avec rollback</h3>
+      <pre><code><span class="cmd-comment"># Créer un stack avec rollback sur erreur</span>
+aws cloudformation create-stack \
+  <span class="cmd-flag">--stack-name</span> my-app-prod \
+  <span class="cmd-flag">--template-body</span> file://template.yaml \
+  <span class="cmd-flag">--parameters</span> ParameterKey=Env,ParameterValue=prod \
+  <span class="cmd-flag">--on-failure</span> ROLLBACK \
+  <span class="cmd-flag">--capabilities</span> CAPABILITY_IAM
+
+<span class="cmd-comment"># Mettre à jour avec un Change Set</span>
+aws cloudformation create-change-set \
+  <span class="cmd-flag">--stack-name</span> my-app-prod \
+  <span class="cmd-flag">--template-body</span> file://template-v2.yaml \
+  <span class="cmd-flag">--change-set-name</span> update-v2
+
+aws cloudformation execute-change-set \
+  <span class="cmd-flag">--change-set-name</span> update-v2 \
+  <span class="cmd-flag">--stack-name</span> my-app-prod</code></pre>
+
+      <h3 style="margin:16px 0 10px">AWS Systems Manager (SSM)</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Parameter Store</h4>
+          <p>Stockage de configuration et secrets. Hiérarchie <code>/app/prod/db-password</code>. Intégration native CloudFormation, Lambda, CodeBuild. Tier standard gratuit.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Secrets Manager</h4>
+          <p>Rotation automatique des secrets (RDS, Redshift, custom). Intègre Lambda pour la rotation. Plus cher que Parameter Store mais rotation native.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Session Manager</h4>
+          <p>Shell sur instances EC2 sans SSH, sans clé, sans port 22 ouvert. Audit via CloudTrail. Idéal pour les environnements sécurisés (pas de bastion).</p>
+        </div>
+        <div class="concept-card">
+          <h4>Run Command</h4>
+          <p>Exécute des commandes sur des flottes d'instances (par tags, groupes). Remplace Ansible/Chef pour les tâches ponctuelles. Résultats dans S3 ou CloudWatch Logs.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Patch Manager</h4>
+          <p>Applique les patches OS selon une Patch Baseline. Planifié via Maintenance Windows. Rapports de compliance dans SSM Compliance.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Automation</h4>
+          <p>Runbooks SSM pour automatiser les opérations (créer AMI, remediation…). Peut être déclenché par EventBridge, AWS Config, ou manuellement.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">CDK vs CloudFormation vs Terraform</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Outil</th><th>Langage</th><th>Avantage principal</th><th>Cas d'usage</th></tr>
+          <tr><td>CloudFormation</td><td>YAML/JSON</td><td>Natif AWS, gratuit, change sets</td><td>IaC standard AWS</td></tr>
+          <tr><td>CDK</td><td>TypeScript/Python/Java…</td><td>Abstractions haut niveau, constructs réutilisables</td><td>Équipes dev qui préfèrent le code</td></tr>
+          <tr><td>Terraform</td><td>HCL</td><td>Multi-cloud, state management, modules registry</td><td>Organisations multi-cloud</td></tr>
+          <tr><td>OpsWorks</td><td>Chef/Puppet</td><td>Config management classique (deprecated)</td><td>Migration legacy</td></tr>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- S3 : SECURITY -->
+  <section class="section" id="s3">
+    <div class="section-head">
+      <span class="section-tag tag-security">Security &amp; Compliance · 17 %</span>
+      <h2>Security &amp; Compliance</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">IAM avancé, AWS Config, Security Hub, GuardDuty, chiffrement</p>
+    </div>
+    <div class="section-body">
+
+      <h3 style="margin-bottom:10px">IAM avancé</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Permissions Boundaries</h4>
+          <p>Plafond de permissions d'une entité IAM. Même si une policy accorde plus, la boundary limite. Délégation sécurisée à des développeurs pour créer des rôles.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Service Control Policies (SCP)</h4>
+          <p>Politiques Organizations : limitent ce que les comptes membres peuvent faire, même pour l'admin. Whitelist ou blacklist de services/actions.</p>
+        </div>
+        <div class="concept-card">
+          <h4>IAM Roles Anywhere</h4>
+          <p>Permet aux workloads on-premise d'assumer des rôles IAM via des certificats X.509. Élimine les long-lived access keys pour les serveurs hors AWS.</p>
+        </div>
+        <div class="concept-card">
+          <h4>ABAC — Attribute-Based</h4>
+          <p>Contrôle d'accès basé sur des tags (ex: <code>Project=Alpha</code>). Plus scalable que RBAC traditionnel quand les équipes et ressources grandissent.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">AWS Config — Conformité continue</h3>
+      <pre><code><span class="cmd-comment"># AWS Config enregistre chaque changement de ressource</span>
+<span class="cmd-comment"># Config Rules évaluent la conformité en continu</span>
+
+<span class="cmd-comment"># Règles managées utiles pour l'exam :</span>
+<span class="cmd-comment"># - s3-bucket-public-read-prohibited</span>
+<span class="cmd-comment"># - ec2-instance-no-public-ip</span>
+<span class="cmd-comment"># - required-tags</span>
+<span class="cmd-comment"># - encrypted-volumes</span>
+<span class="cmd-comment"># - mfa-enabled-for-iam-console-access</span>
+
+<span class="cmd-comment"># Remediation automatique via SSM Automation</span>
+aws configservice put-remediation-configurations \
+  <span class="cmd-flag">--config-rule-name</span> s3-bucket-public-read-prohibited \
+  <span class="cmd-flag">--remediation-configurations</span> file://remediation.json</code></pre>
+
+      <h3 style="margin:16px 0 10px">Services de sécurité — aperçu rapide</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Service</th><th>Rôle</th><th>Source de données</th></tr>
+          <tr><td><strong>GuardDuty</strong></td><td>Détection de menaces ML (accès suspects, malware)</td><td>VPC Flow Logs, CloudTrail, DNS Logs</td></tr>
+          <tr><td><strong>Security Hub</strong></td><td>Tableau de bord centralisé, scores CIS/PCI-DSS</td><td>GuardDuty, Inspector, Macie, Config</td></tr>
+          <tr><td><strong>Inspector</strong></td><td>Vulnérabilités EC2/ECR/Lambda</td><td>SSM Agent, ECR image scan</td></tr>
+          <tr><td><strong>Macie</strong></td><td>Découverte de données sensibles (PII) dans S3</td><td>Buckets S3</td></tr>
+          <tr><td><strong>Detective</strong></td><td>Investigation forensique des incidents</td><td>GuardDuty findings, CloudTrail</td></tr>
+          <tr><td><strong>AWS Config</strong></td><td>Conformité continue, historique des changements</td><td>Toutes les ressources AWS</td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Chiffrement &amp; Secrets</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>KMS CMK</h4>
+          <p>Customer Managed Keys : rotation annuelle automatique optionnelle. Utilisé pour chiffrer S3, EBS, RDS, Secrets Manager. Audit via CloudTrail.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Envelope Encryption</h4>
+          <p>KMS chiffre une Data Encryption Key (DEK), la DEK chiffre les données. KMS ne voit jamais les données en clair. Pattern standard AWS.</p>
+        </div>
+        <div class="concept-card">
+          <h4>ACM — Certificate Manager</h4>
+          <p>Certificats TLS gratuits pour ALB, CloudFront, API Gateway. Renouvellement automatique. Les certificats ne peuvent pas être exportés (sauf Private CA).</p>
+        </div>
+        <div class="concept-card">
+          <h4>Secrets Manager</h4>
+          <p>Rotation automatique toutes les N jours via Lambda. Intègre nativement RDS, Redshift, DocumentDB. Référencer depuis ECS Task Definition ou Lambda env vars.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- S4 : MONITORING -->
+  <section class="section" id="s4">
+    <div class="section-head">
+      <span class="section-tag tag-monitoring">Monitoring &amp; Logging · 15 %</span>
+      <h2>Monitoring &amp; Logging</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">CloudWatch, X-Ray, CloudTrail — observabilité complète</p>
+    </div>
+    <div class="section-body">
+
+      <h3 style="margin-bottom:10px">CloudWatch — les 4 piliers</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Metrics</h4>
+          <p>Métriques standard (CPUUtilization, RequestCount…) et custom. Résolution standard 1min, haute résolution 1s. Rétention jusqu'à 15 mois.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Logs</h4>
+          <p>Log Groups → Log Streams. Metric Filters extraient des métriques des logs. Subscription Filters envoient vers Lambda, Kinesis, OpenSearch en temps réel.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Alarms</h4>
+          <p>Déclenche actions : Auto Scaling, SNS, EC2 (stop/reboot/recover). États : OK, ALARM, INSUFFICIENT_DATA. Composite Alarms combinent plusieurs alarmes.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Dashboards</h4>
+          <p>Visualisations cross-account et cross-region. Partageables. Widgets : graphiques, chiffres, textes. Supporte les expressions mathématiques sur métriques.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">CloudWatch Logs — flux de données</h3>
+      <pre><code><span class="cmd-comment"># Envoyer des logs custom depuis une app</span>
+aws logs put-log-events \
+  <span class="cmd-flag">--log-group-name</span> /app/production \
+  <span class="cmd-flag">--log-stream-name</span> instance-i-1234567890abcdef0 \
+  <span class="cmd-flag">--log-events</span> timestamp=1699900000000,message="Deploy OK"
+
+<span class="cmd-comment"># Créer un Metric Filter (compter les erreurs 500)</span>
+aws logs put-metric-filter \
+  <span class="cmd-flag">--log-group-name</span> /app/production \
+  <span class="cmd-flag">--filter-name</span> Http500Errors \
+  <span class="cmd-flag">--filter-pattern</span> "[..., statusCode=5*]" \
+  <span class="cmd-flag">--metric-transformations</span> \
+    metricName=Http500Count,metricNamespace=AppMetrics,metricValue=1
+
+<span class="cmd-comment"># Exporter des logs vers S3 (analytique)</span>
+aws logs create-export-task \
+  <span class="cmd-flag">--log-group-name</span> /app/production \
+  <span class="cmd-flag">--from</span> 1699900000000 \
+  <span class="cmd-flag">--to</span> 1699986400000 \
+  <span class="cmd-flag">--destination</span> my-logs-bucket</code></pre>
+
+      <h3 style="margin:16px 0 10px">AWS X-Ray — Distributed Tracing</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Traces &amp; Segments</h4>
+          <p>Une trace = requête end-to-end. Segments = une unité de travail (Lambda, EC2, service). Subsegments pour les appels AWS SDK ou HTTP.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Service Map</h4>
+          <p>Carte visuelle des services et leurs latences/erreurs. Identifie les goulots d'étranglement et les cascades d'erreurs dans les architectures microservices.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Sampling</h4>
+          <p>Pour réduire les coûts : rule par défaut = 5% des requêtes + 1/s. Sampling rules custom par service, path, méthode HTTP.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Groups &amp; Insights</h4>
+          <p>Filtres de traces pour alerter sur des anomalies (latence anormale, taux d'erreur élevé). Intègre CloudWatch pour les alarmes.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">CloudTrail — Audit des actions API</h3>
+      <div class="ok-box">
+        ✅ CloudTrail enregistre <strong>toutes les API calls</strong> (console + CLI + SDK). Trail multi-région obligatoire pour la compliance. <strong>Log File Validation</strong> (hash SHA-256) garantit l'intégrité. Envoie vers S3 (long terme) + CloudWatch Logs (temps réel) + EventBridge (réaction).
+      </div>
+      <div class="warn-box">
+        ⚠️ CloudTrail a un délai de ~15 minutes. Pour une réponse en temps réel aux événements de sécurité, utiliser <strong>EventBridge</strong> (quasi temps réel) plutôt que CloudTrail directement.
+      </div>
+
+    </div>
+  </section>
+
+  <!-- S5 : RESILIENCE -->
+  <section class="section" id="s5">
+    <div class="section-head">
+      <span class="section-tag tag-resilience">Resilient Cloud Solutions · 15 %</span>
+      <h2>Resilient Cloud Solutions</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">Auto Scaling, multi-AZ, DR, RDS/ECS/Lambda haute disponibilité</p>
+    </div>
+    <div class="section-body">
+
+      <h3 style="margin-bottom:10px">Auto Scaling Groups (ASG)</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Target Tracking</h4>
+          <p>Maintient une métrique cible (ex: 50% CPU). AWS gère automatiquement scale-out et scale-in. La politique la plus simple et recommandée.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Step Scaling</h4>
+          <p>Actions par paliers selon l'ampleur de l'alarme. Ex: +2 instances si CPU 60-80%, +4 si CPU >80%. Plus fine que simple scaling.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Scheduled Scaling</h4>
+          <p>Montée en charge prévisible (black friday, horaires bureau). Définit min/max/desired à un moment précis ou en cron.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Predictive Scaling</h4>
+          <p>Machine learning analyse l'historique et anticipe. Combine avec reactive scaling. Réduit la latence de démarrage grâce à l'anticipation.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Stratégies de Disaster Recovery</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Stratégie</th><th>RTO</th><th>RPO</th><th>Coût</th><th>Description</th></tr>
+          <tr><td><strong>Backup &amp; Restore</strong></td><td>Heures</td><td>Heures</td><td>💲</td><td>Snapshots S3/RDS, recréer l'infra au besoin</td></tr>
+          <tr><td><strong>Pilot Light</strong></td><td>~1h</td><td>Minutes</td><td>💲💲</td><td>Noyau minimal actif (DB replication), scale au besoin</td></tr>
+          <tr><td><strong>Warm Standby</strong></td><td>Minutes</td><td>Secondes</td><td>💲💲💲</td><td>Version réduite toujours active, scale rapide</td></tr>
+          <tr><td><strong>Multi-Site Active/Active</strong></td><td>Secondes</td><td>0</td><td>💲💲💲💲</td><td>Deux régions actives simultanément, Route53 routing</td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin:16px 0 10px">RDS — Haute disponibilité</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Multi-AZ</h4>
+          <p>Réplica synchrone dans une autre AZ. Failover automatique en 60-120s. Pour la <strong>haute disponibilité</strong>, pas pour la performance lecture.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Read Replicas</h4>
+          <p>Réplica asynchrone pour décharger les lectures. Peut être promu en instance principale. Cross-region possible. Pour la <strong>scalabilité lecture</strong>.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Aurora Global Database</h4>
+          <p>Réplication cross-région en moins d'1 seconde. RPO &lt;1s, RTO &lt;1min. Idéal pour les applications mondiales et la DR active.</p>
+        </div>
+        <div class="concept-card">
+          <h4>RDS Proxy</h4>
+          <p>Pool de connexions entre Lambda/ECS et RDS. Réduit les connexions directes (problème classique Lambda). Failover transparent.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- S6 : INCIDENT & EVENT RESPONSE -->
+  <section class="section" id="s6">
+    <div class="section-head">
+      <span class="section-tag tag-incident">Incident &amp; Event Response · 14 %</span>
+      <h2>Incident &amp; Event Response</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">EventBridge, SNS, SQS, Lambda, Step Functions — automatiser la réponse</p>
+    </div>
+    <div class="section-body">
+
+      <h3 style="margin-bottom:10px">EventBridge — le hub d'événements AWS</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Event Bus</h4>
+          <p>Default (services AWS), Custom (apps), Partner (SaaS). Les règles filtrent les événements et routent vers des targets (Lambda, SQS, Step Functions, SNS…).</p>
+        </div>
+        <div class="concept-card">
+          <h4>Event Rules</h4>
+          <p>Pattern matching sur les attributs d'un event JSON. Ex: EC2 state-change → <code>{"source":["aws.ec2"],"detail-type":["EC2 Instance State-change Notification"]}</code>.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Scheduled Rules</h4>
+          <p>Cron ou rate expression pour déclencher des workflows périodiques. Remplace CloudWatch Events (même service, nouveau nom).</p>
+        </div>
+        <div class="concept-card">
+          <h4>Pipes</h4>
+          <p>Connexion point-à-point source → enrichissement → target. Source : SQS, DynamoDB Streams, Kinesis. Filtre et enrichit sans code Lambda intermédiaire.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Pattern : remédiation automatique avec Config + SSM</h3>
+      <pre><code><span class="cmd-comment"># Flow : Config détecte une non-conformité</span>
+<span class="cmd-comment">#        → EventBridge reçoit l'event Config</span>
+<span class="cmd-comment">#        → déclenche SSM Automation Runbook</span>
+<span class="cmd-comment">#        → remédie automatiquement</span>
+
+<span class="cmd-comment"># Exemple : S3 bucket public read → remédiation auto</span>
+<span class="cmd-comment"># EventBridge Rule :</span>
+{
+  "source": ["aws.config"],
+  "detail-type": ["Config Rules Compliance Change"],
+  "detail": {
+    "configRuleName": ["s3-bucket-public-read-prohibited"],
+    "newEvaluationResult": {
+      "complianceType": ["NON_COMPLIANT"]
+    }
+  }
+}
+<span class="cmd-comment"># Target : SSM Automation avec AWS-DisableS3BucketPublicReadWrite</span></code></pre>
+
+      <h3 style="margin:16px 0 10px">SNS vs SQS vs EventBridge</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Service</th><th>Pattern</th><th>Delivery</th><th>Usage type</th></tr>
+          <tr><td><strong>SNS</strong></td><td>Pub/Sub fan-out</td><td>Push, au moins une fois</td><td>Notifications, fan-out vers SQS/Lambda</td></tr>
+          <tr><td><strong>SQS</strong></td><td>Queue point-à-point</td><td>Pull, au moins une fois</td><td>Découplage, buffer, traitement async</td></tr>
+          <tr><td><strong>SQS FIFO</strong></td><td>Queue ordonnée</td><td>Exactement une fois</td><td>Ordre garanti, déduplication</td></tr>
+          <tr><td><strong>EventBridge</strong></td><td>Event routing</td><td>Push, quasi temps réel</td><td>Automatisation, intégration multi-service</td></tr>
+          <tr><td><strong>Kinesis</strong></td><td>Streaming</td><td>Pull, jusqu'à 7 jours</td><td>Analytics temps réel, logs, IoT</td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin:16px 0 10px">Step Functions — orchestration</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h4>Standard Workflows</h4>
+          <p>Jusqu'à 1 an d'exécution. Exactement une fois. Idéal pour les workflows métier longs (commandes, approbations humaines). Visible dans la console.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Express Workflows</h4>
+          <p>Jusqu'à 5 minutes. Au moins une fois. Haute performance (100k/s). Pour IoT, traitement de données en masse. Moins cher.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Parallel &amp; Map</h4>
+          <p>Parallel : exécute plusieurs branches en parallèle. Map : itère sur un tableau (traitement batch). Les deux attendent la complétion avant de continuer.</p>
+        </div>
+        <div class="concept-card">
+          <h4>Wait for Callback</h4>
+          <p>Workflow pause et envoie un token. Reprend quand un service externe appelle <code>SendTaskSuccess</code>. Pattern pour les approbations humaines ou APIs externes.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- S7 : AWS CLI -->
+  <section class="section" id="s7">
+    <div class="section-head">
+      <span class="section-tag tag-sdlc">AWS CLI · Commandes essentielles</span>
+      <h2>AWS CLI — Référence rapide DOP-C02</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">Les commandes les plus utiles pour comprendre et dépanner</p>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        💡 <strong>L'examen DOP-C02 teste la compréhension architecturale</strong>, pas la mémorisation de commandes. Ces commandes aident à comprendre les services, pas à les réciter parfaitement.
+      </div>
+
+      <h3 style="margin:16px 0 10px">CodePipeline — gestion</h3>
+      <pre><code><span class="cmd-comment"># Lister les pipelines</span>
+aws codepipeline list-pipelines
+
+<span class="cmd-comment"># État d'un pipeline</span>
+aws codepipeline get-pipeline-state <span class="cmd-flag">--name</span> my-pipeline
+
+<span class="cmd-comment"># Déclencher manuellement</span>
+aws codepipeline start-pipeline-execution <span class="cmd-flag">--name</span> my-pipeline
+
+<span class="cmd-comment"># Approuver une action manuelle</span>
+aws codepipeline put-approval-result \
+  <span class="cmd-flag">--pipeline-name</span> my-pipeline \
+  <span class="cmd-flag">--stage-name</span> Approval \
+  <span class="cmd-flag">--action-name</span> ManualApproval \
+  <span class="cmd-flag">--result</span> summary="LGTM",status=Approved \
+  <span class="cmd-flag">--token</span> &lt;token-from-notification&gt;</code></pre>
+
+      <h3 style="margin:16px 0 10px">CloudFormation — dépannage</h3>
+      <pre><code><span class="cmd-comment"># Voir les events d'un stack (trouver les erreurs)</span>
+aws cloudformation describe-stack-events \
+  <span class="cmd-flag">--stack-name</span> my-app-prod \
+  <span class="cmd-flag">--query</span> 'StackEvents[?ResourceStatus==`CREATE_FAILED`]'
+
+<span class="cmd-comment"># Ressources d'un stack</span>
+aws cloudformation list-stack-resources \
+  <span class="cmd-flag">--stack-name</span> my-app-prod
+
+<span class="cmd-comment"># Drift detection</span>
+aws cloudformation detect-stack-drift <span class="cmd-flag">--stack-name</span> my-app-prod
+aws cloudformation describe-stack-drift-detection-status \
+  <span class="cmd-flag">--stack-drift-detection-id</span> &lt;detection-id&gt;</code></pre>
+
+      <h3 style="margin:16px 0 10px">CloudWatch — alarmes et métriques</h3>
+      <pre><code><span class="cmd-comment"># Créer une alarme CPU</span>
+aws cloudwatch put-metric-alarm \
+  <span class="cmd-flag">--alarm-name</span> HighCPU \
+  <span class="cmd-flag">--metric-name</span> CPUUtilization \
+  <span class="cmd-flag">--namespace</span> AWS/EC2 \
+  <span class="cmd-flag">--dimensions</span> Name=AutoScalingGroupName,Value=my-asg \
+  <span class="cmd-flag">--statistic</span> Average \
+  <span class="cmd-flag">--period</span> 60 \
+  <span class="cmd-flag">--threshold</span> 80 \
+  <span class="cmd-flag">--comparison-operator</span> GreaterThanOrEqualToThreshold \
+  <span class="cmd-flag">--evaluation-periods</span> 2 \
+  <span class="cmd-flag">--alarm-actions</span> arn:aws:sns:us-east-1:123:alerts
+
+<span class="cmd-comment"># Mettre une alarme en état ALARM (test)</span>
+aws cloudwatch set-alarm-state \
+  <span class="cmd-flag">--alarm-name</span> HighCPU \
+  <span class="cmd-flag">--state-value</span> ALARM \
+  <span class="cmd-flag">--state-reason</span> "Test"</code></pre>
+
+      <h3 style="margin:16px 0 10px">SSM — opérations courantes</h3>
+      <pre><code><span class="cmd-comment"># Exécuter une commande sur toutes les instances taguées</span>
+aws ssm send-command \
+  <span class="cmd-flag">--document-name</span> "AWS-RunShellScript" \
+  <span class="cmd-flag">--targets</span> 'Key=tag:Env,Values=production' \
+  <span class="cmd-flag">--parameters</span> 'commands=["systemctl status nginx"]'
+
+<span class="cmd-comment"># Démarrer une session SSM (sans SSH)</span>
+aws ssm start-session <span class="cmd-flag">--target</span> i-1234567890abcdef0
+
+<span class="cmd-comment"># Récupérer un paramètre (avec déchiffrement)</span>
+aws ssm get-parameter \
+  <span class="cmd-flag">--name</span> /app/prod/db-password \
+  <span class="cmd-flag">--with-decryption</span> \
+  <span class="cmd-flag">--query</span> Parameter.Value \
+  <span class="cmd-flag">--output</span> text</code></pre>
+
+    </div>
+  </section>
+
+  <!-- S8 : PIEGES -->
+  <section class="section" id="s8">
+    <div class="section-head">
+      <span class="section-tag" style="background:var(--warn-soft);color:var(--warn)">⚠️ Pièges &amp; astuces</span>
+      <h2>Pièges courants à l'examen DOP-C02</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:4px">Les erreurs classiques qui font perdre des points</p>
+    </div>
+    <div class="section-body">
+      <div class="concept-grid">
+        <div class="concept-card warn">
+          <h4>CodeDeploy ≠ CodePipeline</h4>
+          <p>CodeDeploy = outil de déploiement (EC2/Lambda/ECS). CodePipeline = orchestrateur CI/CD qui peut appeler CodeDeploy. Ne pas les confondre dans les scénarios.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>Multi-AZ ≠ Read Replica</h4>
+          <p>Multi-AZ = haute disponibilité (failover auto, réplica synchrone). Read Replica = scalabilité lecture (réplica asynchrone). L'exam teste souvent cette distinction.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>CloudTrail délai 15 min</h4>
+          <p>CloudTrail ne convient pas pour des alertes de sécurité immédiates. Utiliser EventBridge (quasi temps réel) + GuardDuty pour détecter et réagir instantanément.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>Parameter Store vs Secrets Manager</h4>
+          <p>Secrets Manager = rotation automatique + coût ($0.40/secret/mois). Parameter Store Standard = gratuit, pas de rotation auto. SecureString = KMS mais pas de rotation.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>SCP ne remplace pas IAM</h4>
+          <p>Les SCP (Organizations) définissent le plafond des permissions. IAM doit toujours accorder explicitement les droits. Les deux s'appliquent (intersection).</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>Blue/Green sur Lambda</h4>
+          <p>Pour Lambda, utiliser les alias et la traffic shifting (Canary/Linear) via CodeDeploy. Les CloudWatch Alarms déclenchent le rollback automatique si erreurs.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>cfn-signal obligatoire</h4>
+          <p>Sans <code>cfn-signal</code> dans le UserData, CloudFormation considère l'instance prête dès sa création (pas après bootstrap). Utiliser CreationPolicy + cfn-signal pour attendre réellement.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>EventBridge ≠ SNS pour l'automation</h4>
+          <p>Pour réagir aux événements AWS (Config, GuardDuty, CodePipeline), EventBridge est le bon choix. SNS est mieux pour les notifications humaines (email, SMS).</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>RDS Proxy pour Lambda</h4>
+          <p>Lambda peut créer des milliers de connexions RDS simultanées lors du scale. RDS Proxy pool les connexions. Toujours proposer RDS Proxy quand Lambda + RDS.</p>
+        </div>
+        <div class="concept-card warn">
+          <h4>StackSets nécessite confiance</h4>
+          <p>StackSets cross-account nécessite un rôle <code>AWSCloudFormationStackSetAdministrationRole</code> dans le compte admin et <code>AWSCloudFormationStackSetExecutionRole</code> dans les cibles.</p>
+        </div>
+      </div>
+
+      <h3 style="margin:20px 0 10px">Architecture de référence — Pipeline CI/CD complet</h3>
+      <pre><code><span class="cmd-comment"># Pipeline type pour une app containerisée :</span>
+<span class="cmd-comment">#</span>
+<span class="cmd-comment"># CodeCommit (git push)</span>
+<span class="cmd-comment">#   ↓ EventBridge</span>
+<span class="cmd-comment"># CodePipeline</span>
+<span class="cmd-comment">#   Stage 1 — Source    : CodeCommit / GitHub</span>
+<span class="cmd-comment">#   Stage 2 — Build     : CodeBuild (tests + docker build + push ECR)</span>
+<span class="cmd-comment">#   Stage 3 — Staging   : CodeDeploy → ECS Blue/Green</span>
+<span class="cmd-comment">#   Stage 4 — Approval  : SNS notification → approbation manuelle</span>
+<span class="cmd-comment">#   Stage 5 — Prod      : CodeDeploy → ECS Canary 10% → 100%</span>
+<span class="cmd-comment">#                          + CloudWatch Alarm → rollback auto si erreurs</span></code></pre>
+
+      <h3 style="margin:20px 0 10px">Ressources de préparation</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Ressource</th><th>Usage</th></tr>
+          <tr><td><a href="https://aws.amazon.com/certification/certified-devops-engineer-professional/" target="_blank">Page officielle AWS DOP-C02</a></td><td>Guide d'examen, exemples de questions</td></tr>
+          <tr><td><a href="https://docs.aws.amazon.com/" target="_blank">AWS Documentation</a></td><td>Référence complète de tous les services</td></tr>
+          <tr><td><a href="https://www.udemy.com/course/aws-certified-devops-engineer-professional-hands-on/" target="_blank">Udemy — Stephane Maarek</a></td><td>Cours le plus complet, labs pratiques</td></tr>
+          <tr><td><a href="https://tutorialsdojo.com/aws-certified-devops-engineer-professional/" target="_blank">Tutorials Dojo</a></td><td>Practice exams, cheat sheets</td></tr>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<button class="theme-btn" id="themeBtn" title="Changer de thème">🌙</button>
+<script>
+(function(){
+  const btn = document.getElementById('themeBtn');
+  const root = document.documentElement;
+  let theme = '';
+  try { theme = localStorage.getItem('aws-devops-theme') || ''; } catch(e){}
+  if(theme) { root.dataset.theme = theme; btn.textContent = theme === 'dark' ? '☀️' : '🌙'; }
+  btn.addEventListener('click', () => {
+    const cur = root.dataset.theme;
+    const next = cur === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    btn.textContent = next === 'dark' ? '☀️' : '🌙';
+    try { localStorage.setItem('aws-devops-theme', next); } catch(e){}
+  });
+})();
+</script>
+</body>
+</html>
