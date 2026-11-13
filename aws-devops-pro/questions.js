@@ -3815,6 +3815,144 @@ window.QDATA = {
     a: 1,
     e: "CloudWatch ServiceLens : tableau de bord d'observabilité unifiée combinant : (1) Service Map (depuis X-Ray) : visualisation des dépendances. (2) Métriques CloudWatch : latence, taux d'erreur, throughput. (3) Logs CloudWatch : logs corrélés par trace ID. (4) X-Ray Traces : traces détaillées. Navigation : alarme métriques → traces X-Ray associées → logs CloudWatch correspondants (corrélation par request ID). Avantage : réduire le Mean Time To Detect (MTTD) et Mean Time To Resolution (MTTR). Prérequis : X-Ray actif + CloudWatch Agent + logs structurés avec corrélation de IDs. Pattern recommandé DOP-C02 pour observabilité complète."
   }
+],
+
+14: [
+  // ─── EventBridge ──────────────────────────────────────────────────────────
+  {
+    t: "EventBridge fondamentaux",
+    q: "Qu'est-ce qu'Amazon EventBridge et en quoi diffère-t-il de CloudWatch Events ?",
+    o: [
+      "EventBridge est un ancien nom de CloudWatch Events — identiques",
+      "EventBridge est l'évolution de CloudWatch Events avec des sources d'événements supplémentaires (SaaS partners, custom event buses, Schema Registry) et une meilleure gestion des event buses",
+      "EventBridge remplace entièrement SNS et SQS",
+      "EventBridge ne peut envoyer des événements qu'à Lambda"
+    ],
+    a: 1,
+    e: "Amazon EventBridge (anciennement CloudWatch Events) : bus d'événements serverless. Évolutions vs CloudWatch Events : (1) Multiple Event Buses : default (AWS services), custom (vos apps), partner (SaaS : Zendesk, Datadog, PagerDuty, etc.). (2) Schema Registry : découverte et versioning des schémas d'événements. (3) Event Archive + Replay : rejouer des événements passés. (4) Pipes : connexions point-à-point filtrées entre sources et targets. Sources : services AWS (200+), applications custom (PutEvents API), SaaS partners. Targets : Lambda, SQS, SNS, Step Functions, Kinesis, API Gateway, autre bus EventBridge, etc."
+  },
+  {
+    t: "EventBridge rules",
+    q: "Comment créer une règle EventBridge qui déclenche une Lambda toutes les heures ?",
+    o: [
+      "EventBridge ne supporte pas le scheduling — utiliser CloudWatch Alarms",
+      "Créer une EventBridge Rule avec schedule expression (cron ou rate) : rate(1 hour) ou cron(0 * * * ? *) + configurer Lambda comme target avec les permissions nécessaires",
+      "Utiliser un CloudWatch Event Rule avec un cron Linux",
+      "EventBridge Scheduler est requis pour les tâches récurrentes — les Rules ne supportent pas le scheduling"
+    ],
+    a: 1,
+    e: "EventBridge Scheduled Rules : (1) Rate expression : rate(1 hour), rate(5 minutes), rate(1 day). (2) Cron expression : cron(0 12 * * ? *) = tous les jours à 12h UTC, cron(0/15 * * * ? *) = toutes les 15 minutes. (3) Target : Lambda, SQS, SNS, Step Functions, etc. (4) IAM : EventBridge doit avoir les permissions d'invoquer la Lambda (automatiquement géré via la console). Note : EventBridge Scheduler (service séparé) offre des fonctionnalités avancées : one-time events, timezone support, flexible time windows, retry policies avec DLQ. Pour les workflows simples, les Rules suffisent."
+  },
+  {
+    t: "EventBridge event patterns",
+    q: "Comment créer une règle EventBridge qui réagit uniquement aux déploiements CodePipeline en échec dans l'environnement de production ?",
+    o: [
+      "EventBridge ne peut pas filtrer les événements par contenu",
+      "Créer une rule avec event pattern : { source: [aws.codepipeline], detail-type: [CodePipeline Pipeline Execution State Change], detail: { state: [FAILED], pipeline: [{ prefix: prod }] } }",
+      "Utiliser CloudWatch Events rules pour les événements CodePipeline",
+      "Filtrer les événements uniquement avec une Lambda qui reçoit tous les événements CodePipeline"
+    ],
+    a: 1,
+    e: "EventBridge Event Pattern filtering : filtrage par contenu des événements sans code. Syntaxe JSON : `{\"source\": [\"aws.codepipeline\"], \"detail-type\": [\"CodePipeline Pipeline Execution State Change\"], \"detail\": {\"state\": [\"FAILED\"], \"pipeline\": [{\"prefix\": \"prod-\"}]}}`. Opérateurs de matching : prefix, suffix, anything-but, numeric (equals, range), exists, ip-address. Content filtering : filtrer par valeur de champ dans detail. Sans filtrage : vous recevez tous les événements et filtrez dans Lambda = coût inutile. Avec filtrage : événements filtrés AVANT d'invoquer la target = économies + simplicité."
+  },
+  {
+    t: "EventBridge Pipes",
+    q: "Qu'est-ce qu'EventBridge Pipes et quand l'utiliser ?",
+    o: [
+      "EventBridge Pipes remplace les Event Rules classiques",
+      "EventBridge Pipes crée des connections point-à-point entre une source (SQS, Kinesis, DynamoDB Streams) et une target avec filtrage, transformation (enrichissement via Lambda/Step Functions) et batching — sans écrire de code de glue",
+      "Pipes est uniquement pour connecter deux SQS queues",
+      "Pipes est identique aux EventBridge Rules avec une source SQS"
+    ],
+    a: 1,
+    e: "EventBridge Pipes : intégration point-à-point low-code. Architecture : Source (polling) → Filter → Enrichment (Lambda optionnel) → Target. Sources supportées : SQS, Kinesis, DynamoDB Streams, Kafka (MSK), RabbitMQ. Targets : Lambda, Step Functions, SQS, SNS, EventBridge Bus, API Gateway, etc. Fonctionnalités : (1) Filtrage natif pour ne traiter que les événements pertinents. (2) Enrichissement : appel Lambda ou API pour ajouter du contexte. (3) Batching configurable. (4) Retry et DLQ intégrés. Use case typique : DynamoDB Stream → filter nouveaux utilisateurs → enrichir avec profil → notifier via SNS."
+  },
+  // ─── SNS ──────────────────────────────────────────────────────────────────
+  {
+    t: "SNS fondamentaux",
+    q: "Quels types de subscribers SNS peuvent recevoir des messages et quelles sont les limites ?",
+    o: [
+      "SNS envoie uniquement des emails",
+      "SNS subscribers : Lambda, SQS, HTTP/HTTPS endpoints, email (plain text), SMS, mobile push (iOS/Android), Kinesis Firehose — limite : 12.5 million subscriptions par topic standard",
+      "SNS peut envoyer uniquement vers Lambda et SQS",
+      "SNS ne supporte pas les endpoints HTTP — uniquement HTTPS"
+    ],
+    a: 1,
+    e: "SNS (Simple Notification Service) : pub/sub messaging. Subscribers : (1) Lambda (invocation synchrone). (2) SQS (fan-out pattern). (3) HTTP/HTTPS endpoints. (4) Email (plain text uniquement). (5) SMS (via SNS → mobile). (6) Mobile Push : APNs (iOS), FCM/GCM (Android), ADM. (7) Kinesis Data Firehose (livraison vers S3, Redshift, OpenSearch). Limites : 12.5M subscriptions/topic standard, 100 topics par compte (augmentable). SNS FIFO : ordering garanti, deduplication, uniquement pour SQS FIFO et Lambda subscribers. Message size max : 256KB."
+  },
+  {
+    t: "SNS fan-out pattern",
+    q: "Comment implémenter le pattern SNS fan-out pour traiter des commandes e-commerce en parallèle ?",
+    o: [
+      "Envoyer le message à chaque Lambda séparément depuis l'application",
+      "SNS Topic (order-created) → multiple SQS Queues subscribers (inventory-queue, billing-queue, notification-queue) → chaque queue déclenche sa Lambda indépendamment — les 3 traitements se font en parallèle de manière découplée",
+      "Utiliser EventBridge à la place de SNS pour le fan-out",
+      "Fan-out SNS ne fonctionne qu'avec HTTP endpoints"
+    ],
+    a: 1,
+    e: "SNS Fan-out pattern : publication unique → distribution vers N subscribers. Architecture commande : SNS Topic 'order-created' → (1) SQS Inventory Queue → Lambda met à jour le stock. (2) SQS Billing Queue → Lambda génère la facture. (3) SQS Notification Queue → Lambda envoie email/SMS. Avantages : (1) Découplage total entre producteur et consommateurs. (2) Traitement parallèle. (3) SQS comme buffer : absorbe les pics, retry automatique. (4) Failure isolation : si billing Lambda échoue, inventory n'est pas affecté. (5) Ajout facile de nouveaux consumers sans modifier l'application."
+  },
+  {
+    t: "SNS message filtering",
+    q: "Comment éviter qu'un subscriber SNS reçoive des messages qui ne le concernent pas ?",
+    o: [
+      "Créer un Topic SNS séparé pour chaque type de message",
+      "Configurer une Subscription Filter Policy sur la subscription : le subscriber ne reçoit que les messages dont les message attributes correspondent au filtre",
+      "Filtrer les messages dans la Lambda après réception",
+      "SNS ne supporte pas le filtrage — tous les subscribers reçoivent tous les messages"
+    ],
+    a: 1,
+    e: "SNS Subscription Filter Policies : filtrage côté SNS avant livraison. Configuration JSON sur la subscription : `{\"event-type\": [\"order-placed\", \"order-cancelled\"], \"order-value\": [{\"numeric\": [\">=\", 100]}]}`. Le message doit avoir des message attributes correspondants. Opérateurs : valeur exacte, préfixe, anything-but, numérique (range), existence. Avantages vs filtrage applicatif : (1) Messages non pertinents ne sont pas livrés → pas de coût SQS/Lambda inutile. (2) Simplicité : chaque subscriber définit son filtre. (3) SNS filter policy sur message body (JSON) aussi disponible. Pattern DOP-C02 : un seul topic + filtres par type d'événement."
+  },
+  // ─── SQS ──────────────────────────────────────────────────────────────────
+  {
+    t: "SQS Dead Letter Queue",
+    q: "Qu'est-ce qu'une SQS Dead Letter Queue (DLQ) et comment la configurer ?",
+    o: [
+      "DLQ est une queue pour les messages urgents qui doivent être traités en priorité",
+      "DLQ reçoit les messages qui ont échoué à être traités après N tentatives (maxReceiveCount) — permet d'analyser les messages en erreur sans les perdre et sans bloquer la queue principale",
+      "DLQ est uniquement disponible pour SQS FIFO",
+      "DLQ supprime automatiquement les messages en erreur après 24h"
+    ],
+    a: 1,
+    e: "SQS Dead Letter Queue : (1) Configuration : sur la queue source, définir 'Redrive Policy' avec sourceQueue ARN + maxReceiveCount (ex: 3 = après 3 échecs, le message va en DLQ). (2) La DLQ doit être du même type que la source (Standard → Standard DLQ, FIFO → FIFO DLQ). (3) Rétention : configurer le DLQ retention period plus long que la queue source (ex: 14 jours vs 4 jours). (4) Alarme CloudWatch : ApproximateNumberOfMessagesVisible > 0 sur la DLQ → alerte immédiate. (5) DLQ Redrive : re-traiter les messages depuis la DLQ une fois le bug corrigé. Essentiel pour tout système de traitement de messages en production."
+  },
+  {
+    t: "SQS FIFO vs Standard",
+    q: "Dans quel cas doit-on absolument utiliser SQS FIFO plutôt qu'une queue Standard ?",
+    o: [
+      "Toujours utiliser FIFO — plus fiable",
+      "FIFO si l'ordre des messages est critique (ex: transactions bancaires, séquences d'événements) et/ou si l'idempotence exacte est requise (exactly-once processing) — Standard offre at-least-once et ordering best-effort",
+      "FIFO si le volume dépasse 1000 messages/seconde",
+      "Standard si le déploiement est en multi-région — FIFO ne supporte pas le cross-region"
+    ],
+    a: 1,
+    e: "SQS FIFO : (1) Ordering garanti : messages traités dans l'ordre exact d'envoi. (2) Exactly-once : deduplication basée sur MessageDeduplicationId (SHA256 du body ou custom). (3) Throughput : 300 TPS sans batching, 3000 TPS avec batching (vs illimité pour Standard). (4) Message Group ID : ordering par groupe indépendant (ex: commandes du même client dans le même groupe). Standard : at-least-once (un message peut être livré 2x → code idempotent requis), best-effort ordering (quasi-FIFO mais pas garanti), throughput illimité. Use cases FIFO : séquences de transactions, workflows ordonnés, déduplication garantie."
+  },
+  {
+    t: "SQS Visibility Timeout",
+    q: "Qu'est-ce que le Visibility Timeout SQS et que se passe-t-il s'il est trop court ?",
+    o: [
+      "Visibility Timeout est le délai avant qu'un message soit supprimé automatiquement",
+      "Visibility Timeout est la durée pendant laquelle un message est invisible dans la queue après réception par un consumer — si le traitement n'est pas terminé avant la fin du timeout, le message redevient visible et peut être récupéré par un autre consumer (double traitement)",
+      "Visibility Timeout est identique au message retention period",
+      "Un Visibility Timeout trop court accélère le traitement"
+    ],
+    a: 1,
+    e: "SQS Visibility Timeout : après `ReceiveMessage`, le message disparait temporairement de la queue (invisible aux autres consumers) pendant la durée du timeout (défaut 30s, max 12h). Si le consumer ne supprime pas le message avec `DeleteMessage` avant le timeout : message redevient visible → risque de double traitement. Bonnes pratiques : (1) Configurer > temps de traitement max estimé + marge. (2) Consumer peut prolonger dynamiquement avec `ChangeMessageVisibility`. (3) Lambda : timeout Lambda auto-calé sur Visibility Timeout. Trop court : double traitement. Trop long : un message coincé bloque longtemps. DLQ + maxReceiveCount pour éviter les loops infinies."
+  },
+  {
+    t: "EventBridge vs SNS vs SQS",
+    q: "Un DevOps doit choisir entre EventBridge, SNS et SQS pour un système d'événements. Quels critères guident le choix ?",
+    o: [
+      "Toujours utiliser EventBridge — plus moderne",
+      "EventBridge si : routage basé sur contenu, intégration SaaS, event sourcing, schema registry ; SNS si : fan-out multi-subscriber, notifications mobiles/SMS ; SQS si : buffering, découplage producteur-consommateur, retry automatique",
+      "SQS pour tout — plus simple",
+      "SNS remplace entièrement EventBridge et SQS"
+    ],
+    a: 1,
+    e: "Critères de choix : EventBridge : (1) Routage par contenu des événements (filtrage riche). (2) Sources multiples (AWS + SaaS + custom). (3) Schema Registry pour discovery et validation. (4) Archive et replay. (5) Orchestration d'événements cross-account. SNS : (1) Fan-out vers N subscribers simultanément. (2) Notifications push (mobile, SMS, email). (3) Pub/sub simple et rapide. SQS : (1) Buffer entre producteur et consommateur. (2) Découplage avec persistance. (3) Retry automatique avec DLQ. (4) Fan-in (N producteurs → 1 queue). Pattern fréquent DOP-C02 : SNS (fan-out) + SQS (buffer/retry) + EventBridge (routage/scheduling)."
+  }
 ]
 
 };
