@@ -18,7 +18,7 @@ window.QUIZ_META={
     ["D3 › D2 › D1 › D4","34 · 30 · 24 · 12 %"]
   ]
 ,
-  totalQ: 399
+  totalQ: 413
 };
 
 // ── Plan de révision 7 jours ────────────────────────────────────────────────
@@ -242,7 +242,13 @@ window.QDATA[3] = [
 {id:"clf-j3-47",q:"Quel service orchestre une chaîne CI/CD complète, de la source au déploiement ?",choices:["AWS CodePipeline","AWS CodeBuild","AWS X-Ray","AWS CLI"],answer:0,exp:"CodePipeline automatise l'ensemble du pipeline de livraison."},
 {id:"clf-j3-48",q:"Une application distribuée est lente et l'équipe veut savoir quel composant ralentit les requêtes. Quel service utiliser ?",choices:["AWS X-Ray","AWS CloudTrail","AWS CodeBuild","Amazon Inspector"],answer:0,exp:"X-Ray trace les requêtes à travers les composants."},
 {id:"clf-j3-49",q:"Une startup veut construire et héberger rapidement une application web et mobile full-stack. Quel service choisir ?",choices:["AWS Amplify","AWS IoT Core","Amazon AppStream 2.0","AWS Batch"],answer:0,exp:"Amplify sert à construire et héberger des applis web et mobiles."},
-{id:"clf-j3-50",q:"Une usine veut connecter et gérer de façon sécurisée des milliers de capteurs. Quel service choisir ?",choices:["AWS IoT Core","Amazon Kinesis seul","Amazon Connect","AWS Amplify"],answer:0,exp:"IoT Core connecte et gère des objets connectés."}
+{id:"clf-j3-50",q:"Une usine veut connecter et gérer de façon sécurisée des milliers de capteurs. Quel service choisir ?",choices:["AWS IoT Core","Amazon Kinesis seul","Amazon Connect","AWS Amplify"],answer:0,exp:"IoT Core connecte et gère des objets connectés."},
+{id:"clf-j3-51",q:"Une entreprise veut rechercher et analyser rapidement de gros volumes de logs et de données textuelles (recherche plein texte, tableaux de bord). Quel service choisir ?",choices:["Amazon OpenSearch Service","Amazon Athena","Amazon Rekognition","AWS Glue"],answer:0,exp:"OpenSearch Service permet la recherche, l'analyse de logs et la visualisation. Athena interroge des données S3 en SQL."},
+{id:"clf-j3-52",q:"Une équipe de data scientists veut créer, entraîner et déployer des modèles de machine learning. Quel service utiliser ?",choices:["Amazon Polly","Amazon Transcribe","Amazon Lex","Amazon SageMaker AI"],answer:3,exp:"SageMaker AI est la plateforme de création, d'entraînement et de déploiement de modèles de ML."},
+{id:"clf-j3-53",q:"Quel service AWS permet de connecter des appareils IoT (capteurs, objets connectés) de façon sécurisée au cloud ?",choices:["Amazon SQS","AWS Direct Connect","AWS IoT Core","Amazon AppStream 2.0"],answer:2,exp:"AWS IoT Core connecte des appareils IoT au cloud et gère les messages de façon sécurisée."},
+{id:"clf-j3-54",q:"Quel service permet d'orchestrer plusieurs fonctions Lambda et services dans un workflow visuel avec gestion des erreurs et des nouvelles tentatives ?",choices:["Amazon SNS","AWS Step Functions","AWS Batch","Amazon EventBridge"],answer:1,exp:"Step Functions orchestre des workflows de plusieurs étapes (machines à états). EventBridge route des événements."},
+{id:"clf-j3-55",q:"Une entreprise veut accéder à un service hébergé sur AWS depuis son VPC sans passer par internet, via une connexion privée. Quel service ?",choices:["AWS PrivateLink","Amazon CloudFront","AWS WAF","Amazon Route 53"],answer:0,exp:"PrivateLink expose des services de façon privée entre VPC et services AWS sans traverser l'internet public."},
+{id:"clf-j3-56",q:"Quel service permet de créer un Active Directory managé dans AWS ou de connecter AWS à un annuaire existant ?",choices:["Amazon Cognito","AWS Secrets Manager","AWS Organizations","AWS Directory Service"],answer:3,exp:"Directory Service fournit un Microsoft Active Directory managé ; Cognito gère l'identité des utilisateurs d'applications."},
 ];
 
 window.QDATA[4] = [
@@ -392,7 +398,12 @@ window.QDATA[5] = [
 {id:"clf-j5-47",q:"Quel avantage apporte l'automatisation dans le cloud ?",choices:["Moins d'erreurs humaines et des déploiements reproductibles","La suppression de tous les coûts","La fin de la responsabilité du client sur ses données","Un plan de support gratuit"],answer:0,exp:"Automatiser réduit les erreurs et accélère les déploiements."},
 {id:"clf-j5-48",q:"En passant au cloud, comment évoluent principalement les coûts d'une entreprise ?",choices:["De coûts fixes vers des coûts variables","De coûts variables vers des coûts fixes","Ils deviennent tous nuls","Ils deviennent tous prévisibles à l'euro près"],answer:0,exp:"On paie à l'usage au lieu d'investir d'avance."},
 {id:"clf-j5-49",q:"Quelle différence fondamentale y a-t-il entre CloudWatch et CloudTrail ?",choices:["CloudWatch surveille les performances, CloudTrail enregistre qui a fait quoi","CloudWatch audite les API, CloudTrail mesure le CPU","Ce sont deux noms du même service","CloudTrail envoie des alarmes, CloudWatch non"],answer:0,exp:"C'est la distinction clé : performance d'un côté, audit de l'autre."},
-{id:"clf-j5-50",q:"Une équipe veut un tableau de bord qui affiche en temps réel le nombre de requêtes et la latence de son application. Quel service utiliser ?",choices:["Amazon CloudWatch","AWS CloudTrail","AWS Artifact","AWS Service Catalog"],answer:0,exp:"Les tableaux de bord CloudWatch affichent les métriques en temps réel."}
+{id:"clf-j5-50",q:"Une équipe veut un tableau de bord qui affiche en temps réel le nombre de requêtes et la latence de son application. Quel service utiliser ?",choices:["Amazon CloudWatch","AWS CloudTrail","AWS Artifact","AWS Service Catalog"],answer:0,exp:"Les tableaux de bord CloudWatch affichent les métriques en temps réel."},
+{id:"clf-j5-51",q:"Une entreprise veut consulter ses quotas de service AWS et demander une augmentation de limite. Quel service ?",choices:["AWS Budgets","Service Quotas","AWS Config","Amazon Inspector"],answer:1,exp:"Service Quotas permet de voir et gérer les quotas (limites) des services AWS."},
+{id:"clf-j5-52",q:"Quel service recommande des tailles d'instances EC2 optimales à partir de l'usage observé afin de réduire les coûts ?",choices:["AWS Compute Optimizer","AWS Health Dashboard","AWS Artifact","AWS CloudTrail"],answer:0,exp:"Compute Optimizer analyse l'utilisation et recommande des ressources adaptées (EC2, EBS, Lambda)."},
+{id:"clf-j5-53",q:"Une entreprise veut suivre ses licences logicielles (Microsoft, Oracle) pour éviter de dépasser les droits. Quel service ?",choices:["AWS Marketplace","AWS Service Catalog","AWS Artifact","AWS License Manager"],answer:3,exp:"License Manager aide à suivre et à limiter l'usage des licences logicielles."},
+{id:"clf-j5-54",q:"Avant une migration, quel service découvre les serveurs sur site et collecte des données d'utilisation et de dépendances ?",choices:["AWS Application Migration Service","AWS Database Migration Service","AWS Application Discovery Service","AWS Snowball"],answer:2,exp:"Application Discovery Service inventorie les serveurs et leurs dépendances pour planifier la migration."},
+{id:"clf-j5-55",q:"Quel service permet de migrer des serveurs physiques ou virtuels vers EC2 avec un minimum de changements (lift-and-shift) ?",choices:["AWS Schema Conversion Tool","AWS Application Migration Service","Amazon Aurora","AWS Service Catalog"],answer:1,exp:"Application Migration Service réplique les serveurs vers AWS pour un rehosting (lift-and-shift)."},
 ];
 
 window.QDATA[6] = [
@@ -451,6 +462,9 @@ window.QDATA[6] = [
 {id:"clf-j6-53",q:"Une entreprise veut être notifiée automatiquement des événements AWS qui touchent ses ressources, via ses propres outils. Que utiliser ?",choices:["L'API AWS Health avec Amazon EventBridge","AWS Artifact","AWS Cost Explorer","AWS Organizations"],answer:0,exp:"L'API AWS Health expose les événements ; EventBridge peut déclencher des actions ou notifications."},
 {id:"clf-j6-54",q:"Quel plan de support est requis pour accéder à l'API AWS Health ?",choices:["Basic","Developer","Aucun plan, l'API est ouverte à tous","Business ou Enterprise"],answer:3,exp:"L'API AWS Health nécessite un plan Business, Enterprise On-Ramp ou Enterprise."},
 {id:"clf-j6-55",q:"Quelle différence y a-t-il entre AWS Health et Amazon CloudWatch ?",choices:["Health surveille le CPU ; CloudWatch publie les pannes AWS","Ils sont identiques","Health informe sur les événements AWS qui affectent le compte ; CloudWatch surveille les métriques et logs des ressources","Health est réservé aux coûts"],answer:2,exp:"Health = événements côté AWS. CloudWatch = performance de vos ressources."},
+{id:"clf-j6-56",q:"Une entreprise veut un conseil en architecture pour concevoir une solution sur AWS. Quelle ressource peut l'aider ?",choices:["Le calculateur de prix AWS","AWS CloudTrail","Amazon Macie","Les AWS Solutions Architects"],answer:3,exp:"Les Solutions Architects conseillent sur les architectures (bonnes pratiques, Well-Architected)."},
+{id:"clf-j6-57",q:"Où un client ouvre-t-il un dossier pour contacter le support technique d'AWS ?",choices:["Dans AWS Artifact","Dans AWS Budgets","Dans l'AWS Support Center","Dans AWS Cost Explorer"],answer:2,exp:"Le Centre de support AWS permet de créer et suivre des dossiers de support."},
+{id:"clf-j6-58",q:"Quelle équipe d'experts AWS mène des projets avec le client (migration, conception) en mode prestation ?",choices:["AWS Support Basic","AWS Professional Services","AWS re:Post","AWS Knowledge Center"],answer:1,exp:"Professional Services accompagne les projets des clients, avec ou sans partenaire APN."},
 ];
 
 window.QDATA[7] = [
