@@ -328,7 +328,7 @@ const CHK_KEY=KEY+".svc";
 let chkFilter="all";
 function chkLoad(){try{return JSON.parse(localStorage.getItem(CHK_KEY)||"{}")}catch(e){return{}}}
 function chkSave(m){try{localStorage.setItem(CHK_KEY,JSON.stringify(m))}catch(e){}}
-const CHK_STOP=["connect","support","backup","batch","config","health","translate","outposts","budgets"];
+const CHK_STOP=["quick","transform","connect","support","backup","batch","config","health","translate","outposts","budgets"];
 function chkAliases(name){
   const out=new Set([name]);
   const par=name.match(/\(([^)]+)\)/);
