@@ -421,8 +421,8 @@ ${cats||'<p class="intro">Aucun service dans ce filtre.</p>'}`;
 function chkBind(){
   const v=document.getElementById("view");
   v.querySelectorAll("[data-chk]").forEach(b=>b.onclick=()=>{
-    const m=chkLoad(),st=chkErrStats(),id=b.dataset.chk;
-    const nx=(chkEff(m,st,id)+1)%3;
+    const m=chkLoad(),id=b.dataset.chk;
+    const nx=((m[id]||0)+1)%3;
     if(nx===0)delete m[id];else m[id]=nx;
     chkSave(m);
     const y=window.scrollY;render();window.scrollTo(0,y);
