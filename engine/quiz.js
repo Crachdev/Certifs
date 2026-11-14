@@ -309,7 +309,7 @@ let tab="plan",session=null,timerId=null;
 /* ── FEATURE 4 : ANIMATION FADE ENTRE TABS ─────────────── */
 function setTab(t){
   tab=t;
-  [["plan","tabPlan"],["quiz","tabQuiz"],["free","tabFree"],["err","tabErr"]].forEach(([k,id])=>document.getElementById(id).setAttribute("aria-selected",k===t));
+  [["plan","tabPlan"],["quiz","tabQuiz"],["free","tabFree"],["err","tabErr"],["chk","tabChk"]].forEach(([k,id])=>{const e=document.getElementById(id);if(e)e.setAttribute("aria-selected",k===t)});
   const v=document.getElementById("view");
   v.style.opacity="0";
   v.style.transition="opacity .1s";
@@ -322,6 +322,85 @@ document.getElementById("tabPlan").onclick=()=>setTab("plan");
 document.getElementById("tabQuiz").onclick=()=>setTab("quiz");
 document.getElementById("tabFree").onclick=()=>setTab("free");
 document.getElementById("tabErr").onclick=()=>setTab("err");
+
+/* ── CHECKLIST DES SERVICES (optionnelle : window.QUIZ_CHECKLIST) ───────── */
+const CHK_KEY=KEY+".svc";
+let chkFilter="all";
+function chkLoad(){try{return JSON.parse(localStorage.getItem(CHK_KEY)||"{}")}catch(e){return{}}}
+function chkSave(m){try{localStorage.setItem(CHK_KEY,JSON.stringify(m))}catch(e){}}
+function chkEsc(x){return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function chkCounts(m){
+  let g=0,o=0,t=0;
+  (window.QUIZ_CHECKLIST||[]).forEach(c=>c.items.forEach(i=>{t++;if(m[i.id]===2)g++;else if(m[i.id]===1)o++;}));
+  return{g,o,t,n:t-g-o};
+}
+function chkHTML(){
+  const m=chkLoad(),c=chkCounts(m),pct=c.t?Math.round(c.g*100/c.t):0;
+  const f=chkFilter;
+  const chip=(k,l)=>`<button class="chk-chip" data-chkf="${k}" aria-pressed="${f===k}">${l}</button>`;
+  const cats=(window.QUIZ_CHECKLIST||[]).map(cat=>{
+    const rows=cat.items.filter(i=>f==="all"||(f==="orange"&&m[i.id]===1)||(f==="todo"&&!m[i.id])||(f==="green"&&m[i.id]===2));
+    if(!rows.length)return"";
+    const cg=cat.items.filter(i=>m[i.id]===2).length;
+    return `<section class="chk-cat"><h3>${chkEsc(cat.cat)} <span>${cg}/${cat.items.length}</span></h3>${rows.map(i=>{
+      const s=m[i.id]||0;
+      const lbl=s===2?"Maîtrisé":s===1?"Encore flou":"À évaluer";
+      return `<button class="chk-row s${s}" data-chk="${chkEsc(i.id)}" aria-label="${chkEsc(i.name)} : ${lbl}"><span class="chk-box" aria-hidden="true">${s===2?"✓":s===1?"~":""}</span><span class="chk-txt"><b>${chkEsc(i.name)}</b><small>${chkEsc(i.desc||"")}</small></span><span class="chk-lbl">${lbl}</span></button>`;}).join("")}</section>`;
+  }).join("");
+  return `<style>
+.chk-sum{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.chk-sum div{flex:1 1 90px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--sheet)}
+.chk-sum b{display:block;font:600 1.2rem var(--f-mono,monospace)}
+.chk-sum span{font-size:.78rem;color:var(--muted)}
+.chk-bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;display:flex;margin-bottom:10px}
+.chk-bar i{display:block;height:100%}
+.chk-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chk-chip{border:1px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:999px;padding:5px 12px;font-size:.82rem;cursor:pointer}
+.chk-chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.chk-cat{margin:0 0 14px}
+.chk-cat h3{font:600 .78rem var(--f-mono,monospace);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px;display:flex;justify-content:space-between;gap:8px}
+.chk-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:8px;padding:9px 10px;margin:0 0 6px;cursor:pointer;font:inherit}
+.chk-row:focus-visible,.chk-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chk-box{flex:0 0 26px;height:26px;border-radius:6px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
+.chk-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.chk-txt small{color:var(--muted);font-size:.78rem}
+.chk-lbl{font-size:.72rem;font-weight:600;color:var(--muted);flex:0 0 auto}
+.chk-row.s1{background:rgba(224,138,0,.14);border-color:#e08a00}.chk-row.s1 .chk-box{background:#e08a00;border-color:#e08a00}.chk-row.s1 .chk-lbl{color:#c27500}
+.chk-row.s2{background:rgba(29,122,79,.14);border-color:#1d7a4f}.chk-row.s2 .chk-box{background:#1d7a4f;border-color:#1d7a4f}.chk-row.s2 .chk-lbl{color:#1d7a4f}
+@media(max-width:480px){.chk-lbl{display:none}}
+</style>
+<p class="intro">Liste officielle des services du périmètre de l'examen. Touche un service pour le marquer : <b style="color:#c27500">orange = encore flou</b>, <b style="color:#1d7a4f">vert = maîtrisé</b>, un troisième appui remet à « à évaluer ». Ta progression est enregistrée sur cet appareil.</p>
+<div class="chk-sum"><div><b style="color:#1d7a4f">${c.g}</b><span>maîtrisés</span></div><div><b style="color:#c27500">${c.o}</b><span>encore flous</span></div><div><b>${c.n}</b><span>à évaluer</span></div><div><b>${pct} %</b><span>maîtrise globale</span></div></div>
+<div class="chk-bar" aria-hidden="true"><i style="width:${c.t?c.g*100/c.t:0}%;background:#1d7a4f"></i><i style="width:${c.t?c.o*100/c.t:0}%;background:#e08a00"></i></div>
+<div class="chk-filters">${chip("all","Tous ("+c.t+")")}${chip("orange","🟠 Flous ("+c.o+")")}${chip("todo","⚪ À évaluer ("+c.n+")")}${chip("green","🟢 Maîtrisés ("+c.g+")")}<button class="chk-chip" data-chkreset="1">Réinitialiser</button></div>
+${cats||'<p class="intro">Aucun service dans ce filtre.</p>'}`;
+}
+function chkBind(){
+  const v=document.getElementById("view");
+  v.querySelectorAll("[data-chk]").forEach(b=>b.onclick=()=>{
+    const m=chkLoad(),id=b.dataset.chk;
+    const nx=((m[id]||0)+1)%3;
+    if(nx===0)delete m[id];else m[id]=nx;
+    chkSave(m);
+    const y=window.scrollY;render();window.scrollTo(0,y);
+  });
+  v.querySelectorAll("[data-chkf]").forEach(b=>b.onclick=()=>{chkFilter=b.dataset.chkf;render();});
+  const r=v.querySelector("[data-chkreset]");
+  if(r)r.onclick=()=>{
+    if(r.dataset.armed){chkSave({});render();return;}
+    r.dataset.armed="1";r.textContent="Confirmer la remise à zéro";
+    setTimeout(()=>{if(r.isConnected){delete r.dataset.armed;r.textContent="Réinitialiser";}},4000);
+  };
+}
+(function injectChkTab(){
+  if(!window.QUIZ_CHECKLIST||!window.QUIZ_CHECKLIST.length)return;
+  const nav=document.querySelector("nav.tabs");if(!nav||document.getElementById("tabChk"))return;
+  const b=document.createElement("button");
+  b.setAttribute("role","tab");b.id="tabChk";b.setAttribute("aria-selected","false");b.textContent="Checklist services";
+  b.onclick=()=>setTab("chk");
+  const errBtn=document.getElementById("tabErr");
+  if(errBtn&&errBtn.nextSibling)nav.insertBefore(b,errBtn.nextSibling);else nav.appendChild(b);
+})();
 
 // Bouton theme switcher — injecté si pas encore présent dans le HTML
 (function injectThemeBtn(){
@@ -402,6 +481,7 @@ function render(){
   const v=document.getElementById("view");
   if(tab==="plan")v.innerHTML=planHTML();
   else if(tab==="err")v.innerHTML=errHTML();
+  else if(tab==="chk"){v.innerHTML=chkHTML();chkBind();return;}
   else if(tab==="free")v.innerHTML=session?(session.done?resultHTML():qHTML()):freeHTML();
   else v.innerHTML=session?(session.done?resultHTML():qHTML()):pickHTML();
   bind();
