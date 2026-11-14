@@ -914,7 +914,7 @@ function qHTML(){
   return `<div class="qhead">${liveBadge}${passBadge}<span class="eyebrow">${esc(session.label)} · ${esc(q.t)}</span>
     <span class="num" style="font-size:.85rem;color:var(--muted)">${session.idx+1} / ${session.items.length} · ${session.score} juste${session.score>1?"s":""}${session.end?` · <span id="timer" class="timer">${fmt(session.end-Date.now())}</span>`:""}</span></div>
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">${svgCircle(Math.round(session.idx/session.items.length*100),40,"var(--accent)")}<div class="bar" style="flex:1;margin:0"><i style="width:${session.idx/session.items.length*100}%"></i></div></div>
-  <div class="qcard"><p class="qtext">${esc(q.q.replace(/ \(2 réponses\)/,""))}</p>${multi?`<div class="multi">Choisis ${need} réponses</div>`:""}
+  <div class="qcard"><p class="qtext">${esc(q.q.replace(/ \(\d réponses\)/,""))}</p>${multi?`<div class="multi">Choisis ${need} réponses</div>`:""}
   <div class="opts">${opts}</div>
   ${session.checked?`<div class="verdict ${ok?"ok":"ko"}">${ok?"Bonne réponse.":"Raté. Relis l'explication de chaque option."}</div>`:""}
   <div class="qnav"><button class="btn ghost" data-quit>Arrêter</button>
