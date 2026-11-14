@@ -328,24 +328,67 @@ const CHK_KEY=KEY+".svc";
 let chkFilter="all";
 function chkLoad(){try{return JSON.parse(localStorage.getItem(CHK_KEY)||"{}")}catch(e){return{}}}
 function chkSave(m){try{localStorage.setItem(CHK_KEY,JSON.stringify(m))}catch(e){}}
+const CHK_STOP=["connect","support","backup","batch","config","health","translate","outposts","budgets"];
+function chkAliases(name){
+  const out=new Set([name]);
+  const par=name.match(/\(([^)]+)\)/);
+  const base=name.replace(/\s*\([^)]*\)/g,"").trim();
+  out.add(base);
+  if(par)par[1].split(/[,/]/).forEach(x=>{x=x.trim();if(x.length>=3)out.add(x)});
+  base.split(" / ").forEach(x=>out.add(x.trim()));
+  const short=base.replace(/^(Amazon|AWS)\s+/,"").trim();
+  if(short.length>=3&&!CHK_STOP.includes(short.toLowerCase()))out.add(short);
+  return [...out].filter(x=>x.length>=3);
+}
+let chkRx=null;
+function chkRegexes(){
+  if(chkRx)return chkRx;
+  chkRx={};
+  (window.QUIZ_CHECKLIST||[]).forEach(c=>c.items.forEach(i=>{
+    const alts=chkAliases(i.name).map(x=>x.replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&"));
+    try{chkRx[i.id]=new RegExp("(^|[^A-Za-z0-9])(?:"+alts.join("|")+")(?![A-Za-z0-9])","i");}catch(e){}
+  }));
+  return chkRx;
+}
+// Par service : nombre de questions répondues et d'erreurs en cours, d'après les questions qui le citent (énoncé + bonne réponse)
+function chkErrStats(){
+  const rx=chkRegexes(),st={};
+  Object.keys(store.r).forEach(k=>{
+    const [d,i]=k.split("-").map(Number);
+    let q;try{q=Q(d,i)}catch(e){return}
+    if(!q)return;
+    const txt=(q.q||"")+" "+((q.o&&q.o[q.a])||"");
+    for(const id in rx){
+      if(rx[id].test(txt)){
+        const o=st[id]||(st[id]={n:0,bad:0});
+        o.n++;if(store.r[k]===0)o.bad++;
+      }
+    }
+  });
+  return st;
+}
 function chkEsc(x){return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-function chkCounts(m){
-  let g=0,o=0,t=0;
-  (window.QUIZ_CHECKLIST||[]).forEach(c=>c.items.forEach(i=>{t++;if(m[i.id]===2)g++;else if(m[i.id]===1)o++;}));
-  return{g,o,t,n:t-g-o};
+function chkEff(m,st,id){
+  if(m[id])return m[id];
+  return(st[id]&&st[id].bad>0)?1:0;
+}
+function chkCounts(m,st){
+  let g=0,o=0,t=0,e=0;
+  (window.QUIZ_CHECKLIST||[]).forEach(c=>c.items.forEach(i=>{t++;const s=chkEff(m,st,i.id);if(s===2)g++;else if(s===1)o++;if(st[i.id]&&st[i.id].bad>0)e++;}));
+  return{g,o,t,e,n:t-g-o};
 }
 function chkHTML(){
-  const m=chkLoad(),c=chkCounts(m),pct=c.t?Math.round(c.g*100/c.t):0;
+  const m=chkLoad(),st=chkErrStats(),c=chkCounts(m,st),pct=c.t?Math.round(c.g*100/c.t):0;
   const f=chkFilter;
   const chip=(k,l)=>`<button class="chk-chip" data-chkf="${k}" aria-pressed="${f===k}">${l}</button>`;
   const cats=(window.QUIZ_CHECKLIST||[]).map(cat=>{
-    const rows=cat.items.filter(i=>f==="all"||(f==="orange"&&m[i.id]===1)||(f==="todo"&&!m[i.id])||(f==="green"&&m[i.id]===2));
+    const rows=cat.items.filter(i=>{const e=chkEff(m,st,i.id);return f==="all"||(f==="orange"&&e===1)||(f==="todo"&&e===0)||(f==="green"&&e===2)||(f==="errs"&&st[i.id]&&st[i.id].bad>0)});
     if(!rows.length)return"";
-    const cg=cat.items.filter(i=>m[i.id]===2).length;
+    const cg=cat.items.filter(i=>chkEff(m,st,i.id)===2).length;
     return `<section class="chk-cat"><h3>${chkEsc(cat.cat)} <span>${cg}/${cat.items.length}</span></h3>${rows.map(i=>{
-      const s=m[i.id]||0;
-      const lbl=s===2?"Maîtrisé":s===1?"Encore flou":"À évaluer";
-      return `<button class="chk-row s${s}" data-chk="${chkEsc(i.id)}" aria-label="${chkEsc(i.name)} : ${lbl}"><span class="chk-box" aria-hidden="true">${s===2?"✓":s===1?"~":""}</span><span class="chk-txt"><b>${chkEsc(i.name)}</b><small>${chkEsc(i.desc||"")}</small></span><span class="chk-lbl">${lbl}</span></button>`;}).join("")}</section>`;
+      const s=chkEff(m,st,i.id),er=st[i.id]&&st[i.id].bad>0?st[i.id]:null,auto=!m[i.id]&&s===1;
+      const lbl=s===2?"Maîtrisé":s===1?(auto?"Flou (erreurs)":"Encore flou"):"À évaluer";
+      return `<button class="chk-row s${s}" data-chk="${chkEsc(i.id)}" aria-label="${chkEsc(i.name)} : ${lbl}"><span class="chk-box" aria-hidden="true">${s===2?"✓":s===1?"~":""}</span><span class="chk-txt"><b>${chkEsc(i.name)}</b><small>${chkEsc(i.desc||"")}${er?` · <b style="color:#c27500">🔁 ${er.bad} erreur${er.bad>1?"s":""} de quiz</b>`:""}</small></span><span class="chk-lbl">${lbl}</span></button>`;}).join("")}</section>`;
   }).join("");
   return `<style>
 .chk-sum{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
@@ -369,17 +412,17 @@ function chkHTML(){
 .chk-row.s2{background:rgba(29,122,79,.14);border-color:#1d7a4f}.chk-row.s2 .chk-box{background:#1d7a4f;border-color:#1d7a4f}.chk-row.s2 .chk-lbl{color:#1d7a4f}
 @media(max-width:480px){.chk-lbl{display:none}}
 </style>
-<p class="intro">Liste officielle des services du périmètre de l'examen. Touche un service pour le marquer : <b style="color:#c27500">orange = encore flou</b>, <b style="color:#1d7a4f">vert = maîtrisé</b>, un troisième appui remet à « à évaluer ». Ta progression est enregistrée sur cet appareil.</p>
+<p class="intro">Liste officielle des services du périmètre de l'examen. Touche un service pour le marquer : <b style="color:#c27500">orange = encore flou</b>, <b style="color:#1d7a4f">vert = maîtrisé</b>, un troisième appui remet à « à évaluer ». Un service cité dans une question que tu as ratée passe <b style="color:#c27500">automatiquement en orange</b> tant que l'erreur n'est pas corrigée. Ta progression est enregistrée sur cet appareil.</p>
 <div class="chk-sum"><div><b style="color:#1d7a4f">${c.g}</b><span>maîtrisés</span></div><div><b style="color:#c27500">${c.o}</b><span>encore flous</span></div><div><b>${c.n}</b><span>à évaluer</span></div><div><b>${pct} %</b><span>maîtrise globale</span></div></div>
 <div class="chk-bar" aria-hidden="true"><i style="width:${c.t?c.g*100/c.t:0}%;background:#1d7a4f"></i><i style="width:${c.t?c.o*100/c.t:0}%;background:#e08a00"></i></div>
-<div class="chk-filters">${chip("all","Tous ("+c.t+")")}${chip("orange","🟠 Flous ("+c.o+")")}${chip("todo","⚪ À évaluer ("+c.n+")")}${chip("green","🟢 Maîtrisés ("+c.g+")")}<button class="chk-chip" data-chkreset="1">Réinitialiser</button></div>
+<div class="chk-filters">${chip("all","Tous ("+c.t+")")}${chip("orange","🟠 Flous ("+c.o+")")}${chip("todo","⚪ À évaluer ("+c.n+")")}${chip("green","🟢 Maîtrisés ("+c.g+")")}${chip("errs","🔁 Avec erreurs ("+c.e+")")}<button class="chk-chip" data-chkreset="1">Réinitialiser</button></div>
 ${cats||'<p class="intro">Aucun service dans ce filtre.</p>'}`;
 }
 function chkBind(){
   const v=document.getElementById("view");
   v.querySelectorAll("[data-chk]").forEach(b=>b.onclick=()=>{
-    const m=chkLoad(),id=b.dataset.chk;
-    const nx=((m[id]||0)+1)%3;
+    const m=chkLoad(),st=chkErrStats(),id=b.dataset.chk;
+    const nx=(chkEff(m,st,id)+1)%3;
     if(nx===0)delete m[id];else m[id]=nx;
     chkSave(m);
     const y=window.scrollY;render();window.scrollTo(0,y);
