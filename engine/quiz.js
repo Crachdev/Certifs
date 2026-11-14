@@ -339,6 +339,47 @@ document.getElementById("tabErr").onclick=()=>setTab("err");
   updateThemeBtn();
 })();
 
+// Bouton plein écran — API Fullscreen si dispo, sinon mode "focus" (masque l'en-tête)
+(function injectFullscreenBtn(){
+  if(document.getElementById("fsToggle"))return;
+  const nav=document.querySelector("nav.tabs");
+  if(!nav)return;
+  const st=document.createElement("style");
+  st.textContent="body.focus-mode .home-link,body.focus-mode header.top{display:none!important}body.focus-mode .wrap{padding-top:8px}";
+  document.head.appendChild(st);
+  const el=document.documentElement;
+  const canFs=!!(el.requestFullscreen||el.webkitRequestFullscreen);
+  const isFs=()=>!!(document.fullscreenElement||document.webkitFullscreenElement)||document.body.classList.contains("focus-mode");
+  const btn=document.createElement("button");
+  btn.id="fsToggle";
+  btn.style.cssText="background:none;border:0;padding:8px 10px;color:var(--muted);font-size:1rem;cursor:pointer;white-space:nowrap;flex-shrink:0";
+  const upd=()=>{const on=isFs();btn.textContent=on?"\u2715":"\u26F6";btn.title=on?"Quitter le plein écran":"Plein écran";btn.setAttribute("aria-label",btn.title);};
+  btn.onclick=async function(){
+    try{
+      if(document.fullscreenElement||document.webkitFullscreenElement){
+        await (document.exitFullscreen||document.webkitExitFullscreen).call(document);
+      }else if(document.body.classList.contains("focus-mode")){
+        document.body.classList.remove("focus-mode");
+      }else if(canFs){
+        await (el.requestFullscreen||el.webkitRequestFullscreen).call(el);
+      }else{
+        document.body.classList.add("focus-mode");
+      }
+    }catch(e){document.body.classList.toggle("focus-mode");}
+    upd();
+  };
+  document.addEventListener("fullscreenchange",upd);
+  document.addEventListener("webkitfullscreenchange",upd);
+  const th=document.getElementById("themeToggle");
+  if(th&&th.parentNode===nav){nav.insertBefore(btn,th)}else{
+    const ficheLink=nav.querySelector(".tab-fiche");
+    if(ficheLink){nav.insertBefore(btn,ficheLink)}else{nav.appendChild(btn)}
+  }
+  // le bouton thème garde margin-left:auto ; on le déplace sur le plein écran
+  if(th&&th.parentNode===nav){btn.style.marginLeft="auto";th.style.marginLeft="0";}
+  upd();
+})();
+
 // Demander le pseudo au premier lancement (léger délai pour le rendu initial)
 if(!getPseudo()){setTimeout(showPseudoModal,400);}
 else{
