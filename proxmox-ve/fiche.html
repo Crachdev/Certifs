@@ -1661,6 +1661,93 @@ qemu-img convert -p -f qcow2 -O vhdx disque.qcow2 out.vhdx</code></div>
         </tbody>
       </table></div>
 
+      <h3>Labo guidé : quorum, corosync et HA (en 8 manipulations)</h3>
+      <div class="info"><strong>Objectif :</strong> provoquer volontairement les pannes qui comptent et voir ce que fait le cluster. À faire <strong>dans un labo jetable</strong>, jamais en production.</div>
+
+      <h3>Préparer le labo (depuis Hyper-V ou VMware Workstation)</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Élément</th><th>Valeur conseillée</th></tr></thead>
+        <tbody>
+          <tr><td>3 VM Proxmox VE</td><td><code>pve1</code>, <code>pve2</code>, <code>pve3</code> : 2 vCPU, 4 Go de RAM, 1 disque de 32 Go chacune</td></tr>
+          <tr><td>2 cartes réseau par VM</td><td><strong>Réseau A</strong> = gestion + lien 1 (ex. 192.168.1.0/24) ; <strong>Réseau B</strong> = corosync lien 0 (ex. 10.10.10.0/24, commutateur privé)</td></tr>
+          <tr><td>Virtualisation imbriquée</td><td>Hyper-V : <code>Set-VMProcessor -VMName pve1 -ExposeVirtualizationExtensions $true</code> et <code>Set-VMNetworkAdapter -VMName pve1 -MacAddressSpoofing On</code> (idem pve2, pve3) ; VMware Workstation : cocher « Virtualize Intel VT-x/EPT »</td></tr>
+          <tr><td>Stockage partagé pour la HA</td><td>Un NFS simple (petite VM Linux ou partage de l'hôte) déclaré en stockage « partagé », sinon la HA ne pourra pas relancer les VM</td></tr>
+          <tr><td>4<sup>e</sup> VM (plus tard)</td><td>Petite VM Debian pour le QDevice (<code>corosync-qnetd</code>)</td></tr>
+          <tr><td>Retour arrière</td><td><strong>Point de contrôle Hyper-V</strong> (ou snapshot VMware) de chaque VM après l'installation, avant le cluster</td></tr>
+        </tbody>
+      </table></div>
+      <p>Installer Proxmox sur chaque VM avec un FQDN fixe (<code>pve1.lab.local</code>…) et la <strong>première</strong> carte pour la gestion ; ajouter la seconde comme réseau corosync.</p>
+
+      <h3>Manipulation 1 : créer le cluster avec deux liens</h3>
+      <div class="code-block"><code><span class="comment"># sur pve1</span>
+pvecm create lab --link0 10.10.10.11 --link1 192.168.1.11
+<span class="comment"># sur pve2 puis pve3 (IP de pve1 + leurs adresses locales)</span>
+pvecm add 192.168.1.11 --link0 10.10.10.12 --link1 192.168.1.12
+pvecm add 192.168.1.11 --link0 10.10.10.13 --link1 192.168.1.13
+<span class="comment"># vérifier</span>
+pvecm status ; pvecm nodes ; corosync-cfgtool -s</code></div>
+      <p><strong>À observer :</strong> 3 votes, quorum à 2, drapeau <code>Quorate</code>, deux liens « connected » pour chaque nœud. Lire <code>/etc/pve/corosync.conf</code> et repérer <code>config_version</code>.</p>
+
+      <h3>Manipulation 2 : perdre un lien</h3>
+      <div class="code-block"><code><span class="comment"># sur pve2 : couper le réseau corosync (lien 0)</span>
+ip link set &lt;interface-corosync&gt; down
+corosync-cfgtool -s ; pvecm status
+journalctl -u corosync -e</code></div>
+      <p><strong>À observer :</strong> le lien 0 passe « disconnected », le cluster reste <strong>Quorate</strong> via le lien 1 (redondance kronosnet). Remonter l'interface et constater le retour du lien. <strong>Puis</strong> couper aussi le lien 1 : pve2 se retrouve isolé (voir manipulation 3).</p>
+
+      <h3>Manipulation 3 : perdre un nœud, puis deux</h3>
+      <ol>
+        <li>Éteindre <code>pve3</code> : <code>pvecm status</code> sur pve1 → 2 votes sur 3, <strong>toujours Quorate</strong></li>
+        <li>Éteindre aussi <code>pve2</code> : sur pve1, plus de quorum</li>
+        <li>Tester : <code>touch /etc/pve/test</code> (échec : lecture seule), <code>qm start</code> d'une VM arrêtée (refus), mais une VM déjà démarrée <strong>continue de tourner</strong></li>
+        <li>Regarder l'interface web : nœuds en rouge, message de quorum</li>
+      </ol>
+
+      <h3>Manipulation 4 : récupérer sans quorum puis revenir à la normale</h3>
+      <div class="code-block"><code><span class="comment"># sur pve1 (pve2 et pve3 vraiment éteints)</span>
+pvecm expected 1
+pvecm status ; touch /etc/pve/test ; rm /etc/pve/test
+<span class="comment"># rallumer pve2 et pve3, puis</span>
+pvecm status ; pvecm nodes</code></div>
+      <p><strong>À observer :</strong> le quorum revient localement, <code>/etc/pve</code> redevient modifiable ; au retour des autres nœuds, les votes se rééquilibrent. <strong>Retenir le danger :</strong> si pve2 et pve3 avaient été vivants et isolés, deux moitiés auraient pu écrire en parallèle.</p>
+
+      <h3>Manipulation 5 : HA et fencing</h3>
+      <ol>
+        <li>Créer une VM dont le disque est sur le NFS partagé, la déclarer en HA : <code>ha-manager add vm:100 --state started</code></li>
+        <li>Repérer le nœud qui l'héberge : <code>ha-manager status</code></li>
+        <li>Sur ce nœud, couper <strong>les deux</strong> liens corosync (<code>ip link set … down</code>)</li>
+        <li>Observer sur ce nœud : au bout d'environ <strong>une minute</strong>, il perd le quorum et <strong>se fige / redémarre</strong> (watchdog)</li>
+        <li>Observer sur les deux autres : après environ <strong>deux minutes</strong>, la VM est <strong>relancée</strong> sur un nœud sain</li>
+      </ol>
+      <p><strong>Retenir :</strong> la HA <strong>redémarre</strong> la VM (pas de migration à chaud d'une panne) ; sans stockage partagé ou réplication, le redémarrage échoue.</p>
+
+      <h3>Manipulation 6 : ajouter un QDevice sur un cluster à 2 nœuds</h3>
+      <div class="code-block"><code><span class="comment"># retirer pve3 proprement du cluster (migrer / supprimer ses VM, l'éteindre) puis, depuis pve1 :</span>
+pvecm delnode pve3
+<span class="comment"># sur la VM Debian externe :</span>
+apt install corosync-qnetd
+<span class="comment"># sur pve1 et pve2 :</span>
+apt install corosync-qdevice
+<span class="comment"># depuis pve1 :</span>
+pvecm qdevice setup &lt;IP-de-la-VM-Debian&gt;
+pvecm status</code></div>
+      <p><strong>À observer :</strong> une ligne <em>Qdevice</em>, 3 votes au total. <strong>Test :</strong> éteindre pve2 : pve1 reste <strong>Quorate</strong> grâce à la voix du QDevice. Éteindre ensuite la VM QDevice <em>et</em> pve2 : plus de quorum.</p>
+
+      <h3>Manipulation 7 : modifier corosync.conf sans casser</h3>
+      <ol>
+        <li>Sauvegarder : <code>cp /etc/pve/corosync.conf /root/corosync.conf.bak</code></li>
+        <li>Copier : <code>cp /etc/pve/corosync.conf /etc/pve/corosync.conf.new</code></li>
+        <li>Éditer la copie : ajouter un commentaire, ou changer <code>knet_link_priority</code> ; <strong>incrémenter <code>config_version</code></strong></li>
+        <li>Remplacer : <code>mv /etc/pve/corosync.conf.new /etc/pve/corosync.conf</code></li>
+        <li>Vérifier sur les autres nœuds que <code>/etc/corosync/corosync.conf</code> a la nouvelle version</li>
+        <li><strong>Variante d'erreur :</strong> refaire sans incrémenter <code>config_version</code> et constater que la modification n'est pas prise en compte</li>
+      </ol>
+
+      <h3>Manipulation 8 : retirer un nœud (et tout reconstruire)</h3>
+      <p>Appliquer la procédure de la section 9 (« Retirer un nœud proprement ») sur un nœud du labo : migrer les VM, éteindre le nœud, <code>pvecm delnode</code> depuis un autre, nettoyer <code>/etc/pve/nodes/&lt;nom&gt;</code>. Revenir ensuite au point de contrôle initial pour recommencer le labo.</p>
+
+      <div class="tip"><strong>Fiche de bord :</strong> pour chaque manipulation, note (1) la commande lancée, (2) ce que tu attendais, (3) ce que tu as vu dans <code>pvecm status</code>, l'interface et les journaux. C'est exactement le genre de compte rendu utile ensuite pour le projet de migration (tests de PoC).</div>
+
       <h3>Auto-évaluation — clique pour voir la réponse</h3>
       <div id="qa">
         <details><summary>Quelles deux technologies de virtualisation Proxmox VE propose-t-il ?</summary><p>KVM pour les machines virtuelles et LXC pour les conteneurs Linux.</p></details>
