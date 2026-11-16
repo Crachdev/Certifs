@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#b85600">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche Proxmox DevOps — Automatisation</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#b85600;--accent-soft:#fdeedd;
+  --ps:#2b2f36;--ps-mid:#b85600;--ps-light:#f6d9b8;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#ff9d42;--accent-soft:#33210f;
+  --ps:#3a3f48;--ps-mid:#ff9d42;--ps-light:#33210f;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#ff9d42;--accent-soft:#33210f;
+  --ps:#3a3f48;--ps-mid:#ff9d42;--ps-light:#33210f;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.8rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+h4{font-size:.9rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--f-mono)}
+p{margin:6px 0 10px}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Header */
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.top-actions{display:flex;gap:8px;align-items:center}
+details{border:1px solid var(--line);border-radius:7px;padding:9px 14px;margin:8px 0;background:var(--sheet)}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details[open] summary{color:var(--accent);margin-bottom:6px}
+details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PS Banner */
+.ps-banner{background:var(--ps);border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.ps-banner-left .label{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ps-banner-left h1{color:#fff;font-size:1.5rem}
+.ps-banner-left p{color:rgba(255,255,255,.7);font-size:.88rem;margin:4px 0 0}
+.ps-stats{display:flex;gap:16px;flex-wrap:wrap}
+.ps-stat{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;text-align:center;min-width:80px}
+.ps-stat b{display:block;font:700 1.3rem var(--f-mono);color:#fff}
+.ps-stat span{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em}
+
+/* Sommaire rapide */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:28px}
+.toc h4{margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;text-decoration:none;color:var(--ink);font-size:.85rem;transition:background .15s}
+.toc-item:hover{background:var(--accent-soft);color:var(--accent)}
+.toc-num{font:600 .7rem var(--f-mono);background:var(--ps-light);color:var(--ps-mid);padding:1px 6px;border-radius:3px;min-width:28px;text-align:center}
+
+/* Sections */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.section-header{background:var(--ps);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.section-num{font:700 .75rem var(--f-mono);background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:4px}
+.section-title-text{font:700 1rem var(--f-display);color:#fff;flex:1}
+.section-nb{font:500 .7rem var(--f-mono);color:rgba(255,255,255,.55)}
+.section-body{padding:20px}
+
+/* Blocs de contenu */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.concept-card{border:1px solid var(--line);border-radius:7px;padding:12px 14px}
+.concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
+.concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
+.concept-card ul li{margin:2px 0}
+.concept-card.warn{border-left:3px solid var(--warn);border-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+
+/* Cmdlets */
+.cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+.cmdlet-table th{text-align:left;padding:7px 10px;background:var(--accent-soft);color:var(--accent);font:600 .72rem var(--f-mono);letter-spacing:.05em;border-bottom:2px solid var(--line)}
+.cmdlet-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmdlet-table tr:last-child td{border-bottom:0}
+.cmdlet-table td:first-child{font:500 .85rem var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmdlet-table td:last-child{color:var(--muted)}
+.cmdlet-table td:nth-child(2){color:var(--ink)}
+.cmdlet-table-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+
+/* Code blocks */
+.code-block{background:var(--ps);border-radius:7px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.code-block code{font:500 .85rem var(--f-mono);color:#f6d9b8;white-space:pre;display:block;line-height:1.6}
+.code-block .comment{color:rgba(255,255,255,.4)}
+.code-block .keyword{color:#9cdcfe}
+.code-block .string{color:#ce9178}
+.code-block .cmdlet{color:#dcdcaa}
+.code-block .param{color:#9cdcfe}
+
+/* Astuce / Attention */
+.tip{background:var(--ok-soft);border-left:3px solid var(--ok);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.tip strong{color:var(--ok)}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.warn strong{color:var(--warn)}
+.info{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.info strong{color:var(--accent)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font:500 .72rem var(--f-mono);padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.admin{background:var(--ok-soft);color:var(--ok)}
+.tag.cloud{background:#fdeedd;color:#b85600}
+.tag.script{background:#f3e8ff;color:#6b21a8}
+
+/* Comparatif */
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.compare-table th{padding:7px 10px;text-align:left;border-bottom:2px solid var(--line);font:600 .72rem var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.compare-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table td:first-child{font:600 .85rem var(--f-mono);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  h1{font-size:1.3rem}
+  .ps-banner{padding:14px 16px}
+  .ps-banner-left h1{font-size:1.2rem}
+  .ps-stats{gap:8px}
+  .ps-stat{padding:8px 10px;min-width:64px}
+  .ps-stat b{font-size:1rem}
+  .concept-grid{grid-template-columns:1fr}
+  .toc-grid{grid-template-columns:1fr}
+  .section-body{padding:14px}
+  .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">Virtualisation · Proxmox DevOps</div>
+      <h1>Fiche — Proxmox en mode DevOps</h1>
+    </div>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="ps-banner">
+    <div class="ps-banner-left">
+      <div class="label">Formation autonome · Suite de la fiche Proxmox VE</div>
+      <h1>Proxmox DevOps — automatiser avec Terraform et Ansible</h1>
+      <p>API · Jetons · cloud-init · Packer · Terraform · Ansible · CI · Migration VMware</p>
+    </div>
+    <div class="ps-stats">
+      <div class="ps-stat"><b>12</b><span>Sections</span></div>
+      <div class="ps-stat"><b>9.x</b><span>Version</span></div>
+      <div class="ps-stat"><b>18</b><span>Q/R</span></div>
+    </div>
+  </div>
+
+  <div class="info"><strong>Prérequis :</strong> la <a href="../proxmox-ve/fiche.html">fiche Proxmox VE</a> (clusters, stockage, VM, sauvegardes). <strong>Sources :</strong> wiki et guide officiels Proxmox (API, <code>pveum</code>, cloud-init), documentation du provider Terraform bpg/proxmox, de la collection Ansible community.proxmox et du plugin Packer Proxmox, lues le 16/11/2026. Les exemples sont des <strong>points de départ</strong> à valider sur ta version (<code>terraform validate</code>, <code>ansible-lint</code>, <code>packer validate</code>) et <strong>à tester en labo</strong>.</div>
+
+  <div class="toc">
+    <h4>Sommaire</h4>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">1</span>Pourquoi automatiser Proxmox</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>L'API, pvesh et appels directs</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>Comptes de service, rôles et jetons</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">4</span>Cloud-init et modèles de VM</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">5</span>Packer : modèles reproductibles</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">6</span>Terraform avec Proxmox</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Ansible avec Proxmox</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Terraform + Ansible et GitOps</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Automatiser l'exploitation</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span>Automatiser la migration VMware</a>
+      <a href="#s11" class="toc-item"><span class="toc-num">11</span>Pièges et aide-mémoire</a>
+      <a href="#s12" class="toc-item"><span class="toc-num">12</span>Plan de labo et Q/R</a>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div class="section" id="s1">
+    <div class="section-header"><span class="section-num">1</span><span class="section-title-text">Pourquoi automatiser Proxmox (vue d'ensemble DevOps)</span><span class="section-nb">Les outils</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">IaC</span><span class="tag">Packer</span><span class="tag">Terraform</span><span class="tag">Ansible</span></div>
+      <div class="info"><strong>Idée :</strong> décrire l'infrastructure dans des fichiers versionnés (Git) plutôt que de cliquer. On passe de « je crée une VM » à « je déclare ce que je veux, l'outil s'occupe du reste, et je peux le refaire à l'identique ». Les versions d'outils changent vite : <strong>les exemples sont à valider avec <code>terraform validate</code> / <code>ansible-lint</code></strong> sur ta version.</div>
+
+      <h3>Qui fait quoi</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Outil</th><th>Rôle</th><th>Pour Proxmox</th></tr></thead><tbody><tr><td><strong>Packer</strong></td><td>Fabrique des <strong>images / modèles</strong> reproductibles</td><td>Construit un modèle de VM (ISO → modèle) via les builders <code>proxmox-iso</code> et <code>proxmox-clone</code></td></tr><tr><td><strong>Terraform</strong></td><td><strong>Crée et supprime</strong> l'infrastructure (déclaratif, état)</td><td>VM, conteneurs, stockages, pools, réseaux, utilisateurs via un provider qui parle à l'API</td></tr><tr><td><strong>Ansible</strong></td><td><strong>Configure</strong> ce qui existe (idempotent, sans agent)</td><td>Configure les hôtes Proxmox <em>et</em> les invités ; modules Proxmox pour piloter l'API</td></tr><tr><td><strong>cloud-init</strong></td><td>Personnalise une VM <strong>au premier démarrage</strong></td><td>Clé SSH, utilisateur, IP, nom : injectés par Proxmox dans un disque dédié</td></tr><tr><td><strong>Git + CI</strong></td><td>Historique, revue, déploiement contrôlé</td><td>Pipeline : validation, plan, approbation, application</td></tr><tr><td><strong>API / pvesh</strong></td><td>Le socle de tout le reste</td><td>Tout outil passe par l'API REST de Proxmox (port 8006)</td></tr></tbody></table></div>
+
+      <h3>Le flux type</h3>
+      <div class="code-block"><code>Packer          -> modèle « tpl-ubuntu » (cloud-init)
+Terraform       -> clone N VM depuis le modèle (IP, CPU, RAM, disque)
+Ansible         -> configure les VM (paquets, services, sécurité)
+Git + CI        -> tout est versionné, relu, appliqué par pipeline</code></div>
+
+      <h3>Équivalences pour un profil Windows / Hyper-V</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Habitude</th><th>Équivalent ici</th></tr></thead><tbody><tr><td>PowerShell + module Hyper-V</td><td><code>pvesh</code>, <code>qm</code>, API REST ; PowerShell peut aussi appeler l'API avec <code>Invoke-RestMethod</code></td></tr><tr><td>DSC / scripts</td><td>Ansible (idempotent) et Terraform (déclaratif)</td></tr><tr><td>Modèles Hyper-V / sysprep</td><td>Modèle Proxmox + cloud-init (Linux) ; Windows : sysprep + Packer</td></tr><tr><td>SCVMM / WAC</td><td>Interface web, plus l'API pour tout ce qui se répète</td></tr></tbody></table></div>
+      <div class="tip"><strong>Poste de travail Windows :</strong> Ansible ne tourne pas nativement comme contrôleur sous Windows : utiliser <strong>WSL2</strong> (Linux) pour Ansible. Terraform et Packer existent en binaire Windows.</div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section" id="s2">
+    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">L'API Proxmox, pvesh et appels directs</span><span class="section-nb">API</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">REST</span><span class="tag">pvesh</span><span class="tag">curl</span><span class="tag">PowerShell</span></div>
+      <div class="info"><strong>Fait central :</strong> l'interface web, <code>qm</code>, <code>pvesh</code>, Terraform et Ansible utilisent <strong>la même API REST</strong> : <code>https://HÔTE:8006/api2/json/…</code>. Le visualiseur d'API de la documentation (<em>API Viewer</em>) liste chaque chemin, méthode et paramètre.</div>
+
+      <h3>Authentification : ticket ou jeton</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Méthode</th><th>Usage</th><th>Remarque</th></tr></thead><tbody><tr><td>Ticket + CSRF</td><td>Session interactive (mot de passe, TOTP)</td><td>Expire (2 h) ; le jeton CSRF est requis pour les écritures</td></tr><tr><td><strong>Jeton d'API</strong></td><td>Automatisation (CI, Terraform, Ansible)</td><td>Pas de mot de passe ; en-tête <code>Authorization: PVEAPIToken=USER@REALM!JETON=SECRET</code></td></tr></tbody></table></div>
+      <div class="code-block"><code><span class="comment"># Lister les VM avec un jeton (curl)</span>
+curl -s -k -H "Authorization: PVEAPIToken=terraform@pve!tf=$PVE_TOKEN_SECRET" \
+  "https://pve1.lab.local:8006/api2/json/cluster/resources?type=vm"
+
+<span class="comment"># Même chose en local sur un nœud, sans jeton (pvesh utilise l'identité de l'utilisateur)</span>
+pvesh get /cluster/resources --type vm --output-format json
+
+<span class="comment"># Cloner un modèle (écriture)</span>
+pvesh create /nodes/pve1/qemu/9000/clone --newid 201 --name web-01 --full 1
+
+<span class="comment"># Équivalent PowerShell 7</span>
+$h = @{ Authorization = "PVEAPIToken=terraform@pve!tf=$env:PVE_TOKEN_SECRET" }
+Invoke-RestMethod -Uri "https://pve1.lab.local:8006/api2/json/cluster/resources?type=vm" -Headers $h -SkipCertificateCheck</code></div>
+      <ul><li><code>-k</code> / <code>-SkipCertificateCheck</code> ignorent la vérification TLS : <strong>acceptable en labo seulement</strong> ; en production, installer un certificat de confiance ou la CA interne (<code>pvenode cert</code>, ACME)</li><li>Les réponses sont en JSON dans la clé <code>data</code> ; les opérations longues renvoient un <strong>UPID</strong> (identifiant de tâche) à suivre</li><li>Toutes les opérations asynchrones (clone, démarrage, sauvegarde) sont des <strong>tâches</strong> : l'outil doit attendre qu'elles se terminent</li></ul>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">Comptes de service, rôles et jetons (moindre privilège)</span><span class="section-nb">Sécurité</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">pveum</span><span class="tag">Jeton</span><span class="tag">Rôle</span><span class="tag">privsep</span></div>
+      <div class="info"><strong>Règle :</strong> un outil d'automatisation n'utilise <strong>jamais</strong> <code>root@pam</code>. On crée un utilisateur de service, un <strong>rôle limité</strong>, un <strong>jeton</strong> par outil, et on affecte les droits sur le bon chemin (<code>/</code>, <code>/vms</code>, <code>/pool/NOM</code>…).</div>
+      <div class="code-block"><code><span class="comment"># 1. Un rôle limité à l'approvisionnement de VM</span>
+pveum role add Provisioner --privs "VM.Allocate,VM.Clone,VM.Audit,VM.PowerMgmt,VM.Config.CPU,VM.Config.Memory,VM.Config.Disk,VM.Config.Network,VM.Config.Options,VM.Config.Cloudinit,VM.Config.CDROM,VM.Config.HWType,VM.GuestAgent.Audit,Datastore.Audit,Datastore.AllocateSpace,Sys.Audit,SDN.Use,Pool.Audit"
+
+<span class="comment"># 2. Un utilisateur de service dans le realm « pve »</span>
+pveum user add terraform@pve --comment "Automatisation"
+pveum aclmod / --users terraform@pve --roles Provisioner
+
+<span class="comment"># 3. Un jeton AVEC séparation de privilèges (le secret n'est affiché qu'une fois)</span>
+pveum user token add terraform@pve tf --privsep 1
+pveum aclmod / --tokens 'terraform@pve!tf' --roles Provisioner
+
+<span class="comment"># Vérifier</span>
+pveum user token permissions terraform@pve tf</code></div>
+      <ul><li><strong>Séparation de privilèges (<code>privsep 1</code>)</strong> : le jeton n'a que ses propres ACL, <em>dans la limite</em> de ceux de l'utilisateur ; <strong>les deux doivent recevoir le rôle</strong></li><li>Sans séparation, le jeton hérite de <strong>tous</strong> les droits de l'utilisateur</li><li>Le secret ne s'affiche <strong>qu'une fois</strong> : le stocker immédiatement dans un coffre (Vault, gestionnaire de secrets de la CI, variable chiffrée)</li><li>Un jeton par outil et par environnement ; durée de vie (<code>--expire</code>) et rotation planifiées</li><li><strong>Proxmox 9 :</strong> le privilège <code>VM.Monitor</code> a été supprimé (remplacé par <code>Sys.Audit</code> et des droits fins) ; un ancien rôle copié de la version 8 peut échouer</li></ul>
+      <div class="warn">Certaines opérations restent réservées à <code>root@pam</code> (conteneur privilégié avec options spéciales, passthrough PCI/USB sans mapping de ressources, certains paramètres de migration). Elles ne passent <strong>pas</strong> avec un jeton ordinaire : prévoir une voie dédiée plutôt que de donner root à tout le monde.</div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section" id="s4">
+    <div class="section-header"><span class="section-num">4</span><span class="section-title-text">Cloud-init et modèles de VM : la base de tout</span><span class="section-nb">Modèle</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">qm</span><span class="tag">cloud-init</span><span class="tag">Template</span></div>
+      <div class="info">Un <strong>modèle cloud-init</strong> est l'équivalent d'une image « dorée » : on le clone, et chaque clone reçoit son nom, son IP et sa clé SSH au premier démarrage. C'est la brique commune de Terraform, d'Ansible et de la migration.</div>
+      <div class="code-block"><code><span class="comment"># Construire un modèle à partir d'une image cloud (séquence de la documentation)</span>
+wget https://cloud-images.ubuntu.com/…/…-server-cloudimg-amd64.img
+qm create 9000 --name tpl-ubuntu --memory 2048 --net0 virtio,bridge=vmbr0 --scsihw virtio-scsi-pci
+qm set 9000 --scsi0 local-lvm:0,import-from=/chemin/…-cloudimg-amd64.img
+qm set 9000 --ide2 local-lvm:cloudinit
+qm set 9000 --boot order=scsi0
+qm set 9000 --serial0 socket --vga serial0
+qm set 9000 --agent enabled=1
+qm template 9000
+
+<span class="comment"># Cloner et personnaliser</span>
+qm clone 9000 201 --name web-01 --full 1
+qm set 201 --ciuser ops --sshkeys ~/.ssh/id_ed25519.pub --ipconfig0 ip=192.168.10.51/24,gw=192.168.10.1 --nameserver 192.168.10.2
+qm resize 201 scsi0 +20G
+qm start 201</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Option cloud-init</th><th>Rôle</th></tr></thead><tbody><tr><td><code>ciuser</code> · <code>cipassword</code></td><td>Utilisateur par défaut (préférer les clés SSH au mot de passe)</td></tr><tr><td><code>sshkeys</code></td><td>Clé(s) publique(s) SSH du compte</td></tr><tr><td><code>ipconfig0</code> (…<code>n</code>)</td><td>Réseau de la carte <code>net0</code> : <code>ip=…/24,gw=…</code> ou <code>ip=dhcp</code></td></tr><tr><td><code>nameserver</code> · <code>searchdomain</code></td><td>DNS de la VM (sinon ceux de l'hôte)</td></tr><tr><td><code>cicustom</code></td><td>Fichiers utilisateur / réseau / vendor (<em>snippets</em>) pour aller plus loin</td></tr></tbody></table></div>
+      <ul><li><strong>Si on modifie la config cloud-init après le premier démarrage</strong>, il faut <strong>régénérer</strong> l'image cloud-init (<code>qm cloudinit update 201</code>) puis redémarrer ; l'OS ne rejoue pas toujours tout seul</li><li>Installer <code>qemu-guest-agent</code> dans le modèle (via <code>cicustom</code> ou en personnalisant l'image) : indispensable pour que les outils lisent l'IP de la VM</li><li>Un modèle se <strong>clone en lien</strong> (rapide, dépend du modèle) ou en <strong>clone complet</strong> (indépendant) selon le stockage</li><li><strong>Windows :</strong> pas de cloud-init natif de la même façon ; utiliser sysprep + Packer pour les modèles</li></ul>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div class="section" id="s5">
+    <div class="section-header"><span class="section-num">5</span><span class="section-title-text">Packer : fabriquer des modèles reproductibles</span><span class="section-nb">Packer</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">proxmox-iso</span><span class="tag">proxmox-clone</span><span class="tag">HCL</span></div>
+      <div class="info"><strong>Packer</strong> automatise la création du modèle : il démarre une VM sur Proxmox, l'installe ou la prépare, puis la convertit en <strong>modèle</strong>. Deux builders : <code>proxmox-iso</code> (depuis une ISO) et <code>proxmox-clone</code> (depuis un modèle existant).</div>
+      <div class="code-block"><code>packer {
+  required_plugins {
+    proxmox = {
+      version = "~> 1"
+      source  = "github.com/hashicorp/proxmox"
+    }
+  }
+}
+
+<span class="comment"># Squelette : à compléter avec les options exactes de la doc du plugin</span>
+source "proxmox-clone" "ubuntu" {
+  proxmox_url              = var.pve_url   <span class="comment"># https://pve1:8006/api2/json</span>
+  username                 = var.pve_token_id     <span class="comment"># terraform@pve!packer</span>
+  token                    = var.pve_token_secret <span class="comment"># jamais en clair dans le dépôt</span>
+  insecure_skip_tls_verify = false
+  node                     = "pve1"
+  clone_vm                 = "tpl-ubuntu-base"
+  vm_name                  = "tpl-ubuntu-golden"
+  ssh_username             = "ops"
+}
+
+build {
+  sources = ["source.proxmox-clone.ubuntu"]
+  provisioner "shell" { inline = ["sudo apt-get update", "sudo apt-get -y install qemu-guest-agent"] }
+}</code></div>
+      <ul><li><code>packer init</code> télécharge le plugin, <code>packer validate</code> vérifie, <code>packer build</code> construit</li><li>Intérêt : <strong>modèles à jour et identiques</strong> (correctifs, agent, durcissement) reconstruits régulièrement par la CI</li><li>Les noms exacts des options (<code>proxmox_url</code>, <code>token</code>, <code>clone_vm</code>…) sont à vérifier dans la page du plugin avant usage</li></ul>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="section" id="s6">
+    <div class="section-header"><span class="section-num">6</span><span class="section-title-text">Terraform avec Proxmox (provider bpg/proxmox)</span><span class="section-nb">Terraform</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Provider</span><span class="tag">VM</span><span class="tag">État</span><span class="tag">Variables</span></div>
+      <div class="info">Les exemples ci-dessous utilisent le provider <strong>bpg/proxmox</strong> (version <code>~> 0.122</code> au moment de la lecture de la doc). D'autres providers existent : <strong>vérifier l'activité et la compatibilité PVE 9</strong> avant de choisir pour un projet réel.</div>
+
+      <h3>Configuration du provider et authentification</h3>
+      <div class="code-block"><code>terraform {
+  required_providers {
+    proxmox = {
+      source  = "bpg/proxmox"
+      version = "~> 0.122.0"
+    }
+  }
+}
+
+variable "pve_endpoint"  { type = string }
+variable "pve_api_token" { type = string, sensitive = true }  <span class="comment"># terraform@pve!tf=SECRET</span>
+
+provider "proxmox" {
+  endpoint  = var.pve_endpoint   <span class="comment"># https://pve1.lab.local:8006/</span>
+  api_token = var.pve_api_token
+  insecure  = false              <span class="comment"># true seulement en labo (certificat auto-signé)</span>
+
+  ssh {
+    agent    = true
+    username = "terraform"       <span class="comment"># requis pour certaines ressources (snippets, import disque par fichier)</span>
+  }
+}</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Mode d'authentification</th><th>Usage</th></tr></thead><tbody><tr><td><strong>Jeton d'API</strong> (<code>api_token</code> / <code>PROXMOX_VE_API_TOKEN</code>)</td><td>Recommandé pour la production et la CI</td></tr><tr><td>Ticket (<code>auth_ticket</code> + <code>csrf_prevention_token</code>)</td><td>Scripts, avec TOTP</td></tr><tr><td>Utilisateur / mot de passe</td><td>Développement, tests</td></tr></tbody></table></div>
+      <ul><li><strong>SSH n'est requis que pour</strong> : envoi de snippets / certains fichiers, import de disque par <code>source_file.path</code>, entrées <code>idmap</code> de conteneurs. Créer / modifier / supprimer VM et conteneurs, stockages, pools, utilisateurs : <strong>API seule</strong></li><li>Avec un jeton, le mot de passe SSH n'est <strong>pas</strong> hérité : charger une clé dans <code>ssh-agent</code> ou la déclarer dans le bloc <code>ssh</code> ; l'utilisateur SSH non root doit avoir <code>sudo</code> sans mot de passe sur les commandes nécessaires (règles strictes, <strong>pas</strong> de <code>sudo</code> libre sur <code>qm</code> ni de joker <code>*</code>)</li><li>TLS 1.3 est exigé par défaut sur l'API (<code>min_tls</code> pour assouplir)</li><li>Avec un jeton, garder <code>SDN.Audit</code> ou <code>SDN.Use</code> dans le rôle, sinon les ponts sont invisibles et le provider échoue (« interface not found »)</li></ul>
+
+      <h3>Créer des VM par clonage du modèle</h3>
+      <div class="code-block"><code>resource "proxmox_virtual_environment_vm" "web" {
+  for_each  = toset(["web-01", "web-02"])
+  name      = each.key
+  node_name = "pve1"
+  tags      = ["terraform", "web"]
+
+  clone {
+    vm_id = 9000   <span class="comment"># le modèle cloud-init</span>
+  }
+
+  agent {
+    enabled = true
+  }
+
+  cpu {
+    cores = 2
+    type  = "x86-64-v2-AES"
+  }
+
+  memory {
+    dedicated = 2048
+  }
+
+  disk {
+    datastore_id = "local-lvm"
+    interface    = "scsi0"
+    size         = 20
+    discard      = "on"
+    iothread     = true
+  }
+
+  network_device {
+    bridge = "vmbr0"
+  }
+
+  initialization {
+    ip_config {
+      ipv4 {
+        address = "dhcp"
+      }
+    }
+    user_account {
+      username = "ops"
+      keys     = [var.ssh_public_key]
+    }
+  }
+}</code></div>
+      <div class="tip"><strong>À valider :</strong> les noms de blocs viennent de ma connaissance du provider ; la page de la ressource <code>proxmox_virtual_environment_vm</code> fait foi. Lance toujours <code>terraform validate</code> puis <code>terraform plan</code> en labo.</div>
+
+      <h3>Le cycle de travail</h3>
+      <div class="code-block"><code>terraform init       <span class="comment"># télécharge le provider</span>
+terraform fmt -recursive
+terraform validate
+terraform plan -out tfplan      <span class="comment"># lit l'API, montre ce qui changera</span>
+terraform apply tfplan          <span class="comment"># applique exactement ce plan</span>
+terraform destroy               <span class="comment"># supprime ce que Terraform gère (labo)</span>
+terraform import &lt;adresse&gt; &lt;id&gt; <span class="comment"># rattacher une VM déjà existante</span>
+terraform state list</code></div>
+
+      <h3>Bonnes pratiques Terraform</h3>
+      <ul><li><strong>État (<code>terraform.tfstate</code>)</strong> : il contient des données sensibles ; ne <strong>jamais</strong> le commiter. Utiliser un <strong>backend distant</strong> avec verrouillage et sauvegarde</li><li><code>.gitignore</code> : <code>*.tfstate*</code>, <code>.terraform/</code>, <code>*.tfvars</code> contenant des secrets, <code>tfplan</code></li><li>Secrets via variables d'environnement (<code>TF_VAR_…</code>, <code>PROXMOX_VE_API_TOKEN</code>) ou coffre-fort ; marquer les variables <code>sensitive = true</code></li><li><code>for_each</code> plutôt que <code>count</code> pour des VM nommées (retirer un élément ne décale pas les autres)</li><li><code>lifecycle { prevent_destroy = true }</code> sur les ressources critiques ; <code>ignore_changes</code> pour ce qu'Ansible ou l'exploitation modifie</li><li>Fixer les <strong>versions</strong> du provider (<code>~></code>) et commiter <code>.terraform.lock.hcl</code></li><li>Les <strong>modifications manuelles</strong> dans l'interface créent une <em>dérive</em> : <code>plan</code> la détecte</li></ul>
+    </div>
+  </div>
+
+  <!-- S7 -->
+  <div class="section" id="s7">
+    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Ansible avec Proxmox (collection community.proxmox)</span><span class="section-nb">Ansible</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Modules</span><span class="tag">Inventaire dynamique</span><span class="tag">Playbooks</span><span class="tag">Hôtes</span></div>
+      <div class="info">Deux usages distincts : (1) <strong>piloter l'API</strong> avec les modules Proxmox (créer / cloner / démarrer des VM) ; (2) <strong>configurer des machines</strong> (les hôtes Proxmox eux-mêmes, ou les invités) en SSH comme n'importe quel Linux. Les modules Proxmox sont dans la collection <strong>community.proxmox</strong>.</div>
+      <div class="code-block"><code><span class="comment"># Installation (contrôleur Linux ou WSL2)</span>
+ansible-galaxy collection install community.proxmox
+pip install proxmoxer requests     <span class="comment"># prérequis des modules API sur le contrôleur</span></code></div>
+
+      <h3>Modules principaux</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Module</th><th>Rôle</th></tr></thead><tbody><tr><td><code>community.proxmox.proxmox_kvm</code></td><td>Créer, cloner, démarrer, arrêter, supprimer des VM (QEMU/KVM) ; options cloud-init (<code>ciuser</code>, <code>sshkeys</code>, <code>ipconfig</code>, <code>nameservers</code>)</td></tr><tr><td><code>community.proxmox.proxmox</code></td><td>Conteneurs LXC</td></tr><tr><td><code>proxmox_disk</code> · <code>proxmox_nic</code></td><td>Disques et cartes réseau d'une VM</td></tr><tr><td><code>proxmox_template</code></td><td>Modèles de conteneurs / ISO sur un stockage</td></tr><tr><td><code>proxmox_backup</code></td><td>Lancer une sauvegarde</td></tr><tr><td><code>proxmox_vm_info</code> · <code>proxmox_user</code> · <code>proxmox_user_info</code></td><td>Lecture d'informations et gestion des utilisateurs</td></tr></tbody></table></div>
+
+      <h3>Exemple : cloner un modèle et démarrer</h3>
+      <div class="code-block"><code>- name: Déployer web-01 depuis le modèle
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Cloner
+      community.proxmox.proxmox_kvm:
+        api_host: pve1.lab.local
+        api_user: ansible@pve
+        api_token_id: ansible
+        api_token_secret: "{{ pve_token_secret }}"   <span class="comment"># depuis Ansible Vault / variable d'environnement</span>
+        validate_certs: true
+        node: pve1
+        clone: tpl-ubuntu
+        name: web-01
+        newid: 201
+        storage: local-lvm
+        full: true
+        timeout: 300
+
+    - name: Démarrer
+      community.proxmox.proxmox_kvm:
+        api_host: pve1.lab.local
+        api_user: ansible@pve
+        api_token_id: ansible
+        api_token_secret: "{{ pve_token_secret }}"
+        name: web-01
+        node: pve1
+        state: started</code></div>
+      <ul><li><code>state</code> : <code>present</code>, <code>started</code>, <code>stopped</code>, <code>restarted</code>, <code>absent</code>, <code>template</code>…</li><li>Par sécurité, la mise à jour de <code>net</code>, <code>virtio</code>, <code>ide</code>, <code>sata</code>, <code>scsi</code> est <strong>désactivée</strong> par défaut (un changement de réseau régénère la MAC, un disque virtio crée un nouveau disque) : <code>update_unsafe: true</code> pour l'autoriser</li><li>Les modules ne suppriment ni ne recréent rien « magiquement » : lire la doc du module avant de s'en servir pour modifier une VM existante</li></ul>
+
+      <h3>Inventaire dynamique : les VM Proxmox deviennent des hôtes Ansible</h3>
+      <div class="code-block"><code><span class="comment"># lab.proxmox.yml  (le nom doit se terminer par .proxmox.yml)</span>
+plugin: community.proxmox.proxmox
+url: https://pve1.lab.local:8006
+user: ansible@pve
+token_id: ansible
+token_secret: "{{ lookup('env', 'PVE_TOKEN_SECRET') }}"
+validate_certs: true
+want_facts: true
+
+<span class="comment"># Test</span>
+ansible-inventory -i lab.proxmox.yml --graph</code></div>
+
+      <h3>Configurer les hôtes Proxmox eux-mêmes</h3>
+      <div class="code-block"><code>- hosts: pve_nodes
+  become: true
+  tasks:
+    - name: Fuseau horaire et NTP
+      ansible.builtin.apt:
+        name: chrony
+        state: present
+    - name: Utilisateur de service pour l'API (idempotent)
+      ansible.builtin.command: pveum user list
+      changed_when: false
+    - name: Déposer le fichier sysctl (plus /etc/sysctl.conf sous PVE 9)
+      ansible.builtin.copy:
+        dest: /etc/sysctl.d/90-lab.conf
+        content: "net.ipv4.ip_forward = 1\n"
+        mode: "0644"</code></div>
+      <div class="tip">Idempotence : une tâche rejouée ne doit rien changer. Pour <code>command</code>/<code>shell</code>, utiliser <code>changed_when</code>, <code>creates</code> ou un test préalable.</div>
+    </div>
+  </div>
+
+  <!-- S8 -->
+  <div class="section" id="s8">
+    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Terraform + Ansible ensemble, et GitOps</span><span class="section-nb">Intégration</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pipeline</span><span class="tag">Secrets</span><span class="tag">CI</span><span class="tag">Rolling update</span></div>
+
+      <h3>Répartition des rôles</h3>
+      <div class="concept-grid"><div class="concept-card"><h4>Terraform : le « quoi existe »</h4><ul><li>VM, disques, réseaux, pools, droits</li><li>Sortie (<code>output</code>) des IP / noms</li><li>État partagé et verrouillé</li></ul></div><div class="concept-card"><h4>Ansible : le « comment c'est configuré »</h4><ul><li>Paquets, services, utilisateurs, durcissement</li><li>Mises à jour des hôtes Proxmox</li><li>Inventaire dynamique depuis l'API</li></ul></div><div class="concept-card"><h4>cloud-init : le pont</h4><ul><li>Amorce SSH + IP à la création</li><li>Permet à Ansible de se connecter dès le premier démarrage</li></ul></div></div>
+
+      <h3>Organisation du dépôt Git</h3>
+      <div class="code-block"><code>infra/
+  packer/            <span class="comment"># modèles</span>
+  terraform/
+    envs/lab/  envs/prod/
+    modules/vm/      <span class="comment"># module réutilisable « une VM Linux »</span>
+  ansible/
+    inventories/  roles/  playbooks/
+  .gitignore  README.md  .github/workflows/ (ou .gitlab-ci.yml)</code></div>
+
+      <h3>Pipeline type</h3>
+      <ol><li><strong>Pull request</strong> : <code>fmt</code>, <code>validate</code>, <code>ansible-lint</code>, <code>terraform plan</code> posté en commentaire</li><li><strong>Relecture</strong> par un pair, puis fusion</li><li><strong>Application</strong> : <code>terraform apply</code> avec <strong>approbation manuelle</strong> pour la production, puis <code>ansible-playbook</code></li><li><strong>Contrôle de dérive</strong> planifié : un <code>plan</code> nocturne qui alerte s'il n'est pas vide</li></ol>
+      <div class="warn"><strong>Le runner doit atteindre l'API Proxmox</strong> (réseau interne, port 8006). Utiliser un <strong>runner auto-hébergé</strong> dans le réseau d'administration plutôt que d'exposer l'API sur Internet.</div>
+
+      <h3>Mise à jour des nœuds en continu (rolling update)</h3>
+      <div class="code-block"><code>- hosts: pve_nodes
+  serial: 1                  <span class="comment"># un nœud à la fois : le cluster garde son quorum</span>
+  become: true
+  tasks:
+    - name: Évacuer les VM du nœud (migration / mode maintenance HA selon la version)
+      ansible.builtin.debug: msg="à adapter : ha-manager / qm migrate"
+    - name: Mettre à jour
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: dist
+    - name: Redémarrer si le noyau a changé
+      ansible.builtin.reboot:
+        reboot_timeout: 900
+    - name: Attendre le quorum
+      ansible.builtin.command: pvecm status
+      register: q
+      until: "'Quorate' in q.stdout"
+      retries: 20
+      delay: 15
+      changed_when: false</code></div>
+      <ul><li><strong><code>serial: 1</code></strong> est la clé : jamais deux nœuds en même temps sur un cluster à 3</li><li>Vérifier <code>pvecm status</code> (drapeau <em>Quorate</em>) <strong>avant</strong> de passer au nœud suivant</li><li>Pour une montée de version majeure (8 → 9), utiliser la procédure officielle et <code>pve8to9</code> ; l'automatiser seulement après l'avoir réussie à la main en labo</li></ul>
+    </div>
+  </div>
+
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Automatiser l'exploitation : sauvegardes, supervision, scripts</span><span class="section-nb">Exploitation</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">vzdump</span><span class="tag">pvesh</span><span class="tag">Notifications</span><span class="tag">Métriques</span></div>
+      <div class="concept-grid"><div class="concept-card"><h4>Sauvegardes</h4><ul><li>Tâches planifiées (<em>Datacenter → Backup</em>) ou <code>vzdump</code></li><li><code>prune-backups</code> pour la rétention (<code>maxfiles</code> n'existe plus en 9)</li><li>Sauvegarde <strong>et</strong> test de restauration automatisé en labo</li><li><code>community.proxmox.proxmox_backup</code> pour lancer à la demande</li></ul></div><div class="concept-card"><h4>Supervision</h4><ul><li><em>Datacenter → Metric Server</em> : export vers InfluxDB ou Graphite</li><li>Alertes sur : quorum, stockage thin (Data%), espace de sauvegarde, tâches en échec</li><li>Journal : <code>journalctl</code>, <code>/var/log/pve/tasks/</code></li></ul></div><div class="concept-card"><h4>Scripts d'exploitation</h4><ul><li><code>pvesh get … --output-format json</code> + <code>jq</code> ou PowerShell</li><li>Rapports : VM sans sauvegarde, VM sans agent, snapshots anciens</li><li>Étiquettes (<em>tags</em>) pour classer : environnement, propriétaire, vague de migration</li></ul></div></div>
+      <div class="code-block"><code><span class="comment"># Exemples utiles (nœud Proxmox)</span>
+pvesh get /cluster/resources --type vm --output-format json | jq -r '.[] | select(.status=="running") | [.vmid,.name,.node] | @tsv'
+qm list ; pct list
+vzdump 201 --storage pbs --mode snapshot --compress zstd
+vzdump --all 1 --storage pbs --prune-backups keep-daily=7,keep-weekly=4</code></div>
+      <div class="tip"><strong>Idée projet :</strong> un playbook de « conformité » qui vérifie chaque nuit que chaque VM est étiquetée, sauvegardée et dotée de l'agent, et signale les écarts.</div>
+    </div>
+  </div>
+
+  <!-- S10 -->
+  <div class="section" id="s10">
+    <div class="section-header"><span class="section-num">10</span><span class="section-title-text">Automatiser la migration VMware → Proxmox</span><span class="section-nb">Migration</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Terraform</span><span class="tag">Ansible</span><span class="tag">qm importovf</span><span class="tag">Post-migration</span></div>
+      <div class="info">L'import d'une VM VMware reste une opération à surveiller (voir la fiche Proxmox VE, section 16). L'automatisation sert surtout à <strong>préparer la cible</strong>, <strong>traiter les lots</strong> et <strong>standardiser l'après-migration</strong>.</div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Étape</th><th>Outil</th><th>Idée</th></tr></thead><tbody><tr><td>Inventaire de la source</td><td>Script (PowerCLI) / export CSV</td><td>Alimenter l'inventaire des VM (voir le runbook interactif)</td></tr><tr><td>Préparer la cible</td><td>Terraform</td><td>Créer pools, stockages, étiquettes, droits, ponts / VLAN avant les vagues</td></tr><tr><td>Importer</td><td>Assistant ESXi, ou <code>qm importovf</code> / <code>qm disk import</code> en script</td><td>Un script par lot ; <strong>sérialiser</strong> (pas plus de quelques disques en parallèle)</td></tr><tr><td>Après import</td><td>Ansible</td><td>Installer <code>qemu-guest-agent</code>, pilotes VirtIO (Windows), réglages réseau, retrait de VMware Tools</td></tr><tr><td>Contrôle</td><td>Ansible / <code>pvesh</code></td><td>Rapport : agent actif, sauvegarde faite, étiquette de vague, VM source éteinte</td></tr><tr><td>Sauvegarde et HA</td><td>Terraform / jobs</td><td>Inscrire la VM aux sauvegardes et à la HA selon sa criticité</td></tr></tbody></table></div>
+      <div class="code-block"><code><span class="comment"># Lot d'import (squelette) : une VM à la fois</span>
+for ovf in /srv/export/*/*.ovf; do
+  vmid=$(pvesh get /cluster/nextid)
+  qm importovf "$vmid" "$ovf" local-lvm --format qcow2 || { echo "ECHEC $ovf"; continue; }
+  qm set "$vmid" --cpu x86-64-v2-AES --scsihw virtio-scsi-single --agent enabled=1
+  echo "$ovf -> VM $vmid"
+done</code></div>
+      <div class="warn">Un script d'import <strong>ne remplace pas</strong> le PoC : tester d'abord sur une VM jetable, garder la VM source éteinte, ne jamais démarrer la même VM des deux côtés.</div>
+    </div>
+  </div>
+
+  <!-- S11 -->
+  <div class="section" id="s11">
+    <div class="section-header"><span class="section-num">11</span><span class="section-title-text">Pièges et aide-mémoire</span><span class="section-nb">Révision</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pièges</span><span class="tag">Erreurs fréquentes</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Piège</th><th>Conséquence</th><th>Parade</th></tr></thead><tbody><tr><td>Jeton sans séparation de privilèges ou avec <code>root@pam</code></td><td>Un secret volé = accès complet</td><td>Utilisateur de service + rôle limité + <code>privsep 1</code></td></tr><tr><td>Rôle copié de PVE 8 avec <code>VM.Monitor</code></td><td>Droit inexistant en 9 / opérations refusées</td><td>Réviser les rôles (<code>Sys.Audit</code>…)</td></tr><tr><td>Secret du jeton perdu</td><td>Non récupérable (affiché une fois)</td><td>Le stocker dans un coffre dès la création ; regénérer sinon</td></tr><tr><td><code>insecure = true</code> en production</td><td>Pas de vérification TLS</td><td>Certificat de confiance ou CA interne</td></tr><tr><td><code>terraform.tfstate</code> dans Git</td><td>Secrets et ressources exposés</td><td>Backend distant chiffré + <code>.gitignore</code></td></tr><tr><td>Modification manuelle dans l'interface</td><td>Dérive entre le code et la réalité</td><td><code>plan</code> régulier ; interdire les changements hors code</td></tr><tr><td>Config cloud-init modifiée après le premier boot</td><td>Rien ne se passe</td><td><code>qm cloudinit update</code> + redémarrage</td></tr><tr><td>Pas d'agent <code>qemu-guest-agent</code> dans le modèle</td><td>IP de la VM introuvable pour les outils</td><td>Agent dans le modèle + <code>agent enabled=1</code></td></tr><tr><td>VMID en conflit entre outils</td><td>Clone refusé ou VM écrasée</td><td>Plage de VMID réservée à l'automatisation (ou <code>nextid</code>)</td></tr><tr><td>Mise à jour de tous les nœuds en même temps</td><td>Perte de quorum, arrêt de la HA</td><td><code>serial: 1</code> et contrôle de quorum</td></tr><tr><td>API exposée sur Internet pour la CI</td><td>Surface d'attaque</td><td>Runner interne ou VPN</td></tr><tr><td>SSH du provider avec <code>sudo</code> libre</td><td>Élévation de privilèges</td><td>Règles <code>sudoers</code> strictes, sans <code>*</code></td></tr></tbody></table></div>
+
+      <h3>Aide-mémoire : ports et fichiers</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Élément</th><th>Valeur</th></tr></thead><tbody><tr><td>API / interface web</td><td>TCP <strong>8006</strong> (HTTPS)</td></tr><tr><td>Chemin de l'API</td><td><code>/api2/json/…</code></td></tr><tr><td>En-tête jeton</td><td><code>Authorization: PVEAPIToken=USER@REALM!JETON=SECRET</code></td></tr><tr><td>Config du cluster</td><td><code>/etc/pve</code> (pmxcfs)</td></tr><tr><td>Stockages</td><td><code>/etc/pve/storage.cfg</code></td></tr><tr><td>Droits / utilisateurs</td><td><code>/etc/pve/user.cfg</code></td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S12 -->
+  <div class="section" id="s12">
+    <div class="section-header"><span class="section-num">12</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">18 questions</span></div>
+
+      <h3>Parcours en 6 séances de labo</h3>
+      <ol><li><strong>Séance 1 : API et jeton.</strong> Créer le rôle, l'utilisateur et le jeton (<code>pveum</code>), tester <code>curl</code>, <code>pvesh</code> et PowerShell</li><li><strong>Séance 2 : modèle cloud-init.</strong> Construire le modèle 9000, cloner à la main, tester IP et clé SSH, changer la config et régénérer</li><li><strong>Séance 3 : Terraform.</strong> Provider, 2 VM par <code>for_each</code>, <code>plan</code> / <code>apply</code> / <code>destroy</code>, provoquer une dérive et la voir</li><li><strong>Séance 4 : Ansible.</strong> Collection, inventaire dynamique, playbook de configuration des VM, playbook de conformité</li><li><strong>Séance 5 : Packer et CI.</strong> Reconstruire le modèle par Packer ; pipeline <code>validate</code> + <code>plan</code> sur un dépôt Git de labo avec runner interne</li><li><strong>Séance 6 : exploitation.</strong> Rolling update <code>serial: 1</code> sur un cluster de labo, sauvegarde + restauration scriptées, lot d'import OVF sur VM de test</li></ol>
+
+      <h3>Auto-évaluation — clique pour voir la réponse</h3>
+      <div class="qr-list">
+        <details><summary>Pourquoi utiliser un jeton d'API plutôt que le mot de passe root ?</summary><p>Pas de mot de passe à diffuser, droits limités par rôle et par chemin, révocable individuellement, adapté à la CI.</p></details>
+        <details><summary>Que fait l'option privsep sur un jeton ?</summary><p>Le jeton ne reçoit que ses propres ACL (dans la limite de celles de l'utilisateur) ; sans elle, il hérite de tous les droits de l'utilisateur.</p></details>
+        <details><summary>Quand le secret d'un jeton est-il visible ?</summary><p>Une seule fois, à la création : il faut le stocker aussitôt dans un coffre.</p></details>
+        <details><summary>Quelle est la différence entre Terraform et Ansible ?</summary><p>Terraform crée et supprime l'infrastructure de façon déclarative avec un état ; Ansible configure ce qui existe, de façon idempotente et sans agent.</p></details>
+        <details><summary>À quoi sert Packer ?</summary><p>À fabriquer des modèles de VM reproductibles (builders proxmox-iso et proxmox-clone).</p></details>
+        <details><summary>Pourquoi un modèle cloud-init ?</summary><p>Chaque clone reçoit au premier démarrage son nom, son IP et sa clé SSH ; c'est la brique commune de Terraform, Ansible et de la migration.</p></details>
+        <details><summary>Que faire si on change la config cloud-init après le premier démarrage ?</summary><p>Régénérer l'image cloud-init (qm cloudinit update) puis redémarrer la VM.</p></details>
+        <details><summary>Quand le provider Terraform a-t-il besoin de SSH ?</summary><p>Pour l'envoi de snippets et de certains fichiers, l'import de disque par source_file.path et les entrées idmap des conteneurs ; le reste passe par l'API.</p></details>
+        <details><summary>Pourquoi ne pas commiter terraform.tfstate ?</summary><p>Il contient des données sensibles et l'état réel ; il faut un backend distant avec verrouillage et sauvegarde.</p></details>
+        <details><summary>Pourquoi for_each plutôt que count pour des VM nommées ?</summary><p>Retirer un élément ne décale pas les autres ressources, contrairement à un index numérique.</p></details>
+        <details><summary>Qu'est-ce que la dérive et comment la détecter ?</summary><p>Un écart entre le code et la réalité (modification manuelle) ; un terraform plan régulier la montre.</p></details>
+        <details><summary>Comment Ansible découvre-t-il les VM Proxmox ?</summary><p>Avec le plugin d'inventaire community.proxmox.proxmox (fichier se terminant par .proxmox.yml) qui lit l'API.</p></details>
+        <details><summary>Quel prérequis Python pour les modules API Ansible ?</summary><p>proxmoxer et requests sur le contrôleur.</p></details>
+        <details><summary>Pourquoi serial: 1 dans un playbook de mise à jour ?</summary><p>Pour traiter un nœud à la fois et préserver le quorum du cluster.</p></details>
+        <details><summary>Pourquoi un runner de CI auto-hébergé ?</summary><p>Pour atteindre l'API Proxmox sur le réseau d'administration sans l'exposer sur Internet.</p></details>
+        <details><summary>Quel privilège a disparu en Proxmox VE 9 qui peut casser un ancien rôle ?</summary><p>VM.Monitor, remplacé par Sys.Audit et des droits plus fins.</p></details>
+        <details><summary>Comment automatiser l'après-migration VMware ?</summary><p>Un playbook Ansible : agent invité, pilotes VirtIO, réseau, retrait de VMware Tools, puis rapport de contrôle.</p></details>
+        <details><summary>Pourquoi sérialiser les imports en lot ?</summary><p>Les imports sollicitent l'ESXi (connexions, bande passante) et le stockage ; trop de parallélisme provoque erreurs et lenteurs.</p></details>
+      </div>
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)">
+    Fiche Proxmox DevOps ·
+    <a href="https://pve.proxmox.com/pve-docs/api-viewer/index.html" target="_blank" style="color:var(--accent);text-decoration:none">API Viewer Proxmox</a> ·
+    <a href="https://registry.terraform.io/providers/bpg/proxmox/latest/docs" target="_blank" style="color:var(--accent);text-decoration:none">Provider Terraform bpg/proxmox</a> ·
+    <a href="https://docs.ansible.com/projects/ansible/latest/collections/community/proxmox/index.html" target="_blank" style="color:var(--accent);text-decoration:none">Collection Ansible</a> ·
+    <a href="https://pve.proxmox.com/wiki/Cloud-Init_Support" target="_blank" style="color:var(--accent);text-decoration:none">Cloud-Init Proxmox</a>
+  </footer>
+
+</div>
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("proxmox-devops-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("proxmox-devops-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>
