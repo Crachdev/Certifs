@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#b85600">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche Proxmox VE — Virtualisation</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#b85600;--accent-soft:#fdeedd;
+  --ps:#2b2f36;--ps-mid:#b85600;--ps-light:#f6d9b8;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#ff9d42;--accent-soft:#33210f;
+  --ps:#3a3f48;--ps-mid:#ff9d42;--ps-light:#33210f;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#ff9d42;--accent-soft:#33210f;
+  --ps:#3a3f48;--ps-mid:#ff9d42;--ps-light:#33210f;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.8rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+h4{font-size:.9rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--f-mono)}
+p{margin:6px 0 10px}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Header */
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.top-actions{display:flex;gap:8px;align-items:center}
+details{border:1px solid var(--line);border-radius:7px;padding:9px 14px;margin:8px 0;background:var(--sheet)}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details[open] summary{color:var(--accent);margin-bottom:6px}
+details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PS Banner */
+.ps-banner{background:var(--ps);border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.ps-banner-left .label{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ps-banner-left h1{color:#fff;font-size:1.5rem}
+.ps-banner-left p{color:rgba(255,255,255,.7);font-size:.88rem;margin:4px 0 0}
+.ps-stats{display:flex;gap:16px;flex-wrap:wrap}
+.ps-stat{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;text-align:center;min-width:80px}
+.ps-stat b{display:block;font:700 1.3rem var(--f-mono);color:#fff}
+.ps-stat span{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em}
+
+/* Sommaire rapide */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:28px}
+.toc h4{margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;text-decoration:none;color:var(--ink);font-size:.85rem;transition:background .15s}
+.toc-item:hover{background:var(--accent-soft);color:var(--accent)}
+.toc-num{font:600 .7rem var(--f-mono);background:var(--ps-light);color:var(--ps-mid);padding:1px 6px;border-radius:3px;min-width:28px;text-align:center}
+
+/* Sections */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.section-header{background:var(--ps);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.section-num{font:700 .75rem var(--f-mono);background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:4px}
+.section-title-text{font:700 1rem var(--f-display);color:#fff;flex:1}
+.section-nb{font:500 .7rem var(--f-mono);color:rgba(255,255,255,.55)}
+.section-body{padding:20px}
+
+/* Blocs de contenu */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.concept-card{border:1px solid var(--line);border-radius:7px;padding:12px 14px}
+.concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
+.concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
+.concept-card ul li{margin:2px 0}
+.concept-card.warn{border-left:3px solid var(--warn);border-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+
+/* Cmdlets */
+.cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+.cmdlet-table th{text-align:left;padding:7px 10px;background:var(--accent-soft);color:var(--accent);font:600 .72rem var(--f-mono);letter-spacing:.05em;border-bottom:2px solid var(--line)}
+.cmdlet-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmdlet-table tr:last-child td{border-bottom:0}
+.cmdlet-table td:first-child{font:500 .85rem var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmdlet-table td:last-child{color:var(--muted)}
+.cmdlet-table td:nth-child(2){color:var(--ink)}
+.cmdlet-table-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+
+/* Code blocks */
+.code-block{background:var(--ps);border-radius:7px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.code-block code{font:500 .85rem var(--f-mono);color:#f6d9b8;white-space:pre;display:block;line-height:1.6}
+.code-block .comment{color:rgba(255,255,255,.4)}
+.code-block .keyword{color:#9cdcfe}
+.code-block .string{color:#ce9178}
+.code-block .cmdlet{color:#dcdcaa}
+.code-block .param{color:#9cdcfe}
+
+/* Astuce / Attention */
+.tip{background:var(--ok-soft);border-left:3px solid var(--ok);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.tip strong{color:var(--ok)}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.warn strong{color:var(--warn)}
+.info{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.info strong{color:var(--accent)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font:500 .72rem var(--f-mono);padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.admin{background:var(--ok-soft);color:var(--ok)}
+.tag.cloud{background:#fdeedd;color:#b85600}
+.tag.script{background:#f3e8ff;color:#6b21a8}
+
+/* Comparatif */
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.compare-table th{padding:7px 10px;text-align:left;border-bottom:2px solid var(--line);font:600 .72rem var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.compare-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table td:first-child{font:600 .85rem var(--f-mono);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  h1{font-size:1.3rem}
+  .ps-banner{padding:14px 16px}
+  .ps-banner-left h1{font-size:1.2rem}
+  .ps-stats{gap:8px}
+  .ps-stat{padding:8px 10px;min-width:64px}
+  .ps-stat b{font-size:1rem}
+  .concept-grid{grid-template-columns:1fr}
+  .toc-grid{grid-template-columns:1fr}
+  .section-body{padding:14px}
+  .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">Virtualisation · Proxmox VE</div>
+      <h1>Fiche de révision — Proxmox VE</h1>
+    </div>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="ps-banner">
+    <div class="ps-banner-left">
+      <div class="label">Formation autonome · Pas de certification</div>
+      <h1>Proxmox VE — administrer sa virtualisation</h1>
+      <p>KVM · LXC · Stockage · Réseau · Cluster · HA · Sauvegardes · Pare-feu</p>
+    </div>
+    <div class="ps-stats">
+      <div class="ps-stat"><b>17</b><span>Sections</span></div>
+      <div class="ps-stat"><b>9.x</b><span>Version</span></div>
+      <div class="ps-stat"><b>30</b><span>Q/R</span></div>
+    </div>
+  </div>
+
+  <div class="info"><strong>Source :</strong> guide d'administration officiel Proxmox VE 9 (Debian 13 « Trixie »). Les noms de commandes, chemins et ports sont ceux de la doc ; vérifie toujours la version affichée en haut à droite de ton interface (les sections HA ont changé en 9.0).</div>
+
+  <div class="toc">
+    <h4>Sommaire</h4>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">1</span>Vue d'ensemble</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>Installation</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>Administration de l'hôte</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">4</span>Interface web et CLI</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">5</span>Réseau et SDN</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">6</span>Stockage</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Machines virtuelles (KVM)</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Conteneurs LXC</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Cluster et pmxcfs</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span>Haute disponibilité</a>
+      <a href="#s11" class="toc-item"><span class="toc-num">11</span>Migration et réplication</a>
+      <a href="#s12" class="toc-item"><span class="toc-num">12</span>Sauvegarde et restauration</a>
+      <a href="#s13" class="toc-item"><span class="toc-num">13</span>Pare-feu</a>
+      <a href="#s14" class="toc-item"><span class="toc-num">14</span>Utilisateurs et droits</a>
+      <a href="#s15" class="toc-item"><span class="toc-num">15</span>Ceph (hyperconvergé)</a>
+      <a href="#s16" class="toc-item"><span class="toc-num" style="background:#fef3cd;color:#996600">⚠</span>Pièges et aide-mémoire</a>
+      <a href="#s17" class="toc-item"><span class="toc-num">17</span>Plan de labo et Q/R</a>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div class="section" id="s1">
+    <div class="section-header"><span class="section-num">1</span><span class="section-title-text">Vue d'ensemble et architecture</span><span class="section-nb">Les bases</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Open source</span><span class="tag">Debian</span><span class="tag">KVM + LXC</span></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Qu'est-ce que Proxmox VE ?</h4><ul>
+          <li>Plateforme de virtualisation 100 % open source, basée sur <strong>Debian GNU/Linux</strong></li>
+          <li>Deux technologies : <strong>KVM</strong> (machines virtuelles) et <strong>LXC</strong> (conteneurs système)</li>
+          <li>Gestion centralisée en <strong>multi-maître</strong> : on peut administrer tout le cluster depuis n'importe quel nœud</li>
+          <li>Fonctions intégrées : sauvegarde, HA, SDN, pare-feu, Ceph, ZFS</li>
+        </ul></div>
+        <div class="concept-card"><h4>VM (KVM) vs conteneur (LXC)</h4><ul>
+          <li><strong>VM</strong> : matériel émulé, noyau et OS propres, n'importe quel OS (Windows, Linux, BSD…), isolation forte</li>
+          <li><strong>LXC</strong> : partage le noyau de l'hôte, démarrage rapide, peu de ressources, <strong>Linux uniquement</strong></li>
+          <li>Isolation d'un conteneur plus faible : surface d'attaque = noyau de l'hôte</li>
+          <li>Règle pratique : VM pour Windows/isolation, LXC pour services Linux légers</li>
+        </ul></div>
+        <div class="concept-card"><h4>Les démons à connaître</h4><ul>
+          <li><code>pveproxy</code> : proxy API / interface web (port 8006)</li>
+          <li><code>pvedaemon</code> : démon API (actions privilégiées)</li>
+          <li><code>pvestatd</code> : collecte des statuts et métriques</li>
+          <li><code>pvescheduler</code> : tâches planifiées (sauvegardes, réplications)</li>
+          <li><code>pve-cluster</code> (pmxcfs) + <code>corosync</code> : cluster</li>
+          <li><code>pve-firewall</code>, <code>pve-ha-crm</code> / <code>pve-ha-lrm</code></li>
+        </ul></div>
+        <div class="concept-card"><h4>pmxcfs en une phrase</h4><ul>
+          <li>Système de fichiers <strong>de configuration</strong> du cluster, monté sur <code>/etc/pve</code></li>
+          <li>Basé sur une base de données, <strong>répliqué en temps réel</strong> entre nœuds via corosync</li>
+          <li>Taille maximale <strong>128 Mio</strong>, tenu en RAM : on n'y met que de la config</li>
+          <li>Conséquence : modifier un fichier dans <code>/etc/pve</code> sur un nœud le modifie partout</li>
+        </ul></div>
+      </div>
+      <h3>Types de stockage supportés (vue rapide)</h3>
+      <p><strong>Réseau :</strong> NFS, CIFS, iSCSI, LVM sur iSCSI, Ceph RBD, CephFS, Proxmox Backup Server. <strong>Local :</strong> répertoire, LVM, LVM-thin, ZFS, Btrfs.</p>
+      <div class="tip"><strong>À retenir :</strong> Proxmox VE = Debian + noyau Proxmox + outils (<code>qm</code>, <code>pct</code>, <code>pvesm</code>, <code>pvecm</code>…) + interface web. Tout ce que fait l'interface passe par l'API REST, donc par <code>pvesh</code> aussi.</div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section" id="s2">
+    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">Installation</span><span class="section-nb">ISO, disques, post-install</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">ISO</span><span class="tag">ZFS</span><span class="tag">LVM</span></div>
+      <h3>Prérequis matériels</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Élément</th><th>Minimum (évaluation)</th><th>Recommandé</th></tr></thead>
+        <tbody>
+          <tr><td>CPU</td><td>x86-64 (Intel 64 / AMD64) avec Intel VT ou AMD-V</td><td>Idem + IOMMU (VT-d / AMD-Vi) pour le passthrough PCI(e)</td></tr>
+          <tr><td>RAM</td><td>1 Go + mémoire des invités</td><td>2 Go pour l'OS et les services + invités ; ~1 Go par To de stockage pour ZFS/Ceph</td></tr>
+          <tr><td>Stockage</td><td>1 disque</td><td>SSD rapides et redondants, de préférence avec protection contre les coupures (PLP)</td></tr>
+          <tr><td>Réseau</td><td>1 carte réseau</td><td>Plusieurs NIC Gbit redondantes, selon stockage et cluster</td></tr>
+        </tbody>
+      </table></div>
+      <div class="warn"><strong>Attention :</strong> ZFS et Ceph ne sont <strong>pas compatibles avec un contrôleur RAID matériel</strong> : il leur faut un accès direct aux disques (mode HBA / IT).</div>
+      <h3>Méthodes et systèmes de fichiers</h3>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Méthodes</h4><ul>
+          <li><strong>ISO</strong> sur clé USB (recommandé) ou CD/DVD</li>
+          <li><strong>Sur un Debian existant</strong> (ajout des dépôts Proxmox)</li>
+          <li><strong>Installation automatisée</strong> : fichier de réponses + ISO préparée</li>
+        </ul></div>
+        <div class="concept-card"><h4>Système de fichiers de l'OS</h4><ul>
+          <li><strong>ext4</strong> (défaut) ou <strong>XFS</strong> sur LVM</li>
+          <li><strong>ZFS</strong> : RAID logiciel (stripe, miroir, RAIDZ…), disques à choisir dans les options</li>
+          <li><strong>Btrfs</strong> : aperçu technologique</li>
+        </ul></div>
+        <div class="concept-card"><h4>Disposition LVM par défaut</h4><ul>
+          <li>Groupe de volumes <code>pve</code></li>
+          <li>LV <code>root</code> et <code>swap</code> + pool thin <code>data</code></li>
+          <li>Stockages créés : <code>local</code> (répertoire) et <code>local-lvm</code> (LVM-thin)</li>
+        </ul></div>
+        <div class="concept-card"><h4>Options de l'installateur LVM</h4><ul>
+          <li><code>hdsize</code> : taille de disque utilisée</li>
+          <li><code>swapsize</code> : taille du swap (0 = pas de swap)</li>
+          <li><code>maxroot</code> : taille max du volume root</li>
+          <li><code>minfree</code> : espace libre laissé dans le VG</li>
+          <li><code>maxvz</code> : taille max du volume de données</li>
+        </ul></div>
+      </div>
+      <h3>Après l'installation</h3>
+      <ul>
+        <li>Ouvrir <code>https://adresse-ip:8006</code>, se connecter en <strong>root</strong> (realm <strong>PAM</strong>) avec le mot de passe choisi</li>
+        <li>Soit charger une <strong>clé d'abonnement</strong> (dépôt Enterprise), soit configurer les dépôts publics <em>no-subscription</em></li>
+        <li>Vérifier IP, nom d'hôte, fuseau horaire et pare-feu</li>
+      </ul>
+      <div class="tip"><strong>Nom d'hôte :</strong> le changer après la création d'un cluster est délicat. Choisis un FQDN propre dès l'installation.</div>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">Administration de l'hôte</span><span class="section-nb">Dépôts, mises à jour, services</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">apt</span><span class="tag">Dépôts</span><span class="tag">ZFS</span></div>
+      <h3>Les trois dépôts de paquets</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Dépôt</th><th>Composant</th><th>Usage</th></tr></thead>
+        <tbody>
+          <tr><td>Enterprise</td><td><code>pve-enterprise</code></td><td>Production, <strong>nécessite un abonnement</strong> ; paquets les plus testés</td></tr>
+          <tr><td>No-subscription</td><td><code>pve-no-subscription</code></td><td>Gratuit, mises à jour moins testées (labo, usage perso)</td></tr>
+          <tr><td>Test</td><td><code>pve-test</code></td><td>Pour tester les nouveautés, jamais en production</td></tr>
+        </tbody>
+      </table></div>
+      <p>Depuis Debian 13, les dépôts sont décrits au format <code>.sources</code> dans <code>/etc/apt/sources.list.d/</code> (suite <code>trixie</code>).</p>
+      <div class="code-block"><code><span class="comment"># Mises à jour</span>
+apt update
+apt full-upgrade
+<span class="comment"># ou l'alias fourni par Proxmox</span>
+pveupgrade</code></div>
+      <div class="warn"><strong>Piège :</strong> sans abonnement, le dépôt Enterprise renvoie une erreur 401 à <code>apt update</code> : désactive-le et active <code>pve-no-subscription</code>. Pas de <code>apt upgrade</code> seul : on utilise <code>full-upgrade</code> (ou <code>dist-upgrade</code>) car le noyau et les dépendances changent.</div>
+      <h3>Autres tâches de l'hôte</h3>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Temps</h4><ul><li><strong>Synchronisation obligatoire</strong> (chrony ou systemd-timesyncd)</li><li>Une dérive casse corosync et les certificats</li></ul></div>
+        <div class="concept-card"><h4>Certificats</h4><ul><li><code>pvenode cert info</code> / <code>set</code> pour gérer le certificat de l'interface</li><li>ACME / Let's Encrypt intégré</li></ul></div>
+        <div class="concept-card"><h4>Chargeur de démarrage</h4><ul><li><code>proxmox-boot-tool</code> gère les ESP (notamment ZFS/UEFI)</li><li>Noyau Proxmox : choisir/épingler une version au démarrage</li></ul></div>
+        <div class="concept-card"><h4>Santé des disques</h4><ul><li><code>smartctl</code> (paquet smartmontools)</li><li>État SMART visible dans <em>Nœud → Disques</em></li></ul></div>
+        <div class="concept-card"><h4>ZFS sur Linux</h4><ul><li><code>zpool status</code>, <code>zpool scrub</code> (vérification d'intégrité)</li><li>Limiter le cache ARC : <code>zfs_arc_max</code></li><li>RAID ZFS : stripe, miroir, RAIDZ-1/2/3, RAID10</li></ul></div>
+        <div class="concept-card"><h4>Métriques externes</h4><ul><li>Envoi vers <strong>Graphite</strong>, <strong>InfluxDB</strong> ou OpenTelemetry</li><li>Config : <em>Datacenter → Metric Server</em></li></ul></div>
+        <div class="concept-card"><h4>KSM</h4><ul><li><em>Kernel Samepage Merging</em> : fusionne les pages mémoire identiques entre VM</li><li>Gain de RAM, mais coût CPU et risque de sécurité</li></ul></div>
+        <div class="concept-card"><h4>Notifications</h4><ul><li>Système de <strong>cibles</strong> (targets) et de <strong>règles</strong> (matchers)</li><li>Remplace l'option <code>mailto</code> des sauvegardes</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section" id="s4">
+    <div class="section-header"><span class="section-num">4</span><span class="section-title-text">Interface web et ligne de commande</span><span class="section-nb">GUI, qm, pct, pvesh…</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Port 8006</span><span class="tag">API REST</span></div>
+      <p>L'interface web (HTTPS, <strong>port 8006</strong>) est organisée en arbre : <strong>Datacenter</strong> (niveau cluster) → <strong>Nœud</strong> → <strong>invités et stockages</strong>. Chaque niveau a ses propres onglets (Résumé, Options, Firewall, Permissions…).</p>
+      <h3>Les outils en ligne de commande</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Commande</th><th>Rôle</th><th>Exemple</th></tr></thead>
+        <tbody>
+          <tr><td><code>qm</code></td><td>Machines virtuelles QEMU/KVM</td><td><code>qm list</code>, <code>qm start 100</code></td></tr>
+          <tr><td><code>pct</code></td><td>Conteneurs LXC</td><td><code>pct enter 101</code></td></tr>
+          <tr><td><code>pvesm</code></td><td>Stockages</td><td><code>pvesm status</code></td></tr>
+          <tr><td><code>pvecm</code></td><td>Cluster</td><td><code>pvecm status</code></td></tr>
+          <tr><td><code>pveum</code></td><td>Utilisateurs, rôles, ACL</td><td><code>pveum acl modify …</code></td></tr>
+          <tr><td><code>pveam</code></td><td>Modèles de conteneurs</td><td><code>pveam update</code></td></tr>
+          <tr><td><code>vzdump</code> / <code>qmrestore</code></td><td>Sauvegarde / restauration VM</td><td><code>vzdump 100 --storage nas</code></td></tr>
+          <tr><td><code>pvesr</code></td><td>Réplication de stockage</td><td><code>pvesr status</code></td></tr>
+          <tr><td><code>ha-manager</code></td><td>Haute disponibilité</td><td><code>ha-manager status</code></td></tr>
+          <tr><td><code>pveceph</code></td><td>Ceph hyperconvergé</td><td><code>pveceph osd create /dev/sdb</code></td></tr>
+          <tr><td><code>pvenode</code></td><td>Gestion du nœud (certificats, tâches)</td><td><code>pvenode task list</code></td></tr>
+          <tr><td><code>pvesh</code></td><td>Shell pour l'API REST</td><td><code>pvesh get /nodes</code></td></tr>
+          <tr><td><code>pveperf</code></td><td>Benchmark rapide du nœud</td><td><code>pveperf</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="tip"><strong>Astuce :</strong> <code>pvesh get /cluster/resources</code> donne en une commande l'état de tout le cluster. L'<em>API Viewer</em> de la doc liste tous les appels disponibles.</div>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div class="section" id="s5">
+    <div class="section-header"><span class="section-num">5</span><span class="section-title-text">Réseau et SDN</span><span class="section-nb">Bridges, bonds, VLAN</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">vmbr0</span><span class="tag">/etc/network/interfaces</span><span class="tag">SDN</span></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Principe</h4><ul>
+          <li>Configuration dans <code>/etc/network/interfaces</code> (modifiable aussi via l'interface)</li>
+          <li>Les invités se branchent sur un <strong>pont Linux</strong> (<code>vmbr0</code>) relié à la carte physique</li>
+          <li>Appliquer sans redémarrer : <code>ifreload -a</code></li>
+        </ul></div>
+        <div class="concept-card"><h4>Conventions de noms</h4><ul>
+          <li>Cartes : <code>en*</code> ou <code>eth[N]</code></li>
+          <li>Ponts : <code>vmbr[N]</code></li>
+          <li>Agrégats : <code>bond[N]</code></li>
+          <li>VLAN : numéro après un point : <code>eno1.50</code>, <code>bond1.30</code></li>
+        </ul></div>
+        <div class="concept-card"><h4>Modes de bonding</h4><ul>
+          <li><code>active-backup</code> : basculement simple, aucun réglage côté switch</li>
+          <li><code>802.3ad</code> (LACP) : agrégation, <strong>switch compatible requis</strong></li>
+          <li><code>balance-rr</code>, <code>balance-xor</code>, <code>broadcast</code>, <code>balance-tlb</code>, <code>balance-alb</code></li>
+        </ul></div>
+        <div class="concept-card"><h4>VLAN</h4><ul>
+          <li>Standard IEEE 802.1q</li>
+          <li>Pont « VLAN aware » + étiquette VLAN sur la carte virtuelle de l'invité</li>
+          <li>Permet plusieurs réseaux isolés sur un seul pont</li>
+        </ul></div>
+      </div>
+      <h3>Exemple de pont (/etc/network/interfaces)</h3>
+      <div class="code-block"><code>auto vmbr0
+iface vmbr0 inet static
+    address 192.168.1.10/24
+    gateway 192.168.1.1
+    bridge-ports eno1
+    bridge-stp off
+    bridge-fd 0</code></div>
+      <h3>SDN (Software-Defined Network)</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Type de zone</th><th>Principe</th><th>À retenir</th></tr></thead>
+        <tbody>
+          <tr><td>Simple</td><td>Pont isolé par nœud</td><td>Pas de lien entre nœuds ; souvent avec NAT/DHCP</td></tr>
+          <tr><td>VLAN</td><td>Utilise les VLAN d'un pont existant</td><td>Demande que le switch laisse passer les VLAN</td></tr>
+          <tr><td>QinQ</td><td>Double étiquetage 802.1ad</td><td>Pour les fournisseurs / empilement de VLAN</td></tr>
+          <tr><td>VXLAN</td><td>Tunnels L2 sur réseau L3 (UDP)</td><td>Relie des nœuds sans VLAN commun</td></tr>
+          <tr><td>EVPN</td><td>VXLAN + BGP (routage)</td><td>Le plus complexe ; utilise FRR</td></tr>
+        </tbody>
+      </table></div>
+      <p>Vocabulaire SDN : <strong>zone</strong> (type de réseau) → <strong>VNet</strong> (réseau virtuel visible par les invités) → <strong>sous-réseau</strong>. S'ajoutent <strong>contrôleurs</strong>, <strong>IPAM</strong> et <strong>DHCP</strong>. La configuration est dans <code>/etc/pve/sdn</code> et doit être <strong>appliquée</strong> depuis le panneau SDN pour prendre effet.</p>
+      <div class="warn"><strong>Piège :</strong> une mauvaise modification du réseau de gestion peut te couper de l'interface. Garde un accès console (iDRAC/IPMI, écran) avant de toucher à <code>vmbr0</code>.</div>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="section" id="s6">
+    <div class="section-header"><span class="section-num">6</span><span class="section-title-text">Stockage</span><span class="section-nb">pvesm, storage.cfg</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">storage.cfg</span><span class="tag">Partagé vs local</span><span class="tag">Types de contenu</span></div>
+      <p>La configuration des stockages est dans <code>/etc/pve/storage.cfg</code> (donc partagée par tout le cluster). Un volume s'identifie par <code>STOCKAGE:nom</code>, par exemple <code>local:230/disk.raw</code>. Deux stockages par défaut : <code>local</code> (répertoire) et <code>local-lvm</code> (LVM-thin).</p>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Type (id)</th><th>Snapshots</th><th>Partagé</th><th>Contenu</th></tr></thead>
+        <tbody>
+          <tr><td>Répertoire (<code>dir</code>)</td><td>Oui (qcow2)</td><td>Non</td><td>images, rootdir, vztmpl, iso, backup, snippets, import</td></tr>
+          <tr><td>LVM (<code>lvm</code>)</td><td>Limité : chaînes de volumes (depuis PVE 9, VM)</td><td>Non (oui sur LUN iSCSI/FC/SAS)</td><td>images, rootdir</td></tr>
+          <tr><td>LVM-thin (<code>lvmthin</code>)</td><td>Oui</td><td>Non</td><td>images, rootdir</td></tr>
+          <tr><td>ZFS (<code>zfspool</code>)</td><td>Oui</td><td>Non</td><td>images, rootdir</td></tr>
+          <tr><td>Btrfs (<code>btrfs</code>)</td><td>Oui</td><td>Non</td><td>comme dir</td></tr>
+          <tr><td>NFS (<code>nfs</code>)</td><td>Oui (qcow2)</td><td><strong>Oui</strong></td><td>images, rootdir, vztmpl, iso, backup, snippets, import</td></tr>
+          <tr><td>CIFS/SMB (<code>cifs</code>)</td><td>Oui (qcow2)</td><td><strong>Oui</strong></td><td>comme NFS</td></tr>
+          <tr><td>iSCSI (<code>iscsi</code>)</td><td>Via LVM par-dessus</td><td><strong>Oui</strong></td><td>images (LUN brutes)</td></tr>
+          <tr><td>Ceph RBD (<code>rbd</code>)</td><td>Oui</td><td><strong>Oui</strong></td><td>images, rootdir</td></tr>
+          <tr><td>CephFS (<code>cephfs</code>)</td><td>Oui</td><td><strong>Oui</strong></td><td>vztmpl, iso, backup, snippets</td></tr>
+          <tr><td>ZFS sur iSCSI (<code>zfs</code>)</td><td>Oui</td><td><strong>Oui</strong></td><td>images</td></tr>
+          <tr><td>Proxmox Backup Server (<code>pbs</code>)</td><td>n/a</td><td><strong>Oui</strong></td><td>backup uniquement</td></tr>
+        </tbody>
+      </table></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Types de contenu</h4><ul>
+          <li><code>images</code> : disques de VM</li>
+          <li><code>rootdir</code> : disques de conteneurs</li>
+          <li><code>vztmpl</code> : modèles de conteneurs</li>
+          <li><code>iso</code> : images d'installation</li>
+          <li><code>backup</code> : sauvegardes vzdump</li>
+          <li><code>snippets</code> : fichiers (cloud-init, hookscripts)</li>
+        </ul></div>
+        <div class="concept-card"><h4>Pourquoi du stockage partagé ?</h4><ul>
+          <li>Migration à chaud <strong>sans copier les disques</strong></li>
+          <li>Redémarrage rapide des invités HA sur un autre nœud</li>
+          <li>Alternative sans stockage partagé : <strong>réplication ZFS</strong></li>
+        </ul></div>
+        <div class="concept-card"><h4>Thin provisioning</h4><ul>
+          <li>Disponible partout où les snapshots existent : LVM-thin, ZFS, qcow2, Ceph</li>
+          <li>On alloue plus que l'espace réel : <strong>surveiller le remplissage</strong>, un pool thin plein fige les VM</li>
+        </ul></div>
+      </div>
+      <div class="code-block"><code>pvesm status                          <span class="comment"># état des stockages</span>
+pvesm list local                      <span class="comment"># contenu d'un stockage</span>
+pvesm add nfs nas --server 10.0.0.5 --export /data --content backup,iso
+pvesm set nas --disable 1             <span class="comment"># désactiver sans supprimer</span>
+pvesm path local:iso/debian.iso       <span class="comment"># chemin réel d'un volume</span></code></div>
+      <div class="tip"><strong>LVM vs LVM-thin :</strong> les snapshots LVM classiques dégradent fortement les écritures du groupe de volumes ; depuis PVE 9 existent des « snapshots en chaîne de volumes » pour les VM. Le LVM-thin gère les snapshots efficacement mais n'est <strong>pas partagé</strong> : c'est pourquoi on y met les disques locaux (<code>local-lvm</code>).</div><div class="info"><strong>Fichiers qcow2 :</strong> sur les stockages à fichiers (répertoire, NFS, CIFS), les snapshots passent par le format qcow2. Créer ou supprimer un snapshot interne peut bloquer une VM en marche, très lentement sur NFS pour de gros disques : préfère le faire VM éteinte.</div>
+    </div>
+  </div>
+
+  <!-- S7 -->
+  <div class="section" id="s7">
+    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Machines virtuelles (QEMU/KVM)</span><span class="section-nb">qm, bonnes pratiques</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">VirtIO</span><span class="tag">q35 + OVMF</span><span class="tag">cloud-init</span></div>
+      <p>Chaque VM a un <strong>VMID unique sur tout le cluster</strong> (≥ 100) et un fichier <code>/etc/pve/qemu-server/&lt;VMID&gt;.conf</code>.</p>
+      <h3>Réglages recommandés à la création</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Réglage</th><th>Choix courant</th><th>Pourquoi</th></tr></thead>
+        <tbody>
+          <tr><td>Type d'OS</td><td>Le bon (Windows / Linux)</td><td>Ajuste horloge (Windows = heure locale) et optimisations</td></tr>
+          <tr><td>Machine</td><td><code>q35</code></td><td>Bus PCIe virtuel, nécessaire au passthrough PCIe (défaut : i440fx)</td></tr>
+          <tr><td>BIOS</td><td><code>OVMF</code> (UEFI)</td><td>Requis pour Secure Boot ; défaut SeaBIOS</td></tr>
+          <tr><td>TPM</td><td><code>tpmstate0</code>, version 2.0</td><td>Exigé par Windows 11</td></tr>
+          <tr><td>Contrôleur disque</td><td><strong>VirtIO SCSI single</strong> + IO Thread</td><td>Meilleures performances</td></tr>
+          <tr><td>Carte réseau</td><td><strong>VirtIO</strong></td><td>Performances maximales (E1000 = défaut compatible)</td></tr>
+          <tr><td>Type de CPU</td><td><code>host</code> ou <code>x86-64-v2-AES</code></td><td><code>host</code> = performances ; type générique = migration entre CPU différents</td></tr>
+          <tr><td>Cache disque</td><td><code>none</code> (défaut)</td><td>Autres : writeback, writethrough, directsync, unsafe</td></tr>
+          <tr><td>Disque</td><td><code>discard=on</code>, <code>ssd=1</code></td><td>Libérer l'espace côté stockage / émuler un SSD</td></tr>
+          <tr><td>Agent invité</td><td><code>agent=1</code> + <code>qemu-guest-agent</code> dans l'invité</td><td>Arrêt propre, IP visible, gel du FS pour sauvegarde</td></tr>
+        </tbody>
+      </table></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>CPU et mémoire</h4><ul>
+          <li>vCPU total = <strong>sockets × cœurs</strong></li>
+          <li><strong>NUMA</strong> : à activer sur gros hôtes multi-sockets</li>
+          <li><strong>Ballooning</strong> : mémoire ajustable (cible <code>balloon</code>) ; fixer min = max pour le désactiver</li>
+          <li><strong>Hotplug</strong> : network, disk, cpu, memory, usb</li>
+        </ul></div>
+        <div class="concept-card"><h4>Modèles et clones</h4><ul>
+          <li><code>qm template &lt;vmid&gt;</code> : convertit en modèle (non démarrable)</li>
+          <li><strong>Clone complet</strong> : copie indépendante</li>
+          <li><strong>Clone lié</strong> : s'appuie sur le modèle (rapide, économe), le modèle ne peut plus être supprimé</li>
+        </ul></div>
+        <div class="concept-card"><h4>Cloud-init</h4><ul>
+          <li>Disque spécial : <code>qm set 9000 --ide2 local-lvm:cloudinit</code></li>
+          <li>Paramètres : <code>ciuser</code>, <code>cipassword</code>, <code>sshkeys</code>, <code>ipconfig0</code></li>
+          <li>Idéal pour industrialiser : modèle + clone + cloud-init</li>
+        </ul></div>
+        <div class="concept-card"><h4>Passthrough PCI(e)</h4><ul>
+          <li>Donne un périphérique physique (GPU, carte réseau) à une VM</li>
+          <li>Prérequis : <strong>IOMMU</strong> activée (VT-d / AMD-Vi), machine <code>q35</code>, OVMF</li>
+          <li><code>qm set 100 -hostpci0 02:00,pcie=on</code></li>
+          <li>La VM ne peut plus être migrée à chaud</li>
+        </ul></div>
+      </div>
+      <div class="code-block"><code>qm create 100 --name web --memory 4096 --cores 2 --net0 virtio,bridge=vmbr0
+qm start 100 ; qm shutdown 100 ; qm stop 100   <span class="comment"># shutdown = propre, stop = coupure brutale</span>
+qm clone 9000 101 --name web2 --full
+qm snapshot 100 avant-maj ; qm rollback 100 avant-maj
+qm resize 100 scsi0 +10G                       <span class="comment"># agrandir un disque (jamais réduire)</span>
+qm move-disk 100 scsi0 local-lvm               <span class="comment"># migrer un disque vers un autre stockage</span>
+qm config 100                                  <span class="comment"># afficher la configuration</span>
+qm migrate 100 pve2 --online</code></div>
+      <div class="tip"><strong>Ordre de démarrage :</strong> <code>onboot: 1</code> démarre la VM avec le nœud ; <code>startup: order=1,up=30,down=60</code> règle l'ordre et les délais.</div>
+      <div class="warn"><strong>Snapshots :</strong> ils sont pratiques avant une mise à jour mais ne remplacent <strong>pas</strong> une sauvegarde (même stockage que le disque). Un snapshot « avec RAM » capture aussi l'état en mémoire.</div>
+    </div>
+  </div>
+
+  <!-- S8 -->
+  <div class="section" id="s8">
+    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Conteneurs LXC</span><span class="section-nb">pct, pveam</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">LXC</span><span class="tag">Modèles</span><span class="tag">Non privilégié</span></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Principe</h4><ul>
+          <li>Un conteneur utilise le <strong>noyau de l'hôte</strong> : démarrage en secondes, très peu de surcharge</li>
+          <li>Fichier : <code>/etc/pve/lxc/&lt;CTID&gt;.conf</code></li>
+          <li>Seulement des distributions Linux</li>
+          <li>Conteneurs « système » (le cas courant) ; conteneurs « application » OCI en aperçu technologique</li>
+        </ul></div>
+        <div class="concept-card"><h4>Privilégié vs non privilégié</h4><ul>
+          <li><strong>Non privilégié</strong> (défaut) : root du conteneur = utilisateur sans droits sur l'hôte (<em>user namespaces</em>)</li>
+          <li><strong>Privilégié</strong> : considéré peu sûr ; seulement en environnement de confiance</li>
+          <li>Préférer toujours le non privilégié</li>
+        </ul></div>
+        <div class="concept-card"><h4>Fonctionnalités (features)</h4><ul>
+          <li><code>nesting</code> : conteneurs imbriqués, requis par systemd</li>
+          <li><code>keyctl</code> : appel système nécessaire pour <strong>Docker</strong> dans un conteneur non privilégié</li>
+          <li><code>fuse</code> : systèmes de fichiers FUSE</li>
+        </ul></div>
+        <div class="concept-card"><h4>Points de montage</h4><ul>
+          <li><code>rootfs</code> + <code>mp0</code> à <code>mp255</code></li>
+          <li><strong>Sur stockage</strong> : géré par Proxmox (snapshots, redimensionnement)</li>
+          <li><strong>Bind mount</strong> : dossier de l'hôte, hors stockage (pas de snapshot, soucis de droits UID en non privilégié)</li>
+          <li>Ne jamais monter <code>/</code>, <code>/etc</code> ou <code>/var</code> de l'hôte</li>
+        </ul></div>
+      </div>
+      <div class="code-block"><code>pveam update                                   <span class="comment"># rafraîchir la liste des modèles</span>
+pveam available --section system
+pveam download local &lt;modèle&gt;.tar.zst           <span class="comment"># nom exact affiché par pveam available</span>
+pct create 200 local:vztmpl/&lt;modèle&gt;.tar.zst \
+    --hostname ct1 --memory 512 --cores 1 --unprivileged 1 \
+    --net0 name=eth0,bridge=vmbr0,ip=dhcp --rootfs local-lvm:8
+pct start 200 ; pct enter 200 ; pct console 200
+pct shutdown 200 ; pct stop 200
+pct migrate 200 pve2 --restart                 <span class="comment"># conteneur : migration avec redémarrage</span></code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Limite</th><th>Option</th><th>Effet</th></tr></thead>
+        <tbody>
+          <tr><td>Cœurs</td><td><code>cores</code></td><td>Nombre de CPU visibles (cpuset)</td></tr>
+          <tr><td>Plafond CPU</td><td><code>cpulimit</code></td><td>Limite le temps CPU (ex. 0.5 = demi-cœur)</td></tr>
+          <tr><td>Poids CPU</td><td><code>cpuunits</code></td><td>Priorité relative entre conteneurs</td></tr>
+          <tr><td>Mémoire / swap</td><td><code>memory</code>, <code>swap</code></td><td>Plafonds de RAM et de swap</td></tr>
+        </tbody>
+      </table></div>
+      <div class="warn"><strong>Piège :</strong> un conteneur <strong>ne se migre pas à chaud</strong> : la migration redémarre le conteneur. Et les VM n'ont pas ce problème grâce à la migration live QEMU.</div>
+    </div>
+  </div>
+
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Cluster et pmxcfs</span><span class="section-nb">pvecm, corosync, quorum</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Corosync</span><span class="tag">Quorum</span><span class="tag">QDevice</span></div>
+      <h3>Prérequis du cluster</h3>
+      <ul>
+        <li>Les nœuds se joignent en <strong>UDP 5405-5412</strong> (corosync) et par <strong>SSH TCP 22</strong></li>
+        <li><strong>Heure synchronisée</strong>, même version de Proxmox VE sur tous les nœuds</li>
+        <li>Réseau corosync à <strong>faible latence</strong>, idéalement dédié ; corosync accepte jusqu'à <strong>8 liens</strong> (redondance)</li>
+        <li>Pour la HA : <strong>au moins 3 nœuds</strong></li>
+        <li>Un nœud qui rejoint <strong>ne doit contenir aucun invité</strong> (conflit d'ID) et hérite de la configuration des stockages du cluster</li>
+      </ul>
+      <div class="code-block"><code>pvecm create MONCLUSTER --link0 10.10.10.1     <span class="comment"># sur le premier nœud</span>
+pvecm add 10.10.10.1                           <span class="comment"># sur chaque nœud qui rejoint</span>
+pvecm status ; pvecm nodes                     <span class="comment"># état du quorum, liste des nœuds</span>
+pvecm delnode ancien-noeud                     <span class="comment"># retirer un nœud (éteint, hors cluster)</span>
+pvecm qdevice setup 10.0.0.9                   <span class="comment"># ajouter un arbitre externe</span>
+pvecm expected 1                               <span class="comment"># DANGER : forcer le quorum à 1 vote</span></code></div>
+      <h3>Le quorum</h3>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Définition</h4><ul>
+          <li>Nombre minimal de votes pour qu'une opération soit autorisée : la <strong>majorité</strong> (N/2 + 1)</li>
+          <li>Sans quorum, le cluster passe en <strong>lecture seule</strong> : plus de démarrage d'invité ni de changement de config</li>
+        </ul></div>
+        <div class="concept-card"><h4>Cluster à 2 nœuds</h4><ul>
+          <li>Perdre un nœud = perdre la majorité → blocage</li>
+          <li>Solution : un <strong>QDevice</strong> (troisième voix sur un petit serveur ou une VM externe)</li>
+          <li>Pour la HA, viser 3 vrais nœuds</li>
+        </ul></div>
+        <div class="concept-card warn"><h4>pvecm expected 1</h4><ul>
+          <li>Débloque un nœud isolé en abaissant le seuil de quorum</li>
+          <li>À n'utiliser qu'en dépannage, <strong>jamais</strong> avec deux moitiés du cluster actives : risque de <em>split-brain</em></li>
+        </ul></div>
+        <div class="concept-card"><h4>Fichiers utiles</h4><ul>
+          <li><code>/etc/pve/corosync.conf</code> (copie cluster)</li>
+          <li><code>/etc/corosync/corosync.conf</code> (copie locale)</li>
+          <li><code>/etc/pve</code> = pmxcfs, <strong>en lecture seule sans quorum</strong></li>
+        </ul></div>
+      </div>
+      <div class="warn"><strong>Piège :</strong> un nœud retiré avec <code>pvecm delnode</code> ne doit <strong>jamais</strong> revenir tel quel sur le même réseau : il faut le réinstaller (ses ID et sa configuration entreraient en conflit).</div>
+    </div>
+  </div>
+
+  <!-- S10 -->
+  <div class="section" id="s10">
+    <div class="section-header"><span class="section-num">10</span><span class="section-title-text">Haute disponibilité (HA)</span><span class="section-nb">ha-manager, fencing</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">CRM / LRM</span><span class="tag">Watchdog</span><span class="tag">Règles d'affinité</span></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Prérequis</h4><ul>
+          <li><strong>3 nœuds au minimum</strong> pour un quorum fiable</li>
+          <li><strong>Stockage partagé</strong> (ou réplication) pour VM et conteneurs</li>
+          <li>Redondance matérielle partout, composants de qualité serveur</li>
+        </ul></div>
+        <div class="concept-card"><h4>Les deux démons</h4><ul>
+          <li><code>pve-ha-lrm</code> (<em>Local Resource Manager</em>) : pilote les services du nœud local</li>
+          <li><code>pve-ha-crm</code> (<em>Cluster Resource Manager</em>) : décisions globales, déplacements, fencing</li>
+        </ul></div>
+        <div class="concept-card"><h4>Fencing</h4><ul>
+          <li>Garantit qu'un nœud en panne n'exécute plus rien avant de relancer ses services ailleurs</li>
+          <li>Repose sur un <strong>watchdog</strong> : matériel si configuré (<code>/etc/default/pve-ha-manager</code>), sinon <code>softdog</code> logiciel</li>
+          <li>Un nœud sans quorum avec des services HA actifs <strong>redémarre après ~60 s</strong></li>
+          <li>Basculement typique : environ 2 minutes</li>
+        </ul></div>
+        <div class="concept-card"><h4>États d'une ressource</h4><ul>
+          <li><code>started</code> / <code>stopped</code> / <code>disabled</code> : états demandés</li>
+          <li><code>migrate</code>, <code>fence</code>, <code>recovery</code>, <code>freeze</code>, <code>error</code>, <code>ignored</code>…</li>
+          <li><code>error</code> : intervention manuelle (désactiver puis réactiver)</li>
+        </ul></div>
+      </div>
+      <div class="code-block"><code>ha-manager add vm:100 --state started
+ha-manager status
+ha-manager migrate vm:100 pve2        <span class="comment"># migration normale</span>
+ha-manager relocate vm:100 pve2       <span class="comment"># arrêt puis redémarrage ailleurs</span>
+ha-manager set vm:100 --state stopped
+ha-manager remove vm:100
+ha-manager crm-command node-maintenance enable pve1   <span class="comment"># vider un nœud pour maintenance</span></code></div>
+      <h3>Placement : groupes (avant 9.0) → règles (9.x)</h3>
+      <ul>
+        <li>Les <strong>groupes HA</strong> sont <strong>dépréciés</strong> et convertis en règles d'<strong>affinité de nœud</strong> depuis Proxmox VE 9.0</li>
+        <li><strong>Affinité de nœud</strong> : lie des ressources à des nœuds (positive/négative, stricte ou non, avec priorités)</li>
+        <li><strong>Affinité de ressources</strong> : positive = « rester ensemble sur le même nœud », négative = « rester séparées » (utile pour deux contrôleurs redondants)</li>
+        <li>Paramètres : <code>max_restart</code> (essais de redémarrage sur le nœud, défaut 1) et <code>max_relocate</code> (essais de déplacement, défaut 1)</li>
+        <li><strong>CRS</strong> (<em>Cluster Resource Scheduling</em>) choisit le nœud de reprise : mode de base, charge statique ou dynamique</li>
+      </ul>
+      <div class="info"><strong>Fichiers :</strong> <code>/etc/pve/ha/resources.cfg</code>, <code>rules.cfg</code> (et <code>groups.cfg</code> historique), <code>manager_status</code>.</div>
+      <div class="warn"><strong>HA ≠ sauvegarde.</strong> La HA relance le service sur un autre nœud ; elle ne protège pas contre une suppression, un ransomware ou une corruption du stockage partagé.</div>
+    </div>
+  </div>
+
+  <!-- S11 -->
+  <div class="section" id="s11">
+    <div class="section-header"><span class="section-num">11</span><span class="section-title-text">Migration et réplication</span><span class="section-nb">qm migrate, pvesr</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Live migration</span><span class="tag">ZFS</span><span class="tag">pvesr</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Type</th><th>Principe</th><th>Condition / remarque</th></tr></thead>
+        <tbody>
+          <tr><td>Migration à chaud (VM)</td><td>La VM tourne pendant le transfert de la mémoire</td><td><code>qm migrate 100 pve2 --online</code> ; stockage partagé, sinon copie des disques locaux (<code>--with-local-disks</code>)</td></tr>
+          <tr><td>Migration à froid</td><td>Arrêt, déplacement, redémarrage</td><td>Seule option pour les <strong>conteneurs</strong> (redémarrage)</td></tr>
+          <tr><td>Migration de stockage</td><td>Déplace un disque d'un stockage à un autre</td><td><code>qm move-disk</code> ; la VM peut rester en marche</td></tr>
+        </tbody>
+      </table></div>
+      <p><strong>Réseau de migration :</strong> par défaut le trafic passe par le réseau du cluster en <code>secure</code> (SSH, chiffré). Dans <code>/etc/pve/datacenter.cfg</code> : <code>migration: secure,network=10.1.2.0/24</code> ou <code>type=insecure</code> (plus rapide, non chiffré, réseau de confiance seulement). Ports de migration : TCP <strong>60000-60050</strong>.</p>
+      <h3>Réplication de stockage (pvesr)</h3>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Principe</h4><ul>
+          <li>Copie périodique des disques d'un invité vers un autre nœud, par <strong>snapshots ZFS</strong> incrémentaux</li>
+          <li><strong>ZFS local uniquement</strong>, même nom de pool sur la source et la cible</li>
+          <li>Planification en calendrier systemd ; intervalle de <strong>1 minute à 1 semaine</strong></li>
+        </ul></div>
+        <div class="concept-card"><h4>Intérêt</h4><ul>
+          <li>Migration rapide vers un nœud déjà répliqué (seules les différences sont envoyées)</li>
+          <li>HA possible <strong>sans stockage partagé</strong>, mais avec perte de données possible (jusqu'à la dernière réplication)</li>
+          <li>Un invité peut être répliqué vers plusieurs nœuds, pas deux fois vers le même</li>
+        </ul></div>
+        <div class="concept-card"><h4>Erreurs</h4><ul>
+          <li>En cas d'échec, le job passe en erreur et réessaie toutes les <strong>30 minutes</strong></li>
+          <li>Le journal de réplication donne la cause</li>
+        </ul></div>
+      </div>
+      <div class="code-block"><code>pvesr create-local-job 100-0 pve2 --schedule "*/15"   <span class="comment"># toutes les 15 minutes</span>
+pvesr status ; pvesr list</code></div>
+    </div>
+  </div>
+
+  <!-- S12 -->
+  <div class="section" id="s12">
+    <div class="section-header"><span class="section-num">12</span><span class="section-title-text">Sauvegarde et restauration</span><span class="section-nb">vzdump, PBS</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">vzdump</span><span class="tag">Proxmox Backup Server</span><span class="tag">Rétention</span></div>
+      <h3>Les trois modes de sauvegarde</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Mode</th><th>VM</th><th>Conteneur</th></tr></thead>
+        <tbody>
+          <tr><td><code>stop</code></td><td>Arrêt propre, sauvegarde « live » QEMU en tâche de fond, puis reprise : <strong>cohérence maximale</strong>, courte interruption</td><td>Conteneur arrêté pendant toute la sauvegarde : interruption potentiellement longue</td></tr>
+          <tr><td><code>suspend</code></td><td>Conservé pour compatibilité : suspend puis passe en snapshot. <strong>Préférer snapshot</strong></td><td>rsync vers un dossier temporaire, suspension brève, second rsync des changements ; demande de l'espace</td></tr>
+          <tr><td><code>snapshot</code></td><td><strong>Interruption quasi nulle</strong> ; si l'agent invité tourne, gel/dégel du système de fichiers (<code>fsfreeze</code>)</td><td>Snapshot du stockage : <strong>exige un stockage avec snapshots</strong></td></tr>
+        </tbody>
+      </table></div>
+      <div class="code-block"><code>vzdump 100 101 --storage nas --mode snapshot --compress zstd \
+       --prune-backups keep-daily=7,keep-weekly=4,keep-monthly=6
+qmrestore /mnt/pve/nas/dump/vzdump-qemu-100-….vma.zst 300   <span class="comment"># restaurer une VM sous un nouvel ID</span>
+pct restore 301 /mnt/pve/nas/dump/vzdump-lxc-200-….tar.zst  <span class="comment"># restaurer un conteneur</span></code></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Planification</h4><ul>
+          <li>Interface : <em>Datacenter → Backup</em></li>
+          <li>Jobs stockés dans <code>/etc/pve/jobs.cfg</code>, exécutés par <code>pvescheduler</code></li>
+          <li>Sélection par VM, par pool ou « tous »</li>
+        </ul></div>
+        <div class="concept-card"><h4>Rétention (prune)</h4><ul>
+          <li><code>keep-last</code>, <code>keep-hourly</code>, <code>keep-daily</code>, <code>keep-weekly</code>, <code>keep-monthly</code>, <code>keep-yearly</code>, <code>keep-all</code></li>
+          <li>Une sauvegarde <strong>protégée</strong> n'est jamais élaguée ni supprimée par l'interface</li>
+        </ul></div>
+        <div class="concept-card"><h4>Compression</h4><ul>
+          <li>Options : none, lzo, gzip, <strong>zstd</strong> (recommandé : rapide et efficace)</li>
+          <li>Limiter la bande passante : <code>bwlimit</code></li>
+        </ul></div>
+        <div class="concept-card"><h4>Disques inclus</h4><ul>
+          <li>Un disque avec <code>backup=0</code> n'est pas sauvegardé</li>
+          <li>Conteneurs : points de montage supplémentaires exclus par défaut sauf option Backup ; <strong>bind mounts jamais sauvegardés</strong></li>
+        </ul></div>
+      </div>
+      <h3>Proxmox Backup Server (PBS)</h3>
+      <ul>
+        <li>Produit séparé, ajouté comme stockage de type <code>pbs</code> (contenu : backup uniquement)</li>
+        <li>Stocke des <strong>blocs dédupliqués</strong> et incrémentaux : sauvegardes très rapides et peu volumineuses</li>
+        <li><strong>Chiffrement côté client</strong>, restauration de fichiers individuels, <em>live-restore</em></li>
+        <li><strong>Fleecing</strong> (VM) : tampon des anciennes données sur un stockage rapide pour ne pas ralentir l'invité pendant la sauvegarde</li>
+      </ul>
+      <div class="warn"><strong>Règle 3-2-1 :</strong> 3 copies, sur 2 supports différents, dont 1 hors site. Un stockage de sauvegarde monté sur le même hôte ne protège pas d'un incendie. Et <strong>teste une restauration</strong> : une sauvegarde jamais restaurée n'est qu'une hypothèse.</div>
+    </div>
+  </div>
+
+  <!-- S13 -->
+  <div class="section" id="s13">
+    <div class="section-header"><span class="section-num">13</span><span class="section-title-text">Pare-feu</span><span class="section-nb">Datacenter, nœud, invité</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">pve-firewall</span><span class="tag">Security groups</span><span class="tag">IPSet</span></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Niveaux</h4><ul>
+          <li><strong>Datacenter</strong> : règles globales, groupes de sécurité, IPSet, alias</li>
+          <li><strong>Nœud</strong> : protège l'hôte lui-même</li>
+          <li><strong>VM / conteneur</strong> : règles par invité (et par carte réseau)</li>
+          <li><strong>VNet</strong> (SDN)</li>
+        </ul></div>
+        <div class="concept-card"><h4>Fichiers</h4><ul>
+          <li><code>/etc/pve/firewall/cluster.fw</code></li>
+          <li><code>/etc/pve/nodes/&lt;nœud&gt;/host.fw</code></li>
+          <li><code>/etc/pve/firewall/&lt;vmid&gt;.fw</code></li>
+        </ul></div>
+        <div class="concept-card"><h4>Politique par défaut</h4><ul>
+          <li><strong>Entrée : DROP</strong>, sortie : ACCEPT (une fois le pare-feu activé)</li>
+          <li>Directions de règle : <code>IN</code>, <code>OUT</code>, <code>FORWARD</code></li>
+          <li>Actions : ACCEPT, DROP, REJECT</li>
+        </ul></div>
+        <div class="concept-card"><h4>Objets réutilisables</h4><ul>
+          <li><strong>Security group</strong> : ensemble de règles nommé, utilisable par toutes les VM</li>
+          <li><strong>IPSet</strong> : groupe d'adresses (<code>+nom</code>) ; standards : <code>management</code>, <code>blacklist</code></li>
+          <li><strong>Alias</strong> : nom pour une IP/réseau</li>
+          <li><strong>Macro</strong> : règles prédéfinies (SSH, HTTP…)</li>
+        </ul></div>
+      </div>
+      <div class="warn"><strong>À activer à deux endroits :</strong> le pare-feu doit être activé au niveau <strong>Datacenter</strong> ET au niveau de l'invité, <strong>et chaque carte réseau virtuelle</strong> a son propre drapeau « Firewall ». Un seul des trois oublié = aucune règle appliquée.</div>
+      <h3>Accès autorisés par défaut vers l'hôte (depuis le réseau de gestion)</h3>
+      <p>Interface web 8006, consoles VNC 5900-5999, proxy SPICE 3128, SSH 22, migration 60000-60050, corosync UDP 5405-5412. Journalisation via <code>pvefw-logger</code> ; commandes : <code>pve-firewall status</code>, <code>pve-firewall localnet</code>.</p>
+      <div class="info"><strong>nftables :</strong> le pare-feu historique est basé sur <strong>iptables</strong> (<code>pve-firewall</code>). Une implémentation <strong>nftables</strong> (<code>proxmox-firewall</code>) existe en aperçu technologique.</div>
+      <div class="tip"><strong>Avant d'activer :</strong> vérifie que ton IP de gestion fait partie du réseau local détecté (<code>pve-firewall localnet</code>), sinon tu risques de te bloquer l'accès à l'interface.</div>
+    </div>
+  </div>
+
+  <!-- S14 -->
+  <div class="section" id="s14">
+    <div class="section-header"><span class="section-num">14</span><span class="section-title-text">Utilisateurs, rôles et permissions</span><span class="section-nb">pveum, realms, ACL</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Realms</span><span class="tag">RBAC</span><span class="tag">2FA</span><span class="tag">API tokens</span></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Realms d'authentification</h4><ul>
+          <li><strong>PAM</strong> : comptes Linux de l'hôte (root@pam)</li>
+          <li><strong>PVE</strong> : comptes propres à Proxmox (mot de passe haché dans <code>/etc/pve/priv/shadow.cfg</code>)</li>
+          <li><strong>LDAP</strong> et <strong>Active Directory</strong> (avec synchronisation <code>pveum realm sync</code>)</li>
+          <li><strong>OpenID Connect</strong> (SSO)</li>
+          <li>Format d'identifiant : <code>utilisateur@realm</code></li>
+        </ul></div>
+        <div class="concept-card"><h4>Modèle de permissions</h4><ul>
+          <li>Une ACL = <strong>(chemin, sujet, rôle)</strong>, où le sujet est un utilisateur, un groupe ou un token</li>
+          <li>Un <strong>rôle</strong> = ensemble de <strong>privilèges</strong> (<code>VM.PowerMgmt</code>, <code>Datastore.Audit</code>…)</li>
+          <li><strong>Propagation</strong> activée par défaut : un droit sur <code>/vms</code> vaut pour toutes les VM</li>
+          <li>Chemins : <code>/</code>, <code>/vms/100</code>, <code>/storage/nas</code>, <code>/pool/dev</code>, <code>/access</code>…</li>
+        </ul></div>
+        <div class="concept-card"><h4>Rôles prédéfinis</h4><ul>
+          <li><strong>Administrator</strong> : tout</li>
+          <li><strong>PVEAdmin</strong> : tout sauf les réglages système</li>
+          <li><strong>PVEVMAdmin</strong> / <strong>PVEVMUser</strong> : administrer / utiliser des VM</li>
+          <li><strong>PVEAuditor</strong> : lecture seule</li>
+          <li><strong>PVEDatastoreAdmin/User</strong>, <strong>PVEPoolAdmin/User</strong>, <strong>PVESDNAdmin/User</strong>, <strong>PVEUserAdmin</strong>, <strong>PVETemplateUser</strong></li>
+          <li><strong>NoAccess</strong> : interdit explicitement</li>
+        </ul></div>
+        <div class="concept-card"><h4>Pools et groupes</h4><ul>
+          <li><strong>Groupe</strong> : regrouper des utilisateurs pour leur donner des droits d'un coup</li>
+          <li><strong>Pool</strong> : regrouper des VM et des stockages (droits par projet/équipe)</li>
+          <li>Donner les droits aux groupes plutôt qu'aux utilisateurs isolés</li>
+        </ul></div>
+        <div class="concept-card"><h4>Jetons d'API</h4><ul>
+          <li>Format <code>utilisateur@realm!nom-du-jeton</code></li>
+          <li><strong>Séparation de privilèges</strong> activée : le jeton n'a que les droits qu'on lui donne (au maximum ceux de l'utilisateur)</li>
+          <li>Idéal pour scripts et supervision (rôle PVEAuditor)</li>
+        </ul></div>
+        <div class="concept-card"><h4>Double authentification</h4><ul>
+          <li><strong>TOTP</strong>, <strong>WebAuthn</strong> (clé de sécurité), <strong>YubiKey OTP</strong></li>
+          <li>Codes de <strong>récupération</strong> à conserver</li>
+          <li>Déblocage : <code>pveum user tfa unlock joe@pve</code></li>
+        </ul></div>
+      </div>
+      <div class="code-block"><code>pveum user add joe@pve --comment "Joe, exploitation"
+pveum passwd joe@pve
+pveum group add admins
+pveum acl modify / --group admins --role Administrator
+pveum acl modify /vms --user joe@pve --role PVEVMAdmin
+pveum role add Sauvegardeur --privs "VM.Backup Datastore.AllocateSpace"
+pveum user token add joe@pve monitoring --privsep 1
+pveum acl modify /vms --token 'joe@pve!monitoring' --role PVEAuditor
+pveum user permissions joe@pve                  <span class="comment"># voir les droits effectifs</span></code></div>
+      <div class="warn"><strong>Bonne pratique :</strong> n'utilise <code>root@pam</code> que pour l'administration de l'hôte ; crée des comptes nominatifs avec double authentification pour le quotidien.</div>
+    </div>
+  </div>
+
+  <!-- S15 -->
+  <div class="section" id="s15">
+    <div class="section-header"><span class="section-num">15</span><span class="section-title-text">Ceph (hyperconvergé)</span><span class="section-nb">pveceph</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Stockage distribué</span><span class="tag">RBD</span><span class="tag">CephFS</span></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Composants</h4><ul>
+          <li><strong>MON</strong> (moniteur) : état et quorum de Ceph</li>
+          <li><strong>MGR</strong> (manager) : métriques, tableau de bord</li>
+          <li><strong>OSD</strong> : un démon par disque, stocke les données</li>
+          <li><strong>MDS</strong> : métadonnées, nécessaire pour <strong>CephFS</strong> uniquement</li>
+        </ul></div>
+        <div class="concept-card"><h4>RBD vs CephFS</h4><ul>
+          <li><strong>RBD</strong> : stockage bloc pour disques de VM et de conteneurs</li>
+          <li><strong>CephFS</strong> : système de fichiers partagé POSIX (ISO, modèles, sauvegardes)</li>
+        </ul></div>
+        <div class="concept-card"><h4>Dimensionnement</h4><ul>
+          <li>Au moins <strong>3 serveurs</strong> identiques, beaucoup d'OSD répartis</li>
+          <li>Réseau d'au moins <strong>10 Gbit/s</strong> ; idéalement réseaux séparés : trafic interne Ceph, trafic public, et corosync (1 Gbit dédié)</li>
+          <li>Environ 8 Gio de RAM par OSD pour de bonnes performances</li>
+          <li>SSD/NVMe et <strong>contrôleur HBA</strong>, pas de RAID matériel</li>
+        </ul></div>
+        <div class="concept-card"><h4>Réplication des pools</h4><ul>
+          <li>Défaut : <code>size 3</code> (trois copies) et <code>min_size 2</code> (E/S possibles tant que 2 copies existent)</li>
+          <li>Règles <strong>CRUSH</strong> : placement des données, par classe de disque (hdd, ssd, nvme)</li>
+          <li>États de santé : <code>HEALTH_OK</code>, <code>HEALTH_WARN</code>, <code>HEALTH_ERR</code></li>
+        </ul></div>
+      </div>
+      <div class="code-block"><code>pveceph install
+pveceph init --network 10.10.10.0/24
+pveceph mon create
+pveceph osd create /dev/sdb
+pveceph pool create vm-pool --add_storages    <span class="comment"># crée aussi le stockage RBD</span>
+ceph -s                                        <span class="comment"># état global</span></code></div>
+    </div>
+  </div>
+
+  <!-- S16 -->
+  <div class="section" id="s16">
+    <div class="section-header"><span class="section-num" style="background:#fef3cd;color:#996600">⚠</span><span class="section-title-text">Pièges fréquents et aide-mémoire</span><span class="section-nb">À relire avant de pratiquer</span></div>
+    <div class="section-body">
+      <h3>Les 12 pièges classiques</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>#</th><th>Piège</th><th>Bon réflexe</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Dépôt Enterprise sans abonnement (erreur 401)</td><td>Passer sur <code>pve-no-subscription</code></td></tr>
+          <tr><td>2</td><td><code>apt upgrade</code> au lieu de <code>full-upgrade</code></td><td>Utiliser <code>apt full-upgrade</code> ou <code>pveupgrade</code></td></tr>
+          <tr><td>3</td><td>ZFS/Ceph sur un contrôleur RAID matériel</td><td>Mode HBA / passthrough des disques</td></tr>
+          <tr><td>4</td><td>Cluster à 2 nœuds qui se bloque</td><td>Ajouter un QDevice ou un 3e nœud</td></tr>
+          <tr><td>5</td><td><code>pvecm expected 1</code> utilisé à la légère</td><td>Dépannage seulement, un seul côté actif</td></tr>
+          <tr><td>6</td><td>Nœud avec des invités qui rejoint un cluster</td><td>Sauvegarder, vider, puis joindre</td></tr>
+          <tr><td>7</td><td>Heure non synchronisée</td><td>chrony / timesyncd partout</td></tr>
+          <tr><td>8</td><td>Snapshot pris pour une sauvegarde</td><td>vzdump / PBS vers un autre stockage</td></tr>
+          <tr><td>9</td><td>Pool LVM-thin plein</td><td>Surveiller le remplissage, discard activé</td></tr>
+          <tr><td>10</td><td>Pare-feu activé sans autoriser sa propre IP</td><td>Vérifier <code>localnet</code> avant d'activer</td></tr>
+          <tr><td>11</td><td>Conteneur privilégié « pour que ça marche »</td><td>Non privilégié + <code>nesting</code>/<code>keyctl</code> au besoin</td></tr>
+          <tr><td>12</td><td>HA sans stockage partagé ni réplication</td><td>Ceph, NFS, ou réplication ZFS</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Ports à connaître</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Port</th><th>Service</th></tr></thead>
+        <tbody>
+          <tr><td>TCP 8006</td><td>Interface web et API</td></tr>
+          <tr><td>TCP 22</td><td>SSH (actions de cluster comprises)</td></tr>
+          <tr><td>TCP 5900-5999</td><td>Console VNC web</td></tr>
+          <tr><td>TCP 3128</td><td>Proxy SPICE</td></tr>
+          <tr><td>UDP 5405-5412</td><td>Corosync</td></tr>
+          <tr><td>TCP 60000-60050</td><td>Migration à chaud</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Fichiers importants</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Chemin</th><th>Contenu</th></tr></thead>
+        <tbody>
+          <tr><td>/etc/pve/qemu-server/&lt;id&gt;.conf</td><td>Configuration d'une VM</td></tr>
+          <tr><td>/etc/pve/lxc/&lt;id&gt;.conf</td><td>Configuration d'un conteneur</td></tr>
+          <tr><td>/etc/pve/storage.cfg</td><td>Stockages du cluster</td></tr>
+          <tr><td>/etc/pve/user.cfg</td><td>Utilisateurs, groupes, rôles, ACL</td></tr>
+          <tr><td>/etc/pve/datacenter.cfg</td><td>Options globales (migration, HA, clavier…)</td></tr>
+          <tr><td>/etc/pve/jobs.cfg</td><td>Jobs de sauvegarde planifiés</td></tr>
+          <tr><td>/etc/pve/ha/resources.cfg</td><td>Ressources HA</td></tr>
+          <tr><td>/etc/pve/corosync.conf</td><td>Configuration du cluster</td></tr>
+          <tr><td>/etc/pve/firewall/cluster.fw</td><td>Pare-feu du datacenter</td></tr>
+          <tr><td>/etc/network/interfaces</td><td>Réseau de l'hôte (local à chaque nœud)</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- S17 -->
+  <div class="section" id="s17">
+    <div class="section-header"><span class="section-num">17</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">30 questions</span></div>
+      <div class="info"><strong>Le labo qui coûte presque rien :</strong> installe Proxmox dans une VM (virtualisation imbriquée activée) ou sur un vieux PC. Pour le cluster, trois VM Proxmox suffisent ; pour la HA, ajoute un petit stockage NFS partagé.</div>
+      <h3>Parcours en 5 séances</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Séance</th><th>Objectif</th><th>À réussir</th></tr></thead>
+        <tbody>
+          <tr><td>1 · Bases</td><td>Installer, configurer dépôts, mettre à jour</td><td>Interface sur 8006, <code>apt full-upgrade</code> OK, hôte en no-subscription</td></tr>
+          <tr><td>2 · Invités</td><td>VM Linux avec VirtIO + agent, conteneur LXC, modèle + clone cloud-init</td><td>Cloner un modèle en 30 s, IP visible via l'agent</td></tr>
+          <tr><td>3 · Stockage et réseau</td><td>Ajouter NFS, pont VLAN, déplacer un disque</td><td><code>qm move-disk</code> à chaud, deux VLAN isolés</td></tr>
+          <tr><td>4 · Sauvegarde</td><td>Job vzdump quotidien, rétention, restauration complète</td><td>Restaurer sous un nouvel ID et démarrer</td></tr>
+          <tr><td>5 · Cluster et HA</td><td>3 nœuds, migration à chaud, ressource HA, panne simulée</td><td>Éteindre un nœud : la VM redémarre ailleurs en ~2 min</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Auto-évaluation — clique pour voir la réponse</h3>
+      <div id="qa">
+        <details><summary>Quelles deux technologies de virtualisation Proxmox VE propose-t-il ?</summary><p>KVM pour les machines virtuelles et LXC pour les conteneurs Linux.</p></details>
+        <details><summary>Sur quel port écoute l'interface web ?</summary><p>TCP 8006, en HTTPS.</p></details>
+        <details><summary>Quelle est la différence entre le dépôt Enterprise et no-subscription ?</summary><p>Enterprise est réservé aux abonnés (paquets les plus testés) ; no-subscription est gratuit mais moins testé. Sans abonnement, désactive Enterprise (erreur 401).</p></details>
+        <details><summary>Pourquoi utiliser <code>full-upgrade</code> plutôt que <code>upgrade</code> ?</summary><p>Parce qu'il peut installer ou supprimer des paquets pour résoudre les dépendances (noyau, paquets Proxmox).</p></details>
+        <details><summary>Qu'est-ce que pmxcfs et où est-il monté ?</summary><p>Le système de fichiers de configuration du cluster, basé sur une base de données répliquée par corosync, monté sur /etc/pve (128 Mio max, en RAM).</p></details>
+        <details><summary>ZFS est-il compatible avec un contrôleur RAID matériel ?</summary><p>Non : ZFS (comme Ceph) doit accéder directement aux disques (mode HBA).</p></details>
+        <details><summary>Quels sont les stockages de VM locaux par défaut après installation ?</summary><p><code>local</code> (répertoire : ISO, sauvegardes, modèles) et <code>local-lvm</code> (LVM-thin : disques de VM et de conteneurs).</p></details>
+        <details><summary>Quels types de stockage sont partagés ?</summary><p>NFS, CIFS, iSCSI, Ceph RBD, CephFS, ZFS sur iSCSI et Proxmox Backup Server. LVM, LVM-thin, ZFS local, Btrfs et répertoire ne le sont pas.</p></details>
+        <details><summary>Quel contrôleur disque et quelle carte réseau privilégier pour les performances d'une VM ?</summary><p>VirtIO SCSI single (avec IO Thread) et carte réseau VirtIO.</p></details>
+        <details><summary>Que faut-il pour le passthrough PCIe ?</summary><p>IOMMU activée (VT-d / AMD-Vi), machine q35 et BIOS OVMF. La VM ne se migre plus à chaud.</p></details>
+        <details><summary>Différence entre clone complet et clone lié ?</summary><p>Le clone complet est une copie indépendante. Le clone lié partage les données du modèle (rapide, économe) mais dépend de lui.</p></details>
+        <details><summary>À quoi sert l'agent invité QEMU ?</summary><p>Arrêt propre, remontée de l'IP, gel du système de fichiers pendant une sauvegarde snapshot.</p></details>
+        <details><summary>Pourquoi préférer un conteneur non privilégié ?</summary><p>Le root du conteneur correspond à un utilisateur sans droits sur l'hôte (user namespaces) : un échappement est bien moins grave. Les privilégiés sont à réserver aux environnements de confiance.</p></details>
+        <details><summary>Quelle fonctionnalité faut-il activer pour Docker dans un LXC non privilégié ?</summary><p><code>keyctl=1</code>, avec généralement <code>nesting=1</code>.</p></details>
+        <details><summary>Quels ports et prérequis pour un cluster ?</summary><p>UDP 5405-5412 (corosync), SSH 22, heure synchronisée, même version. Un nœud qui rejoint ne doit contenir aucun invité.</p></details>
+        <details><summary>Qu'est-ce que le quorum et que se passe-t-il sans lui ?</summary><p>La majorité des votes (N/2+1). Sans quorum, /etc/pve passe en lecture seule : plus de démarrage d'invités ni de modifications.</p></details>
+        <details><summary>Comment faire fonctionner un cluster à deux nœuds de façon fiable ?</summary><p>Ajouter un QDevice (<code>pvecm qdevice setup</code>) comme troisième voix.</p></details>
+        <details><summary>Pourquoi <code>pvecm expected 1</code> est-il dangereux ?</summary><p>Il force le quorum à un vote : si les deux moitiés du cluster le font, elles écrivent chacune de leur côté (split-brain).</p></details>
+        <details><summary>Quels sont les prérequis de la HA ?</summary><p>3 nœuds minimum, stockage partagé (ou réplication), redondance matérielle, fencing par watchdog.</p></details>
+        <details><summary>Rôles de pve-ha-crm et pve-ha-lrm ?</summary><p>CRM : décisions globales du cluster, déplacements et fencing. LRM : exécute les services du nœud local.</p></details>
+        <details><summary>Que devient un nœud HA qui perd le quorum ?</summary><p>Si des services HA y sont actifs, le watchdog le fait redémarrer après environ 60 secondes ; ses services sont relancés ailleurs.</p></details>
+        <details><summary>Quels sont les trois modes de vzdump et lequel préférer pour une VM ?</summary><p>stop, suspend, snapshot. Snapshot pour une interruption quasi nulle (avec l'agent invité) ; stop pour la cohérence maximale.</p></details>
+        <details><summary>Qu'apporte Proxmox Backup Server par rapport à un simple stockage vzdump ?</summary><p>Déduplication par blocs, sauvegardes incrémentales rapides, chiffrement côté client, restauration de fichiers et live-restore.</p></details>
+        <details><summary>Quelles conditions pour la réplication de stockage ?</summary><p>ZFS local sur les deux nœuds, même nom de pool ; planification de 1 minute à 1 semaine ; peut perdre les dernières données en cas de HA.</p></details>
+        <details><summary>Où s'active le pare-feu pour qu'une règle de VM s'applique ?</summary><p>Au niveau Datacenter, au niveau de la VM, et sur la carte réseau virtuelle concernée.</p></details>
+        <details><summary>Quelle est la politique par défaut du pare-feu ?</summary><p>Entrée en DROP, sortie en ACCEPT, avec exceptions pour la gestion (8006, SSH, etc.) depuis le réseau local.</p></details>
+        <details><summary>Comment s'écrit un identifiant d'utilisateur et d'un jeton d'API ?</summary><p><code>joe@pve</code> pour l'utilisateur ; <code>joe@pve!monitoring</code> pour le jeton.</p></details>
+        <details><summary>Que compose une permission dans Proxmox ?</summary><p>Un triplet chemin + sujet (utilisateur, groupe ou jeton) + rôle, avec propagation par défaut.</p></details>
+        <details><summary>Quels rôles pour un accès en lecture seule et pour administrer des VM ?</summary><p>PVEAuditor (lecture seule) et PVEVMAdmin (administration des VM).</p></details>
+        <details><summary>Valeurs par défaut d'un pool Ceph et signification ?</summary><p>size 3 (trois copies) et min_size 2 : les E/S continuent tant qu'au moins deux copies sont disponibles.</p></details>
+      </div>
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)">
+    Fiche de révision Proxmox VE · Basée sur la documentation officielle ·
+    <a href="https://pve.proxmox.com/pve-docs/" target="_blank" style="color:var(--accent);text-decoration:none">pve.proxmox.com/pve-docs</a> ·
+    <a href="https://pve.proxmox.com/pve-docs/pve-admin-guide.pdf" target="_blank" style="color:var(--accent);text-decoration:none">Guide PDF</a> ·
+    <a href="https://pve.proxmox.com/wiki/Main_Page" target="_blank" style="color:var(--accent);text-decoration:none">Wiki</a>
+  </footer>
+
+</div>
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("proxmox-ve-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("proxmox-ve-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>
