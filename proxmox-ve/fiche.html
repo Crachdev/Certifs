@@ -179,9 +179,9 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
       <p>KVM · LXC · Stockage · Réseau · Cluster · HA · Sauvegardes · Pare-feu</p>
     </div>
     <div class="ps-stats">
-      <div class="ps-stat"><b>18</b><span>Sections</span></div>
+      <div class="ps-stat"><b>20</b><span>Sections</span></div>
       <div class="ps-stat"><b>9.x</b><span>Version</span></div>
-      <div class="ps-stat"><b>50</b><span>Q/R</span></div>
+      <div class="ps-stat"><b>55</b><span>Q/R</span></div>
     </div>
   </div>
 
@@ -207,7 +207,9 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
       <a href="#s15" class="toc-item"><span class="toc-num">15</span>Ceph (hyperconvergé)</a>
       <a href="#s16" class="toc-item"><span class="toc-num">16</span>Migration VMware → Proxmox</a>
       <a href="#s17" class="toc-item"><span class="toc-num" style="background:#fef3cd;color:#996600">⚠</span>Pièges et aide-mémoire</a>
-      <a href="#s18" class="toc-item"><span class="toc-num">18</span>Plan de labo et Q/R</a>
+      <a href="#s18" class="toc-item"><span class="toc-num">18</span>Boîte à outils de l'admin</a>
+      <a href="#s19" class="toc-item"><span class="toc-num">19</span>Projet de migration : cadrage</a>
+      <a href="#s20" class="toc-item"><span class="toc-num">20</span>Plan de labo et Q/R</a>
     </div>
   </div>
 
@@ -1360,9 +1362,177 @@ qemu-img convert -p -f qcow2 -O vhdx disque.qcow2 out.vhdx</code></div>
 
   <!-- S18 -->
   <div class="section" id="s18">
-    <div class="section-header"><span class="section-num">18</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
+    <div class="section-header"><span class="section-num">18</span><span class="section-title-text">Boîte à outils de l'admin (venant de Hyper-V / VMware)</span><span class="section-nb">Pratique</span></div>
     <div class="section-body">
-      <div class="tags"><span class="tag">Pratique</span><span class="tag">50 questions</span></div>
+      <div class="tags"><span class="tag">Correspondances</span><span class="tag">Jour 1</span><span class="tag">Diagnostic</span><span class="tag">pvesh</span></div>
+      <div class="info"><strong>Changement de culture :</strong> Proxmox VE est un <strong>Linux (Debian)</strong> avec KVM/QEMU et LXC. Pas de serveur de gestion séparé (type vCenter ou SCVMM) : chaque nœud porte l'interface web et la config du cluster est répliquée dans <code>/etc/pve</code>. Beaucoup de tâches se font aussi en <strong>ligne de commande</strong> (SSH), ce qui est aussi le moyen de diagnostic le plus fiable.</div>
+
+      <h3>Hyper-V → Proxmox VE</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Hyper-V</th><th>Proxmox VE</th><th>Remarque</th></tr></thead>
+        <tbody>
+          <tr><td>Gestionnaire Hyper-V, WAC, SCVMM</td><td>Interface web (port 8006), un seul portail par cluster</td><td>Pas de console centrale à installer</td></tr>
+          <tr><td>Cluster de basculement</td><td>Cluster (corosync) + <strong>HA</strong> (<code>ha-manager</code>)</td><td>Quorum : voir <em>QDevice</em> (équivalent d'un témoin)</td></tr>
+          <tr><td>Témoin de quorum (disque / cloud / partage)</td><td>QDevice (<code>corosync-qnetd</code>)</td><td>Serveur externe indépendant</td></tr>
+          <tr><td>CSV (volumes partagés de cluster)</td><td>Stockage partagé (NFS, Ceph, LVM sur SAN)</td><td>Pas de système de fichiers cluster natif équivalent aux CSV</td></tr>
+          <tr><td>Storage Spaces Direct</td><td><strong>Ceph</strong> (hyperconvergé) ou ZFS</td><td>Ceph = stockage distribué intégré</td></tr>
+          <tr><td>VHDX (dynamique / fixe)</td><td>qcow2 / raw (thin / thick)</td><td>Conversion : <code>qemu-img</code></td></tr>
+          <tr><td>Génération 1 / 2</td><td>SeaBIOS / <strong>OVMF</strong> (UEFI) + disque EFI</td><td>Gen 2 → OVMF</td></tr>
+          <tr><td>Services d'intégration</td><td><code>qemu-guest-agent</code> + pilotes <strong>VirtIO</strong></td><td>Windows : ISO VirtIO</td></tr>
+          <tr><td>Commutateur virtuel (externe / interne)</td><td>Pont Linux <code>vmbr</code> (+ VLAN, bonding)</td><td>SDN pour des réseaux multi-nœuds</td></tr>
+          <tr><td>Mémoire dynamique</td><td>Ballooning</td><td>Plage min / max par VM</td></tr>
+          <tr><td>Points de contrôle (checkpoints)</td><td>Snapshots</td><td>Mêmes réserves : pas une sauvegarde</td></tr>
+          <tr><td>Live Migration / Storage Migration</td><td><code>qm migrate --online</code> / <em>Move Storage</em></td><td>Voir sections migration</td></tr>
+          <tr><td>Hyper-V Replica</td><td>Réplication de stockage (<code>pvesr</code>, ZFS)</td><td>Asynchrone, intervalle minimum 1 min</td></tr>
+          <tr><td>Export-VM / sauvegarde tierce</td><td><code>vzdump</code> / <strong>Proxmox Backup Server</strong></td><td>PBS : déduplication, incrémentiel, live-restore</td></tr>
+          <tr><td>VM protégée / vTPM</td><td>vTPM v2.0 (disque d'état dédié)</td><td>Le vTPM n'est pas migrable depuis VMware</td></tr>
+          <tr><td>PowerShell (module Hyper-V)</td><td><code>qm</code>, <code>pct</code>, <code>pvesh</code>, API REST</td><td><code>pvesh</code> = accès direct à l'API en ligne de commande</td></tr>
+          <tr><td>Active Directory</td><td>Realm LDAP / AD dans <em>Datacenter → Permissions → Realms</em></td><td>+ 2FA (TOTP, WebAuthn)</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>VMware → Proxmox VE (les différences qui comptent)</h3>
+      <ul>
+        <li><strong>Pas de vCenter :</strong> cluster <strong>multi-maître</strong>, on gère depuis n'importe quel nœud ; la perte du quorum bloque la config, pas les VM déjà en marche</li>
+        <li><strong>Pas de VMFS :</strong> choisir le stockage selon le besoin (voir tableau des types) ; le datastore « partagé » classique devient NFS, Ceph ou LVM sur SAN</li>
+        <li><strong>Snapshots :</strong> dépendent du <strong>stockage</strong> et pas d'un moteur unique ; un snapshot n'est pas disponible partout (voir matrice)</li>
+        <li><strong>DRS / vMotion :</strong> migration à chaud OK, mais pas d'équilibrage automatique aussi poussé ; la HA redémarre les VM, ne les « migre » pas à chaud en cas de panne</li>
+        <li><strong>Licences :</strong> logiciel libre (AGPL) ; l'<strong>abonnement</strong> donne accès au dépôt entreprise (mises à jour testées) et au support, par socket CPU</li>
+      </ul>
+
+      <h3>Jour 1 : premier nœud, premier cluster</h3>
+      <ol>
+        <li>Installer depuis l'ISO, noter le <strong>nom d'hôte (FQDN)</strong> et l'<strong>IP</strong> : ils ne se changent plus facilement ensuite (surtout en cluster)</li>
+        <li>Dépôts : sans abonnement, activer le dépôt « no-subscription » et désactiver le dépôt entreprise ; puis mettre à jour (<code>apt update &amp;&amp; apt full-upgrade</code>) et redémarrer si le noyau change</li>
+        <li><strong>NTP</strong> correct (corosync, certificats et Ceph en dépendent)</li>
+        <li>Réseau : un pont <code>vmbr0</code> pour les VM et la gestion ; prévoir des <strong>réseaux séparés</strong> (corosync, stockage, migration)</li>
+        <li>Stockage : créer les stockages (LVM-thin, ZFS, NFS…), définir les types de contenu</li>
+        <li>Accès : compte admin nominatif (realm <code>pve</code> ou AD), <strong>2FA</strong>, limiter <code>root@pam</code></li>
+        <li>Sauvegardes : tâche planifiée vzdump / PBS <strong>dès le début</strong>, et test de restauration</li>
+        <li>Pare-feu et notifications (e-mail de tâche), supervision (métriques vers InfluxDB / Graphite / Prometheus)</li>
+        <li>Créer le cluster (<code>pvecm create</code>) puis ajouter les nœuds (<code>pvecm add</code>) ; vérifier <code>pvecm status</code></li>
+      </ol>
+
+      <h3>Commandes de diagnostic (le « kit » à garder sous la main)</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Besoin</th><th>Commande</th></tr></thead>
+        <tbody>
+          <tr><td>Version et paquets</td><td><code>pveversion -v</code></td></tr>
+          <tr><td>Lister VM / conteneurs</td><td><code>qm list</code> · <code>pct list</code></td></tr>
+          <tr><td>Config d'une VM</td><td><code>qm config 100</code> · <code>qm status 100 --verbose</code></td></tr>
+          <tr><td>État des stockages</td><td><code>pvesm status</code> · <code>pvesm list NOM</code></td></tr>
+          <tr><td>Quorum et nœuds</td><td><code>pvecm status</code> · <code>pvecm nodes</code></td></tr>
+          <tr><td>HA</td><td><code>ha-manager status</code></td></tr>
+          <tr><td>Services de base</td><td><code>systemctl status pveproxy pvedaemon pve-cluster corosync</code></td></tr>
+          <tr><td>Journaux</td><td><code>journalctl -u pve-cluster -u corosync -e</code> · <code>/var/log/pve/tasks/</code></td></tr>
+          <tr><td>Disques LVM / ZFS / Ceph</td><td><code>lvs ; vgs</code> · <code>zpool status</code> · <code>ceph -s</code></td></tr>
+          <tr><td>Réseau</td><td><code>ip -br a</code> · <code>bridge vlan</code> · <code>ifreload -a</code></td></tr>
+          <tr><td>API en CLI (≈ PowerShell)</td><td><code>pvesh get /cluster/resources --output-format json</code></td></tr>
+          <tr><td>Sauvegarde ponctuelle</td><td><code>vzdump 100 --storage NOM --mode snapshot</code></td></tr>
+          <tr><td>VM verrouillée après incident</td><td><code>qm unlock 100</code> (après vérification)</td></tr>
+        </tbody>
+      </table></div>
+      <div class="warn"><strong>Réflexe :</strong> avant toute modification de réseau ou de cluster, vérifie que tu as un accès <strong>hors bande</strong> (console, iDRAC/iLO) : une erreur de pont ou de <code>corosync.conf</code> coupe la gestion à distance.</div>
+    </div>
+  </div>
+
+  <!-- S19 -->
+  <div class="section" id="s19">
+    <div class="section-header"><span class="section-num">19</span><span class="section-title-text">Projet de migration VMware → Proxmox : cadrage</span><span class="section-nb">Projet</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Inventaire</span><span class="tag">PoC</span><span class="tag">Vagues</span><span class="tag">Rollback</span></div>
+      <div class="info"><strong>Principe :</strong> on ne migre pas des VM, on migre un <strong>service</strong> avec ses dépendances (réseau, stockage, sauvegarde, supervision, licences). La technique d'import est la partie facile ; le cadrage fait la réussite.</div>
+
+      <h3>Parcours de montée en compétence conseillé</h3>
+      <ol>
+        <li><strong>Comprendre</strong> : sections 1 à 5 (architecture, installation, interface, réseau)</li>
+        <li><strong>Stockage et VM</strong> : sections 6 à 8, puis les snapshots et le thin/thick</li>
+        <li><strong>Cluster, HA, migration, sauvegarde</strong> : sections 9 à 12</li>
+        <li><strong>Exploitation</strong> : section 18 (kit d'admin) et pièges (section 17)</li>
+        <li><strong>Migration VMware</strong> : section 16, d'abord sur une VM de test, ensuite sur le plan ci-dessous</li>
+      </ol>
+
+      <h3>Phases du projet</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Phase</th><th>Contenu</th><th>Sortie attendue</th></tr></thead>
+        <tbody>
+          <tr><td>1. Découverte</td><td>Inventaire des VM, dépendances, réseaux, stockages, sauvegardes, licences, contraintes métier</td><td>Tableau d'inventaire + classement des VM</td></tr>
+          <tr><td>2. Conception cible</td><td>Nombre de nœuds, CPU/RAM, réseau (corosync, stockage, migration, VLAN), stockage (Ceph, SAN + LVM, NFS, ZFS), sauvegarde (PBS), supervision, sécurité</td><td>Schéma d'architecture + dimensionnement</td></tr>
+          <tr><td>3. Preuve de concept</td><td>Cluster de labo, migration de VM représentatives, test de HA, de sauvegarde et de restauration</td><td>Rapport PoC + décision go / no-go</td></tr>
+          <tr><td>4. Pilote</td><td>Migration de VM peu critiques en production</td><td>Retour d'expérience, runbook ajusté</td></tr>
+          <tr><td>5. Vagues</td><td>Groupes de VM par criticité et dépendances, fenêtres de maintenance</td><td>VM migrées, validées par les métiers</td></tr>
+          <tr><td>6. Clôture</td><td>Décommissionnement VMware (après période de rétention), documentation, formation, transfert en exploitation</td><td>Rapport final</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Inventaire : colonnes à relever pour chaque VM</h3>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Technique</h4><ul>
+          <li>OS et version (pilotes VirtIO disponibles ?)</li>
+          <li>Firmware BIOS ou UEFI, Secure Boot, vTPM</li>
+          <li>vCPU, RAM, disques (taille, thin / thick, nombre)</li>
+          <li>Snapshots existants, disques chiffrés, vSAN</li>
+          <li>Cartes réseau, VLAN, IP et MAC fixes</li>
+          <li>Périphériques spéciaux : passthrough, clé USB, GPU, RDM</li>
+        </ul></div>
+        <div class="concept-card"><h4>Service</h4><ul>
+          <li>Propriétaire et criticité (RTO / RPO)</li>
+          <li>Dépendances (AD, base de données, DNS, licences liées au matériel)</li>
+          <li>Fenêtre de maintenance acceptable</li>
+          <li>Sauvegarde actuelle et supervision</li>
+          <li>Support éditeur : l'application est-elle supportée sur KVM ?</li>
+        </ul></div>
+      </div>
+
+      <h3>Classement des VM (pour planifier les vagues)</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Catégorie</th><th>Exemples</th><th>Méthode type</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Simple</strong></td><td>Linux récent, Windows serveur standard, peu de disques</td><td>Import ESXi automatique</td></tr>
+          <tr><td><strong>Moyenne</strong></td><td>Gros disques, plusieurs cartes, UEFI, base de données</td><td>Import + live-import, ou attach &amp; move disk</td></tr>
+          <tr><td><strong>Complexe</strong></td><td>vTPM, disques chiffrés, vSAN, passthrough, vieux OS sans pilote, licence liée au matériel</td><td>Traitement au cas par cas, à tester en PoC</td></tr>
+          <tr><td><strong>À repenser</strong></td><td>Appliances fermées, éditeur non supporté sur KVM</td><td>Contacter l'éditeur, alternative ou maintien hors projet</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Critères de conception à trancher tôt</h3>
+      <ul>
+        <li><strong>Au moins 3 nœuds</strong> pour un vrai cluster avec quorum (ou 2 nœuds + QDevice)</li>
+        <li><strong>Réseau</strong> : corosync dédié et redondant, stockage séparé, bande passante de migration, VLAN repris de VMware</li>
+        <li><strong>Stockage</strong> : réutiliser le SAN existant (LVM partagé) ou passer à Ceph / ZFS ; vérifier les snapshots et le thin souhaités</li>
+        <li><strong>Sauvegarde</strong> : PBS dédié, rétention, test de restauration ; alternative à Veeam ou autre outil actuel</li>
+        <li><strong>Support</strong> : abonnement Proxmox ou prestataire ; qui est d'astreinte ?</li>
+        <li><strong>Compétences</strong> : formation de l'équipe, documentation, procédures d'exploitation</li>
+      </ul>
+
+      <h3>Risques et parades</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Risque</th><th>Parade</th></tr></thead>
+        <tbody>
+          <tr><td>VM qui ne démarre pas après import</td><td>Test en PoC ; IDE/SATA d'abord ; VM source conservée éteinte</td></tr>
+          <tr><td>Arrêt trop long sur gros disques</td><td>Live-import, attach &amp; move disk, fenêtre adaptée</td></tr>
+          <tr><td>Performances inférieures aux attentes</td><td>VirtIO SCSI single, <code>IO thread</code>, CPU adapté, réseau dimensionné</td></tr>
+          <tr><td>Stockage plein (thin)</td><td>Supervision du remplissage, alertes à 80 %</td></tr>
+          <tr><td>Perte de quorum</td><td>Réseau corosync dédié, QDevice, procédure de reprise documentée</td></tr>
+          <tr><td>Application non supportée sur KVM</td><td>Validation éditeur avant la vague concernée</td></tr>
+          <tr><td>Mauvaise connaissance de l'équipe</td><td>Formation, labo, runbooks, accompagnement au démarrage</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Go / no-go et retour arrière</h3>
+      <ul>
+        <li><strong>Critères de go :</strong> restauration testée, HA testée, supervision en place, runbook validé, accord des métiers</li>
+        <li><strong>Retour arrière :</strong> VM source conservée <strong>éteinte</strong> jusqu'à validation ; instantané du service côté VMware ; plan de bascule inverse (IP, DNS) écrit avant l'opération</li>
+        <li><strong>Interdit :</strong> démarrer la même VM des deux côtés</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- S20 -->
+  <div class="section" id="s20">
+    <div class="section-header"><span class="section-num">20</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">55 questions</span></div>
       <div class="info"><strong>Le labo qui coûte presque rien :</strong> installe Proxmox dans une VM (virtualisation imbriquée activée) ou sur un vieux PC. Pour le cluster, trois VM Proxmox suffisent ; pour la HA, ajoute un petit stockage NFS partagé.</div>
       <h3>Parcours en 5 séances</h3>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table">
@@ -1428,6 +1598,11 @@ qemu-img convert -p -f qcow2 -O vhdx disque.qcow2 out.vhdx</code></div>
         <details><summary>Comment convertir un VMDK en qcow2 ?</summary><p>qemu-img convert -p -f vmdk -O qcow2 Server.vmdk Server.qcow2, en pointant le fichier descripteur, avec le -flat.vmdk dans le même dossier ; puis qm disk import.</p></details>
         <details><summary>Quels formats sources autres que VMware peut-on importer ?</summary><p>Hyper-V (vhd, vhdx), VirtualBox (vdi), Xen/KVM/OpenStack (qcow2, raw), OVA (à extraire), et machines physiques clonées en image brute.</p></details>
         <details><summary>Comment récupérer l'espace après passage en thin ?</summary><p>Activer discard sur le disque de la VM puis fstrim (Linux) ou retrim (Windows) ; sans TRIM, remplir de zéros (zerofree, sdelete -z) puis reconvertir.</p></details>
+        <details><summary>Quel est l'équivalent Proxmox d'un témoin de quorum Hyper-V ?</summary><p>Le QDevice (corosync-qnetd sur un serveur externe indépendant).</p></details>
+        <details><summary>Quel est l'équivalent des CSV et de Storage Spaces Direct ?</summary><p>Un stockage partagé (NFS, Ceph, LVM sur SAN) pour les CSV, et Ceph (ou ZFS) pour Storage Spaces Direct.</p></details>
+        <details><summary>Quel outil en ligne de commande donne un accès à l'API comme PowerShell ?</summary><p>pvesh (par exemple pvesh get /cluster/resources --output-format json), avec qm et pct pour VM et conteneurs.</p></details>
+        <details><summary>Quelles sont les phases d'un projet de migration VMware → Proxmox ?</summary><p>Découverte et inventaire, conception cible, preuve de concept, pilote, vagues de migration, clôture avec décommissionnement.</p></details>
+        <details><summary>Quand conserver la VM source après migration ?</summary><p>Éteinte, non supprimée, jusqu'à validation par les métiers et fin de la période de rétention : c'est le plan de retour arrière.</p></details>
       </div>
     </div>
   </div>
