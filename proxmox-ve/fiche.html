@@ -179,9 +179,9 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
       <p>KVM · LXC · Stockage · Réseau · Cluster · HA · Sauvegardes · Pare-feu</p>
     </div>
     <div class="ps-stats">
-      <div class="ps-stat"><b>20</b><span>Sections</span></div>
+      <div class="ps-stat"><b>21</b><span>Sections</span></div>
       <div class="ps-stat"><b>9.x</b><span>Version</span></div>
-      <div class="ps-stat"><b>61</b><span>Q/R</span></div>
+      <div class="ps-stat"><b>66</b><span>Q/R</span></div>
     </div>
   </div>
 
@@ -209,7 +209,8 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
       <a href="#s17" class="toc-item"><span class="toc-num" style="background:#fef3cd;color:#996600">⚠</span>Pièges et aide-mémoire</a>
       <a href="#s18" class="toc-item"><span class="toc-num">18</span>Boîte à outils de l'admin</a>
       <a href="#s19" class="toc-item"><span class="toc-num">19</span>Projet de migration : cadrage</a>
-      <a href="#s20" class="toc-item"><span class="toc-num">20</span>Plan de labo et Q/R</a>
+      <a href="#s20" class="toc-item"><span class="toc-num">20</span>PVE 8 vs 9 et mise à jour</a>
+      <a href="#s21" class="toc-item"><span class="toc-num">21</span>Plan de labo et Q/R</a>
     </div>
   </div>
 
@@ -1645,9 +1646,88 @@ qemu-img convert -p -f qcow2 -O vhdx disque.qcow2 out.vhdx</code></div>
 
   <!-- S20 -->
   <div class="section" id="s20">
-    <div class="section-header"><span class="section-num">20</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
+    <div class="section-header"><span class="section-num">20</span><span class="section-title-text">Proxmox VE 8 vs 9 et mise à jour</span><span class="section-nb">Versions</span></div>
     <div class="section-body">
-      <div class="tags"><span class="tag">Pratique</span><span class="tag">61 questions</span></div>
+      <div class="tags"><span class="tag">pve8to9</span><span class="tag">Trixie</span><span class="tag">Changements cassants</span><span class="tag">Cluster</span></div>
+      <div class="info"><strong>Sources :</strong> wiki officiel « Upgrade from 8 to 9 » et « Roadmap » (versions 9.0 et 9.1 lues le 16/11/2026). La doc indiquait une fin de support de PVE 8 <strong>estimée à juillet 2026</strong> : pour un nouveau projet, partir directement sur <strong>9.x</strong> et vérifier le calendrier de support sur le site Proxmox.</div>
+
+      <h3>Ce qui change : 8.x → 9.0 → 9.1</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Élément</th><th>PVE 8.x</th><th>PVE 9.0</th><th>PVE 9.1</th></tr></thead>
+        <tbody>
+          <tr><td>Base Debian</td><td>12 « Bookworm »</td><td>13 « Trixie »</td><td>13.2</td></tr>
+          <tr><td>Noyau</td><td>6.8 (6.14 en option)</td><td>6.14</td><td>6.17</td></tr>
+          <tr><td>QEMU</td><td>9.x</td><td>10.0.2</td><td>10.1.2</td></tr>
+          <tr><td>LXC / ZFS</td><td>—</td><td>6.0.4 / 2.3.3</td><td>6.0.5 / 2.3.4</td></tr>
+          <tr><td>Ceph</td><td>Reef / Squid</td><td>Squid 19.2</td><td>Squid 19.2</td></tr>
+          <tr><td>Snapshots</td><td>Selon le stockage ; pas de snapshot sur LVM épais</td><td>Snapshots en <strong>chaîne de volumes</strong> sur LVM épais et répertoire/NFS/CIFS (<strong>aperçu technique</strong>)</td><td>—</td></tr>
+          <tr><td>Réseau</td><td>SDN</td><td><strong>Fabrics SDN</strong> (OpenFabric, OSPF)</td><td>Statut SDN plus détaillé dans l'interface</td></tr>
+          <tr><td>HA</td><td>Groupes HA</td><td><strong>Règles HA</strong> (affinité de nœud et de ressource) ; groupes dépréciés</td><td>—</td></tr>
+          <tr><td>Conteneurs</td><td>Modèles LXC</td><td>—</td><td>Création depuis <strong>images OCI</strong> (aperçu)</td></tr>
+          <tr><td>vTPM / VM</td><td>État TPM en raw</td><td>—</td><td>État TPM en <strong>qcow2</strong>, drapeau CPU <code>nested-virt</code>, premier support Intel TDX</td></tr>
+          <tr><td>Interface</td><td>—</td><td>Interface mobile refaite (Rust)</td><td>—</td></tr>
+          <tr><td>ZFS</td><td>—</td><td>Ajout d'un disque à un pool RAIDZ existant</td><td>—</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Changements cassants et pièges de la version 9</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Sujet</th><th>Détail</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>Noms d'interfaces réseau</td><td>Le nouveau noyau peut renommer des cartes : le réseau ne remonte plus</td><td>Accès console/IPMI ; outil <code>pve-network-interface-pinning</code></td></tr>
+          <tr><td>cgroup v1</td><td>Supprimé : conteneurs avec systemd ≤ 230 (ex. CentOS 7, Ubuntu 16.04) non supportés</td><td>Migrer ces conteneurs avant</td></tr>
+          <tr><td>LVM : autoactivation</td><td>Les nouveaux volumes ne sont plus activés automatiquement (important sur LVM partagé SAN)</td><td>Script <code>/usr/share/pve-manager/migrations/pve-lvm-disable-autoactivation</code></td></tr>
+          <tr><td><code>/etc/sysctl.conf</code></td><td>N'est plus lu</td><td>Déplacer dans <code>/etc/sysctl.d/NN-nom.conf</code> (EVPN, ip_forward, rp_filter)</td></tr>
+          <tr><td>VirtIO : MTU</td><td>MTU vide = hérite du pont (avant : 1500)</td><td>Vérifier les ponts en jumbo</td></tr>
+          <tr><td>Privilèges</td><td><code>VM.Monitor</code> supprimé ; <code>VM.Replicate</code> pour la réplication ; conteneur privilégié exige <code>Sys.Modify</code></td><td>Revoir les rôles personnalisés</td></tr>
+          <tr><td>Sauvegarde</td><td><code>maxfiles</code> supprimé ; <strong>Veeam non compatible</strong> avec les VM en machine QEMU ≥ 10.0</td><td>Rétention par <code>prune</code> ; pour Veeam, figer la version de machine à <code>9.2+pve1</code> ou attendre</td></tr>
+          <tr><td>Stockage</td><td>GlusterFS abandonné ; plugins tiers à attendre</td><td>Vérifier la compatibilité avant</td></tr>
+          <tr><td>Dépôts</td><td><code>pvetest</code> devient <code>pve-test</code> ; format deb822 (<code>.sources</code>)</td><td><code>apt modernize-sources</code></td></tr>
+          <tr><td>Ceph</td><td>Avertissements « insecure key types » (HEALTH_ERR) après le premier redémarrage d'un nœud MON</td><td>Poursuivre, puis migrer les clés à la fin</td></tr>
+          <tr><td>Divers</td><td>Pool LVM-thin à réparer parfois (<code>lvconvert --repair</code>) ; GRUB UEFI sur LVM (<code>grub-efi-amd64</code>) ; méta-paquet <code>systemd-boot</code> à retirer ; mémoire VM affichée plus haute ; PCI passthrough instable avec 6.14 ; maillage Ceph (<code>post-up</code> frr)</td><td>Lire les « Known issues » avant</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Procédure de mise à jour 8 → 9 (sur place)</h3>
+      <ol>
+        <li><strong>Prérequis :</strong> tous les nœuds en <strong>8.4.1 ou plus</strong> (<code>apt dist-upgrade</code>) ; Ceph hyperconvergé <strong>d'abord en Squid 19</strong> ; PBS installé sur le même hôte : le passer en 4 ; cluster <strong>sain</strong> ; sauvegardes <strong>testées</strong> ; au moins 5 Go libres (idéalement 10) sur la racine ; accès hors bande (IPMI, console)</li>
+        <li><strong>Tester</strong> sur un labo identique (ou une VM Proxmox 8.4) avant la production</li>
+        <li><code>pve8to9 --full</code> : à lancer avant, pendant et après ; il ne fait que lire et signaler</li>
+        <li><strong>Déplacer</strong> les VM/CT importants hors du nœud à traiter (migration d'une version ancienne vers une plus récente : fonctionne ; l'inverse n'est pas supporté)</li>
+        <li>Passer les dépôts de <code>bookworm</code> à <code>trixie</code> (Debian, Proxmox, Ceph), puis <code>apt update</code> et vérifier avec <code>apt policy</code></li>
+        <li>Console (ou tmux/screen), jamais la console de l'interface web : <code>apt dist-upgrade</code>, répondre aux questions sur les fichiers de config (lvm.conf, sshd_config, grub…)</li>
+        <li>Relancer <code>pve8to9</code>, puis <strong>redémarrer</strong> pour utiliser le noyau 9 (même si 6.14 était déjà utilisé)</li>
+        <li>Vider le cache du navigateur ; passer au nœud suivant, <strong>un par un</strong></li>
+        <li>Une fois tous les nœuds en 9 : les <strong>groupes HA</strong> sont convertis automatiquement en <strong>règles HA</strong> ; vérifier avec <code>journalctl -eu pve-ha-crm</code></li>
+      </ol>
+      <div class="code-block"><code>pveversion                       <span class="comment"># au moins 8.4.1 avant de commencer</span>
+pve8to9 --full                   <span class="comment"># rapport : avertissements et erreurs à traiter</span>
+sed -i 's/bookworm/trixie/g' /etc/apt/sources.list
+<span class="comment"># + dépôts Proxmox / Ceph au format .sources (suite trixie), voir wiki « Package Repositories »</span>
+apt update ; apt policy
+apt dist-upgrade                 <span class="comment"># dans tmux, depuis la console</span>
+reboot
+pve8to9                          <span class="comment"># contrôle après reboot</span></code></div>
+      <div class="warn"><strong>Alternative :</strong> <strong>nouvelle installation</strong> en 9.x sur du matériel neuf, puis restauration des VM depuis les sauvegardes (ou reconstruction du cluster). C'est souvent la voie la plus propre quand on migre de toute façon depuis VMware.</div>
+
+      <h3>Conséquences pour ton projet de migration VMware</h3>
+      <ul>
+        <li><strong>Démarrer en 9.x</strong> : évite une mise à jour majeure juste après la migration</li>
+        <li>Snapshots sur <strong>LVM épais partagé</strong> (SAN existant) : uniquement en 9, en <strong>aperçu technique</strong> : à tester avant de s'y fier</li>
+        <li>Sauvegardes <strong>Veeam</strong> : vérifier la compatibilité avec QEMU 10 avant de choisir la sauvegarde cible ; sinon passer à PBS</li>
+        <li>Vieux invités Linux (systemd ≤ 230) en conteneur : pas de support en 9</li>
+        <li>Matériel de plus de 10 ans : tester la compatibilité du noyau 6.x avant achat ou réutilisation</li>
+        <li>Cluster à CPU hétérogènes : la migration à chaud entre CPU de fabricants différents peut poser problème ; viser des nœuds identiques</li>
+        <li>L'import ESXi est présent dès la 8.x ; la 9.x apporte surtout des fonctions de stockage et de HA autour</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- S21 -->
+  <div class="section" id="s21">
+    <div class="section-header"><span class="section-num">21</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">66 questions</span></div>
       <div class="info"><strong>Le labo qui coûte presque rien :</strong> installe Proxmox dans une VM (virtualisation imbriquée activée) ou sur un vieux PC. Pour le cluster, trois VM Proxmox suffisent ; pour la HA, ajoute un petit stockage NFS partagé.</div>
       <h3>Parcours en 5 séances</h3>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table">
@@ -1811,6 +1891,11 @@ pvecm status</code></div>
         <details><summary>Quelles commandes donnent l'état des liens et du quorum ?</summary><p>pvecm status (votes, seuil, drapeau Quorate), corosync-cfgtool -s (état des liens), corosync-quorumtool -s et -l, journalctl -u corosync.</p></details>
         <details><summary>Quand utiliser pvecm expected 1 et quel est le risque ?</summary><p>Pour retrouver le quorum sur un nœud survivant après la perte définitive des autres. Risque de split-brain si les autres nœuds sont en fait vivants : à vérifier avant.</p></details>
         <details><summary>Où placer le serveur QDevice ?</summary><p>Sur une machine externe et indépendante du cluster, jamais sur une VM qu'il arbitre, joignable en TCP depuis chaque nœud.</p></details>
+        <details><summary>Quelle est la base Debian de Proxmox VE 8 et de Proxmox VE 9 ?</summary><p>PVE 8 : Debian 12 Bookworm. PVE 9 : Debian 13 Trixie (noyau 6.14 en 9.0, 6.17 en 9.1).</p></details>
+        <details><summary>Quel outil prépare et vérifie la mise à jour 8 → 9 ?</summary><p>pve8to9 (avec --full), fourni avec PVE 8.4 ; il ne fait que signaler les problèmes, avant, pendant et après la mise à jour.</p></details>
+        <details><summary>Quelle version minimale et quel prérequis Ceph avant de passer en 9 ?</summary><p>Tous les nœuds en 8.4.1 ou plus ; si Ceph est hyperconvergé, il doit être en Squid 19.2 avant la mise à jour.</p></details>
+        <details><summary>Que deviennent les groupes HA après le passage en 9 ?</summary><p>Ils sont remplacés par des règles HA (affinité de nœud et de ressource) et convertis automatiquement une fois tous les nœuds en 9.</p></details>
+        <details><summary>Pourquoi garder un accès console ou IPMI pendant la mise à jour ?</summary><p>Le nouveau noyau peut renommer les interfaces réseau et couper l'accès à distance ; la mise à jour ne doit pas se faire depuis la console web.</p></details>
       </div>
     </div>
   </div>
