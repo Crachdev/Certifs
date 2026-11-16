@@ -181,7 +181,7 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
     <div class="ps-stats">
       <div class="ps-stat"><b>18</b><span>Sections</span></div>
       <div class="ps-stat"><b>9.x</b><span>Version</span></div>
-      <div class="ps-stat"><b>47</b><span>Q/R</span></div>
+      <div class="ps-stat"><b>50</b><span>Q/R</span></div>
     </div>
   </div>
 
@@ -1212,6 +1212,43 @@ nano images/103/vm-103-disk-0.vmdk
 <span class="comment"># après :</span>  RW 104857600 VMFS "../../Server/Server-flat.vmdk"</code></div>
       <div class="warn"><strong>Danger :</strong> ne jamais allumer la même VM côté VMware <strong>et</strong> côté Proxmox : corruption de disque assurée.</div>
 
+      <h3>Conversion de disques (qemu-img)</h3>
+      <p><code>qm disk import</code> et <code>qm importovf</code> convertissent à la volée, mais <code>qemu-img</code> donne un contrôle total : utile pour convertir avant import, pour des sources non VMware, ou pour un export vers un autre hyperviseur.</p>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Source</th><th>Format</th><th>Particularité</th></tr></thead>
+        <tbody>
+          <tr><td>VMware</td><td><code>vmdk</code></td><td>Un <strong>descripteur</strong> (<code>Server.vmdk</code>, texte) + un fichier de données <code>Server-flat.vmdk</code> : convertir en pointant le <strong>descripteur</strong>, les deux fichiers dans le même dossier</td></tr>
+          <tr><td>Hyper-V</td><td><code>vhd</code> / <code>vhdx</code></td><td>Format <code>vpc</code> pour VHD, <code>vhdx</code> pour VHDX ; VM de génération 2 = UEFI (OVMF)</td></tr>
+          <tr><td>VirtualBox</td><td><code>vdi</code></td><td>Reconnu directement par <code>qemu-img</code></td></tr>
+          <tr><td>Xen / KVM / OpenStack</td><td><code>qcow2</code>, <code>raw</code></td><td>Souvent importables tels quels</td></tr>
+          <tr><td>OVA</td><td>archive tar</td><td>Extraire (<code>tar xf</code>) pour obtenir l'OVF et les VMDK</td></tr>
+          <tr><td>Machine physique (P2V)</td><td>image brute</td><td>Cloner avec Clonezilla / <code>dd</code>, puis importer l'image en raw</td></tr>
+        </tbody>
+      </table></div>
+      <div class="code-block"><code><span class="comment"># Inspecter et vérifier</span>
+qemu-img info Server.vmdk
+qemu-img check disque.qcow2
+<span class="comment"># VMDK -> qcow2 (progression, -p)</span>
+qemu-img convert -p -f vmdk -O qcow2 Server.vmdk Server.qcow2
+<span class="comment"># VMDK / VHDX -> raw (pour LVM, ZFS, Ceph) ; -S 0 évite les fichiers creux</span>
+qemu-img convert -p -f vhdx -O raw Server.vhdx Server.raw
+<span class="comment"># Options utiles : compression, préallocation</span>
+qemu-img convert -p -c -O qcow2 src.raw dst.qcow2
+qemu-img convert -p -O qcow2 -o preallocation=metadata src.raw dst.qcow2
+<span class="comment"># Puis importer le résultat</span>
+qm disk import 104 Server.qcow2 local-lvm
+<span class="comment"># Export inverse : Proxmox -> VMware / Hyper-V</span>
+qemu-img convert -p -f qcow2 -O vmdk -o subformat=streamOptimized disque.qcow2 out.vmdk
+qemu-img convert -p -f qcow2 -O vhdx disque.qcow2 out.vhdx</code></div>
+      <div class="info"><strong>Thick → thin :</strong> convertir en qcow2 (ou importer vers LVM-thin / ZFS sparse) ne copie que les blocs utilisés quand les zéros sont détectés. Sur un disque raw déjà gros, la conversion qcow2 réduit la taille. <strong>Récupérer l'espace après coup :</strong> activer <code>discard</code> sur le disque de la VM, puis <code>fstrim -av</code> (Linux) ou <em>Optimiser le lecteur / retrim</em> (Windows) ; pour les disques sans TRIM, remplir de zéros (<code>zerofree</code>, <code>sdelete -z</code>) puis reconvertir.</div>
+      <ul>
+        <li>La conversion nécessite de la <strong>place temporaire</strong> (source + destination) sur le stockage de travail ; convertir de préférence <strong>hors production</strong></li>
+        <li>Toujours <strong>éteindre</strong> la VM source (ou la cloner) avant de convertir, pour un disque cohérent</li>
+        <li>Vérifier avec <code>qemu-img info</code> la taille virtuelle vs la taille réelle, puis <code>qemu-img check</code></li>
+        <li>VM <strong>UEFI</strong> : prévoir un disque EFI et vérifier l'ordre de démarrage ; si le démarrage échoue, entrer dans le firmware de la VM (Échap/F2) pour re-sélectionner le fichier de démarrage</li>
+        <li>Conversions de <strong>VM entière</strong> (pilotes injectés automatiquement) : l'outil <code>virt-v2v</code> (libguestfs) existe mais n'est pas intégré à Proxmox ; la méthode standard reste l'assistant ESXi ou l'import + installation des pilotes</li>
+      </ul>
+
       <h3>Pilotes VirtIO : Windows et Linux</h3>
       <div class="concept-grid">
         <div class="concept-card"><h4>Windows</h4><ul>
@@ -1325,7 +1362,7 @@ nano images/103/vm-103-disk-0.vmdk
   <div class="section" id="s18">
     <div class="section-header"><span class="section-num">18</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
     <div class="section-body">
-      <div class="tags"><span class="tag">Pratique</span><span class="tag">47 questions</span></div>
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">50 questions</span></div>
       <div class="info"><strong>Le labo qui coûte presque rien :</strong> installe Proxmox dans une VM (virtualisation imbriquée activée) ou sur un vieux PC. Pour le cluster, trois VM Proxmox suffisent ; pour la HA, ajoute un petit stockage NFS partagé.</div>
       <h3>Parcours en 5 séances</h3>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table">
@@ -1388,6 +1425,9 @@ nano images/103/vm-103-disk-0.vmdk
         <details><summary>Que faut-il faire avant de migrer une VM Windows depuis VMware ?</summary><p>Désinstaller VMware Tools, noter ou retirer l'IP statique, gérer la MAC (DHCP), éteindre la VM ; après import, démarrer en IDE/SATA puis installer les pilotes VirtIO avant de basculer.</p></details>
         <details><summary>Quelles sont les limites de l'import automatique ESXi ?</summary><p>Pas de disques sur vSAN, import lent avec snapshots, pas de disques chiffrés, vTPM non migrable, datastores avec caractère spécial parfois en échec.</p></details>
         <details><summary>Quel danger avec la méthode attach & move disk ?</summary><p>Allumer la VM des deux côtés (VMware et Proxmox) : corruption du disque. Éteindre la source avant de démarrer la cible.</p></details>
+        <details><summary>Comment convertir un VMDK en qcow2 ?</summary><p>qemu-img convert -p -f vmdk -O qcow2 Server.vmdk Server.qcow2, en pointant le fichier descripteur, avec le -flat.vmdk dans le même dossier ; puis qm disk import.</p></details>
+        <details><summary>Quels formats sources autres que VMware peut-on importer ?</summary><p>Hyper-V (vhd, vhdx), VirtualBox (vdi), Xen/KVM/OpenStack (qcow2, raw), OVA (à extraire), et machines physiques clonées en image brute.</p></details>
+        <details><summary>Comment récupérer l'espace après passage en thin ?</summary><p>Activer discard sur le disque de la VM puis fstrim (Linux) ou retrim (Windows) ; sans TRIM, remplir de zéros (zerofree, sdelete -z) puis reconvertir.</p></details>
       </div>
     </div>
   </div>
