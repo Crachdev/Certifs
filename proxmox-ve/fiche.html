@@ -179,9 +179,9 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
       <p>KVM · LXC · Stockage · Réseau · Cluster · HA · Sauvegardes · Pare-feu</p>
     </div>
     <div class="ps-stats">
-      <div class="ps-stat"><b>17</b><span>Sections</span></div>
+      <div class="ps-stat"><b>18</b><span>Sections</span></div>
       <div class="ps-stat"><b>9.x</b><span>Version</span></div>
-      <div class="ps-stat"><b>30</b><span>Q/R</span></div>
+      <div class="ps-stat"><b>46</b><span>Q/R</span></div>
     </div>
   </div>
 
@@ -205,8 +205,9 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
       <a href="#s13" class="toc-item"><span class="toc-num">13</span>Pare-feu</a>
       <a href="#s14" class="toc-item"><span class="toc-num">14</span>Utilisateurs et droits</a>
       <a href="#s15" class="toc-item"><span class="toc-num">15</span>Ceph (hyperconvergé)</a>
-      <a href="#s16" class="toc-item"><span class="toc-num" style="background:#fef3cd;color:#996600">⚠</span>Pièges et aide-mémoire</a>
-      <a href="#s17" class="toc-item"><span class="toc-num">17</span>Plan de labo et Q/R</a>
+      <a href="#s16" class="toc-item"><span class="toc-num">16</span>Migration VMware → Proxmox</a>
+      <a href="#s17" class="toc-item"><span class="toc-num" style="background:#fef3cd;color:#996600">⚠</span>Pièges et aide-mémoire</a>
+      <a href="#s18" class="toc-item"><span class="toc-num">18</span>Plan de labo et Q/R</a>
     </div>
   </div>
 
@@ -464,6 +465,111 @@ pvesm add nfs nas --server 10.0.0.5 --export /data --content backup,iso
 pvesm set nas --disable 1             <span class="comment"># désactiver sans supprimer</span>
 pvesm path local:iso/debian.iso       <span class="comment"># chemin réel d'un volume</span></code></div>
       <div class="tip"><strong>LVM vs LVM-thin :</strong> les snapshots LVM classiques dégradent fortement les écritures du groupe de volumes ; depuis PVE 9 existent des « snapshots en chaîne de volumes » pour les VM. Le LVM-thin gère les snapshots efficacement mais n'est <strong>pas partagé</strong> : c'est pourquoi on y met les disques locaux (<code>local-lvm</code>).</div><div class="info"><strong>Fichiers qcow2 :</strong> sur les stockages à fichiers (répertoire, NFS, CIFS), les snapshots passent par le format qcow2. Créer ou supprimer un snapshot interne peut bloquer une VM en marche, très lentement sur NFS pour de gros disques : préfère le faire VM éteinte.</div>
+
+      <h3>Approfondissement : bloc ou fichier, thick ou thin</h3>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Stockage fichier</h4><ul>
+          <li>Répertoire, NFS, CIFS, CephFS</li>
+          <li>Les disques sont des <strong>fichiers</strong> (raw, <strong>qcow2</strong>, vmdk) ; qcow2 recommandé pour avoir toutes les fonctions</li>
+          <li>Stocke aussi ISO, modèles, sauvegardes, snippets</li>
+          <li>Les snapshots viennent du <strong>format qcow2</strong></li>
+        </ul></div>
+        <div class="concept-card"><h4>Stockage bloc</h4><ul>
+          <li>ZFS, LVM, LVM-thin, Ceph RBD, iSCSI</li>
+          <li>Les disques sont des <strong>volumes bruts</strong> (zvol, LV, image RBD)</li>
+          <li>Les snapshots et clones sont fournis par <strong>la couche de stockage</strong> elle-même</li>
+          <li>Pas d'ISO ni de sauvegardes sur ces types (sauf répertoire par-dessus)</li>
+        </ul></div>
+        <div class="concept-card"><h4>Local ou partagé</h4><ul>
+          <li><strong>Local</strong> : le même nom existe sur tous les nœuds mais le <strong>contenu est différent</strong> ; restreindre aux bons nœuds avec la liste de nœuds du stockage</li>
+          <li><strong>Partagé</strong> : même contenu partout (NFS, Ceph…) ; le drapeau <code>shared</code> dit au cluster qu'un mécanisme externe garantit l'accès</li>
+          <li>Montage non géré : <code>pvesm set STOCKAGE --is_mountpoint 1</code> évite d'écrire sur le disque de l'hôte si le montage est absent</li>
+        </ul></div>
+      </div>
+
+      <h3>Thick (épais) vs thin (fin)</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Critère</th><th>Thick (provisionnement épais)</th><th>Thin (provisionnement fin)</th></tr></thead>
+        <tbody>
+          <tr><td>Allocation</td><td>Tout l'espace est réservé <strong>à la création</strong></td><td>Les blocs sont alloués <strong>à l'écriture</strong></td></tr>
+          <tr><td>Surallocation</td><td>Impossible : l'espace est garanti</td><td>Possible : les volumes peuvent dépasser l'espace physique</td></tr>
+          <tr><td>Exemples</td><td>LVM classique, raw sur répertoire préalloué</td><td>LVM-thin, ZFS <code>sparse</code>, qcow2, Ceph RBD</td></tr>
+          <tr><td>Risque</td><td>Gaspillage d'espace</td><td><strong>Pool plein → erreurs d'E/S sur TOUS les invités du pool</strong>, systèmes de fichiers corrompus</td></tr>
+          <tr><td>Précaution</td><td>Dimensionner correctement</td><td><strong>Superviser le remplissage</strong>, activer <code>discard</code> (TRIM) dans l'invité et sur le disque</td></tr>
+        </tbody>
+      </table></div>
+      <div class="warn"><strong>Question d'examen classique :</strong> « Mon pool thin est plein, toutes mes VM plantent ». Le thin provisioning est une promesse de place, pas de la place. Surveille <code>lvs</code> (colonnes <em>Data%</em> et <em>Meta%</em>) ou <code>zpool list</code>.</div>
+
+      <h3>LVM vs LVM-thin : le comparatif à connaître</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Critère</th><th>LVM (<code>lvm</code>)</th><th>LVM-thin (<code>lvmthin</code>)</th></tr></thead>
+        <tbody>
+          <tr><td>Provisionnement</td><td><strong>Épais</strong> : un LV de la taille du disque</td><td><strong>Fin</strong> : un pool, les volumes grossissent à l'écriture</td></tr>
+          <tr><td>Snapshots</td><td>Classiques : <strong>inefficaces</strong> (ralentissent toutes les écritures du VG tant qu'ils existent). Nouveau : chaînes de volumes (aperçu, PVE 9)</td><td><strong>Natifs et efficaces</strong></td></tr>
+          <tr><td>Clones</td><td>Complets uniquement (pas de clone lié)</td><td>Complets <strong>et liés</strong> efficaces</td></tr>
+          <tr><td>Partage</td><td>Peut être <strong>partagé</strong> sur une LUN iSCSI / FC / SAS (verrouillage cluster, drapeau shared)</td><td><strong>Jamais partagé</strong> : local à un nœud</td></tr>
+          <tr><td>Options</td><td><code>vgname</code>, <code>base</code>, <code>saferemove</code>, <code>snapshot-as-volume-chain</code></td><td><code>vgname</code>, <code>thinpool</code></td></tr>
+          <tr><td>Usage type</td><td>SAN partagé avec LVM par-dessus</td><td>Disques locaux (<code>local-lvm</code> par défaut)</td></tr>
+        </tbody>
+      </table></div>
+      <div class="code-block"><code><span class="comment"># Créer un pool thin sur le VG « pve »</span>
+lvcreate -L 100G -n data pve
+lvconvert --type thin-pool pve/data
+pvesm add lvmthin local-lvm2 --vgname pve --thinpool data --content images,rootdir
+<span class="comment"># LVM épais partagé sur une LUN SAN</span>
+pvesm add lvm san-lvm --vgname vg_san --shared 1 --content images
+<span class="comment"># Surveiller</span>
+vgs ; lvs ; lvs -a                       <span class="comment"># Data% et Meta% du pool thin</span></code></div>
+      <div class="info"><strong><code>saferemove</code> :</strong> à la suppression d'un volume LVM, remet les blocs à zéro (<code>blkdiscard</code> si le stockage sait « write zeroes »). Utile pour ne pas exposer d'anciennes données à un autre invité, au prix de la vitesse.</div>
+
+      <h3>raw, qcow2 ou vmdk ?</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Format</th><th>Fonctions</th><th>À retenir</th></tr></thead>
+        <tbody>
+          <tr><td><code>raw</code></td><td>Aucune (image brute)</td><td>Performances maximales, format des volumes sur stockage bloc. Sur fichier : pas de snapshot ni de thin natif</td></tr>
+          <tr><td><code>qcow2</code></td><td>Snapshots internes, <strong>thin provisioning</strong>, fichiers de base pour clones liés, chaînes de volumes</td><td><strong>Format natif de QEMU/KVM</strong> et recommandé sur stockage fichier ; plus lent que raw, plus complexe</td></tr>
+          <tr><td><code>vmdk</code></td><td>Compatibilité VMware</td><td>Utile pour importer / démarrer un disque VMware tel quel ; on le convertit ensuite en qcow2 ou raw</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li>Le <strong>préallocation</strong> (<code>off | metadata | falloc | full</code>, défaut <code>metadata</code>) se règle sur le stockage répertoire/NFS</li>
+        <li>Le format se choisit sur <strong>stockage fichier</strong> ; sur LVM/ZFS/Ceph, le volume est brut par nature</li>
+        <li>Changer de format : <em>Move Storage</em> avec un autre format cible, ou <code>qm disk import … --format qcow2</code>, ou <code>qemu-img convert</code></li>
+      </ul>
+
+      <h3>Qui sait faire des snapshots ? (matrice)</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Stockage</th><th>Mécanisme</th><th>Remarque</th></tr></thead>
+        <tbody>
+          <tr><td>ZFS</td><td>Snapshots ZFS natifs sur le zvol</td><td>Instantanés, efficaces ; rollback jusqu'au plus récent sans casse</td></tr>
+          <tr><td>LVM-thin</td><td>Snapshots thin natifs</td><td>Efficaces ; local seulement</td></tr>
+          <tr><td>Ceph RBD</td><td>Snapshots RBD natifs</td><td>Partagé, efficace</td></tr>
+          <tr><td>Répertoire / NFS / CIFS</td><td>Snapshots <strong>internes qcow2</strong>, ou chaîne de volumes (aperçu)</td><td>Un snapshot interne <strong>bloque la VM en marche</strong> pendant sa création/suppression ; très lent sur NFS pour gros disques</td></tr>
+          <tr><td>LVM épais (shared SAN)</td><td>Chaîne de volumes qcow2 (<strong>aperçu technique depuis PVE 9.0</strong>, option « Allow Snapshots as Volume-Chain »)</td><td>Désactivé par défaut</td></tr>
+          <tr><td>iSCSI direct (LUN brute)</td><td>Aucun côté Proxmox</td><td>Possibles côté baie, ou passer par LVM par-dessus</td></tr>
+          <tr><td>Conteneurs sur NFS/CIFS</td><td><strong>Impossible</strong></td><td>Un conteneur ne peut pas utiliser qcow2</td></tr>
+        </tbody>
+      </table></div>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Chaîne de volumes (volume chain)</h4><ul>
+          <li>Chaque snapshot = <strong>un nouveau volume</strong> posé en couche sur le précédent (chaînage qcow2)</li>
+          <li>qcow2 ne sert qu'à chaîner ; la gestion est faite par Proxmox, pas par les snapshots internes qcow2</li>
+          <li>Efficace seulement si le stockage sous-jacent est <strong>thin et supporte discard</strong></li>
+          <li>Les volumes de snapshot sont des LV <strong>épais</strong></li>
+          <li>Limite : avec un TPM, le snapshot le plus récent ne peut pas être supprimé VM allumée</li>
+        </ul></div>
+        <div class="concept-card"><h4>Stockage SAN/NAS existant : les options</h4><ul>
+          <li>Recommandation officielle : <strong>Ceph</strong> pour le partagé</li>
+          <li>Une grosse LUN iSCSI/FC + <strong>LVM épais partagé</strong> (+ multipath)</li>
+          <li>Un <strong>partage NFS/CIFS</strong> + qcow2 (snapshots possibles)</li>
+          <li>Plugin du constructeur, ou <strong>ZFS sur iSCSI</strong></li>
+          <li>Déconseillé : une LUN par disque (charge manuelle)</li>
+        </ul></div>
+        <div class="concept-card"><h4>Alternative aux snapshots</h4><ul>
+          <li>Avec <strong>Proxmox Backup Server</strong> : sauvegardes rapides (suivi des blocs modifiés) et <strong>live-restore</strong> (la VM démarre pendant la restauration)</li>
+          <li>Pratique quand le stockage ne sait pas faire de snapshot</li>
+        </ul></div>
+      </div>
     </div>
   </div>
 
@@ -523,6 +629,30 @@ qm config 100                                  <span class="comment"># afficher 
 qm migrate 100 pve2 --online</code></div>
       <div class="tip"><strong>Ordre de démarrage :</strong> <code>onboot: 1</code> démarre la VM avec le nœud ; <code>startup: order=1,up=30,down=60</code> règle l'ordre et les délais.</div>
       <div class="warn"><strong>Snapshots :</strong> ils sont pratiques avant une mise à jour mais ne remplacent <strong>pas</strong> une sauvegarde (même stockage que le disque). Un snapshot « avec RAM » capture aussi l'état en mémoire.</div>
+
+      <h3>Snapshots de VM en détail</h3>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Ce qu'est un snapshot</h4><ul>
+          <li>État des <strong>disques</strong> + <strong>configuration</strong> de la VM à un instant donné</li>
+          <li>La config est conservée dans une section <code>[nom]</code> du fichier <code>.conf</code></li>
+          <li>Option <strong>« inclure la RAM »</strong> (<code>--vmstate 1</code>) : on revient à une VM en marche, état mémoire compris (le fichier d'état demande de la place)</li>
+        </ul></div>
+        <div class="concept-card"><h4>Rollback et suppression</h4><ul>
+          <li><code>qm rollback</code> remet disques et config à l'état du snapshot : <strong>les modifications faites depuis sont perdues</strong></li>
+          <li>Revenir à un snapshot ancien implique souvent de <strong>supprimer les plus récents</strong> (selon le stockage)</li>
+          <li>Supprimer un snapshot fusionne ses changements, ce n'est pas une annulation</li>
+        </ul></div>
+        <div class="concept-card"><h4>Quand les éviter</h4><ul>
+          <li>Snapshots <strong>conservés longtemps</strong> : espace consommé et performances dégradées (surtout qcow2 interne, LVM classique)</li>
+          <li>Pas un backup : même stockage que le disque, perdu avec lui</li>
+          <li>VM avec périphérique PCI en passthrough : pas de snapshot avec RAM</li>
+        </ul></div>
+      </div>
+      <div class="code-block"><code>qm snapshot 100 avant-maj --vmstate 1 --description "avant mise à jour"
+qm listsnapshot 100
+qm rollback 100 avant-maj
+qm delsnapshot 100 avant-maj
+pct snapshot 200 avant-maj ; pct rollback 200 avant-maj   <span class="comment"># conteneurs : stockage compatible requis</span></code></div>
     </div>
   </div>
 
@@ -618,6 +748,64 @@ pvecm expected 1                               <span class="comment"># DANGER : 
         </ul></div>
       </div>
       <div class="warn"><strong>Piège :</strong> un nœud retiré avec <code>pvecm delnode</code> ne doit <strong>jamais</strong> revenir tel quel sur le même réseau : il faut le réinstaller (ses ID et sa configuration entreraient en conflit).</div>
+
+      <h3>Approfondissement cluster</h3>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Réseau corosync : chiffres à connaître</h4><ul>
+          <li>Latence <strong>stable et inférieure à 5 ms</strong> recommandée ; au-delà de 10 ms, une exploitation stable est improbable avec plus de 3 nœuds</li>
+          <li>Faible débit mais <strong>très sensible à la gigue</strong> : une carte 1 Gbit <strong>dédiée</strong> suffit</li>
+          <li>Ne pas partager avec le stockage, les sauvegardes ou la migration : ils saturent le lien</li>
+          <li>Jusqu'à <strong>8 liens</strong> (transport kronosnet) : <code>--link0</code>, <code>--link1</code>, avec <code>priority</code> par lien</li>
+        </ul></div>
+        <div class="concept-card"><h4>Rejoindre un cluster : ce qui se passe</h4><ul>
+          <li><code>pvecm add IP-DU-CLUSTER</code> (ou depuis l'interface), avec <code>--link0 IP-LOCALE</code> si réseau cluster séparé</li>
+          <li>Authentification par défaut via l'API : <strong>mot de passe root@pam</strong> d'un nœud existant + vérification de l'<strong>empreinte SHA-256</strong> du certificat</li>
+          <li>La config de <code>/etc/pve</code> du nœud est <strong>écrasée</strong> ; il hérite des <strong>stockages du cluster</strong></li>
+          <li>Son certificat est remplacé par un certificat signé par la <strong>CA du cluster</strong></li>
+          <li>Conflit d'ID si des invités existent déjà : les sauvegarder (vzdump), puis restaurer avec un autre ID après l'adhésion</li>
+        </ul></div>
+        <div class="concept-card"><h4>Votes et QDevice</h4><ul>
+          <li><strong>1 vote par nœud</strong> par défaut (<code>corosync_votequorum</code>)</li>
+          <li>QDevice : <code>corosync-qnetd</code> sur un serveur <strong>externe indépendant</strong>, <code>corosync-qdevice</code> sur chaque nœud</li>
+          <li>Algorithme <code>ffsplit</code> : en cas d'égalité, la partition au plus petit ID de nœud l'emporte</li>
+          <li><strong>Nombre pair</strong> de nœuds : idéal (+1 voix) ; <strong>nombre impair</strong> : déconseillé (N-1 voix → le qnetd devient un point de défaillance)</li>
+        </ul></div>
+        <div class="concept-card"><h4>Chronologie d'une panne (HA)</h4><ul>
+          <li>Chaque nœud HA signale sa présence toutes les <strong>10 s</strong></li>
+          <li>Si un nœud disparaît, le cluster attend <strong>~2 minutes</strong> avant de relancer ses invités HA ailleurs</li>
+          <li>Un nœud vivant qui perd le quorum attend <strong>~1 minute</strong> puis <strong>se fence lui-même</strong> (équivalent d'un reset)</li>
+          <li>Si tous les nœuds ont le même problème de corosync, tout le cluster semble redémarrer d'un coup</li>
+        </ul></div>
+      </div>
+      <h3>Procédures d'exploitation</h3>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Retirer un nœud proprement</h4><ul>
+          <li>1. Migrer ou supprimer tous les invités, <strong>sauvegarder</strong> les données locales</li>
+          <li>2. Le sortir des jobs de <strong>réplication</strong> ; si Ceph : détruire OSD, MDS, MON, MGR et retirer le bucket CRUSH (attendre <code>HEALTH_OK</code>)</li>
+          <li>3. <strong>Éteindre</strong> le nœud et s'assurer qu'il ne reviendra pas sur le réseau</li>
+          <li>4. Depuis un autre nœud : <code>pvecm delnode nœud</code>, puis <code>pvecm nodes</code></li>
+          <li>5. Nettoyer <code>/etc/pve/nodes/nœud</code></li>
+        </ul></div>
+        <div class="concept-card"><h4>Séparer sans réinstaller (déconseillé)</h4><ul>
+          <li>Résoudre d'abord le stockage partagé</li>
+          <li><code>systemctl stop pve-cluster corosync</code> puis <code>pmxcfs -l</code> (mode local)</li>
+          <li>Supprimer <code>/etc/pve/corosync.conf</code> et <code>/etc/corosync/*</code>, relancer pve-cluster</li>
+          <li><code>pvecm delnode</code> depuis l'autre côté, nettoyer <code>/var/lib/corosync/*</code></li>
+          <li>Procédure risquée : la réinstallation reste la méthode sûre</li>
+        </ul></div>
+        <div class="concept-card"><h4>Modifier corosync.conf sans casser</h4><ul>
+          <li>Copier en <code>corosync.conf.new</code>, éditer cette copie</li>
+          <li><strong>Toujours incrémenter <code>config_version</code></strong> dans la section <code>totem</code></li>
+          <li>Garder une sauvegarde <code>corosync.conf.bak</code>, puis remplacer le fichier</li>
+          <li>Redémarrer corosync si les changements ne sont pas pris en compte</li>
+        </ul></div>
+        <div class="concept-card"><h4>Cas particuliers</h4><ul>
+          <li><strong>Hostname et IP</strong> d'un nœud : <strong>non modifiables</strong> après la création du cluster</li>
+          <li><strong>Démarrage à froid</strong> (panne électrique totale) : pas de quorum tant que les nœuds ne sont pas revenus ; le service <code>pve-guests</code> attend le quorum puis démarre les invités <code>onboot</code></li>
+          <li><strong>Plage de VMID</strong> automatique : <em>Datacenter → Options → Next free VMID range</em></li>
+          <li><strong>Abonnement</strong> : chaque nœud a le sien, tous au même niveau</li>
+        </ul></div>
+      </div>
     </div>
   </div>
 
@@ -701,6 +889,25 @@ ha-manager crm-command node-maintenance enable pve1   <span class="comment"># vi
       </div>
       <div class="code-block"><code>pvesr create-local-job 100-0 pve2 --schedule "*/15"   <span class="comment"># toutes les 15 minutes</span>
 pvesr status ; pvesr list</code></div>
+
+      <h3>Migration : options et conditions</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Option / sujet</th><th>Effet</th><th>Quand</th></tr></thead>
+        <tbody>
+          <tr><td><code>--online</code></td><td>Migration à chaud d'une VM en marche</td><td>Toujours pour éviter l'arrêt</td></tr>
+          <tr><td><code>--with-local-disks</code></td><td>Copie aussi les disques situés sur un stockage local</td><td>Pas de stockage partagé</td></tr>
+          <tr><td><code>--targetstorage</code></td><td>Choisit le stockage de destination des disques</td><td>Nœud cible avec stockage différent</td></tr>
+          <tr><td><code>--migration_type</code></td><td><code>secure</code> (chiffré SSH, défaut) ou <code>insecure</code></td><td>insecure : réseau 100 % maîtrisé seulement</td></tr>
+          <tr><td><code>--migration_network</code></td><td>Réseau dédié (CIDR) pour la migration</td><td>Éviter de saturer corosync</td></tr>
+          <tr><td>Type de CPU</td><td><code>host</code> si CPU identiques ; sinon un modèle générique <code>x86-64-v2-AES</code>…</td><td>Évite un plantage de la VM migrée vers un autre CPU</td></tr>
+          <tr><td>Passthrough PCI</td><td><strong>Bloque la migration à chaud</strong></td><td>Utiliser les « resource mappings » en cluster</td></tr>
+        </tbody>
+      </table></div>
+      <div class="code-block"><code>qm migrate 100 pve2 --online
+qm migrate 100 pve2 --online --with-local-disks --targetstorage local-lvm
+qm migrate 100 pve2 --online --migration_network 10.1.2.0/24 --migration_type secure
+pct migrate 200 pve2 --restart</code></div>
+      <div class="warn"><strong>Migration de stockage ≠ migration de nœud :</strong> <code>qm disk move</code> change le stockage d'un disque (VM sur le même nœud), <code>qm migrate</code> change le nœud. Les deux peuvent se faire VM allumée.</div>
     </div>
   </div>
 
@@ -884,6 +1091,185 @@ ceph -s                                        <span class="comment"># état glo
 
   <!-- S16 -->
   <div class="section" id="s16">
+    <div class="section-header"><span class="section-num">16</span><span class="section-title-text">Migration VMware (ESXi / vCenter) → Proxmox VE</span><span class="section-nb">Volet technique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Import ESXi</span><span class="tag">OVF</span><span class="tag">qm disk import</span><span class="tag">VirtIO</span></div>
+      <div class="info"><strong>Principe :</strong> migrer = recréer la VM côté Proxmox (CPU, RAM, carte réseau, firmware) et y amener les <strong>disques</strong>, puis remplacer les outils et pilotes VMware par ceux de KVM. Source : article « Migrate to Proxmox VE » du wiki officiel, écrit avec VMware en source (la plupart des étapes valent pour d'autres hyperviseurs). <strong>Teste toujours sur une VM de test avant la production.</strong></div>
+
+      <h3>Correspondance des concepts</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>VMware</th><th>Proxmox VE</th><th>Remarque</th></tr></thead>
+        <tbody>
+          <tr><td>ESXi (hôte)</td><td>Nœud</td><td>Debian + noyau Proxmox</td></tr>
+          <tr><td>vCenter</td><td>Cluster (pas de serveur de gestion séparé)</td><td>Multi-maître : on gère depuis n'importe quel nœud</td></tr>
+          <tr><td>Datastore VMFS / NFS</td><td>Stockage (<code>storage.cfg</code>)</td><td>LVM partagé sur LUN, NFS, ou <strong>Ceph</strong> (recommandé)</td></tr>
+          <tr><td>vSAN</td><td>Ceph (hyperconvergé)</td><td>Ou ZFS + réplication</td></tr>
+          <tr><td>VMDK (thin / thick)</td><td>qcow2, raw (ou vmdk)</td><td>Conversion à l'import</td></tr>
+          <tr><td>vSwitch / groupe de ports</td><td>Pont Linux <code>vmbr</code> + VLAN</td><td>SDN pour le multi-nœud</td></tr>
+          <tr><td>vMotion</td><td>Migration à chaud (<code>qm migrate --online</code>)</td><td>Même principe</td></tr>
+          <tr><td>Storage vMotion</td><td>Move Storage (<code>qm disk move</code>)</td><td>VM allumée</td></tr>
+          <tr><td>VMware HA</td><td>HA (<code>ha-manager</code>)</td><td>Fencing par watchdog</td></tr>
+          <tr><td>DRS</td><td>CRS (planification de ressources) et règles d'affinité</td><td>Moins automatique que DRS</td></tr>
+          <tr><td>VMware Tools</td><td><code>qemu-guest-agent</code> + pilotes VirtIO</td><td>À remplacer</td></tr>
+          <tr><td>Modèle / clone</td><td>Modèle + clone (+ cloud-init)</td><td><code>qm template</code>, <code>qm clone</code></td></tr>
+          <tr><td>vSphere Replication</td><td>Réplication de stockage ZFS (<code>pvesr</code>)</td><td>Asynchrone, ZFS uniquement</td></tr>
+          <tr><td>Sauvegarde tierce (ex. Veeam)</td><td>vzdump ou <strong>Proxmox Backup Server</strong></td><td>Dédup., incrémental, live-restore</td></tr>
+          <tr><td>NSX / micro-segmentation</td><td>SDN + pare-feu Proxmox</td><td>Plus simple, moins riche</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Choisir la méthode</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Méthode</th><th>Arrêt de la VM</th><th>Quand l'utiliser</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Import automatique ESXi</strong> (assistant)</td><td>Pendant l'import</td><td>Cas général : un seul assistant, config presque entièrement reprise</td></tr>
+          <tr><td><strong>Live-import</strong></td><td><strong>Réduit</strong> : la VM démarre pendant que les disques arrivent</td><td>Gros disques, arrêt court souhaité (la VM source reste éteinte)</td></tr>
+          <tr><td><code>qm importovf</code> (OVF/OVA)</td><td>Pendant export + import</td><td>Pas d'accès direct à l'ESXi, ou export fait avec <code>ovftool</code></td></tr>
+          <tr><td><code>qm disk import</code> (VMDK)</td><td>Pendant l'import</td><td>Disques récupérés sur un partage ; création manuelle de la VM</td></tr>
+          <tr><td><strong>Attach &amp; Move Disk</strong></td><td><strong>Minimal</strong></td><td>Volumes énormes : démarrer sur le VMDK du partage puis déplacer le disque à chaud</td></tr>
+          <tr><td>Restauration de sauvegarde</td><td>Selon l'outil</td><td>Outil de sauvegarde intégré, ou restauration in situ depuis un média live</td></tr>
+          <tr><td>Clonage direct (Clonezilla)</td><td>Long</td><td>Dernier recours, disques à cloner VM source → VM cible</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Préparation de la VM source</h3>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>À faire AVANT la migration</h4><ul>
+          <li><strong>Désinstaller VMware Tools</strong> (plus dur à retirer après)</li>
+          <li>Noter la <strong>configuration réseau</strong> (IP, DNS, passerelle)</li>
+          <li><strong>Windows</strong> : envisager de retirer l'IP statique, sinon avertissement d'IP en double sur le nouvel adaptateur</li>
+          <li><strong>DHCP</strong> : adapter la réservation à la nouvelle adresse MAC, ou fixer la MAC sur la carte de la VM cible</li>
+          <li>Chiffrement de disque : l'état <strong>vTPM n'est pas migrable</strong> ; désactiver, ou garder les clés manuelles</li>
+          <li><strong>Éteindre</strong> la VM source pour un état cohérent</li>
+        </ul></div>
+        <div class="concept-card"><h4>VM cible : bonnes pratiques</h4><ul>
+          <li><strong>BIOS</strong> : SeaBIOS si la source démarre en legacy, <strong>OVMF</strong> si elle démarre en UEFI (+ disque EFI)</li>
+          <li><strong>CPU</strong> : <code>host</code> si tous les nœuds sont identiques, sinon <code>x86-64-v2-AES</code> ou supérieur</li>
+          <li><strong>Disques</strong> : bus SCSI + contrôleur <strong>VirtIO SCSI single</strong>, <code>discard</code> et <code>IO thread</code> activés</li>
+          <li><strong>Réseau</strong> : VirtIO (modèle E1000 pour anciens OS sans pilote)</li>
+          <li><strong>Mémoire</strong> : activer le ballooning (même inutile, il remonte l'usage réel)</li>
+          <li><strong>Agent</strong> : installer <code>qemu-guest-agent</code></li>
+        </ul></div>
+      </div>
+
+      <h3>Méthode 1 — Import automatique depuis ESXi (pas à pas)</h3>
+      <ol>
+        <li>Proxmox VE en <strong>version 8 ou plus</strong>, à jour</li>
+        <li><em>Datacenter → Storage → Add → ESXi</em> : adresse de l'hôte ESXi et identifiants d'un compte admin. Certificat auto-signé : ajouter la CA ou cocher <em>Skip Certificate Verification</em></li>
+        <li>Préférer l'<strong>hôte ESXi directement</strong> : passer par vCenter <strong>réduit fortement les performances</strong></li>
+        <li>Sélectionner ce stockage dans l'arbre : le panneau <em>Import</em> liste les VM disponibles</li>
+        <li>Choisir la VM → <em>Import</em> ; régler au minimum <strong>le stockage cible</strong> des disques et <strong>le pont réseau</strong></li>
+        <li>Onglet <em>Advanced</em> : stockage par disque, modèle de carte réseau, ISO du lecteur, ne pas importer certains disques / cartes</li>
+        <li>Onglet <em>Resulting Config</em> : vérifier la configuration générée</li>
+        <li>Terminer la préparation, <strong>éteindre la VM côté ESXi</strong>, lancer l'import</li>
+        <li>Démarrer la VM et traiter les points de la section post-migration</li>
+      </ol>
+      <ul>
+        <li>Testé depuis ESXi <strong>6.5 jusqu'à 8.0</strong></li>
+        <li><strong>Live-import</strong> : la VM démarre pendant l'import (les données nécessaires au démarrage arrivent d'abord, le reste en arrière-plan). La VM ESXi reste <strong>éteinte</strong>, donc il y a quand même un arrêt. Légère perte de performances au début. <strong>En cas d'échec, tout ce qui a été écrit depuis le démarrage est perdu</strong> : à tester d'abord, à éviter sur réseau lent ou instable</li>
+        <li><strong>Import en masse :</strong> sérialiser les imports, <strong>pas plus de 4 disques en parallèle</strong>. Limites : nombre de connexions de l'API ESXi (au-delà, blocage d'environ 30 s, parfois erreurs 503 → ajuster <code>Config.HostAgent.vmacore.soap.maxSessionCount</code>) et mémoire (cache de lecture : 8 blocs de 128 Mio par disque)</li>
+      </ul>
+
+      <h3>Méthode 2 — Export OVF puis <code>qm importovf</code></h3>
+      <div class="code-block"><code><span class="comment"># Sur l'hôte Proxmox : exporter depuis un ESXi (ovftool de VMware, version compatible)</span>
+apt install unzip
+./ovftool vi://root@ESXI-IP/NOM-VM /chemin/export
+<span class="comment"># ou depuis vCenter</span>
+./ovftool vi://USER:MDP@VCENTER/DATACENTER/vm/NOM-VM /chemin/export
+
+<span class="comment"># Importer (VMID libre, stockage avec contenu « Disk Image »)</span>
+qm importovf 100 Server.ovf local-zfs
+qm importovf 100 Server.ovf nas --format qcow2   <span class="comment"># format raw | vmdk | qcow2 sur stockage fichier</span>
+qm set 100 --cpu x86-64-v2-AES --scsihw virtio-scsi-single</code></div>
+      <p>Après l'import, il faut <strong>ajouter une carte réseau</strong> et aligner la VM sur les bonnes pratiques. Pour une VM <strong>Windows</strong>, repasser d'abord le disque en <strong>IDE ou SATA</strong> (détacher le disque « Unused », le rattacher sur ce bus).</p>
+
+      <h3>Méthode 3 — Import de disque (<code>qm disk import</code>)</h3>
+      <ol>
+        <li>Rendre les fichiers <code>*.vmdk</code> <strong>et</strong> <code>*-flat.vmdk</code> accessibles (partage NFS/SMB déclaré comme stockage, ou copie)</li>
+        <li>Créer la VM cible à la main et <strong>supprimer le disque par défaut</strong></li>
+        <li>Importer : le disque est converti au format cible à la volée</li>
+        <li>Le disque apparaît en <code>unusedX</code> : l'attacher sur un bus, l'activer dans l'ordre de démarrage</li>
+      </ol>
+      <div class="code-block"><code>cd /mnt/pve/NOM-STOCKAGE/NOM-VM
+qm disk import 104 Server.vmdk local-zfs                <span class="comment"># ancien nom : qm importdisk</span>
+qm disk import 104 Server.vmdk nas --format qcow2
+qm set 104 --scsi0 local-zfs:vm-104-disk-0,discard=on,iothread=1
+qm set 104 --boot order=scsi0</code></div>
+
+      <h3>Méthode 4 — Attach &amp; Move Disk (arrêt minimal)</h3>
+      <p>Idée : démarrer la VM Proxmox <strong>directement sur le VMDK</strong> posé sur un partage commun, puis déplacer le disque vers le stockage définitif <strong>VM allumée</strong>.</p>
+      <ol>
+        <li>Déclarer le partage comme stockage Proxmox (contenu « Disk Image ») : monté sous <code>/mnt/pve/NOM</code></li>
+        <li>Créer la VM cible ; pour le disque système, choisir ce stockage au format <code>vmdk</code> (EFI et TPM sur le stockage définitif)</li>
+        <li>Copier le <code>.vmdk</code> source par-dessus celui que Proxmox vient de créer ; <strong>laisser le <code>-flat.vmdk</code> en place</strong></li>
+        <li>Éditer le descripteur copié : la ligne « Extent description » doit pointer en <strong>chemin relatif</strong> vers le <code>-flat.vmdk</code> source</li>
+        <li>Éteindre la VM côté VMware, <strong>puis</strong> démarrer côté Proxmox</li>
+        <li>VM allumée : <em>Disk Action → Move Storage</em> vers le stockage cible</li>
+      </ol>
+      <div class="code-block"><code>cp Server/Server.vmdk images/103/vm-103-disk-0.vmdk
+nano images/103/vm-103-disk-0.vmdk
+<span class="comment"># avant :</span>  RW 104857600 VMFS "Server-flat.vmdk"
+<span class="comment"># après :</span>  RW 104857600 VMFS "../../Server/Server-flat.vmdk"</code></div>
+      <div class="warn"><strong>Danger :</strong> ne jamais allumer la même VM côté VMware <strong>et</strong> côté Proxmox : corruption de disque assurée.</div>
+
+      <h3>Pilotes VirtIO : Windows et Linux</h3>
+      <div class="concept-grid">
+        <div class="concept-card"><h4>Windows</h4><ul>
+          <li>Démarre « tel quel » seulement sur <strong>IDE ou SATA</strong></li>
+          <li>Joindre l'<strong>ISO des pilotes VirtIO</strong> (lecteur CD supplémentaire), installer les pilotes</li>
+          <li>Procédure officielle pour basculer le disque de démarrage sur <strong>VirtIO SCSI</strong> (ajout d'un disque VirtIO temporaire pour charger le pilote avant de changer le bus du disque système)</li>
+          <li>Pilote réseau et ballooning à installer aussi</li>
+        </ul></div>
+        <div class="concept-card"><h4>Linux</h4><ul>
+          <li>Les pilotes VirtIO sont <strong>dans le noyau</strong> ; vérifier qu'ils sont inclus dans l'<strong>initramfs</strong> avant migration</li>
+          <li>Sinon : démarrer en <strong>mode secours</strong> (initramfs plus complet), ou passer le bus du disque en IDE/SATA pour amorcer, puis régénérer l'initramfs</li>
+          <li>Nom d'interface réseau changé : mettre à jour la config (netplan, NetworkManager, ifcfg)</li>
+        </ul></div>
+      </div>
+
+      <h3>Après la migration</h3>
+      <ul>
+        <li>Mettre à jour la <strong>configuration réseau</strong> (le nom de la carte a changé)</li>
+        <li>Installer les <strong>pilotes manquants</strong> (VirtIO surtout sous Windows) et <code>qemu-guest-agent</code></li>
+        <li>Retirer VMware Tools s'ils sont encore là</li>
+        <li>Activer l'<strong>agent</strong> dans les options de la VM, régler <code>onboot</code> et l'ordre de démarrage</li>
+        <li>Ajouter la VM aux <strong>sauvegardes</strong> et, si besoin, à la <strong>HA</strong> ; faire un test de restauration</li>
+        <li>Déplacer le disque vers son stockage définitif (Ceph, LVM-thin…) si ce n'est pas déjà fait</li>
+        <li>Garder la VM source <strong>éteinte, non supprimée</strong>, quelque temps (retour arrière possible)</li>
+      </ul>
+
+      <h3>Limites connues et pièges</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Problème</th><th>Détail</th><th>Contournement</th></tr></thead>
+        <tbody>
+          <tr><td>Disques sur <strong>vSAN</strong></td><td>L'import automatique ne fonctionne pas</td><td>Déplacer d'abord les disques vers un autre datastore</td></tr>
+          <tr><td>VM avec <strong>snapshots</strong></td><td>Import nettement plus lent</td><td>Supprimer / consolider les snapshots avant</td></tr>
+          <tr><td>Disques <strong>chiffrés</strong> (storage policy) ou vTPM</td><td>Import impossible / état vTPM non migrable</td><td>Retirer la politique de chiffrement ; garder les clés manuelles</td></tr>
+          <tr><td>Datastore avec caractère spécial (ex. « + »)</td><td>Peut échouer</td><td>Renommer le datastore</td></tr>
+          <tr><td>Import via <strong>vCenter</strong></td><td>Performances réduites</td><td>Se connecter à l'hôte ESXi</td></tr>
+          <tr><td>Windows ne démarre pas en VirtIO</td><td>Pilote de stockage absent</td><td>IDE/SATA d'abord, puis procédure VirtIO</td></tr>
+          <tr><td>Snapshots sur LVM épais partagé</td><td>Impossibles par défaut</td><td>« Snapshots as Volume-Chain » (aperçu) ou PBS + live-restore</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Runbook type pour migrer une VM</h3>
+      <ol>
+        <li>Inventaire : OS, firmware (BIOS/UEFI), disques (taille, thin/thick), réseaux, IP/MAC, snapshots, chiffrement</li>
+        <li>Supprimer les snapshots, retirer VMware Tools, noter le réseau</li>
+        <li>Créer / planifier le stockage cible (LVM-thin, Ceph, NFS) et le pont réseau</li>
+        <li>Choisir la méthode (tableau ci-dessus) et tester sur une VM jetable</li>
+        <li>Annoncer la fenêtre de maintenance, éteindre la VM source</li>
+        <li>Importer, vérifier la <em>Resulting Config</em></li>
+        <li>Premier démarrage (IDE/SATA si Windows), pilotes et agent</li>
+        <li>Passer en VirtIO SCSI + <code>discard</code> + <code>IO thread</code>, régler le réseau</li>
+        <li>Tests applicatifs, sauvegarde et test de restauration, HA si nécessaire</li>
+        <li>Conserver la VM source quelques jours, puis la supprimer</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- S17 -->
+  <div class="section" id="s17">
     <div class="section-header"><span class="section-num" style="background:#fef3cd;color:#996600">⚠</span><span class="section-title-text">Pièges fréquents et aide-mémoire</span><span class="section-nb">À relire avant de pratiquer</span></div>
     <div class="section-body">
       <h3>Les 12 pièges classiques</h3>
@@ -935,11 +1321,11 @@ ceph -s                                        <span class="comment"># état glo
     </div>
   </div>
 
-  <!-- S17 -->
-  <div class="section" id="s17">
-    <div class="section-header"><span class="section-num">17</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
+  <!-- S18 -->
+  <div class="section" id="s18">
+    <div class="section-header"><span class="section-num">18</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
     <div class="section-body">
-      <div class="tags"><span class="tag">Pratique</span><span class="tag">30 questions</span></div>
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">46 questions</span></div>
       <div class="info"><strong>Le labo qui coûte presque rien :</strong> installe Proxmox dans une VM (virtualisation imbriquée activée) ou sur un vieux PC. Pour le cluster, trois VM Proxmox suffisent ; pour la HA, ajoute un petit stockage NFS partagé.</div>
       <h3>Parcours en 5 séances</h3>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table">
@@ -985,6 +1371,23 @@ ceph -s                                        <span class="comment"># état glo
         <details><summary>Que compose une permission dans Proxmox ?</summary><p>Un triplet chemin + sujet (utilisateur, groupe ou jeton) + rôle, avec propagation par défaut.</p></details>
         <details><summary>Quels rôles pour un accès en lecture seule et pour administrer des VM ?</summary><p>PVEAuditor (lecture seule) et PVEVMAdmin (administration des VM).</p></details>
         <details><summary>Valeurs par défaut d'un pool Ceph et signification ?</summary><p>size 3 (trois copies) et min_size 2 : les E/S continuent tant qu'au moins deux copies sont disponibles.</p></details>
+        <details><summary>Quelle est la différence entre un volume thick et thin ?</summary><p>Thick : tout l'espace est réservé à la création. Thin : les blocs sont alloués à l'écriture, ce qui permet de surallouer, avec le risque qu'un pool plein provoque des erreurs d'E/S sur tous les invités.</p></details>
+        <details><summary>Pourquoi le LVM classique est-il déconseillé pour les snapshots, contrairement au LVM-thin ?</summary><p>Un snapshot LVM classique ralentit toutes les écritures du groupe de volumes tant qu'il existe. Le LVM-thin gère snapshots et clones nativement et efficacement.</p></details>
+        <details><summary>LVM-thin peut-il être partagé entre nœuds ?</summary><p>Non, un pool thin est local à un nœud. Le LVM épais, lui, peut être partagé sur une LUN iSCSI/FC/SAS avec le drapeau shared.</p></details>
+        <details><summary>Quand utiliser qcow2 plutôt que raw ?</summary><p>Sur stockage fichier (répertoire, NFS, CIFS), pour avoir snapshots, thin provisioning et clones liés. raw est plus rapide mais sans fonctions. Sur LVM, ZFS ou Ceph, le volume est brut.</p></details>
+        <details><summary>Quel est le défaut d'un snapshot interne qcow2 ?</summary><p>Sa création ou suppression bloque la VM en marche et peut prendre très longtemps sur de gros disques, surtout sur NFS.</p></details>
+        <details><summary>Qu'est-ce que « Snapshots as Volume-Chain » ?</summary><p>Une fonction (aperçu technique depuis PVE 9.0) qui crée un volume par snapshot, chaînés en qcow2, par exemple sur LVM épais partagé. Efficace si le stockage dessous est thin avec discard.</p></details>
+        <details><summary>Un snapshot VM remplace-t-il une sauvegarde ?</summary><p>Non : il est sur le même stockage que le disque et se perd avec lui. Il sert de point de retour rapide avant une opération.</p></details>
+        <details><summary>Quelle latence pour corosync et pourquoi un réseau dédié ?</summary><p>Moins de 5 ms et stable ; au-delà de 10 ms, instable avec plus de 3 nœuds. La sensibilité est à la gigue : un lien saturé par stockage ou sauvegarde peut faire fencer des nœuds.</p></details>
+        <details><summary>Que se passe-t-il à l'ajout d'un nœud au cluster ?</summary><p>Authentification par le mot de passe root@pam d'un nœud et empreinte SHA-256 ; sa configuration /etc/pve est écrasée, il hérite des stockages et reçoit un certificat signé par la CA du cluster.</p></details>
+        <details><summary>Dans quels cas un QDevice est-il recommandé ou déconseillé ?</summary><p>Recommandé avec un nombre pair de nœuds (ajoute une voix). Déconseillé avec un nombre impair : le qnetd devient un point de défaillance unique.</p></details>
+        <details><summary>Quelles sont les étapes pour retirer un nœud ?</summary><p>Migrer ou supprimer les invités, sauvegarder, sortir des réplications et de Ceph, éteindre le nœud, pvecm delnode depuis un autre nœud, vérifier avec pvecm nodes, nettoyer /etc/pve/nodes/nœud.</p></details>
+        <details><summary>Qu'est-ce qui est obligatoire quand on modifie corosync.conf ?</summary><p>Travailler sur une copie, incrémenter config_version dans totem, garder une sauvegarde, puis remplacer le fichier.</p></details>
+        <details><summary>Quelles sont les méthodes pour migrer une VM depuis VMware ?</summary><p>Import automatique ESXi (assistant), live-import, OVF (qm importovf), import de disque (qm disk import), attach & move disk, restauration de sauvegarde, clonage direct.</p></details>
+        <details><summary>Pourquoi éviter l'import via vCenter ?</summary><p>Les performances sont fortement réduites ; il vaut mieux se connecter directement à l'hôte ESXi.</p></details>
+        <details><summary>Que faut-il faire avant de migrer une VM Windows depuis VMware ?</summary><p>Désinstaller VMware Tools, noter ou retirer l'IP statique, gérer la MAC (DHCP), éteindre la VM ; après import, démarrer en IDE/SATA puis installer les pilotes VirtIO avant de basculer.</p></details>
+        <details><summary>Quelles sont les limites de l'import automatique ESXi ?</summary><p>Pas de disques sur vSAN, import lent avec snapshots, pas de disques chiffrés, vTPM non migrable, datastores avec caractère spécial parfois en échec.</p></details>
+        <details><summary>Quel danger avec la méthode attach & move disk ?</summary><p>Allumer la VM des deux côtés (VMware et Proxmox) : corruption du disque. Éteindre la source avant de démarrer la cible.</p></details>
       </div>
     </div>
   </div>
