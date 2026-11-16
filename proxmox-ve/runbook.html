@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2b2f36">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Runbook migration VMware vers Proxmox</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<style>
+:root{--paper:#f4f6f8;--sheet:#fff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;--accent:#b85600;--accent-soft:#fdeedd;--ok:#1d7a4f;--ok-soft:#e3f3ea;--f-body:"Segoe UI",system-ui,sans-serif;--f-mono:ui-monospace,Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#ff9d42;--accent-soft:#33210f;--ok:#5ccf95;--ok-soft:#163327;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#ff9d42;--accent-soft:#33210f;--ok:#5ccf95;--ok-soft:#163327;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--f-body);margin:0}
+.wrap{max-width:980px;margin:0 auto;padding:22px max(16px,env(safe-area-inset-left,0px)) 80px}
+a{color:var(--accent)}
+h1{font-size:1.5rem;margin:6px 0 4px}
+h2{font-size:1.05rem;margin:0 0 8px}
+.muted{color:var(--muted);font-size:.85rem}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:14px}
+button,select,input{font:inherit;color:var(--ink)}
+button{background:var(--sheet);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+.tabs{display:flex;gap:6px;margin:14px 0}
+.tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:.78rem;color:var(--muted)}
+label.f input,label.f select{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.prog{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin:8px 0}
+.prog i{display:block;height:100%;background:var(--ok);width:0}
+.chk{display:flex;gap:9px;align-items:flex-start;padding:5px 0;border-top:1px solid var(--line)}
+.chk:first-of-type{border-top:0}
+.chk input{margin-top:4px;width:17px;height:17px;accent-color:var(--ok);flex:none}
+.chk code{font:.82rem var(--f-mono);background:var(--paper);padding:1px 5px;border-radius:4px;word-break:break-word}
+.chk.done span{color:var(--muted);text-decoration:line-through}
+.warn{background:var(--accent-soft);border-left:3px solid var(--accent);padding:8px 12px;border-radius:0 6px 6px 0;font-size:.88rem;margin:10px 0}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--sheet)}
+table{border-collapse:collapse;min-width:1100px;width:100%;font-size:.82rem}
+th,td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:middle}
+th{background:var(--paper);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);white-space:nowrap}
+td input,td select{width:100%;min-width:70px;background:transparent;border:1px solid transparent;border-radius:4px;padding:3px 4px}
+td input:focus,td select:focus{border-color:var(--accent);outline:none;background:var(--paper)}
+td.n input{min-width:130px}
+.hide{display:none}
+@media print{
+  body{background:#fff;color:#000}
+  .bar button,.tabs,.noprint{display:none!important}
+  .card,.tw{border-color:#999;break-inside:avoid}
+  .tw{overflow:visible}
+  table{min-width:0;font-size:.62rem}
+  .hide.printable{display:block}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <a href="index.html" class="muted">← Proxmox VE</a>
+    <span>
+      <button id="themeBtn" type="button">Thème</button>
+      <button id="printBtn" type="button">Imprimer</button>
+    </span>
+  </div>
+  <h1>Runbook de migration VMware → Proxmox VE</h1>
+  <p class="muted">Une checklist par VM (à cocher, sauvegardée dans ce navigateur) et un inventaire à remplir. Rien n'est envoyé nulle part.</p>
+
+  <div class="tabs noprint">
+    <button type="button" id="tabRun" class="on">Runbook (une VM)</button>
+    <button type="button" id="tabInv">Inventaire</button>
+  </div>
+
+  <section id="paneRun">
+    <div class="card">
+      <h2>VM en cours</h2>
+      <div class="grid">
+        <label class="f">Nom de la VM<input id="vmName" placeholder="ex. srv-app01"></label>
+        <label class="f">VMID Proxmox<input id="vmId" placeholder="ex. 120"></label>
+        <label class="f">Date / fenêtre<input id="vmDate" placeholder="ex. 12/12 22h-02h"></label>
+        <label class="f">Méthode<select id="vmMeth">
+          <option>Import ESXi automatique</option><option>Live-import</option><option>OVF (qm importovf)</option>
+          <option>Import de disque (qm disk import)</option><option>Attach &amp; move disk</option><option>Réplication applicative</option><option>Restauration de sauvegarde</option></select></label>
+      </div>
+      <div class="prog"><i id="progBar"></i></div>
+      <div class="muted" id="progTxt"></div>
+      <div class="noprint"><button type="button" id="resetRun">Réinitialiser cette VM</button></div>
+    </div>
+    <div id="phases"></div>
+    <div class="warn"><strong>Règle d'or :</strong> ne jamais démarrer la même VM côté VMware et côté Proxmox. La VM source reste éteinte, non supprimée, jusqu'à validation.</div>
+  </section>
+
+  <section id="paneInv" class="hide">
+    <div class="bar noprint">
+      <span class="muted" id="invCount"></span>
+      <span>
+        <button type="button" id="addRow">+ Ligne</button>
+        <button type="button" id="csvBtn">Exporter CSV</button>
+        <button type="button" id="clearInv">Tout effacer</button>
+      </span>
+    </div>
+    <div class="tw"><table><thead><tr id="invHead"></tr></thead><tbody id="invBody"></tbody></table></div>
+    <p class="muted">Catégories : <strong>Simple</strong> (import automatique), <strong>Moyenne</strong> (gros disques, UEFI, base), <strong>Complexe</strong> (vTPM, vSAN, RDM, chiffrement, matériel), <strong>À repenser</strong> (appliance ou éditeur non supporté sur KVM).</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  function sg(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  function ss(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  // theme
+  var th=sg("proxmox-ve-theme"); if(th) root.setAttribute("data-theme",th);
+  document.getElementById("themeBtn").onclick=function(){
+    var dark=root.getAttribute("data-theme")==="dark"||(!root.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme:dark)").matches);
+    var n=dark?"light":"dark"; root.setAttribute("data-theme",n); ss("proxmox-ve-theme",n);
+  };
+  document.getElementById("printBtn").onclick=function(){window.print()};
+
+  // tabs
+  var paneRun=document.getElementById("paneRun"),paneInv=document.getElementById("paneInv");
+  var tR=document.getElementById("tabRun"),tI=document.getElementById("tabInv");
+  function show(w){var r=w==="run";paneRun.classList.toggle("hide",!r);paneInv.classList.toggle("hide",r);tR.classList.toggle("on",r);tI.classList.toggle("on",!r);ss("pve-rb-tab",w)}
+  tR.onclick=function(){show("run")};tI.onclick=function(){show("inv")};
+
+  // ---- runbook
+  var PH=[
+   ["1. Avant : cadrage de la VM",[
+    "Fiche d'inventaire remplie (OS, firmware BIOS/UEFI, disques, réseau, IP/MAC, snapshots, chiffrement, périphériques)",
+    "Catégorie décidée (simple / moyenne / complexe / à repenser) et méthode choisie",
+    "Support éditeur confirmé sur KVM pour l'application",
+    "Fenêtre de maintenance validée avec le propriétaire du service",
+    "Sauvegarde récente de la VM côté VMware, restauration vérifiée",
+    "Snapshots VMware consolidés (supprimés) ; disques hors vSAN",
+    "Configuration réseau notée (IP, DNS, passerelle, VLAN, MAC) ; réservation DHCP à adapter",
+    "Windows : clés de récupération BitLocker notées / protection suspendue ; vTPM identifié",
+    "VMware Tools désinstallés (ou plan de désinstallation)"]],
+   ["2. Préparation de la cible Proxmox",[
+    "Stockage cible prêt et supervisé (thin : alerte de remplissage), contenu « Disk image » activé",
+    "Pont réseau <code>vmbr</code> et VLAN prêts, correspondance groupes de ports → VLAN vérifiée",
+    "VMID réservé ; sauvegarde (vzdump / PBS) prévue pour la nouvelle VM",
+    "Méthode testée sur une VM jetable (durée mesurée)",
+    "Accès console et plan de retour arrière écrits (IP, DNS, démarrage de la source)"]],
+   ["3. Bascule : arrêt et import",[
+    "Prévenir les utilisateurs, arrêter proprement les services applicatifs",
+    "Éteindre la VM <strong>côté VMware</strong> (arrêt propre) et vérifier qu'elle est bien éteinte",
+    "Lancer l'import (assistant ESXi : stockage cible + pont réseau ; ou <code>qm importovf</code> / <code>qm disk import</code>)",
+    "Vérifier <em>Resulting Config</em> : firmware (SeaBIOS/OVMF + disque EFI), CPU, RAM, ordre de démarrage",
+    "Windows : disque en <strong>SATA</strong> au premier démarrage ; Linux : vérifier l'initramfs (VirtIO)"]],
+   ["4. Premier démarrage et pilotes",[
+    "Démarrer la VM Proxmox (console), vérifier le démarrage de l'OS",
+    "Installer les pilotes VirtIO (stockage, réseau, ballooning) et <code>qemu-guest-agent</code>",
+    "Passer le disque en <strong>VirtIO SCSI single</strong>, <code>discard</code> et <code>IO thread</code> ; carte réseau en VirtIO",
+    "Reconfigurer le réseau (IP, DNS, nom d'interface) ; retirer les restes de VMware Tools",
+    "Activer l'agent dans les options de la VM, régler <code>onboot</code> et l'ordre de démarrage"]],
+   ["5. Validation",[
+    "Tests applicatifs avec le propriétaire du service",
+    "Sauvegarde exécutée <strong>et</strong> restauration testée",
+    "Supervision en place, HA configurée si nécessaire (stockage partagé ou réplication)",
+    "Performances comparées à l'état avant (CPU, disque, réseau)",
+    "Disque déplacé vers son stockage définitif si l'import l'a posé ailleurs (<em>Move Storage</em>)"]],
+   ["6. Clôture",[
+    "VM source <strong>éteinte, non supprimée</strong>, date de suppression fixée (période de rétention)",
+    "Documentation mise à jour (CMDB, schéma, runbook d'exploitation)",
+    "Retour d'expérience noté (durée, incidents, ajustements pour la prochaine vague)",
+    "Suppression de la VM source après la rétention, suppression des anciens points de sauvegarde si prévu"]]
+  ];
+  var KEY="pve-rb-state";
+  var st={}; try{st=JSON.parse(sg(KEY)||"{}")}catch(e){st={}}
+  if(!st.f) st.f={}; if(!st.c) st.c={};
+  function save(){ss(KEY,JSON.stringify(st))}
+  var wrap=document.getElementById("phases"),total=0;
+  PH.forEach(function(p,pi){
+    var d=document.createElement("div");d.className="card";
+    var h=document.createElement("h2");h.textContent=p[0];d.appendChild(h);
+    p[1].forEach(function(t,i){
+      var id=pi+"."+i;total++;
+      var l=document.createElement("label");l.className="chk";
+      var c=document.createElement("input");c.type="checkbox";c.checked=!!st.c[id];
+      var s=document.createElement("span");s.innerHTML=t;
+      l.classList.toggle("done",c.checked);
+      c.onchange=function(){st.c[id]=c.checked;l.classList.toggle("done",c.checked);save();prog()};
+      l.appendChild(c);l.appendChild(s);d.appendChild(l);
+    });
+    wrap.appendChild(d);
+  });
+  function prog(){
+    var n=0;for(var k in st.c){if(st.c[k])n++}
+    document.getElementById("progBar").style.width=(100*n/total)+"%";
+    document.getElementById("progTxt").textContent=n+" / "+total+" étapes cochées";
+  }
+  ["vmName","vmId","vmDate","vmMeth"].forEach(function(id){
+    var e=document.getElementById(id);if(st.f[id])e.value=st.f[id];
+    e.oninput=e.onchange=function(){st.f[id]=e.value;save()};
+  });
+  document.getElementById("resetRun").onclick=function(){
+    if(!document.getElementById("resetRun").dataset.sure){var b=document.getElementById("resetRun");b.dataset.sure=1;b.textContent="Cliquer encore pour confirmer";setTimeout(function(){delete b.dataset.sure;b.textContent="Réinitialiser cette VM"},3000);return}
+    st={f:{},c:{}};save();location.reload();
+  };
+  prog();
+
+  // ---- inventaire
+  var COLS=[["Nom","t","n"],["OS","t"],["Firmware","s",["BIOS","UEFI"]],["vCPU","t"],["RAM (Go)","t"],["Disques (Go)","t"],["Snapshots","s",["non","oui"]],["vTPM / chiffré","s",["non","oui"]],["vSAN / RDM","s",["non","vSAN","RDM"]],["Réseau / VLAN","t"],["IP","t"],["Criticité","s",["1","2","3"]],["Catégorie","s",["Simple","Moyenne","Complexe","À repenser"]],["Méthode","t"],["Vague","t"],["Statut","s",["À faire","En cours","Migrée","Validée"]]];
+  var IK="pve-rb-inv",rows=[];
+  try{rows=JSON.parse(sg(IK)||"[]")}catch(e){rows=[]}
+  var head=document.getElementById("invHead"),body=document.getElementById("invBody");
+  COLS.forEach(function(c){var th=document.createElement("th");th.textContent=c[0];head.appendChild(th)});
+  head.appendChild(document.createElement("th"));
+  function emptyRow(){return COLS.map(function(c){return c[1]==="s"?c[2][0]:""})}
+  function saveInv(){ss(IK,JSON.stringify(rows));document.getElementById("invCount").textContent=rows.length+" VM"}
+  function render(){
+    body.innerHTML="";
+    rows.forEach(function(r,ri){
+      var tr=document.createElement("tr");
+      COLS.forEach(function(c,ci){
+        var td=document.createElement("td");if(c[2]&&c[2]==="n"||c[3]==="n")td.className="n";
+        var e;
+        if(c[1]==="s"){e=document.createElement("select");c[2].forEach(function(o){var op=document.createElement("option");op.textContent=o;e.appendChild(op)});e.value=r[ci]}
+        else{e=document.createElement("input");e.value=r[ci]||""}
+        e.oninput=e.onchange=function(){rows[ri][ci]=e.value;saveInv()};
+        td.appendChild(e);tr.appendChild(td);
+      });
+      var td=document.createElement("td");td.className="noprint";
+      var b=document.createElement("button");b.textContent="✕";b.title="Supprimer la ligne";
+      b.onclick=function(){rows.splice(ri,1);saveInv();render()};
+      td.appendChild(b);tr.appendChild(td);body.appendChild(tr);
+    });
+    saveInv();
+  }
+  document.getElementById("addRow").onclick=function(){rows.push(emptyRow());render()};
+  document.getElementById("clearInv").onclick=function(){
+    var b=document.getElementById("clearInv");
+    if(!b.dataset.sure){b.dataset.sure=1;b.textContent="Cliquer encore pour confirmer";setTimeout(function(){delete b.dataset.sure;b.textContent="Tout effacer"},3000);return}
+    rows=[];render();b.textContent="Tout effacer";delete b.dataset.sure;
+  };
+  document.getElementById("csvBtn").onclick=function(){
+    function q(v){v=String(v==null?"":v);return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+    var lines=[COLS.map(function(c){return q(c[0])}).join(";")].concat(rows.map(function(r){return r.map(q).join(";")}));
+    var blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+    var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="inventaire-migration-vmware.csv";
+    document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
+  };
+  if(!rows.length)rows.push(emptyRow());
+  render();
+  show(sg("pve-rb-tab")==="inv"?"inv":"run");
+})();
+</script>
+</body>
+</html>
