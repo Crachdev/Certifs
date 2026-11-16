@@ -181,7 +181,7 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
     <div class="ps-stats">
       <div class="ps-stat"><b>20</b><span>Sections</span></div>
       <div class="ps-stat"><b>9.x</b><span>Version</span></div>
-      <div class="ps-stat"><b>55</b><span>Q/R</span></div>
+      <div class="ps-stat"><b>61</b><span>Q/R</span></div>
     </div>
   </div>
 
@@ -779,6 +779,121 @@ pvecm expected 1                               <span class="comment"># DANGER : 
           <li>Si tous les nœuds ont le même problème de corosync, tout le cluster semble redémarrer d'un coup</li>
         </ul></div>
       </div>
+      <h3>Quorum et corosync en détail</h3>
+      <div class="info"><strong>Rôles :</strong> <strong>corosync</strong> assure la communication entre nœuds (protocole Totem, transport <strong>kronosnet</strong>, en unicast) et le calcul du <strong>quorum</strong> (module <code>votequorum</code>). <strong>pmxcfs</strong> (service <code>pve-cluster</code>) utilise ce quorum pour savoir si <code>/etc/pve</code> peut être écrit. Sans quorum : les VM déjà en marche <strong>continuent de tourner</strong>, mais on ne peut plus démarrer d'invité ni modifier la configuration.</div>
+
+      <h3>Le calcul du quorum</h3>
+      <p>Le quorum est la <strong>majorité stricte</strong> des votes attendus : <code>quorum = ⌊votes / 2⌋ + 1</code>. Une partition du cluster ne peut agir que si elle a la majorité : c'est ce qui évite le <em>split-brain</em> (deux moitiés qui démarrent chacune la même VM).</p>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Nœuds (1 vote chacun)</th><th>Quorum</th><th>Pannes tolérées</th><th>Commentaire</th></tr></thead>
+        <tbody>
+          <tr><td>2</td><td>2</td><td><strong>0</strong></td><td>Une seule panne = plus de quorum. Ajouter un QDevice</td></tr>
+          <tr><td>3</td><td>2</td><td>1</td><td>Minimum recommandé pour un cluster sans QDevice</td></tr>
+          <tr><td>4</td><td>3</td><td>1</td><td>Pas mieux que 3 ; risque d'égalité 2/2</td></tr>
+          <tr><td>5</td><td>3</td><td>2</td><td>Bonne tolérance</td></tr>
+          <tr><td>2 + QDevice (3 votes)</td><td>2</td><td>1</td><td>Le QDevice apporte la voix de départage</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li>Chaque nœud a <code>quorum_votes: 1</code> par défaut ; on peut pondérer dans la section <code>nodelist</code>, mais c'est rarement une bonne idée</li>
+        <li>Une panne d'un nœud sur 3 ne gêne pas ; <strong>deux</strong> pannes sur 3 font perdre le quorum aux survivants</li>
+        <li>La section <code>quorum</code> de la config contient <code>provider: corosync_votequorum</code></li>
+      </ul>
+
+      <h3>Anatomie de corosync.conf</h3>
+      <div class="code-block"><code>totem {
+  version: 2
+  cluster_name: moncluster
+  config_version: 7              <span class="comment"># À INCRÉMENTER à chaque modification</span>
+  ip_version: ipv4-6
+  secauth: on
+  interface {
+    linknumber: 0
+    knet_link_priority: 20       <span class="comment"># priorité du lien (le plus élevé est préféré)</span>
+  }
+  interface {
+    linknumber: 1
+    knet_link_priority: 10
+  }
+}
+nodelist {
+  node {
+    name: pve1
+    nodeid: 1
+    quorum_votes: 1
+    ring0_addr: 10.10.10.1       <span class="comment"># lien 0 (réseau corosync dédié)</span>
+    ring1_addr: 192.168.1.11     <span class="comment"># lien 1 (secours)</span>
+  }
+  <span class="comment"># ... un bloc node par nœud</span>
+}
+quorum {
+  provider: corosync_votequorum
+}
+logging {
+  to_syslog: yes
+}</code></div>
+      <ul>
+        <li>La config <strong>cluster</strong> est <code>/etc/pve/corosync.conf</code> (répliquée par pmxcfs) ; la copie <strong>locale</strong> utilisée par le service est <code>/etc/corosync/corosync.conf</code> ; la clé partagée est <code>/etc/corosync/authkey</code></li>
+        <li>Quand <code>config_version</code> augmente dans la copie cluster, les nœuds la recopient en local puis corosync recharge ; <strong>sans incrément, la modification n'est pas propagée</strong></li>
+        <li><code>ring0_addr</code> peut être une IP ou un nom ; <strong>préférer des IP</strong> pour ne pas dépendre du DNS</li>
+        <li>Chaque lien est un réseau physique distinct de préférence ; kronosnet bascule automatiquement sur un autre lien si l'un tombe</li>
+      </ul>
+
+      <h3>Lire l'état : pvecm status et outils corosync</h3>
+      <div class="code-block"><code>pvecm status
+<span class="comment"># Votequorum information</span>
+<span class="comment">#   Expected votes:   3     (votes attendus)</span>
+<span class="comment">#   Highest expected: 3</span>
+<span class="comment">#   Total votes:      3     (votes présents)</span>
+<span class="comment">#   Quorum:           2     (seuil)</span>
+<span class="comment">#   Flags:            Quorate  (OK) ; absent = pas de quorum</span>
+
+corosync-cfgtool -s            <span class="comment"># état de chaque lien (connected / disconnected) par nœud</span>
+corosync-quorumtool -s         <span class="comment"># vue détaillée du quorum</span>
+corosync-quorumtool -l         <span class="comment"># liste des membres</span>
+journalctl -u corosync -e      <span class="comment"># événements : link up/down, membership changes</span>
+systemctl status corosync pve-cluster</code></div>
+
+      <h3>Diagnostic : quorum perdu, que faire ?</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Symptôme</th><th>Cause probable</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>/etc/pve</code> en lecture seule, « cluster not ready - no quorum? »</td><td>Quorum perdu (nœuds éteints, réseau corosync coupé)</td><td><code>pvecm status</code> ; rétablir le réseau ou rallumer les nœuds</td></tr>
+          <tr><td>Un seul nœud isolé, les autres vivants</td><td>Problème de lien (câble, switch, VLAN, pare-feu UDP 5405-5412)</td><td><code>corosync-cfgtool -s</code>, <code>ping</code> sur le réseau corosync, MTU identique</td></tr>
+          <tr><td>« link down / link up » à répétition, « retransmit list »</td><td>Latence ou gigue élevée, lien saturé, MTU incohérent</td><td>Dédier un réseau, supprimer la saturation, ajouter un 2<sup>e</sup> lien</td></tr>
+          <tr><td>Nœuds qui redémarrent en même temps</td><td>Perte de quorum avec HA actif : <strong>fencing par watchdog</strong></td><td>Corriger le réseau ; vérifier les journaux avant redémarrage</td></tr>
+          <tr><td>Modification de corosync.conf sans effet</td><td><code>config_version</code> non incrémenté</td><td>Incrémenter puis recharger</td></tr>
+          <tr><td>Nœud perdu définitivement, quorum impossible</td><td>Deux nœuds sur trois HS</td><td>Forcer temporairement avec <code>pvecm expected 1</code> sur le survivant, puis <code>pvecm delnode</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="warn"><strong><code>pvecm expected N</code> :</strong> abaisse le nombre de votes attendus pour retrouver le quorum <em>sur ce nœud seulement</em>. Utile pour récupérer après une catastrophe, <strong>dangereux</strong> si les autres nœuds sont en réalité vivants et joignables (risque de split-brain). Vérifier que les autres sont bien éteints avant.</div>
+
+      <h3>QDevice : mise en place</h3>
+      <ol>
+        <li>Un serveur <strong>externe et indépendant</strong> du cluster (petite VM ailleurs, Raspberry, machine d'un autre site) avec <code>corosync-qnetd</code></li>
+        <li>Sur <strong>tous</strong> les nœuds : <code>apt install corosync-qdevice</code></li>
+        <li>Depuis un nœud : <code>pvecm qdevice setup IP-DU-QNETD</code> (accès SSH root vers le serveur nécessaire pendant l'installation)</li>
+        <li>Vérifier avec <code>pvecm status</code> : une ligne <em>Qdevice</em> apparaît et le total de votes augmente</li>
+        <li>Retirer : <code>pvecm qdevice remove</code></li>
+      </ol>
+      <ul>
+        <li>Le QDevice <strong>ne remplace pas</strong> un nœud : il donne seulement une voix de départage</li>
+        <li>Ne jamais l'héberger <strong>sur une VM du cluster</strong> qu'il arbitre</li>
+        <li>Il doit être joignable par TCP depuis chaque nœud (port 5403 du service qnetd)</li>
+      </ul>
+
+      <h3>Bonnes pratiques corosync (checklist)</h3>
+      <ul>
+        <li>Réseau corosync <strong>dédié</strong> (VLAN ou NIC propre), <strong>pas</strong> partagé avec stockage / sauvegarde / migration</li>
+        <li><strong>Deux liens</strong> au minimum, sur des switchs différents quand possible, avec priorités définies</li>
+        <li>Latence stable &lt; 5 ms ; surveiller la <strong>gigue</strong> plus que le débit</li>
+        <li>MTU cohérent sur tout le chemin ; ouvrir <strong>UDP 5405-5412</strong> entre nœuds si pare-feu</li>
+        <li>NTP synchronisé ; <strong>IP et noms de nœuds stables</strong> (ne pas les changer après création)</li>
+        <li>Nombre de nœuds impair, ou pair + QDevice</li>
+        <li>Documenter la procédure de reprise (<code>pvecm expected</code>, <code>delnode</code>) et la tester en labo</li>
+        <li>Sauvegarder <code>/etc/pve/corosync.conf</code> avant toute modification</li>
+      </ul>
+
       <h3>Procédures d'exploitation</h3>
       <div class="concept-grid">
         <div class="concept-card"><h4>Retirer un nœud proprement</h4><ul>
@@ -1532,7 +1647,7 @@ qemu-img convert -p -f qcow2 -O vhdx disque.qcow2 out.vhdx</code></div>
   <div class="section" id="s20">
     <div class="section-header"><span class="section-num">20</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
     <div class="section-body">
-      <div class="tags"><span class="tag">Pratique</span><span class="tag">55 questions</span></div>
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">61 questions</span></div>
       <div class="info"><strong>Le labo qui coûte presque rien :</strong> installe Proxmox dans une VM (virtualisation imbriquée activée) ou sur un vieux PC. Pour le cluster, trois VM Proxmox suffisent ; pour la HA, ajoute un petit stockage NFS partagé.</div>
       <h3>Parcours en 5 séances</h3>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table">
@@ -1603,6 +1718,12 @@ qemu-img convert -p -f qcow2 -O vhdx disque.qcow2 out.vhdx</code></div>
         <details><summary>Quel outil en ligne de commande donne un accès à l'API comme PowerShell ?</summary><p>pvesh (par exemple pvesh get /cluster/resources --output-format json), avec qm et pct pour VM et conteneurs.</p></details>
         <details><summary>Quelles sont les phases d'un projet de migration VMware → Proxmox ?</summary><p>Découverte et inventaire, conception cible, preuve de concept, pilote, vagues de migration, clôture avec décommissionnement.</p></details>
         <details><summary>Quand conserver la VM source après migration ?</summary><p>Éteinte, non supprimée, jusqu'à validation par les métiers et fin de la période de rétention : c'est le plan de retour arrière.</p></details>
+        <details><summary>Comment se calcule le quorum et pourquoi 2 nœuds sans QDevice sont fragiles ?</summary><p>Quorum = ⌊votes/2⌋ + 1. Avec 2 nœuds il faut 2 votes : la moindre panne fait perdre le quorum. On ajoute un QDevice (3 votes) ou un troisième nœud.</p></details>
+        <details><summary>Que se passe-t-il pour les VM quand le quorum est perdu ?</summary><p>Les VM déjà démarrées continuent de tourner, mais /etc/pve passe en lecture seule : plus de démarrage d'invité ni de modification de config. Avec HA actif, les nœuds sans quorum se fencent au bout d'environ une minute.</p></details>
+        <details><summary>Quel champ faut-il toujours incrémenter dans corosync.conf et pourquoi ?</summary><p>config_version dans la section totem : sans incrément, la nouvelle configuration n'est pas propagée ni rechargée sur les nœuds.</p></details>
+        <details><summary>Quelles commandes donnent l'état des liens et du quorum ?</summary><p>pvecm status (votes, seuil, drapeau Quorate), corosync-cfgtool -s (état des liens), corosync-quorumtool -s et -l, journalctl -u corosync.</p></details>
+        <details><summary>Quand utiliser pvecm expected 1 et quel est le risque ?</summary><p>Pour retrouver le quorum sur un nœud survivant après la perte définitive des autres. Risque de split-brain si les autres nœuds sont en fait vivants : à vérifier avant.</p></details>
+        <details><summary>Où placer le serveur QDevice ?</summary><p>Sur une machine externe et indépendante du cluster, jamais sur une VM qu'il arbitre, joignable en TCP depuis chaque nœud.</p></details>
       </div>
     </div>
   </div>
