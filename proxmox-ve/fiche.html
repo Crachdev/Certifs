@@ -181,7 +181,7 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
     <div class="ps-stats">
       <div class="ps-stat"><b>21</b><span>Sections</span></div>
       <div class="ps-stat"><b>9.x</b><span>Version</span></div>
-      <div class="ps-stat"><b>66</b><span>Q/R</span></div>
+      <div class="ps-stat"><b>69</b><span>Q/R</span></div>
     </div>
   </div>
 
@@ -1407,6 +1407,48 @@ qemu-img convert -p -f qcow2 -O vhdx disque.qcow2 out.vhdx</code></div>
         </tbody>
       </table></div>
 
+      <h3>Scénarios de migration : quel cas, quelle méthode</h3>
+      <div class="info"><strong>Lecture :</strong> repère ta VM dans le tableau, applique la méthode et les points d'attention, puis vérifie en PoC. Ces scénarios complètent le runbook général : certains cas (RDM, disques partagés, appliances) viennent de bonnes pratiques et sont à valider sur ton environnement.</div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table">
+        <thead><tr><th>Scénario</th><th>Méthode conseillée</th><th>Points d'attention</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1. Linux récent, BIOS</strong></td><td>Import ESXi automatique</td><td>Vérifier le nom de l'interface réseau après import ; <code>fstab</code> par UUID</td></tr>
+          <tr><td><strong>2. Linux ancien ou initramfs sans VirtIO</strong></td><td>Import, démarrer en SATA/IDE</td><td>Régénérer l'initramfs avec les modules VirtIO (<code>dracut</code> / <code>update-initramfs</code>) avant de basculer le disque en VirtIO SCSI</td></tr>
+          <tr><td><strong>3. Windows BIOS (génération « legacy »)</strong></td><td>Import ESXi ; machine SeaBIOS</td><td>Démarrer en <strong>SATA</strong>, installer les pilotes VirtIO, puis passer en VirtIO SCSI ; MAC et IP à reprendre</td></tr>
+          <tr><td><strong>4. Windows ou Linux UEFI</strong></td><td>Import ESXi ; machine <strong>OVMF</strong> + disque EFI</td><td>Secure Boot : régler les clés du disque EFI ; si le démarrage échoue, entrer dans le firmware de la VM et re-sélectionner le chargeur</td></tr>
+          <tr><td><strong>5. Gros volume, arrêt très court (base de données de plusieurs To)</strong></td><td>Live-import, ou attach &amp; move disk</td><td>Test de durée sur copie ; réseau stable ; en cas d'échec du live-import, on perd les écritures depuis le démarrage</td></tr>
+          <tr><td><strong>6. Service avec réplication applicative</strong></td><td>Réplication applicative (base répliquée, DFS, AD…) vers une VM déjà créée sous Proxmox, puis bascule</td><td>Quasiment sans coupure ; nécessite que l'application sache répliquer</td></tr>
+          <tr><td><strong>7. Seul un vCenter est accessible</strong></td><td>Export OVF (<code>ovftool</code>) puis <code>qm importovf</code>, ou stockage ESXi vers l'hôte</td><td>L'import via vCenter est lent ; viser les hôtes ESXi directement</td></tr>
+          <tr><td><strong>8. Plus d'accès à l'ESXi, mais des sauvegardes ou VMDK</strong></td><td>Récupérer les VMDK (descripteur + <code>-flat</code>), <code>qm disk import</code></td><td>Créer la VM à la main (firmware, bus, réseau) ; tester la cohérence du disque</td></tr>
+          <tr><td><strong>9. VM avec snapshots</strong></td><td>Consolider (supprimer) les snapshots côté VMware, puis importer</td><td>Sinon import très lent</td></tr>
+          <tr><td><strong>10. Disques sur vSAN</strong></td><td>Déplacer d'abord les disques vers un datastore NFS ou VMFS, puis importer</td><td>L'import automatique ne lit pas vSAN</td></tr>
+          <tr><td><strong>11. Disque RDM (physique ou virtuel)</strong></td><td>Convertir en VMDK côté VMware puis importer ; ou rattacher la LUN comme disque brut côté Proxmox</td><td>Cas à étudier au PoC : la LUN doit être visible par l'hôte Proxmox ; ne jamais l'utiliser des deux côtés</td></tr>
+          <tr><td><strong>12. Disques partagés entre VM (cluster applicatif, multi-writer)</strong></td><td>Repenser l'architecture (réplication applicative)</td><td>Non trivial : à traiter à part, ne pas improviser</td></tr>
+          <tr><td><strong>13. vTPM, BitLocker, disques chiffrés vSphere</strong></td><td>Suspendre ou déchiffrer avant ; retirer la politique de chiffrement ; créer un vTPM neuf côté Proxmox</td><td>L'état du vTPM ne se migre pas : prévoir les clés de récupération BitLocker</td></tr>
+          <tr><td><strong>14. Appliance fournie en OVA (pare-feu, supervision…)</strong></td><td><code>qm importovf</code> après extraction, ou déploiement d'une image KVM de l'éditeur</td><td>Vérifier le <strong>support éditeur</strong> sur KVM ; certaines appliances exigent leur propre image</td></tr>
+          <tr><td><strong>15. Très vieux OS (2003/2008, vieux Linux)</strong></td><td>Import, bus IDE/SATA, carte E1000, SeaBIOS</td><td>Pas de pilote VirtIO disponible : performances limitées, à isoler</td></tr>
+          <tr><td><strong>16. Modèles (templates) et VM Linux « cloud »</strong></td><td>Reconstruire à partir d'une image cloud + <strong>cloud-init</strong>, puis modèle Proxmox</td><td>Plus propre que d'importer d'anciens modèles</td></tr>
+          <tr><td><strong>17. VM d'un poste (Workstation, Fusion)</strong></td><td>Copier les VMDK vers le serveur Proxmox, <code>qm disk import</code></td><td>Même logique qu'un VMDK ESXi</td></tr>
+          <tr><td><strong>18. Machine physique (P2V)</strong></td><td>Clonage (Clonezilla / <code>dd</code> / Disk2vhd) puis import de l'image</td><td>Pilotes et réseau à revoir ; Windows demande souvent un démarrage en SATA</td></tr>
+          <tr><td><strong>19. VM multi-cartes, VLAN taggés</strong></td><td>Pont VLAN-aware <code>vmbr</code>, une carte par VLAN avec son tag</td><td>Reproduire la correspondance groupes de ports → VLAN avant la bascule</td></tr>
+          <tr><td><strong>20. Matériel particulier (GPU, USB, PCI)</strong></td><td>Passthrough Proxmox (mappings de ressources)</td><td>Bloque la migration à chaud entre nœuds ; noyau et IOMMU à tester</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Arbre de décision rapide</h3>
+      <div class="code-block"><code>1. L'ESXi est-il accessible ?
+   non  -> VMDK / sauvegarde -> « qm disk import » (scénario 8)
+   oui  -> 2
+2. La VM est-elle « spéciale » ? (RDM, disques partagés, vTPM, chiffrée, vSAN, appliance)
+   oui  -> traiter à part (scénarios 10 à 14), souvent après préparation côté VMware
+   non  -> 3
+3. Le volume est-il très gros ou l'arrêt très court ?
+   oui  -> live-import / attach &amp; move disk / réplication applicative (5, 6)
+   non  -> 4
+4. Import ESXi automatique (scénarios 1 à 4)
+5. Après import : SATA au premier boot -&gt; pilotes VirtIO -&gt; VirtIO SCSI + discard + IO thread
+6. Tests, sauvegarde, HA ; VM source conservée éteinte</code></div>
+
       <h3>Runbook type pour migrer une VM</h3>
       <ol>
         <li>Inventaire : OS, firmware (BIOS/UEFI), disques (taille, thin/thick), réseaux, IP/MAC, snapshots, chiffrement</li>
@@ -1727,7 +1769,7 @@ pve8to9                          <span class="comment"># contrôle après reboot
   <div class="section" id="s21">
     <div class="section-header"><span class="section-num">21</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
     <div class="section-body">
-      <div class="tags"><span class="tag">Pratique</span><span class="tag">66 questions</span></div>
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">69 questions</span></div>
       <div class="info"><strong>Le labo qui coûte presque rien :</strong> installe Proxmox dans une VM (virtualisation imbriquée activée) ou sur un vieux PC. Pour le cluster, trois VM Proxmox suffisent ; pour la HA, ajoute un petit stockage NFS partagé.</div>
       <h3>Parcours en 5 séances</h3>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table">
@@ -1896,6 +1938,9 @@ pvecm status</code></div>
         <details><summary>Quelle version minimale et quel prérequis Ceph avant de passer en 9 ?</summary><p>Tous les nœuds en 8.4.1 ou plus ; si Ceph est hyperconvergé, il doit être en Squid 19.2 avant la mise à jour.</p></details>
         <details><summary>Que deviennent les groupes HA après le passage en 9 ?</summary><p>Ils sont remplacés par des règles HA (affinité de nœud et de ressource) et convertis automatiquement une fois tous les nœuds en 9.</p></details>
         <details><summary>Pourquoi garder un accès console ou IPMI pendant la mise à jour ?</summary><p>Le nouveau noyau peut renommer les interfaces réseau et couper l'accès à distance ; la mise à jour ne doit pas se faire depuis la console web.</p></details>
+        <details><summary>Une VM VMware est en UEFI avec Secure Boot, que faut-il prévoir côté Proxmox ?</summary><p>Une machine OVMF avec un disque EFI (et les clés adaptées pour Secure Boot) ; si le démarrage échoue, entrer dans le firmware de la VM et re-sélectionner le chargeur.</p></details>
+        <details><summary>Comment migrer une grosse base de données avec un arrêt très court ?</summary><p>Live-import ou attach & move disk ; ou mieux, une réplication applicative vers une VM déjà prête sous Proxmox, puis bascule.</p></details>
+        <details><summary>Que faire d'une VM avec des disques sur vSAN ou avec des snapshots ?</summary><p>vSAN : déplacer d'abord les disques vers un autre datastore. Snapshots : les consolider avant, sinon l'import est très lent.</p></details>
       </div>
     </div>
   </div>
