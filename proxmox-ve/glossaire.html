@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#b85600">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Glossaire Proxmox VE — analogies et équivalences VMware / Hyper-V</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#b85600;--accent-soft:#fdeedd;
+  --ps:#2b2f36;--ps-mid:#b85600;--ps-light:#f6d9b8;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#ff9d42;--accent-soft:#33210f;
+  --ps:#3a3f48;--ps-mid:#ff9d42;--ps-light:#33210f;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#ff9d42;--accent-soft:#33210f;
+  --ps:#3a3f48;--ps-mid:#ff9d42;--ps-light:#33210f;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.8rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+h4{font-size:.9rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--f-mono)}
+p{margin:6px 0 10px}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Header */
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.top-actions{display:flex;gap:8px;align-items:center}
+details{border:1px solid var(--line);border-radius:7px;padding:9px 14px;margin:8px 0;background:var(--sheet)}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details[open] summary{color:var(--accent);margin-bottom:6px}
+details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PS Banner */
+.ps-banner{background:var(--ps);border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.ps-banner-left .label{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ps-banner-left h1{color:#fff;font-size:1.5rem}
+.ps-banner-left p{color:rgba(255,255,255,.7);font-size:.88rem;margin:4px 0 0}
+.ps-stats{display:flex;gap:16px;flex-wrap:wrap}
+.ps-stat{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;text-align:center;min-width:80px}
+.ps-stat b{display:block;font:700 1.3rem var(--f-mono);color:#fff}
+.ps-stat span{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em}
+
+/* Sommaire rapide */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:28px}
+.toc h4{margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;text-decoration:none;color:var(--ink);font-size:.85rem;transition:background .15s}
+.toc-item:hover{background:var(--accent-soft);color:var(--accent)}
+.toc-num{font:600 .7rem var(--f-mono);background:var(--ps-light);color:var(--ps-mid);padding:1px 6px;border-radius:3px;min-width:28px;text-align:center}
+
+/* Sections */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.section-header{background:var(--ps);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.section-num{font:700 .75rem var(--f-mono);background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:4px}
+.section-title-text{font:700 1rem var(--f-display);color:#fff;flex:1}
+.section-nb{font:500 .7rem var(--f-mono);color:rgba(255,255,255,.55)}
+.section-body{padding:20px}
+
+/* Blocs de contenu */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.concept-card{border:1px solid var(--line);border-radius:7px;padding:12px 14px}
+.concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
+.concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
+.concept-card ul li{margin:2px 0}
+.concept-card.warn{border-left:3px solid var(--warn);border-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+
+/* Cmdlets */
+.cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+.cmdlet-table th{text-align:left;padding:7px 10px;background:var(--accent-soft);color:var(--accent);font:600 .72rem var(--f-mono);letter-spacing:.05em;border-bottom:2px solid var(--line)}
+.cmdlet-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmdlet-table tr:last-child td{border-bottom:0}
+.cmdlet-table td:first-child{font:500 .85rem var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmdlet-table td:last-child{color:var(--muted)}
+.cmdlet-table td:nth-child(2){color:var(--ink)}
+.cmdlet-table-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+
+/* Code blocks */
+.code-block{background:var(--ps);border-radius:7px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.code-block code{font:500 .85rem var(--f-mono);color:#f6d9b8;white-space:pre;display:block;line-height:1.6}
+.code-block .comment{color:rgba(255,255,255,.4)}
+.code-block .keyword{color:#9cdcfe}
+.code-block .string{color:#ce9178}
+.code-block .cmdlet{color:#dcdcaa}
+.code-block .param{color:#9cdcfe}
+
+/* Astuce / Attention */
+.tip{background:var(--ok-soft);border-left:3px solid var(--ok);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.tip strong{color:var(--ok)}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.warn strong{color:var(--warn)}
+.info{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.info strong{color:var(--accent)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font:500 .72rem var(--f-mono);padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.admin{background:var(--ok-soft);color:var(--ok)}
+.tag.cloud{background:#fdeedd;color:#b85600}
+.tag.script{background:#f3e8ff;color:#6b21a8}
+
+/* Comparatif */
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.compare-table th{padding:7px 10px;text-align:left;border-bottom:2px solid var(--line);font:600 .72rem var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.compare-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table td:first-child{font:600 .85rem var(--f-mono);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  h1{font-size:1.3rem}
+  .ps-banner{padding:14px 16px}
+  .ps-banner-left h1{font-size:1.2rem}
+  .ps-stats{gap:8px}
+  .ps-stat{padding:8px 10px;min-width:64px}
+  .ps-stat b{font-size:1rem}
+  .concept-grid{grid-template-columns:1fr}
+  .toc-grid{grid-template-columns:1fr}
+  .section-body{padding:14px}
+  .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">Proxmox VE · Glossaire</div>
+      <h1>Glossaire — Proxmox VE illustré</h1>
+    </div>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="ps-banner">
+    <div class="ps-banner-left">
+      <div class="label">Glossaire · Analogies · Équivalences VMware / Hyper-V</div>
+      <h1>Proxmox VE — le glossaire illustré</h1>
+      <p>Chaque terme avec son analogie (l'immeuble) et son équivalent VMware / Hyper-V</p>
+    </div>
+    <div class="ps-stats">
+      <div class="ps-stat"><b>3</b><span>Sections</span></div>
+      <div class="ps-stat"><b>Glossaire</b><span>Version</span></div>
+      <div class="ps-stat"><b>10</b><span>Q/R</span></div>
+    </div>
+  </div>
+
+  <div class="info"><strong>Pour qui :</strong> un administrateur Windows / Hyper-V (et un peu VMware) qui découvre Proxmox. Les équivalences sont des approximations : lis toujours la section correspondante de la <a href="fiche.html">fiche Proxmox VE</a> avant de décider.</div>
+
+  <div class="toc">
+    <h4>Sommaire</h4>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">1</span>L'analogie : Proxmox est un immeuble</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>Glossaire illustré : analogies et équivalences</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>Exercice et auto-évaluation</a>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div class="section" id="s1">
+    <div class="section-header"><span class="section-num">1</span><span class="section-title-text">L'analogie : Proxmox est un immeuble</span><span class="section-nb">Principe</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Analogie</span><span class="tag">Immeuble</span><span class="tag">VMware</span><span class="tag">Hyper-V</span></div>
+      <div class="info"><strong>Fil rouge : un immeuble.</strong> Proxmox est le <em>gestionnaire d'immeuble</em> : il ne vit pas dans les appartements, il les attribue, les surveille et les entretient. Une <strong>VM</strong> est un <strong>appartement complet</strong> (sa propre porte, son propre compteur, sa propre plomberie). Un <strong>conteneur LXC</strong> est une <strong>chambre dans une colocation</strong> : elle partage la plomberie (le noyau) avec les autres. Le <strong>cluster</strong> est un <strong>quartier de plusieurs immeubles</strong> gérés ensemble.</div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Concept</th><th>Analogie</th><th>Ce qu'il faut retenir</th></tr></thead><tbody><tr><td>Hyperviseur / nœud</td><td>Le <strong>bâtiment</strong> et son gestionnaire</td><td>Un nœud Proxmox = un serveur physique avec KVM</td></tr><tr><td>VM (KVM/QEMU)</td><td>Un <strong>appartement</strong> indépendant</td><td>Système d'exploitation complet, isolation forte</td></tr><tr><td>Conteneur (LXC)</td><td>Une <strong>chambre en colocation</strong></td><td>Léger, mais partage le noyau de l'hôte</td></tr><tr><td>Stockage</td><td>Les <strong>caves et parkings</strong> de l'immeuble</td><td>Plusieurs types, avec leurs règles</td></tr><tr><td>Réseau (bridge)</td><td>Les <strong>couloirs et ascenseurs</strong></td><td><code>vmbr0</code> relie les VM au réseau physique</td></tr><tr><td>Cluster</td><td>Un <strong>quartier</strong> : plusieurs immeubles, un seul syndic</td><td>Quorum = vote à la majorité</td></tr><tr><td>HA</td><td>Le <strong>plan de relogement</strong> en cas d'incendie</td><td>Redémarre les VM d'un nœud tombé</td></tr></tbody></table></div>
+      <div class="tip">Cette page est un <strong>glossaire</strong>, pas un cours : pour la technique, retourne aux sections de la <a href="fiche.html">fiche Proxmox VE</a>.</div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section" id="s2">
+    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">Glossaire illustré : chaque terme, son analogie, son équivalent</span><span class="section-nb">Glossaire</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Glossaire</span><span class="tag">Analogies</span><span class="tag">Équivalences</span></div>
+      <div class="info">Colonne de droite pensée pour toi : l'<strong>équivalent dans Hyper-V ou VMware</strong>, quand il existe. Les équivalences sont des <em>approximations</em> (les fonctionnalités ne se recouvrent jamais à 100 %).</div>
+
+      <h3>1. Les briques de base</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Définition courte</th><th>Analogie immeuble</th><th>Équivalent VMware / Hyper-V</th></tr></thead><tbody><tr><td><strong>Proxmox VE</strong></td><td>Plateforme de virtualisation libre (Debian + KVM + LXC)</td><td>Le <strong>logiciel du gestionnaire</strong></td><td>vSphere (ESXi + vCenter) / Hyper-V + SCVMM</td></tr><tr><td><strong>Nœud</strong></td><td>Serveur physique exécutant Proxmox</td><td>Un <strong>immeuble</strong></td><td>Hôte ESXi / hôte Hyper-V</td></tr><tr><td><strong>Cluster</strong></td><td>Nœuds regroupés, gérés par une interface unique</td><td>Un <strong>quartier</strong> sous un même syndic</td><td>Cluster vCenter / cluster de basculement Hyper-V</td></tr><tr><td><strong>KVM / QEMU</strong></td><td>Virtualisation matérielle (noyau Linux) / émulateur de périphériques</td><td>La <strong>maçonnerie</strong> qui sépare les appartements</td><td>Hyperviseur ESXi / Hyper-V</td></tr><tr><td><strong>VM</strong></td><td>Machine virtuelle complète</td><td>Un <strong>appartement</strong></td><td>VM</td></tr><tr><td><strong>LXC</strong></td><td>Conteneur système Linux</td><td>Une <strong>chambre en colocation</strong></td><td>Pas d'équivalent direct (proche des conteneurs)</td></tr><tr><td><strong>VMID</strong></td><td>Numéro unique d'une VM / d'un CT</td><td>Le <strong>numéro de porte</strong></td><td>ID de VM (moref) / GUID</td></tr><tr><td><strong>Modèle (template)</strong></td><td>VM figée servant de base aux clones</td><td>Le <strong>plan type d'appartement</strong></td><td>Template vSphere / VM de référence</td></tr><tr><td><strong>Clone complet / lié</strong></td><td>Copie indépendante / copie dépendante du modèle</td><td><strong>Appartement reconstruit</strong> / <strong>appartement qui partage les murs</strong> du modèle</td><td>Clone complet / clone lié</td></tr><tr><td><strong>Cloud-init</strong></td><td>Personnalisation au premier démarrage (nom, IP, clé SSH)</td><td>Le <strong>dossier d'emménagement</strong> remis au locataire</td><td>Spécification de personnalisation (Guest customization)</td></tr><tr><td><strong>QEMU Guest Agent</strong></td><td>Agent dans la VM pour l'arrêt propre, l'IP, les snapshots cohérents</td><td>Le <strong>gardien à l'intérieur de l'appartement</strong></td><td>VMware Tools / services d'intégration Hyper-V</td></tr><tr><td><strong>VirtIO</strong></td><td>Pilotes paravirtualisés (disque, réseau) rapides</td><td>Des <strong>raccords de plomberie standardisés</strong>, sans adaptateur coûteux</td><td>Pilotes PVSCSI / VMXNET3 ; synthétique Hyper-V</td></tr><tr><td><strong>Type de machine</strong> (q35, i440fx) et <strong>OVMF</strong></td><td>Chipset virtuel ; micrologiciel UEFI</td><td>Le <strong>gabarit de l'appartement</strong> et son <strong>système de fermeture</strong></td><td>Hardware version / génération 2 UEFI</td></tr><tr><td><strong>vTPM</strong>, Secure Boot</td><td>Module de confiance virtuel, démarrage sécurisé</td><td>Le <strong>coffre scellé</strong> de l'appartement</td><td>vTPM</td></tr><tr><td><strong>CPU type</strong> (<code>host</code>, <code>x86-64-v2-AES</code>)</td><td>Jeu d'instructions présenté à la VM</td><td>Le <strong>niveau d'équipement</strong> affiché au locataire</td><td>EVC / compatibilité de processeur</td></tr><tr><td><strong>Ballooning</strong></td><td>Reprise de RAM inutilisée dans la VM</td><td>Le <strong>gestionnaire qui récupère une pièce inutilisée</strong></td><td>Ballooning / mémoire dynamique</td></tr></tbody></table></div>
+
+      <h3>2. Stockage</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Définition courte</th><th>Analogie immeuble</th><th>Équivalent</th></tr></thead><tbody><tr><td><strong>Storage</strong></td><td>Emplacement déclaré où vivent disques, ISO, sauvegardes</td><td>Une <strong>cave ou un parking</strong> de l'immeuble</td><td>Datastore / volume partagé</td></tr><tr><td><strong>local</strong> / <strong>local-lvm</strong></td><td>Répertoire sur disque système / volumes LVM-thin</td><td>La <strong>cave de l'immeuble</strong></td><td>Datastore local</td></tr><tr><td><strong>LVM-thin</strong></td><td>Volumes à allocation fine avec snapshots</td><td>Un <strong>entrepôt partagé où chacun ne paie que l'espace utilisé</strong></td><td>Disque dynamique / thin provisioning</td></tr><tr><td><strong>ZFS</strong></td><td>Système de fichiers avec snapshots, réplication, compression</td><td>Un <strong>entrepôt blindé avec registre de chaque caisse</strong></td><td>VMFS / ReFS (approximation)</td></tr><tr><td><strong>Ceph</strong></td><td>Stockage réparti entre nœuds (RBD)</td><td>Les <strong>caves reliées entre immeubles</strong>, copies en plusieurs lieux</td><td>vSAN / Storage Spaces Direct</td></tr><tr><td><strong>NFS / iSCSI / SMB</strong></td><td>Stockage réseau</td><td>Un <strong>garde-meuble externe</strong></td><td>Datastore NFS / iSCSI, CSV SMB</td></tr><tr><td><strong>qcow2</strong> / <strong>raw</strong></td><td>Formats de disque virtuel (avec fonctions / brut)</td><td>Un <strong>carton avec étiquettes et sauvegardes</strong> / un <strong>bloc brut</strong></td><td>VMDK / VHDX</td></tr><tr><td><strong>Thin / thick provisioning</strong></td><td>Espace alloué à la demande / réservé d'emblée</td><td><strong>Louer au mètre utilisé</strong> / <strong>louer tout le plateau</strong></td><td>Thin / thick (eager, lazy)</td></tr><tr><td><strong>Snapshot</strong></td><td>Point de retour instantané d'une VM</td><td>Une <strong>photo de l'appartement</strong> pour pouvoir y revenir</td><td>Snapshot / point de contrôle</td></tr><tr><td><strong>vzdump</strong> / sauvegarde</td><td>Sauvegarde complète d'une VM ou d'un CT</td><td><strong>Photocopier tout l'appartement</strong> et l'archiver ailleurs</td><td>Export, Veeam, sauvegarde Hyper-V</td></tr><tr><td><strong>PBS</strong> (Proxmox Backup Server)</td><td>Serveur de sauvegarde avec déduplication</td><td>Le <strong>centre d'archivage de l'immeuble</strong></td><td>Veeam / Data Protection</td></tr><tr><td><strong>Réplication</strong> (ZFS)</td><td>Copie périodique d'une VM vers un autre nœud</td><td>Un <strong>double des clés et du mobilier</strong> dans l'immeuble voisin</td><td>Réplica Hyper-V / vSphere Replication</td></tr></tbody></table></div>
+
+      <h3>3. Réseau</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Définition courte</th><th>Analogie immeuble</th><th>Équivalent</th></tr></thead><tbody><tr><td><strong>Bridge</strong> (<code>vmbr0</code>)</td><td>Commutateur virtuel relié à la carte physique</td><td>Le <strong>couloir principal</strong> qui relie tous les appartements à la rue</td><td>vSwitch / commutateur virtuel externe</td></tr><tr><td><strong>VLAN-aware</strong></td><td>Le bridge comprend les étiquettes VLAN</td><td>Des <strong>couloirs colorés</strong> : chaque couleur = un réseau</td><td>Port groups VLAN / VLAN ID</td></tr><tr><td><strong>Bond</strong> (LACP, active-backup)</td><td>Plusieurs cartes physiques réunies</td><td><strong>Plusieurs ascenseurs</strong> qui se relaient</td><td>Teaming / vSwitch uplinks</td></tr><tr><td><strong>SDN</strong></td><td>Réseaux virtuels définis à l'échelle du cluster</td><td>Le <strong>plan de circulation du quartier</strong></td><td>NSX (approx.) / Hyper-V Network Virtualization</td></tr><tr><td><strong>Pare-feu Proxmox</strong></td><td>Règles par datacenter, nœud, VM</td><td>Les <strong>portes verrouillées</strong> à chaque niveau</td><td>NSX DFW / pare-feu Windows</td></tr><tr><td><strong>Réseau de cluster</strong> (corosync)</td><td>Lien dédié aux messages entre nœuds</td><td>Le <strong>téléphone interne du syndic</strong></td><td>Heartbeat réseau du cluster</td></tr></tbody></table></div>
+
+      <h3>4. Cluster, haute disponibilité et migration</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Définition courte</th><th>Analogie immeuble</th><th>Équivalent</th></tr></thead><tbody><tr><td><strong>Corosync</strong></td><td>Service de communication et d'appartenance du cluster</td><td>Le <strong>talkie-walkie des gestionnaires</strong></td><td>Cluster service / HA heartbeat</td></tr><tr><td><strong>Quorum</strong></td><td>Majorité de nœuds nécessaire pour décider</td><td>Le <strong>vote à la majorité</strong> des copropriétaires</td><td>Quorum de cluster</td></tr><tr><td><strong>QDevice</strong></td><td>Témoin externe pour un cluster à 2 nœuds</td><td>Un <strong>voisin arbitre</strong> qui départage deux gestionnaires</td><td>Témoin (witness) de quorum</td></tr><tr><td><strong>pmxcfs</strong> (<code>/etc/pve</code>)</td><td>Système de fichiers répliqué de configuration</td><td>Le <strong>classeur commun</strong> recopié dans chaque immeuble</td><td>Base vCenter (rôle voisin)</td></tr><tr><td><strong>HA manager</strong></td><td>Redémarre les VM d'un nœud défaillant ailleurs</td><td>Le <strong>plan de relogement</strong></td><td>vSphere HA / basculement Hyper-V</td></tr><tr><td><strong>Fencing</strong> / watchdog</td><td>Isoler un nœud défaillant pour éviter le double usage</td><td><strong>Couper le courant d'un immeuble sinistré</strong> avant de reloger ses locataires</td><td>Isolation d'hôte</td></tr><tr><td><strong>Migration à chaud</strong></td><td>Déplacer une VM sans l'éteindre</td><td><strong>Déménager un locataire pendant qu'il dort</strong>, sans qu'il le sente</td><td>vMotion / Live Migration</td></tr><tr><td><strong>Migration de stockage</strong></td><td>Déplacer les disques d'un stockage à un autre</td><td><strong>Changer de cave</strong> sans quitter l'appartement</td><td>Storage vMotion</td></tr><tr><td><strong>Groupe HA</strong> / affinité</td><td>Règles de placement des VM</td><td>Des <strong>règles d'attribution</strong> (« jamais ces deux voisins ensemble »)</td><td>Règles DRS (affinité)</td></tr></tbody></table></div>
+
+      <h3>5. Sécurité, automatisation et exploitation</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Définition courte</th><th>Analogie immeuble</th><th>Équivalent</th></tr></thead><tbody><tr><td><strong>Realm</strong> (pam, pve, LDAP, OIDC)</td><td>Source d'authentification</td><td>Le <strong>registre des locataires reconnus</strong></td><td>Fournisseur d'identité SSO / Active Directory</td></tr><tr><td><strong>Rôle / ACL / permissions</strong></td><td>Droits par chemin (<code>/vms/100</code>)</td><td>Les <strong>badges par étage</strong></td><td>Rôles vCenter / RBAC Hyper-V</td></tr><tr><td><strong>Jeton d'API</strong></td><td>Identité pour l'automatisation, droits limitables</td><td>Un <strong>badge de service</strong> pour les robots d'entretien</td><td>Compte de service / jeton API</td></tr><tr><td><strong>Resource pool</strong></td><td>Regroupement de VM pour les droits et la vue</td><td>Un <strong>étage réservé</strong> à un service</td><td>Resource pool / dossier</td></tr><tr><td><strong>pvesh</strong> / API</td><td>Ligne de commande et API REST</td><td>Le <strong>guichet automatique</strong> du gestionnaire</td><td>PowerCLI / API vSphere, PowerShell Hyper-V</td></tr><tr><td><strong>Terraform / Ansible / Packer</strong></td><td>Créer / configurer / fabriquer des images par code</td><td><strong>Plans d'architecte</strong> / <strong>équipe de décoration</strong> / <strong>usine de plans types</strong></td><td>Mêmes outils, autres providers</td></tr><tr><td><strong>Hook script / tags</strong></td><td>Étiquettes et automatisations par VM</td><td>Des <strong>étiquettes de couleur</strong> sur les portes</td><td>Tags vSphere</td></tr><tr><td><strong>Migration VMware → Proxmox</strong></td><td>Importer des VM d'ESXi vers Proxmox</td><td><strong>Déménager des locataires d'un quartier à un autre</strong> en refaisant les compteurs (pilotes)</td><td>—</td></tr><tr><td><strong>Import wizard</strong> / <code>qm importdisk</code></td><td>Assistants d'import de disque ou de VM</td><td>Le <strong>camion de déménagement</strong></td><td>Convertisseur VMware / outils de conversion</td></tr></tbody></table></div>
+      <div class="tip"><strong>Pour retenir l'essentiel :</strong> un nœud = un immeuble ; une VM = un appartement ; un cluster = un quartier ; le quorum = un vote à la majorité ; la HA = un plan de relogement ; la migration à chaud = un déménagement pendant que le locataire dort.</div>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">Exercice et auto-évaluation</span><span class="section-nb">Pratique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">10 questions</span></div>
+
+      <h3>Exercice de mémorisation en 10 minutes</h3>
+      <ol><li>Cache les colonnes « Analogie » et « Équivalent » et retrouve-les de mémoire pour 10 termes</li><li>Choisis 5 termes et explique-les à voix haute à quelqu'un sans le mot d'origine</li><li>Relie sur papier : nœud, cluster, quorum, HA, fencing, migration à chaud : à quelle situation de l'immeuble correspond chacun ?</li></ol>
+
+      <h3>Auto-évaluation — clique pour voir la réponse</h3>
+      <div class="qr-list">
+        <details><summary>Quelle est la différence entre une VM et un conteneur LXC ?</summary><p>La VM a son propre noyau et une isolation forte ; le conteneur LXC partage le noyau de l'hôte : plus léger, mais moins isolé.</p></details>
+        <details><summary>Quel est l'équivalent de vMotion dans Proxmox ?</summary><p>La migration à chaud (live migration) d'une VM entre nœuds, avec stockage partagé ou migration de stockage.</p></details>
+        <details><summary>À quoi sert le quorum dans un cluster ?</summary><p>Éviter la division : une majorité de nœuds doit s'accorder pour décider (et pour que les VM HA redémarrent).</p></details>
+        <details><summary>Quand utiliser un QDevice ?</summary><p>Dans un cluster à 2 nœuds (ou en nombre pair) pour fournir un vote d'arbitre.</p></details>
+        <details><summary>Que fait le fencing ?</summary><p>Il isole (ou coupe) un nœud défaillant avant de redémarrer ses VM ailleurs, pour éviter qu'une VM tourne en double.</p></details>
+        <details><summary>Quelle différence entre snapshot et sauvegarde ?</summary><p>Le snapshot est un point de retour sur le même stockage ; la sauvegarde est une copie externe qui survit à la perte du stockage.</p></details>
+        <details><summary>Pourquoi installer le QEMU Guest Agent ?</summary><p>Pour des arrêts propres, la remontée d'IP et des snapshots / sauvegardes cohérents.</p></details>
+        <details><summary>Que sont les pilotes VirtIO ?</summary><p>Des pilotes paravirtualisés (disque, réseau) plus rapides ; sous Windows, ils sont à installer avant ou pendant la migration.</p></details>
+        <details><summary>À quoi sert un jeton d'API par rapport à un mot de passe ?</summary><p>À donner à l'automatisation une identité séparée, révocable et aux droits limités.</p></details>
+        <details><summary>Quel outil Proxmox gère les sauvegardes dédupliquées ?</summary><p>Proxmox Backup Server (PBS).</p></details>
+      </div>
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)">
+    Glossaire Proxmox VE ·
+    <a href="https://pve.proxmox.com/pve-docs/" target="_blank" style="color:var(--accent);text-decoration:none">Documentation Proxmox VE</a> ·
+    <a href="https://pve.proxmox.com/wiki/Main_Page" target="_blank" style="color:var(--accent);text-decoration:none">Wiki Proxmox</a>
+  </footer>
+
+</div>
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("proxmox-ve-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("proxmox-ve-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>
