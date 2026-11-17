@@ -1,6 +1,6 @@
 # Claude Certified Associate — Foundations (CCAO-F)
 
-Quiz de révision — 350 questions originales, un domaine par jour, pondérées comme le blueprint de l'examen.
+Quiz de révision — 393 questions originales, un domaine par jour, pondérées comme le blueprint de l'examen.
 
 ## Format
 - 7 jours : produit et modèles (36), prompting (42), évaluation des sorties (63), flux de travail (48), configuration (36), gouvernance (45), dépannage (30)
