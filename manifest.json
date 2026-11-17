@@ -33,6 +33,12 @@
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     },
     {
+      "name": "Claude Certified Associate",
+      "short_name": "CCAO-F",
+      "url": "/Certifs/claude-ccao-f/",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
       "name": "AWS Cloud Practitioner",
       "short_name": "CLF-C02",
       "url": "/Certifs/aws-clf-c02/",

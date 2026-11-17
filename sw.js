@@ -4,7 +4,7 @@
  * Permet l'installation PWA + notifications push (Feature 12).
  */
 
-const CACHE_NAME = "certifs-v55";
+const CACHE_NAME = "certifs-v56";
 
 // Assets à précacher au premier install (shell complet)
 const PRECACHE = [
@@ -27,6 +27,10 @@ const PRECACHE = [
   "/Certifs/aws-ai-practitioner/index.html",
   "/Certifs/aws-ai-practitioner/questions.js",
   "/Certifs/aws-ai-practitioner/fiche.html",
+  // Claude CCAO-F
+  "/Certifs/claude-ccao-f/index.html",
+  "/Certifs/claude-ccao-f/questions.js",
+  "/Certifs/claude-ccao-f/fiche.html",
   // AWS CLF-C02
   "/Certifs/aws-clf-c02/index.html",
   "/Certifs/aws-clf-c02/questions.js",

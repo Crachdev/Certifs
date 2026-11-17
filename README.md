@@ -7,6 +7,7 @@ Révision rapide de certifications éditeurs avec quiz interactifs générés de
 | Certification | Dossier | Questions | Statut |
 |---|---|---|---|
 | AWS Cloud Practitioner (CLF-C02) | `aws-clf-c02/` | 350 (7j × 50) | ✅ Prêt |
+| Claude Certified Associate (CCAO-F) | `claude-ccao-f/` | 300 (7j, un domaine par jour) | ✅ Prêt |
 | GitHub Foundations | `github-foundations/` | — | 🔜 À venir |
 
 ## Structure
