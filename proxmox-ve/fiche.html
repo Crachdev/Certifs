@@ -203,7 +203,7 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
     <div class="ps-stats">
       <div class="ps-stat"><b>21</b><span>Sections</span></div>
       <div class="ps-stat"><b>9.x</b><span>Version</span></div>
-      <div class="ps-stat"><b>69</b><span>Q/R</span></div>
+      <div class="ps-stat"><b>84</b><span>Q/R</span></div>
     </div>
   </div>
 
@@ -232,7 +232,12 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
       <a href="#s18" class="toc-item"><span class="toc-num">18</span>Boîte à outils de l'admin</a>
       <a href="#s19" class="toc-item"><span class="toc-num">19</span>Projet de migration : cadrage</a>
       <a href="#s20" class="toc-item"><span class="toc-num">20</span>PVE 8 vs 9 et mise à jour</a>
-      <a href="#s21" class="toc-item"><span class="toc-num">21</span>Plan de labo et Q/R</a>
+      <a href="#s21" class="toc-item"><span class="toc-num">21</span>VM Windows : VirtIO, UEFI, TPM</a>
+      <a href="#s22" class="toc-item"><span class="toc-num">22</span>Proxmox Backup Server</a>
+      <a href="#s23" class="toc-item"><span class="toc-num">23</span>ZFS et SDN avancés</a>
+      <a href="#s24" class="toc-item"><span class="toc-num">24</span>Exploitation et dépannage</a>
+      <a href="#s25" class="toc-item"><span class="toc-num">25</span>Passthrough PCI et PDM</a>
+      <a href="#s26" class="toc-item"><span class="toc-num">26</span>Plan de labo et Q/R</a>
     </div>
   </div>
 
@@ -1799,13 +1804,197 @@ pve8to9                          <span class="comment"># contrôle après reboot
     </div>
   </div>
 
-  <!-- S21 -->
+    <!-- S21 -->
   <div class="section" id="s21">
-    <div class="section-header"><span class="section-num">21</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
+    <div class="section-header"><span class="section-num">21</span><span class="section-title-text">VM Windows : VirtIO, UEFI, TPM et agent</span><span class="section-nb">Invités Windows</span></div>
     <div class="section-body">
-      <div class="tags"><span class="tag">Pratique</span><span class="tag">69 questions</span></div>
+      <div class="tags"><span class="tag">Windows</span><span class="tag">VirtIO</span><span class="tag">UEFI</span><span class="tag">TPM</span></div>
+      <figure class="fig"><svg viewBox="0 0 560 200" role="img" aria-label="Migrer une VM Windows vers VirtIO sans écran bleu"><defs><marker id="ar401" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="f-ar" d="M0 0 L10 5 L0 10 z"/></marker><marker id="ar401s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="f-ar" d="M10 0 L0 5 L10 10 z"/></marker></defs><rect class="f-nb" x="0" y="16" width="104" height="64" rx="7"/><text class="f-t" x="52.0" y="44.5" text-anchor="middle">1. Import</text><text class="f-ts" x="52.0" y="60.5" text-anchor="middle">disque en SATA</text><path class="f-a" d="M104 48 L114 48" marker-end="url(#ar401)"/><rect class="f-n" x="114" y="16" width="104" height="64" rx="7"/><text class="f-t" x="166.0" y="44.5" text-anchor="middle">2. Disque test</text><text class="f-ts" x="166.0" y="60.5" text-anchor="middle">petit disque</text><text class="f-ts" x="166.0" y="73.5" text-anchor="middle">VirtIO SCSI</text><path class="f-a" d="M218 48 L228 48" marker-end="url(#ar401)"/><rect class="f-wn" x="228" y="16" width="104" height="64" rx="7"/><text class="f-t" x="280.0" y="44.5" text-anchor="middle">3. Pilote</text><text class="f-ts" x="280.0" y="60.5" text-anchor="middle">vioscsi installé</text><text class="f-ts" x="280.0" y="73.5" text-anchor="middle">dans Windows</text><path class="f-a" d="M332 48 L342 48" marker-end="url(#ar401)"/><rect class="f-n" x="342" y="16" width="104" height="64" rx="7"/><text class="f-t" x="394.0" y="44.5" text-anchor="middle">4. Bascule</text><text class="f-ts" x="394.0" y="60.5" text-anchor="middle">système en SCSI</text><path class="f-a" d="M446 48 L456 48" marker-end="url(#ar401)"/><rect class="f-ok" x="456" y="16" width="104" height="64" rx="7"/><text class="f-t" x="508.0" y="44.5" text-anchor="middle">5. Nettoyage</text><text class="f-ts" x="508.0" y="60.5" text-anchor="middle">retirer le</text><text class="f-ts" x="508.0" y="73.5" text-anchor="middle">disque test</text><path class="f-a" d="M342 80 L342 116" marker-end="url(#ar401)"/><text class="f-ts" x="280.0" y="96.0" text-anchor="middle">étape 3 oubliée</text><rect class="f-ko" x="220" y="116" width="260" height="50" rx="7"/><text class="f-t" x="350.0" y="137.5" text-anchor="middle">Sans le pilote</text><text class="f-ts" x="350.0" y="153.5" text-anchor="middle">écran bleu INACCESSIBLE_BOOT_DEVICE</text></svg><figcaption>Le pilote doit être installé dans Windows avant de basculer le disque système en VirtIO SCSI.</figcaption></figure>
+      <div class="info"><strong>Idée :</strong> Windows n'embarque pas les pilotes VirtIO (disque et réseau paravirtualisés). On les fournit via l'ISO <code>virtio-win</code> (projet Fedora). Sans eux, Windows ne voit pas le disque à l'installation, et avec eux les performances disque et réseau sont nettement meilleures qu'avec les contrôleurs émulés (SATA, e1000).</div>
+
+      <h3>Réglages recommandés pour une VM Windows</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Paramètre</th><th>Valeur conseillée</th><th>Pourquoi</th></tr></thead><tbody><tr><td>Type d'OS</td><td><code>win11</code> (Windows 11, Server 2022/2025) ou <code>win10</code> (10, Server 2016/2019)</td><td>Active les optimisations Hyper-V (enlightenments) adaptées</td></tr><tr><td>Machine</td><td><code>q35</code></td><td>Chipset moderne, nécessaire pour le passthrough PCIe</td></tr><tr><td>Firmware</td><td><code>OVMF</code> (UEFI) + disque EFI avec clés pré-enrôlées</td><td>Secure Boot, démarrage moderne</td></tr><tr><td>TPM</td><td>v2.0 (disque d'état dédié)</td><td>Exigé par Windows 11 ; utile pour BitLocker</td></tr><tr><td>Contrôleur disque</td><td><code>VirtIO SCSI single</code>, disque SCSI avec <code>discard</code>, <code>iothread</code>, <code>ssd</code></td><td>Meilleures performances et récupération d'espace (TRIM)</td></tr><tr><td>Carte réseau</td><td><code>VirtIO</code> (paravirtualisée)</td><td>Débit élevé, faible charge CPU</td></tr><tr><td>CPU</td><td><code>host</code>, ou <code>x86-64-v2-AES</code> si le cluster mélange des CPU</td><td><code>host</code> = performances ; type générique = migration à chaud plus sûre</td></tr><tr><td>Sockets / cœurs</td><td>1 socket, N cœurs</td><td>Un Windows client est limité à 2 sockets ; plus simple pour les licences</td></tr><tr><td>Mémoire</td><td>Fixer la RAM pour une base de données ; ballooning réservé aux usages légers</td><td>Le ballooning retire de la RAM à chaud, mauvais pour SQL</td></tr><tr><td>Agent invité</td><td>Activé (<code>agent=1</code>) et installé dans Windows</td><td>IP visible, arrêt propre, sauvegardes cohérentes</td></tr></tbody></table></div>
+
+      <h3>Créer la VM en ligne de commande</h3>
+      <div class="code-block"><code><span class="comment"># VM 201, Windows Server 2022/2025, UEFI + TPM + VirtIO</span>
+qm create 201 --name srv-win01 --ostype win11 --machine q35 --bios ovmf \
+  --efidisk0 local-lvm:1,efitype=4m,pre-enrolled-keys=1 \
+  --tpmstate0 local-lvm:1,version=v2.0 \
+  --scsihw virtio-scsi-single --scsi0 local-lvm:60,discard=on,iothread=1,ssd=1 \
+  --net0 virtio,bridge=vmbr0 --cores 4 --memory 8192 --cpu host --agent 1 \
+  --ide2 local:iso/windows-server.iso,media=cdrom \
+  --ide0 local:iso/virtio-win.iso,media=cdrom
+<span class="comment"># Vérifier la configuration obtenue</span>
+qm config 201</code></div>
+
+      <h3>Installer pas à pas</h3>
+      <ol><li>Monter l'ISO Windows et l'ISO <code>virtio-win</code> comme deuxième lecteur, puis démarrer la VM.</li><li>À l'écran <strong>« Où installer Windows ? »</strong>, la liste est vide : cliquer sur <strong>Charger un pilote</strong>, parcourir l'ISO <code>virtio-win</code> et choisir le dossier <code>vioscsi</code> correspondant à la version (<code>2k22</code>, <code>w11</code>…), sous-dossier <code>amd64</code>.</li><li>Le disque apparaît : poursuivre l'installation normalement.</li><li>Une fois Windows démarré, lancer <code>virtio-win-guest-tools.exe</code> depuis l'ISO : il installe les pilotes manquants (réseau <code>NetKVM</code>, mémoire <code>Balloon</code>…) et l'agent QEMU.</li><li>Vérifier côté hôte : <code>qm agent 201 ping</code> (aucune sortie = succès), puis démonter les ISO.</li></ol>
+
+      <h3>Pilotes VirtIO à connaître</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Pilote</th><th>Rôle</th></tr></thead><tbody><tr><td><code>vioscsi</code></td><td>Contrôleur de disque VirtIO SCSI (celui qu'on charge à l'installation)</td></tr><tr><td><code>viostor</code></td><td>Contrôleur de disque VirtIO block (ancienne variante)</td></tr><tr><td><code>NetKVM</code></td><td>Carte réseau VirtIO</td></tr><tr><td><code>Balloon</code></td><td>Ballooning mémoire</td></tr><tr><td><code>vioserial</code> + <code>qemu-ga</code></td><td>Canal série et agent invité (IP, arrêt, gel du système de fichiers)</td></tr></tbody></table></div>
+
+      <h3>Migrer une VM Windows depuis VMware ou Hyper-V</h3>
+      <div class="warn"><strong>Piège n°1 :</strong> après l'import, Windows plante avec l'écran bleu <code>INACCESSIBLE_BOOT_DEVICE</code> si le disque système est passé en VirtIO SCSI alors que le pilote <code>vioscsi</code> n'est pas installé.</div>
+      <ol><li>Idéal : installer les pilotes VirtIO <strong>avant</strong> la migration, dans la VM source.</li><li>Sinon, importer la VM avec le disque système en <strong>SATA</strong> (ça démarre), et ajouter un petit disque <strong>VirtIO SCSI</strong> temporaire de 1 Go.</li><li>Dans Windows, installer les pilotes depuis l'ISO <code>virtio-win</code> (Gestionnaire de périphériques ou <code>virtio-win-guest-tools.exe</code>) : le contrôleur SCSI est maintenant connu.</li><li>Arrêter la VM, détacher le disque système, le rattacher en SCSI, supprimer le disque temporaire, ajuster l'ordre de démarrage.</li><li>Désinstaller VMware Tools (ou les services d'intégration Hyper-V). La carte réseau change : reconfigurer l'adresse IP, et supprimer l'ancienne carte « fantôme » via <code>devmgmt.msc</code> avec l'affichage des périphériques cachés.</li></ol>
+
+      <h3>Modèle Windows et automatisation</h3>
+      <ul><li>Préparer un modèle : <code>sysprep /generalize /oobe /shutdown</code>, puis clic droit → <strong>Convertir en modèle</strong>.</li><li><strong>Cloudbase-Init</strong> joue le rôle de cloud-init sous Windows (nom, IP, mot de passe, scripts au premier démarrage).</li><li>Pour Terraform ou Ansible, un modèle Windows se clone comme un modèle Linux ; seule la personnalisation passe par Cloudbase-Init ou WinRM.</li></ul>
+      <div class="warn"><strong>Licences :</strong> un changement de matériel virtuel peut déclencher une demande de réactivation. Vérifie aussi le modèle de licence (Windows Server est licencié par cœur physique de l'hôte ou par VM selon ton contrat) avant de migrer.</div>
+
+      <h3>Commandes utiles avec l'agent</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Commande</th><th>Effet</th></tr></thead><tbody><tr><td><code>qm agent 201 ping</code></td><td>Teste que l'agent répond</td></tr><tr><td><code>qm guest cmd 201 network-get-interfaces</code></td><td>Liste les cartes et adresses IP vues par l'invité</td></tr><tr><td><code>qm guest exec 201 -- ipconfig</code></td><td>Exécute une commande dans Windows</td></tr><tr><td><code>qm set 201 --agent enabled=1,fstrim_cloned_disks=1</code></td><td>Active l'agent et le TRIM après clonage</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S22 -->
+  <div class="section" id="s22">
+    <div class="section-header"><span class="section-num">22</span><span class="section-title-text">Proxmox Backup Server (PBS)</span><span class="section-nb">Sauvegarde avancée</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">PBS</span><span class="tag">Déduplication</span><span class="tag">Rétention</span><span class="tag">3-2-1</span></div>
+      <figure class="fig"><svg viewBox="0 0 560 260" role="img" aria-label="Proxmox Backup Server : de la VM à la copie hors site"><defs><marker id="ar402" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="f-ar" d="M0 0 L10 5 L0 10 z"/></marker><marker id="ar402s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="f-ar" d="M10 0 L0 5 L10 10 z"/></marker></defs><rect class="f-g" x="0" y="6" width="150" height="238" rx="9"/><text class="f-tg" x="10" y="22">CLUSTER PVE</text><rect class="f-nb" x="14" y="36" width="122" height="48" rx="7"/><text class="f-t" x="75.0" y="56.5" text-anchor="middle">pve1</text><text class="f-ts" x="75.0" y="72.5" text-anchor="middle">VM · LXC</text><rect class="f-nb" x="14" y="100" width="122" height="48" rx="7"/><text class="f-t" x="75.0" y="120.5" text-anchor="middle">pve2</text><text class="f-ts" x="75.0" y="136.5" text-anchor="middle">VM · LXC</text><rect class="f-nb" x="14" y="164" width="122" height="48" rx="7"/><text class="f-t" x="75.0" y="184.5" text-anchor="middle">pve3</text><text class="f-ts" x="75.0" y="200.5" text-anchor="middle">VM · LXC</text><rect class="f-ac" x="230" y="60" width="150" height="120" rx="7"/><text class="f-tw" x="305.0" y="116.5" text-anchor="middle">PBS principal</text><text class="f-tws" x="305.0" y="132.5" text-anchor="middle">datastore · dédup</text><text class="f-tws" x="305.0" y="145.5" text-anchor="middle">prune · GC · verify</text><text class="f-tws" x="305.0" y="158.5" text-anchor="middle">chiffrement client</text><path class="f-a" d="M136 60 L230 120" marker-end="url(#ar402)"/><path class="f-a" d="M136 124 L230 120" marker-end="url(#ar402)"/><path class="f-a" d="M136 188 L230 120" marker-end="url(#ar402)"/><text class="f-ts" x="305" y="44" text-anchor="middle">blocs modifiés uniquement</text><rect class="f-g" x="440" y="6" width="120" height="238" rx="9"/><text class="f-tg" x="450" y="22">HORS SITE</text><rect class="f-ok" x="452" y="100" width="96" height="56" rx="7"/><text class="f-t" x="500.0" y="124.5" text-anchor="middle">PBS distant</text><text class="f-ts" x="500.0" y="140.5" text-anchor="middle">copie</text><path class="f-a" d="M380 128 L452 128" marker-end="url(#ar402)"/><text class="f-ts" x="416.0" y="120.0" text-anchor="middle">sync</text><text class="f-ts" x="305" y="204" text-anchor="middle">restauration : VM, conteneur ou fichier</text><text class="f-ts" x="305" y="226" text-anchor="middle">règle 3-2-1 : 3 copies · 2 supports · 1 hors site</text></svg><figcaption>Seuls les blocs nouveaux sont transférés et stockés une fois ; une synchronisation protège contre la perte du site.</figcaption></figure>
+      <div class="info"><strong>Proxmox Backup Server (PBS)</strong> est un serveur de sauvegarde dédié, gratuit, qui s'intègre à Proxmox VE. Il découpe les données en blocs, ne stocke chaque bloc qu'une fois (<strong>déduplication</strong>) et ne transfère que ce qui a changé. C'est l'équivalent Proxmox d'un Veeam ou d'un Windows Server Backup, mais pensé pour les VM et conteneurs.</div>
+
+      <h3>Pourquoi PBS plutôt que vzdump vers un partage NFS</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Capacité</th><th>vzdump + NFS</th><th>PBS</th></tr></thead><tbody><tr><td>Sauvegardes incrémentielles rapides</td><td>Non (copie complète)</td><td>Oui, y compris pour une VM allumée (suivi des blocs modifiés)</td></tr><tr><td>Déduplication</td><td>Non</td><td>Oui, entre toutes les sauvegardes du datastore</td></tr><tr><td>Chiffrement côté client</td><td>Non</td><td>Oui, la clé reste chez toi</td></tr><tr><td>Vérification d'intégrité</td><td>Manuelle</td><td>Tâches planifiées de vérification</td></tr><tr><td>Restauration d'un seul fichier</td><td>Non</td><td>Oui, depuis l'interface</td></tr><tr><td>Rétention et nettoyage</td><td>Par job</td><td>Tâches de nettoyage centralisées</td></tr><tr><td>Copie hors site</td><td>À scripter</td><td>Tâche de synchronisation entre deux PBS</td></tr></tbody></table></div>
+
+      <h3>Les notions</h3>
+      <div class="concept-grid"><div class="concept-card"><h4>Datastore</h4><ul><li>Emplacement de stockage des sauvegardes sur le PBS (ZFS, ext4 ou XFS)</li><li>Éviter un datastore sur NFS : lent et fragile</li></ul></div><div class="concept-card"><h4>Prune</h4><ul><li>Supprime les anciennes sauvegardes selon la rétention (<code>keep-daily</code>, <code>keep-weekly</code>…)</li><li>Ne libère pas l'espace tout de suite</li></ul></div><div class="concept-card"><h4>Garbage collection</h4><ul><li>Libère réellement les blocs que plus aucune sauvegarde n'utilise</li><li>À planifier après le prune</li></ul></div><div class="concept-card"><h4>Verify</h4><ul><li>Relit les blocs et contrôle leur intégrité</li><li>Détecte la corruption silencieuse avant qu'on en ait besoin</li></ul></div><div class="concept-card"><h4>Sync</h4><ul><li>Copie un datastore vers un autre PBS (hors site)</li><li>Le PBS distant tire les sauvegardes du principal</li></ul></div></div>
+
+      <h3>Mise en place en 6 étapes</h3>
+      <ol><li>Installer PBS sur une <strong>machine séparée</strong> (ISO dédiée ou paquet sur Debian) ; l'interface répond sur le port <code>8007</code>.</li><li>Créer un datastore sur un disque ou un pool ZFS dédié.</li><li>Créer un utilisateur et lui donner le rôle de sauvegarde sur ce datastore.</li><li>Dans Proxmox VE : <strong>Datacenter → Storage → Add → Proxmox Backup Server</strong>, avec l'empreinte (fingerprint) du certificat du PBS.</li><li>Créer un job de sauvegarde (<strong>Datacenter → Backup</strong>) qui cible ce stockage.</li><li>Planifier côté PBS : prune, garbage collection, vérification, et si besoin une synchronisation hors site.</li></ol>
+      <div class="code-block"><code><span class="comment"># Sur le PBS : datastore, utilisateur et droits</span>
+proxmox-backup-manager datastore create store1 /mnt/datastore/store1
+proxmox-backup-manager user create backup@pbs --password 'à-changer'
+proxmox-backup-manager acl update /datastore/store1 DatastoreBackup --auth-id backup@pbs
+<span class="comment"># Récupérer l'empreinte du certificat</span>
+proxmox-backup-manager cert info | grep -i fingerprint
+
+<span class="comment"># Sur Proxmox VE : déclarer le PBS comme stockage</span>
+pvesm add pbs pbs1 --server 10.0.0.50 --datastore store1 \
+  --username backup@pbs --password 'à-changer' --fingerprint AA:BB:...
+
+<span class="comment"># Tester une sauvegarde de la VM 100</span>
+vzdump 100 --storage pbs1 --mode snapshot</code></div>
+      <div class="tip">Vérifie la syntaxe exacte avec <code>--help</code> : les options du PBS évoluent avec les versions.</div>
+
+      <h3>Restaurer</h3>
+      <ul><li>VM ou conteneur entier : sélectionner la sauvegarde dans le stockage PBS, puis <strong>Restore</strong> (nouvel ID possible).</li><li>Un seul fichier : <strong>File Restore</strong> sur la sauvegarde, parcourir, télécharger le fichier.</li><li>Un dossier d'un serveur physique ou d'une VM : le client <code>proxmox-backup-client</code> sauvegarde et restaure n'importe quel répertoire.</li></ul>
+      <div class="warn"><strong>Chiffrement : sauvegarde ta clé.</strong> Si tu actives le chiffrement côté client et que tu perds la clé, les sauvegardes sont définitivement illisibles. Garde une copie hors du PBS (gestionnaire de mots de passe, impression papier).</div>
+
+      <h3>Bonnes pratiques</h3>
+      <ul><li><strong>Règle 3-2-1 :</strong> trois copies, deux supports, une hors site. Le PBS principal + une synchronisation vers un second PBS distant.</li><li>Ne pas héberger le PBS sur le cluster qu'il protège (une panne du cluster emporterait les sauvegardes).</li><li>SSD ou disque spécial pour les métadonnées sur de gros datastores ; ZFS en miroir pour la fiabilité.</li><li><strong>Tester une restauration</strong> chaque mois : une sauvegarde jamais restaurée n'est qu'une hypothèse.</li></ul>
+    </div>
+  </div>
+
+  <!-- S23 -->
+  <div class="section" id="s23">
+    <div class="section-header"><span class="section-num">23</span><span class="section-title-text">ZFS et SDN avancés</span><span class="section-nb">Stockage et réseau</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">ZFS</span><span class="tag">Réplication</span><span class="tag">SDN</span><span class="tag">VXLAN</span></div>
+      <figure class="fig"><svg viewBox="0 0 560 262" role="img" aria-label="SDN : un réseau déclaré une fois, présent partout"><defs><marker id="ar403" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="f-ar" d="M0 0 L10 5 L0 10 z"/></marker><marker id="ar403s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="f-ar" d="M10 0 L0 5 L10 10 z"/></marker></defs><rect class="f-g" x="0" y="8" width="160" height="150" rx="9"/><text class="f-tg" x="10" y="24">PVE1</text><rect class="f-n" x="14" y="40" width="132" height="40" rx="7"/><text class="f-t" x="80.0" y="64.5" text-anchor="middle">vnet app</text><rect class="f-ok" x="14" y="98" width="132" height="44" rx="7"/><text class="f-t" x="80.0" y="116.5" text-anchor="middle">VM</text><text class="f-ts" x="80.0" y="132.5" text-anchor="middle">carte sur le vnet</text><rect class="f-g" x="200" y="8" width="160" height="150" rx="9"/><text class="f-tg" x="210" y="24">PVE2</text><rect class="f-n" x="214" y="40" width="132" height="40" rx="7"/><text class="f-t" x="280.0" y="64.5" text-anchor="middle">vnet app</text><rect class="f-ok" x="214" y="98" width="132" height="44" rx="7"/><text class="f-t" x="280.0" y="116.5" text-anchor="middle">VM</text><text class="f-ts" x="280.0" y="132.5" text-anchor="middle">carte sur le vnet</text><rect class="f-g" x="400" y="8" width="160" height="150" rx="9"/><text class="f-tg" x="410" y="24">PVE3</text><rect class="f-n" x="414" y="40" width="132" height="40" rx="7"/><text class="f-t" x="480.0" y="64.5" text-anchor="middle">vnet app</text><rect class="f-ok" x="414" y="98" width="132" height="44" rx="7"/><text class="f-t" x="480.0" y="116.5" text-anchor="middle">VM</text><text class="f-ts" x="480.0" y="132.5" text-anchor="middle">carte sur le vnet</text><path class="f-a" d="M146 60 L214 60" marker-end="url(#ar403)" marker-start="url(#ar403s)"/><path class="f-a" d="M346 60 L414 60" marker-end="url(#ar403)" marker-start="url(#ar403s)"/><text class="f-ts" x="280" y="184" text-anchor="middle">tunnel VXLAN (UDP 4789) · MTU réduite de 50 octets</text><rect class="f-n" x="0" y="208" width="125" height="40" rx="7"/><text class="f-t" x="62.5" y="232.5" text-anchor="middle">Zone</text><path class="f-a" d="M125 228 L145 228" marker-end="url(#ar403)"/><rect class="f-n" x="145" y="208" width="125" height="40" rx="7"/><text class="f-t" x="207.5" y="232.5" text-anchor="middle">Vnet</text><path class="f-a" d="M270 228 L290 228" marker-end="url(#ar403)"/><rect class="f-n" x="290" y="208" width="125" height="40" rx="7"/><text class="f-t" x="352.5" y="232.5" text-anchor="middle">Sous-réseau</text><path class="f-a" d="M415 228 L435 228" marker-end="url(#ar403)"/><rect class="f-ac" x="435" y="208" width="125" height="40" rx="7"/><text class="f-tw" x="497.5" y="232.5" text-anchor="middle">Apply</text></svg><figcaption>On crée la zone, le vnet et le sous-réseau au niveau du datacenter, puis Apply pousse la configuration sur tous les nœuds.</figcaption></figure>
+      <div class="info">Deux sujets avancés souvent mal compris : <strong>ZFS</strong> (système de fichiers et gestionnaire de volumes intégré, qui apporte snapshots, compression et réplication) et le <strong>SDN</strong> (réseaux virtuels définis par logiciel, au-delà du simple pont).</div>
+
+      <h3>ZFS : choisir la disposition</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Disposition</th><th>Capacité utile</th><th>Performances VM</th><th>Tolérance de panne</th></tr></thead><tbody><tr><td>Miroir (2 disques)</td><td>50 %</td><td>Très bonnes</td><td>1 disque</td></tr><tr><td>Miroirs agrégés (RAID10)</td><td>50 %</td><td>Excellentes, c'est le choix des VM</td><td>1 disque par miroir</td></tr><tr><td>RAIDZ1</td><td>n − 1 disque</td><td>Moyennes, écritures lentes</td><td>1 disque</td></tr><tr><td>RAIDZ2</td><td>n − 2 disques</td><td>Moyennes</td><td>2 disques</td></tr></tbody></table></div>
+      <ul><li><strong>Pas de RAID matériel sous ZFS :</strong> donner les disques bruts (carte en mode HBA / IT).</li><li><strong>Rester sous 80 % de remplissage</strong> : au-delà, les performances s'effondrent.</li><li><strong>Compression</strong> (<code>lz4</code>) : activée par défaut, gratuite en pratique, à garder.</li><li><strong>Déduplication ZFS :</strong> à éviter (très gourmande en RAM).</li><li><strong>Mémoire ARC :</strong> ZFS utilise la RAM comme cache ; la limiter si les VM en ont besoin.</li><li><code>ashift=12</code> pour les disques à secteurs 4 Ko (la plupart).</li></ul>
+      <div class="code-block"><code><span class="comment"># Créer un pool en miroir, par identifiants stables</span>
+zpool create -f -o ashift=12 tank mirror /dev/disk/by-id/ata-DISK1 /dev/disk/by-id/ata-DISK2
+<span class="comment"># Le déclarer comme stockage Proxmox</span>
+pvesm add zfspool tank --pool tank --content images,rootdir
+
+<span class="comment"># Santé et contrôle d'intégrité</span>
+zpool status
+zpool scrub tank
+
+<span class="comment"># Limiter l'ARC à 8 Gio</span>
+echo "options zfs zfs_arc_max=8589934592" &gt; /etc/modprobe.d/zfs.conf
+update-initramfs -u -k all
+
+<span class="comment"># Instantanés</span>
+zfs list -t snapshot
+zfs snapshot tank/vm-100-disk-0@avant-maj</code></div>
+
+      <h3>Réplication ZFS entre nœuds</h3>
+      <p>Un job de réplication copie périodiquement les disques d'une VM vers un autre nœud (intervalle minimal : 1 minute). En cas de panne, la HA relance la VM sur le nœud de destination avec les données de la dernière copie. Ça évite un stockage partagé, au prix d'une <strong>perte possible des dernières minutes</strong>.</p>
+      <div class="code-block"><code>pvesr create-local-job 100-0 pve2 --schedule '*/15'
+pvesr status</code></div>
+
+      <h3>SDN : réseaux virtuels pour tout le cluster</h3>
+      <p>Sans SDN, chaque nœud définit ses ponts à la main. Le SDN déclare les réseaux <strong>une seule fois au niveau du datacenter</strong> et les pousse sur tous les nœuds. Équivalents : NSX côté VMware, virtualisation de réseau Hyper-V.</p>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Zone</th><th>Usage</th><th>Remarque</th></tr></thead><tbody><tr><td><strong>Simple</strong></td><td>Réseau isolé sur un seul nœud</td><td>Idéal pour un labo ou un réseau interne local</td></tr><tr><td><strong>VLAN</strong></td><td>Utiliser des VLAN existants sur le réseau physique</td><td>Le cas le plus courant en entreprise</td></tr><tr><td><strong>QinQ</strong></td><td>VLAN empilés (double étiquette)</td><td>Pour les hébergeurs et la segmentation fine</td></tr><tr><td><strong>VXLAN</strong></td><td>Réseau de niveau 2 tunnelé sur le réseau IP existant</td><td>Relie des nœuds sans VLAN commun ; baisser la MTU de 50 octets</td></tr><tr><td><strong>EVPN</strong></td><td>VXLAN avec routage (BGP via FRR)</td><td>Multi-réseaux routés, nœuds de sortie ; plus complexe</td></tr></tbody></table></div>
+      <p>Éléments à créer, dans l'ordre : une <strong>zone</strong>, un <strong>vnet</strong> (le réseau virtuel que l'on rattache à une VM), un <strong>sous-réseau</strong> (optionnel, avec passerelle, DHCP et IPAM), puis <strong>Apply</strong> pour déployer.</p>
+      <div class="code-block"><code><span class="comment"># Une zone VXLAN sur trois nœuds, puis un vnet</span>
+pvesh create /cluster/sdn/zones --zone lab --type vxlan --peers 10.0.0.1,10.0.0.2,10.0.0.3
+pvesh create /cluster/sdn/vnets --vnet app --zone lab --tag 100000
+<span class="comment"># Appliquer la configuration SDN</span>
+pvesh set /cluster/sdn
+<span class="comment"># La configuration vit dans le système de fichiers du cluster</span>
+cat /etc/pve/sdn/zones.cfg</code></div>
+      <div class="tip">Les noms de zone et de vnet sont courts (8 caractères maximum). Une VM se rattache ensuite au vnet comme à un pont classique. Les versions récentes ajoutent aussi des « fabrics » pour automatiser le réseau d'interconnexion : vérifie leur disponibilité dans ta version.</div>
+    </div>
+  </div>
+
+  <!-- S24 -->
+  <div class="section" id="s24">
+    <div class="section-header"><span class="section-num">24</span><span class="section-title-text">Exploitation : certificats, 2FA, alertes et dépannage</span><span class="section-nb">Au quotidien</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">ACME</span><span class="tag">2FA</span><span class="tag">Notifications</span><span class="tag">Dépannage</span></div>
+      <div class="info">Ce qui sépare un labo d'une plate-forme exploitable : des certificats valides, une authentification forte, des alertes qui arrivent, et une méthode pour diagnostiquer vite.</div>
+
+      <h3>Certificats Let's Encrypt (ACME)</h3>
+      <div class="code-block"><code><span class="comment"># Créer le compte ACME (une fois par cluster)</span>
+pvenode acme account register default admin@exemple.fr
+<span class="comment"># Associer le nom de domaine du nœud</span>
+pvenode config set --acme domains=pve1.exemple.fr
+<span class="comment"># Commander le certificat</span>
+pvenode acme cert order</code></div>
+      <ul><li><strong>HTTP-01 :</strong> le nœud doit être joignable sur le port 80 depuis Internet.</li><li><strong>DNS-01 :</strong> pour un nœud interne, via un plugin DNS (Datacenter → ACME) ; aucun port à ouvrir.</li><li>Le renouvellement est automatique ; sinon, une autorité de certification interne et un certificat importé conviennent.</li></ul>
+
+      <h3>Authentification forte (2FA)</h3>
+      <ul><li><strong>Datacenter → Permissions → Two Factor</strong> : TOTP (application), WebAuthn / YubiKey, clés de récupération.</li><li>Activer au moins deux méthodes par compte administrateur, et imprimer les <strong>clés de récupération</strong>.</li><li>On peut imposer la 2FA à tout un domaine d'authentification (realm).</li><li>Les <strong>jetons d'API</strong> ne sont pas soumis à la 2FA : leur donner le minimum de droits.</li></ul>
+
+      <h3>Notifications</h3>
+      <p><strong>Datacenter → Notifications</strong> remplace l'ancien courriel envoyé à <code>root</code> : on définit des <strong>cibles</strong> (SMTP, Sendmail, Gotify, webhook) et des <strong>règles</strong> (matchers) qui choisissent quels événements (sauvegarde échouée, HA, mises à jour) partent vers quelle cible. Utilise le bouton de test avant de t'y fier.</p>
+
+      <h3>Dépannage : symptôme, vérification, piste</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Symptôme</th><th>Vérifier</th><th>Piste</th></tr></thead><tbody><tr><td>Cluster en lecture seule, « no quorum »</td><td><code>pvecm status</code></td><td>Un nœud ou le lien corosync est tombé. Dernier recours sur un nœud isolé : <code>pvecm expected 1</code>, en connaissance de cause</td></tr><tr><td>Interface web inaccessible</td><td><code>systemctl status pveproxy pvedaemon</code></td><td>Redémarrer le service, vérifier l'espace disque et l'heure</td></tr><tr><td>Système de fichiers cluster figé</td><td><code>systemctl status pve-cluster corosync</code></td><td>Corosync/réseau ; regarder <code>journalctl -u corosync</code></td></tr><tr><td>Stockage plein, tâches qui échouent</td><td><code>df -h</code> et <code>pvesm status</code></td><td>Purger vieilles sauvegardes et ISO, réduire le journal : <code>journalctl --vacuum-size=200M</code></td></tr><tr><td>VM « locked » après une sauvegarde interrompue</td><td><code>qm config 100 | grep lock</code></td><td><code>qm unlock 100</code> une fois la tâche réellement terminée</td></tr><tr><td>Migration bloquée</td><td>Journal de la tâche, <code>qm config</code></td><td>Disque local, ISO montée, CPU incompatibles, réseau de migration</td></tr><tr><td>VM HA qui ne redémarre pas</td><td><code>ha-manager status</code>, <code>journalctl -u pve-ha-lrm</code></td><td>Quorum, stockage non partagé, ressources insuffisantes sur les autres nœuds</td></tr><tr><td>Comportements étranges, certificats refusés</td><td><code>timedatectl</code></td><td>Une horloge décalée casse quorum et certificats : vérifier NTP (chrony)</td></tr></tbody></table></div>
+
+      <h3>Réflexes d'exploitation</h3>
+      <ul><li>Surveiller l'état SMART des disques (<code>smartctl -a</code>) et lancer un <code>zpool scrub</code> régulier.</li><li>Lire les journaux : <code>journalctl -u pvedaemon</code>, <code>/var/log/pve/tasks/</code>.</li><li>Mettre à jour un nœud à la fois, après avoir libéré le nœud (migration) et vérifié les sauvegardes.</li><li>Garder un document « que faire si » à côté du <a href='runbook.html'>runbook</a>.</li></ul>
+    </div>
+  </div>
+
+  <!-- S25 -->
+  <div class="section" id="s25">
+    <div class="section-header"><span class="section-num">25</span><span class="section-title-text">Passthrough PCI/GPU et Datacenter Manager</span><span class="section-nb">Aller plus loin</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">PCI</span><span class="tag">GPU</span><span class="tag">IOMMU</span><span class="tag">PDM</span></div>
+      <div class="info">Le <strong>passthrough PCI</strong> donne une carte (GPU, carte réseau, contrôleur de disque) à une seule VM, avec des performances quasi natives. Le <strong>Proxmox Datacenter Manager</strong> (PDM) est un outil séparé pour piloter plusieurs clusters ou nœuds indépendants depuis une seule interface.</div>
+
+      <h3>Passthrough PCI en 6 étapes</h3>
+      <ol><li><strong>Activer IOMMU</strong> dans le BIOS (VT-d chez Intel, AMD-Vi chez AMD) et, selon le processeur, <code>intel_iommu=on</code> sur la ligne de commande du noyau.</li><li>Appliquer la modification : <code>/etc/default/grub</code> puis <code>update-grub</code>, ou <code>/etc/kernel/cmdline</code> puis <code>proxmox-boot-tool refresh</code> (installation ZFS avec systemd-boot).</li><li>Charger les modules <code>vfio</code>, <code>vfio_iommu_type1</code>, <code>vfio_pci</code> au démarrage, puis redémarrer.</li><li>Contrôler : <code>dmesg | grep -e DMAR -e IOMMU</code>, repérer le périphérique avec <code>lspci -nn</code> et son <strong>groupe IOMMU</strong>.</li><li>Créer la VM en <code>q35</code> + <code>OVMF</code> et ajouter le périphérique.</li><li>Installer le pilote du constructeur dans l'invité.</li></ol>
+      <div class="code-block"><code><span class="comment"># Ajouter le GPU 01:00 (PCIe) à la VM 300</span>
+qm set 300 --hostpci0 01:00,pcie=1
+<span class="comment"># Version portable avec un « Resource Mapping » du datacenter</span>
+qm set 300 --hostpci0 mapping=gpu1,pcie=1
+<span class="comment"># USB : donner une clé ou un onduleur à une VM</span>
+qm set 300 --usb0 host=1234:abcd</code></div>
+
+      <h3>Ce qu'on perd avec un périphérique PCI passé à une VM</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Contrainte</th><th>Conséquence</th></tr></thead><tbody><tr><td>Migration à chaud</td><td>Impossible : la VM est liée au nœud qui porte la carte</td></tr><tr><td>Snapshot avec la RAM</td><td>Non supporté</td></tr><tr><td>Haute disponibilité</td><td>Possible seulement si les autres nœuds ont une carte équivalente et un mapping commun</td></tr><tr><td>Groupes IOMMU</td><td>Tous les périphériques d'un même groupe partent ensemble</td></tr></tbody></table></div>
+      <div class="tip">Pour un GPU partagé entre plusieurs VM, regarder les solutions vGPU du constructeur (licences et pilotes spécifiques).</div>
+
+      <h3>Proxmox Datacenter Manager (PDM)</h3>
+      <ul><li>Se déploie à part (ISO ou paquet) et ne remplace pas l'interface de chaque cluster.</li><li>Donne une <strong>vue unique</strong> de plusieurs clusters et nœuds seuls : état, ressources, tâches.</li><li>Permet de <strong>déplacer une VM d'un cluster à un autre</strong> (migration entre clusters).</li><li>Équivalent approximatif de vCenter pour la vue multi-site, en plus léger.</li><li>Outil récent : vérifie son état (stable ou non) et ses fonctions dans la documentation avant de le placer en production.</li></ul>
+    </div>
+  </div>
+<!-- S26 -->
+  <div class="section" id="s26">
+    <div class="section-header"><span class="section-num">26</span><span class="section-title-text">Plan de labo et auto-évaluation</span><span class="section-nb">Apprendre en pratiquant</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">84 questions</span></div>
       <div class="info"><strong>Le labo qui coûte presque rien :</strong> installe Proxmox dans une VM (virtualisation imbriquée activée) ou sur un vieux PC. Pour le cluster, trois VM Proxmox suffisent ; pour la HA, ajoute un petit stockage NFS partagé.</div>
-      <h3>Parcours en 5 séances</h3>
+      <h3>Parcours en 6 séances</h3>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table">
         <thead><tr><th>Séance</th><th>Objectif</th><th>À réussir</th></tr></thead>
         <tbody>
@@ -1814,6 +2003,7 @@ pve8to9                          <span class="comment"># contrôle après reboot
           <tr><td>3 · Stockage et réseau</td><td>Ajouter NFS, pont VLAN, déplacer un disque</td><td><code>qm move-disk</code> à chaud, deux VLAN isolés</td></tr>
           <tr><td>4 · Sauvegarde</td><td>Job vzdump quotidien, rétention, restauration complète</td><td>Restaurer sous un nouvel ID et démarrer</td></tr>
           <tr><td>5 · Cluster et HA</td><td>3 nœuds, migration à chaud, ressource HA, panne simulée</td><td>Éteindre un nœud : la VM redémarre ailleurs en ~2 min</td></tr>
+          <tr><td>6 · Compléments</td><td>VM Windows avec VirtIO, serveur PBS, réseau SDN</td><td>Installer Windows sans erreur de disque, sauvegarde dédupliquée restaurée, deux VM sur un vnet VXLAN</td></tr>
         </tbody>
       </table></div>
 
@@ -1975,6 +2165,21 @@ pvecm status</code></div>
         <details><summary>Une VM VMware est en UEFI avec Secure Boot, que faut-il prévoir côté Proxmox ?</summary><p>Une machine OVMF avec un disque EFI (et les clés adaptées pour Secure Boot) ; si le démarrage échoue, entrer dans le firmware de la VM et re-sélectionner le chargeur.</p></details>
         <details><summary>Comment migrer une grosse base de données avec un arrêt très court ?</summary><p>Live-import ou attach & move disk ; ou mieux, une réplication applicative vers une VM déjà prête sous Proxmox, puis bascule.</p></details>
         <details><summary>Que faire d'une VM avec des disques sur vSAN ou avec des snapshots ?</summary><p>vSAN : déplacer d'abord les disques vers un autre datastore. Snapshots : les consolider avant, sinon l'import est très lent.</p></details>
+        <details><summary>Pourquoi une VM Windows sur Proxmox ne voit-elle pas son disque à l'installation ?</summary><p>Parce que Windows n'embarque pas le pilote VirtIO SCSI. Il faut charger <code>vioscsi</code> depuis l'ISO <code>virtio-win</code> via « Charger un pilote ».</p></details>
+        <details><summary>Après avoir importé une VM Windows depuis VMware, elle affiche INACCESSIBLE_BOOT_DEVICE : pourquoi, et comment corriger ?</summary><p>Le disque système est passé en VirtIO SCSI sans pilote installé. Revenir en SATA, ajouter un disque VirtIO SCSI temporaire, installer le pilote dans Windows, puis rebasculer le disque système en SCSI.</p></details>
+        <details><summary>À quoi servent l'UEFI (OVMF), le TPM et le type de machine q35 pour Windows 11 ?</summary><p>OVMF fournit l'UEFI et Secure Boot, le TPM 2.0 est exigé par Windows 11 (et utile à BitLocker), et q35 est le chipset moderne nécessaire notamment au passthrough PCIe.</p></details>
+        <details><summary>Quels avantages apporte Proxmox Backup Server par rapport à un vzdump vers NFS ?</summary><p>Déduplication, sauvegardes incrémentielles rapides, chiffrement côté client, vérification d'intégrité, restauration fichier par fichier, rétention centralisée et synchronisation hors site.</p></details>
+        <details><summary>Quelle différence entre prune et garbage collection dans PBS ?</summary><p>Le prune supprime les anciennes sauvegardes selon la rétention ; le garbage collection libère ensuite réellement l'espace des blocs que plus aucune sauvegarde n'utilise.</p></details>
+        <details><summary>Que se passe-t-il si tu perds la clé de chiffrement d'un PBS ?</summary><p>Les sauvegardes chiffrées sont définitivement illisibles : il faut conserver la clé hors du PBS (gestionnaire de mots de passe, copie papier).</p></details>
+        <details><summary>Pourquoi éviter le RAID matériel sous ZFS et ne pas dépasser environ 80 % de remplissage ?</summary><p>ZFS doit voir les disques bruts pour garantir l'intégrité ; et un pool presque plein fragmente et voit ses performances s'effondrer.</p></details>
+        <details><summary>Quel est le compromis de la réplication ZFS entre nœuds par rapport à un stockage partagé ?</summary><p>Elle évite un stockage partagé mais copie à intervalle : en cas de panne, la VM redémarre avec les données de la dernière copie, donc avec une perte possible de quelques minutes.</p></details>
+        <details><summary>Quelle est la logique du SDN Proxmox et quelles étapes pour créer un réseau ?</summary><p>Définir les réseaux une fois au niveau du datacenter : créer une zone, un vnet, éventuellement un sous-réseau, puis appliquer la configuration pour la déployer sur tous les nœuds.</p></details>
+        <details><summary>Comment obtenir un certificat valide pour un nœud Proxmox ?</summary><p>Avec ACME : enregistrer un compte (<code>pvenode acme account register</code>), associer le domaine du nœud, puis <code>pvenode acme cert order</code> ; HTTP-01 si le port 80 est joignable, DNS-01 pour un nœud interne.</p></details>
+        <details><summary>Que faire face à un message « no quorum » et à un cluster en lecture seule ?</summary><p>Vérifier <code>pvecm status</code> pour trouver le nœud ou le lien corosync tombé ; <code>pvecm expected 1</code> n'est qu'un dernier recours sur un nœud isolé, en connaissance de cause.</p></details>
+        <details><summary>Pourquoi une horloge décalée est-elle un problème sur un cluster Proxmox ?</summary><p>Elle perturbe corosync, le quorum et la validité des certificats : il faut garder une synchronisation NTP fiable (chrony) sur tous les nœuds.</p></details>
+        <details><summary>Quelles étapes préparent un passthrough GPU ?</summary><p>Activer IOMMU (BIOS + noyau), charger les modules vfio, vérifier les groupes IOMMU, créer une VM q35 + OVMF et ajouter le périphérique avec <code>qm set --hostpci0</code>.</p></details>
+        <details><summary>Quelles fonctions perd-on pour une VM avec un périphérique PCI en passthrough ?</summary><p>La migration à chaud et les snapshots avec RAM ; la HA n'est possible que si d'autres nœuds ont une carte équivalente et un mapping commun.</p></details>
+        <details><summary>À quoi sert Proxmox Datacenter Manager ?</summary><p>À gérer plusieurs clusters et nœuds depuis une vue unique et à déplacer des VM entre clusters ; c'est un outil séparé, plus léger que vCenter.</p></details>
       </div>
     </div>
   </div>
