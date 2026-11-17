@@ -179,9 +179,9 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
       <p>Terraform · cloud-init · Ansible · RKE2 HA · Rancher · reconstruction</p>
     </div>
     <div class="ps-stats">
-      <div class="ps-stat"><b>9</b><span>Sections</span></div>
+      <div class="ps-stat"><b>12</b><span>Sections</span></div>
       <div class="ps-stat"><b>Labo</b><span>Version</span></div>
-      <div class="ps-stat"><b>15</b><span>Q/R</span></div>
+      <div class="ps-stat"><b>21</b><span>Q/R</span></div>
     </div>
   </div>
 
@@ -196,9 +196,12 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
       <a href="#s4" class="toc-item"><span class="toc-num">4</span>A : configurer avec Ansible</a>
       <a href="#s5" class="toc-item"><span class="toc-num">5</span>B : VM du cluster RKE2</a>
       <a href="#s6" class="toc-item"><span class="toc-num">6</span>B : RKE2 avec un rôle Ansible</a>
-      <a href="#s7" class="toc-item"><span class="toc-num">7</span>B : Rancher et applications</a>
-      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Industrialiser et reconstruire</a>
-      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Plan de labo et Q/R</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Rancher : installation</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Rancher : SSO, utilisateurs, rôles</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Rancher : clusters downstream</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span>Rancher : Fleet, monitoring, sauvegarde</a>
+      <a href="#s11" class="toc-item"><span class="toc-num">11</span>Industrialiser et reconstruire</a>
+      <a href="#s12" class="toc-item"><span class="toc-num">12</span>Plan de labo et Q/R</a>
     </div>
   </div>
 
@@ -455,9 +458,9 @@ tls-san:
 
   <!-- S7 -->
   <div class="section" id="s7">
-    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Rancher et premières applications (Helm + Fleet)</span><span class="section-nb">Parcours B</span></div>
+    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Rancher : installation et premier accès</span><span class="section-nb">Rancher</span></div>
     <div class="section-body">
-      <div class="tags"><span class="tag">Helm</span><span class="tag">cert-manager</span><span class="tag">Rancher</span><span class="tag">GitOps</span></div>
+      <div class="tags"><span class="tag">Helm</span><span class="tag">cert-manager</span><span class="tag">TLS</span><span class="tag">Bootstrap</span></div>
       <div class="code-block"><code>export KUBECONFIG=~/lab-iac/kubeconfig-rke2.yaml
 kubectl get nodes -o wide
 
@@ -474,7 +477,80 @@ kubectl -n cattle-system rollout status deploy/rancher</code></div>
 
   <!-- S8 -->
   <div class="section" id="s8">
-    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Industrialiser : pipeline, destruction et reconstruction</span><span class="section-nb">Aller plus loin</span></div>
+    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Rancher : authentification, utilisateurs et rôles</span><span class="section-nb">Rancher</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">SSO</span><span class="tag">RBAC</span><span class="tag">Projets</span><span class="tag">Groupes</span></div>
+      <div class="info">Objectif : plus aucun compte partagé. Les personnes se connectent par l'annuaire (ou un fournisseur OIDC), les droits viennent de <strong>groupes</strong>, et le compte <code>admin</code> local reste en secours.</div>
+      <ol><li>Se connecter, changer le mot de passe d'amorçage, vérifier l'<strong>URL du serveur</strong> (Global Settings : <code>server-url</code> = <code>https://rancher.lab.local</code>)</li><li><strong>Users &amp; Authentication → Auth Provider</strong> : configurer ton fournisseur (Active Directory / LDAP, ou OIDC / SAML : Keycloak, Entra ID…)</li><li>Tester la connexion avec un compte de test <em>avant</em> d'activer (Rancher peut restreindre l'accès aux utilisateurs autorisés)</li><li>Créer des <strong>rôles globaux</strong> et attribuer des groupes : administrateurs, lecture seule, équipes applicatives</li><li>Créer des <strong>projets</strong> (regroupements de namespaces) avec quotas et rôles de projet</li></ol>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Niveau</th><th>Exemples de rôles</th><th>Pour qui</th></tr></thead><tbody><tr><td>Global</td><td>Administrator, Standard User, User-Base</td><td>Plateforme</td></tr><tr><td>Cluster</td><td>Cluster Owner, Cluster Member</td><td>Exploitants d'un cluster</td></tr><tr><td>Projet</td><td>Project Owner, Project Member, Read-Only</td><td>Équipes applicatives</td></tr></tbody></table></div>
+      <ul><li>Garde un <strong>compte local de secours</strong> (mot de passe long, hors annuaire) au cas où le SSO tombe</li><li>Les groupes de l'annuaire = les rôles : un départ ou une arrivée ne demande aucune action dans Rancher</li><li>Les noms exacts des menus et des rôles varient selon la version de Rancher : <strong>à valider dans l'interface</strong></li></ul>
+    </div>
+  </div>
+
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Rancher : créer et importer des clusters downstream</span><span class="section-nb">Rancher</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Custom</span><span class="tag">Import</span><span class="tag">Agent</span><span class="tag">Nœuds</span></div>
+
+      <h3>Option 1 : cluster RKE2 « custom » sur des VM créées par Terraform</h3>
+      <ol><li>Créer 3 VM supplémentaires par Terraform (<code>ds-s1</code>, <code>ds-w1</code>, <code>ds-w2</code>), comme dans le parcours B</li><li>Dans Rancher : <strong>Cluster Management → Create → Custom</strong> (RKE2 / K3s), choisir la version de Kubernetes proposée, le CNI, nommer le cluster</li><li>Rancher affiche une <strong>commande d'enregistrement</strong> (rôles à cocher : etcd, control plane, worker) à lancer sur chaque VM</li><li>Automatiser cette commande avec Ansible (un rôle <code>rancher-register</code>) : elle contient un jeton, à passer par Vault</li><li>Suivre l'état du cluster dans l'interface jusqu'à <em>Active</em></li></ol>
+      <div class="code-block"><code><span class="comment"># Forme indicative : la commande réelle (avec jeton et options) vient de l'interface Rancher</span>
+curl -fL https://rancher.lab.local/system-agent-install.sh | sudo sh -s - \
+  --server https://rancher.lab.local --label 'cattle.io/os=linux' \
+  --token JETON --etcd --controlplane --worker</code></div>
+
+      <h3>Option 2 : importer un cluster existant</h3>
+      <div class="code-block"><code><span class="comment"># Rancher → Import Existing → Generic : copier la commande fournie par l'interface</span>
+kubectl apply -f https://rancher.lab.local/v3/import/XXXXX.yaml
+kubectl -n cattle-system get pods            <span class="comment"># attendre cattle-cluster-agent Running</span></code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Cas</th><th>Choix</th></tr></thead><tbody><tr><td>Cluster créé et exploité par Rancher</td><td>Custom (ou fournisseur d'infrastructure) : Rancher gère les mises à jour de version</td></tr><tr><td>Cluster existant (RKE2 du parcours B, autre distribution)</td><td>Import : Rancher observe et gère l'accès, mais <strong>pas</strong> le cycle de vie du cluster</td></tr><tr><td>Beaucoup de VM à créer à la demande</td><td>Fournisseur d'infrastructure supporté (vSphere, Harvester, cloud) ; pour Proxmox : Terraform + custom, ou un pilote communautaire à évaluer</td></tr></tbody></table></div>
+      <div class="warn">Ne mélange pas les méthodes de mise à jour : un cluster <strong>provisionné par Rancher</strong> se met à jour depuis Rancher ; un cluster <strong>importé</strong> se met à jour avec ses propres outils.</div>
+    </div>
+  </div>
+
+  <!-- S10 -->
+  <div class="section" id="s10">
+    <div class="section-header"><span class="section-num">10</span><span class="section-title-text">Rancher : GitOps avec Fleet, monitoring et sauvegarde</span><span class="section-nb">Rancher</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Fleet</span><span class="tag">Monitoring</span><span class="tag">Backups</span><span class="tag">Terraform</span></div>
+
+      <h3>Fleet : déployer depuis Git sur plusieurs clusters</h3>
+      <ol><li>Créer un dépôt Git d'applications (<code>base/</code> + dossiers par environnement)</li><li><strong>Continuous Delivery → Git Repos → Add</strong> (ou un objet <code>GitRepo</code> dans le namespace <code>fleet-default</code>)</li><li>Cibler les clusters par <strong>labels</strong> (<code>env=prod</code>, <code>env=test</code>)</li><li>Modifier le dépôt, observer la synchronisation ; faire un <code>git revert</code> pour revenir en arrière</li></ol>
+      <div class="code-block"><code>apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata: { name: apps, namespace: fleet-default }
+spec:
+  repo: https://git.lab.local/infra/apps.git
+  branch: main
+  paths: [ base ]
+  targets:
+    - clusterSelector: { matchLabels: { env: test } }</code></div>
+
+      <h3>Monitoring et journaux</h3>
+      <ul><li><strong>Apps → Charts</strong> : installer <em>Monitoring</em> (Prometheus + Grafana) et, si besoin, <em>Logging</em> sur chaque cluster concerné</li><li>Définir 3 alertes utiles : nœud <em>NotReady</em>, disque &gt; 85 %, redémarrages de Pods en boucle</li><li>Vérifier le stockage des métriques (volume persistant, rétention) pour ne pas remplir un disque</li></ul>
+
+      <h3>Sauvegarde de Rancher lui-même</h3>
+      <ul><li>Installer l'opérateur <strong>Rancher Backups</strong> depuis le catalogue, créer une sauvegarde planifiée vers un stockage S3 (MinIO en labo)</li><li>Tester une restauration sur un cluster vierge : c'est la seule preuve</li><li>En plus : snapshots etcd du cluster qui héberge Rancher (fiche RKE2, section 7)</li><li><em>Nom exact des charts et des objets : à vérifier dans la documentation de ta version.</em></li></ul>
+
+      <h3>Piloter Rancher par code (optionnel)</h3>
+      <div class="code-block"><code><span class="comment"># Provider Terraform rancher2 : forme générale, À VALIDER dans la documentation du provider</span>
+provider "rancher2" {
+  api_url   = "https://rancher.lab.local"
+  token_key = var.rancher_token      <span class="comment"># jeton API créé dans l'interface (secret)</span>
+}
+
+resource "rancher2_cluster_v2" "ds" {
+  name               = "ds-lab"
+  kubernetes_version = "v1.36.X+rke2r1"   <span class="comment"># à choisir parmi les versions proposées</span>
+}</code></div>
+      <div class="tip">Bout en bout : Terraform crée les VM, Ansible enregistre les nœuds dans Rancher, Fleet déploie les applications depuis Git. Tout est reconstruisible.</div>
+    </div>
+  </div>
+
+  <!-- S11 -->
+  <div class="section" id="s11">
+    <div class="section-header"><span class="section-num">11</span><span class="section-title-text">Industrialiser : pipeline, destruction et reconstruction</span><span class="section-nb">Aller plus loin</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">CI/CD</span><span class="tag">Reconstruction</span><span class="tag">Sauvegarde</span></div>
       <ol><li><code>terraform destroy</code> du cluster RKE2, puis <code>terraform apply</code> + rôle Ansible : le cluster revient <strong>sans clic</strong></li><li>Mesurer le temps de reconstruction : c'est ton RTO d'infrastructure</li><li>Automatiser dans un pipeline (GitLab CI / GitHub Actions) : <code>terraform plan</code> sur chaque merge request, <code>apply</code> après revue</li><li>Prendre des snapshots etcd (<code>rke2 etcd-snapshot save</code>) et simuler une restauration (fiche RKE2, section 7)</li><li>Sauvegarder les VM avec PBS (Proxmox Backup Server) en complément</li></ol>
@@ -483,14 +559,14 @@ kubectl -n cattle-system rollout status deploy/rancher</code></div>
     </div>
   </div>
 
-  <!-- S9 -->
-  <div class="section" id="s9">
-    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
+  <!-- S12 -->
+  <div class="section" id="s12">
+    <div class="section-header"><span class="section-num">12</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
     <div class="section-body">
-      <div class="tags"><span class="tag">Pratique</span><span class="tag">15 questions</span></div>
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">21 questions</span></div>
 
-      <h3>Plan en 6 séances</h3>
-      <ol><li><strong>Séance 1 :</strong> poste de contrôle, dépôt Git, jeton API Proxmox, <code>terraform plan</code> sur 1 VM</li><li><strong>Séance 2 :</strong> parcours A : 3 VM Linux par Terraform, accès SSH par clé</li><li><strong>Séance 3 :</strong> parcours A : playbook <code>site.yml</code>, <code>--check --diff</code>, idempotence, durcissement SSH</li><li><strong>Séance 4 :</strong> parcours B : 4 VM RKE2, rôle Ansible, premier serveur Ready</li><li><strong>Séance 5 :</strong> parcours B : serveurs 2 et 3, worker, IP virtuelle, premier snapshot etcd</li><li><strong>Séance 6 :</strong> Rancher en Helm, Fleet, puis <code>destroy</code> + reconstruction chronométrée</li></ol>
+      <h3>Plan en 8 séances</h3>
+      <ol><li><strong>Séance 1 :</strong> poste de contrôle, dépôt Git, jeton API Proxmox, <code>terraform plan</code> sur 1 VM</li><li><strong>Séance 2 :</strong> parcours A : 3 VM Linux par Terraform, accès SSH par clé</li><li><strong>Séance 3 :</strong> parcours A : playbook <code>site.yml</code>, <code>--check --diff</code>, idempotence, durcissement SSH</li><li><strong>Séance 4 :</strong> parcours B : 4 VM RKE2, rôle Ansible, premier serveur Ready</li><li><strong>Séance 5 :</strong> parcours B : serveurs 2 et 3, worker, IP virtuelle, premier snapshot etcd</li><li><strong>Séance 6 :</strong> Rancher en Helm, vérification du premier accès, URL du serveur</li><li><strong>Séance 7 :</strong> SSO et rôles, cluster downstream (custom puis import), Fleet depuis un dépôt Git</li><li><strong>Séance 8 :</strong> monitoring, Rancher Backups + restauration, puis <code>destroy</code> + reconstruction chronométrée</li></ol>
 
       <h3>Auto-évaluation — clique pour voir la réponse</h3>
       <div class="qr-list">
@@ -508,6 +584,12 @@ kubectl -n cattle-system rollout status deploy/rancher</code></div>
         <details><summary>Comment mesurer un RTO d'infrastructure avec ce labo ?</summary><p>Détruire puis reconstruire par Terraform et Ansible en chronométrant le retour d'un cluster fonctionnel.</p></details>
         <details><summary>Que sauvegarder en plus du code ?</summary><p>Les snapshots etcd, les volumes (Velero ou outil du stockage), le state Terraform et les VM (PBS).</p></details>
         <details><summary>Quel est le risque d'un seul nœud Proxmox ?</summary><p>Un point de défaillance commun : toutes les VM du cluster tombent ensemble ; répartir sur plusieurs nœuds en vrai.</p></details>
+        <details><summary>Quelle différence entre cluster custom et cluster importé dans Rancher ?</summary><p>Custom : Rancher provisionne et gère le cycle de vie (versions). Importé : Rancher se connecte à un cluster existant via un agent, sans gérer ses mises à jour.</p></details>
+        <details><summary>Comment Rancher parle-t-il aux clusters downstream ?</summary><p>Par le cattle-cluster-agent déployé dans le cluster cible, qui se connecte à Rancher en HTTPS (443).</p></details>
+        <details><summary>Pourquoi attribuer les rôles par groupes de l'annuaire ?</summary><p>Les arrivées et départs se gèrent dans l'annuaire, sans toucher aux droits dans Rancher.</p></details>
+        <details><summary>Pourquoi garder un compte local de secours ?</summary><p>Pour pouvoir administrer Rancher si le fournisseur d'identité est indisponible.</p></details>
+        <details><summary>À quoi sert Fleet et comment cibler des clusters ?</summary><p>GitOps intégré : un GitRepo est déployé sur les clusters sélectionnés par labels (clusterSelector).</p></details>
+        <details><summary>Que sauvegarder pour reconstruire Rancher ?</summary><p>L'opérateur Rancher Backups vers S3, les snapshots etcd du cluster hôte, les values Helm et le code Terraform / Ansible dans Git.</p></details>
         <details><summary>Quand utiliser l'inventaire dynamique Proxmox ?</summary><p>Quand les VM sont créées par code : l'inventaire se construit depuis l'API plutôt qu'à la main.</p></details>
       </div>
     </div>
