@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plan 14 jours CCAO-F</title>
+<style>
+:root{--paper:#f4f6f8;--sheet:#fff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;--accent:#2747c9}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0f151c;--sheet:#17202a;--ink:#e5ebf1;--muted:#97a4b2;--line:#2b3744;--accent:#8ea4ff}}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 system-ui,"Segoe UI",sans-serif;margin:0}
+.w{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:20px 64px}
+h1{font-size:1.7rem;margin:6px 0 4px}h2{font-size:1.1rem;margin:26px 0 8px}
+p,li{max-width:65ch}.m{color:var(--muted)}a{color:var(--accent)}
+ul.p{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+ul.p label{display:flex;gap:10px;align-items:flex-start;background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer}
+ul.p input{margin-top:4px;flex:none}em{color:var(--muted);font-style:normal;font-size:.85rem}
+.pr{font-weight:600}
+</style></head><body><div class="w">
+<a href="index.html">← Sprint CCAO-F</a>
+<h1>Plan 14 jours</h1>
+<p class="m">Environ 1 h 30 par jour. Les jours 1 à 7 suivent les jours du quiz ; la deuxième semaine consolide. <span id="pr" class="pr"></span></p>
+<h2>Semaine 1 et 2</h2>
+<ul class="p"><li><label><input type="checkbox" data-k="j1"><span><b>Jour 1</b> · Module 1 officiel + fiche et quiz J1 (produit, modèles) <em>seuil 70 %</em></span></label></li><li><label><input type="checkbox" data-k="j2"><span><b>Jour 2</b> · Module 2 + fiche et quiz J2 (prompting) <em>seuil 70 %</em></span></label></li><li><label><input type="checkbox" data-k="j3"><span><b>Jour 3</b> · Module 3 + fiche et quiz J3 (évaluation) <em>seuil 75 %</em></span></label></li><li><label><input type="checkbox" data-k="j4"><span><b>Jour 4</b> · Refaire le quiz J3 et ses erreurs (domaine le plus lourd) <em>seuil 80 %</em></span></label></li><li><label><input type="checkbox" data-k="j5"><span><b>Jour 5</b> · Modules 4 et 5 + quiz J4 et J5 <em>seuil 70 %</em></span></label></li><li><label><input type="checkbox" data-k="j6"><span><b>Jour 6</b> · Module 6 + quiz J6 (gouvernance) <em>seuil 70 %</em></span></label></li><li><label><input type="checkbox" data-k="j7"><span><b>Jour 7</b> · Module 7 + quiz J7 (dépannage) <em>seuil 70 %</em></span></label></li><li><label><input type="checkbox" data-k="j8"><span><b>Jour 8</b> · « Mes erreurs » en entier, puis fiches des domaines faibles</span></label></li><li><label><input type="checkbox" data-k="j9"><span><b>Jour 9</b> · Pratique réelle : Project avec instructions, une Skill, un calcul en Code Execution</span></label></li><li><label><input type="checkbox" data-k="j10"><span><b>Jour 10</b> · Session libre de 60 questions, chronométrée (120 min max) <em>seuil 75 %</em></span></label></li><li><label><input type="checkbox" data-k="j11"><span><b>Jour 11</b> · Corriger les erreurs de la session, relire les schémas de la fiche</span></label></li><li><label><input type="checkbox" data-k="j12"><span><b>Jour 12</b> · Deuxième session libre de 60 questions <em>seuil 80 %</em></span></label></li><li><label><input type="checkbox" data-k="j13"><span><b>Jour 13</b> · Lire le guide d'examen mis à jour (page officielle) et le comparer à la fiche</span></label></li><li><label><input type="checkbox" data-k="j14"><span><b>Jour 14</b> · Dernier passage sur « Mes erreurs », repos le soir</span></label></li></ul>
+<h2>Règle de décision</h2>
+<ul><li>Prêt si les jours 10 et 12 sont à 80 % ou plus (sessions libres mélangées, comme l'examen).</li>
+<li>Entre 72 et 80 % : ajouter 3 à 4 jours sur le domaine le plus faible.</li>
+<li>Sous 72 % : reprendre les modules officiels du domaine avant de refaire des quiz.</li></ul>
+<h2>Avant de réserver</h2>
+<ul><li>Adhésion au Claude Partner Network active et e-mail professionnel reconnu.</li>
+<li>Nom du profil Pearson VUE identique à la pièce d'identité.</li>
+<li>Réserver après le jour 12, avec 48 h de marge pour annuler ou reporter.</li></ul>
+</div>
+<script>
+var K="ccaof-plan14",s={};try{s=JSON.parse(localStorage.getItem(K)||"{}")}catch(e){}
+var b=document.querySelectorAll("input[data-k]");
+function u(){var n=0;b.forEach(function(x){if(x.checked)n++});document.getElementById("pr").textContent=n+" / "+b.length+" jours faits"}
+b.forEach(function(x){x.checked=!!s[x.dataset.k];x.onchange=function(){s[x.dataset.k]=x.checked;try{localStorage.setItem(K,JSON.stringify(s))}catch(e){}u()}});u();
+</script></body></html>
