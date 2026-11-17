@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b7a9e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche RKE2 et Rancher — Kit de base</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#0b7a9e;--accent-soft:#dff1f7;
+  --ps:#2b2f36;--ps-mid:#0b7a9e;--ps-light:#f6d9b8;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#4cc3e6;--accent-soft:#0f2a33;
+  --ps:#3a3f48;--ps-mid:#4cc3e6;--ps-light:#0f2a33;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#4cc3e6;--accent-soft:#0f2a33;
+  --ps:#3a3f48;--ps-mid:#4cc3e6;--ps-light:#0f2a33;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.8rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+h4{font-size:.9rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--f-mono)}
+p{margin:6px 0 10px}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Header */
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.top-actions{display:flex;gap:8px;align-items:center}
+details{border:1px solid var(--line);border-radius:7px;padding:9px 14px;margin:8px 0;background:var(--sheet)}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details[open] summary{color:var(--accent);margin-bottom:6px}
+details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PS Banner */
+.ps-banner{background:var(--ps);border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.ps-banner-left .label{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ps-banner-left h1{color:#fff;font-size:1.5rem}
+.ps-banner-left p{color:rgba(255,255,255,.7);font-size:.88rem;margin:4px 0 0}
+.ps-stats{display:flex;gap:16px;flex-wrap:wrap}
+.ps-stat{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;text-align:center;min-width:80px}
+.ps-stat b{display:block;font:700 1.3rem var(--f-mono);color:#fff}
+.ps-stat span{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em}
+
+/* Sommaire rapide */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:28px}
+.toc h4{margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;text-decoration:none;color:var(--ink);font-size:.85rem;transition:background .15s}
+.toc-item:hover{background:var(--accent-soft);color:var(--accent)}
+.toc-num{font:600 .7rem var(--f-mono);background:var(--ps-light);color:var(--ps-mid);padding:1px 6px;border-radius:3px;min-width:28px;text-align:center}
+
+/* Sections */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.section-header{background:var(--ps);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.section-num{font:700 .75rem var(--f-mono);background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:4px}
+.section-title-text{font:700 1rem var(--f-display);color:#fff;flex:1}
+.section-nb{font:500 .7rem var(--f-mono);color:rgba(255,255,255,.55)}
+.section-body{padding:20px}
+
+/* Blocs de contenu */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.concept-card{border:1px solid var(--line);border-radius:7px;padding:12px 14px}
+.concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
+.concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
+.concept-card ul li{margin:2px 0}
+.concept-card.warn{border-left:3px solid var(--warn);border-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+
+/* Cmdlets */
+.cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+.cmdlet-table th{text-align:left;padding:7px 10px;background:var(--accent-soft);color:var(--accent);font:600 .72rem var(--f-mono);letter-spacing:.05em;border-bottom:2px solid var(--line)}
+.cmdlet-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmdlet-table tr:last-child td{border-bottom:0}
+.cmdlet-table td:first-child{font:500 .85rem var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmdlet-table td:last-child{color:var(--muted)}
+.cmdlet-table td:nth-child(2){color:var(--ink)}
+.cmdlet-table-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+
+/* Code blocks */
+.code-block{background:var(--ps);border-radius:7px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.code-block code{font:500 .85rem var(--f-mono);color:#f6d9b8;white-space:pre;display:block;line-height:1.6}
+.code-block .comment{color:rgba(255,255,255,.4)}
+.code-block .keyword{color:#9cdcfe}
+.code-block .string{color:#ce9178}
+.code-block .cmdlet{color:#dcdcaa}
+.code-block .param{color:#9cdcfe}
+
+/* Astuce / Attention */
+.tip{background:var(--ok-soft);border-left:3px solid var(--ok);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.tip strong{color:var(--ok)}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.warn strong{color:var(--warn)}
+.info{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.info strong{color:var(--accent)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font:500 .72rem var(--f-mono);padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.admin{background:var(--ok-soft);color:var(--ok)}
+.tag.cloud{background:#dff1f7;color:#0b7a9e}
+.tag.script{background:#f3e8ff;color:#6b21a8}
+
+/* Comparatif */
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.compare-table th{padding:7px 10px;text-align:left;border-bottom:2px solid var(--line);font:600 .72rem var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.compare-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table td:first-child{font:600 .85rem var(--f-mono);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  h1{font-size:1.3rem}
+  .ps-banner{padding:14px 16px}
+  .ps-banner-left h1{font-size:1.2rem}
+  .ps-stats{gap:8px}
+  .ps-stat{padding:8px 10px;min-width:64px}
+  .ps-stat b{font-size:1rem}
+  .concept-grid{grid-template-columns:1fr}
+  .toc-grid{grid-template-columns:1fr}
+  .section-body{padding:14px}
+  .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">Conteneurs · RKE2 et Rancher</div>
+      <h1>Fiche — RKE2 et Rancher (kit de base)</h1>
+    </div>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="ps-banner">
+    <div class="ps-banner-left">
+      <div class="label">Kit de base · Installation, HA, sauvegarde, Rancher</div>
+      <h1>RKE2 et Rancher — le kit de base</h1>
+      <p>Installation · HA · Sauvegarde etcd · Mises à jour · Air-gap · Rancher Helm · Fleet</p>
+    </div>
+    <div class="ps-stats">
+      <div class="ps-stat"><b>15</b><span>Sections</span></div>
+      <div class="ps-stat"><b>1.36</b><span>Version</span></div>
+      <div class="ps-stat"><b>27</b><span>Q/R</span></div>
+    </div>
+  </div>
+
+  <div class="info"><strong>Sources :</strong> documentation officielle RKE2 (docs.rke2.io) et Rancher (ranchermanager.docs.rancher.com), consultées en novembre 2026. <strong>Les versions et options changent vite</strong> : valide chaque commande en labo avec la page de ta version. Points donnés de mémoire et signalés « à vérifier » : charts de l'opérateur Rancher Backups, compatibilité du chart Rancher avec le contrôleur d'ingress. <strong>Prérequis :</strong> <a href="../kubernetes/fiche.html">fiche Kubernetes</a>.</div>
+
+  <div class="toc">
+    <h4>Sommaire</h4>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">1</span>Panorama : RKE2, Rancher</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>Prérequis et dimensionnement</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>Ports et flux réseau</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">4</span>Installer un cluster RKE2</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">5</span>Configuration : config.yaml, CNI</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">6</span>Exploitation : fichiers et outils</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Sauvegarde et restauration etcd</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Mises à jour et maintenance</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Air-gap, registres, CIS</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span>Rancher : installation en HA</a>
+      <a href="#s11" class="toc-item"><span class="toc-num">11</span>Rancher : clusters, SSO, Fleet</a>
+      <a href="#s12" class="toc-item"><span class="toc-num">12</span>Stockage et réseau complémentaires</a>
+      <a href="#s13" class="toc-item"><span class="toc-num">13</span>Dépannage</a>
+      <a href="#s14" class="toc-item"><span class="toc-num">14</span>Check-list de production</a>
+      <a href="#s15" class="toc-item"><span class="toc-num">15</span>Plan de labo et Q/R</a>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div class="section" id="s1">
+    <div class="section-header"><span class="section-num">1</span><span class="section-title-text">Panorama : RKE2, Rancher et leurs rôles</span><span class="section-nb">Fondations</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">RKE2</span><span class="tag">Rancher</span><span class="tag">k3s</span><span class="tag">Downstream</span></div>
+      <div class="info"><strong>RKE2</strong> (Rancher Kubernetes Engine 2, « RKE Government ») est une distribution Kubernetes <strong>certifiée CNCF</strong>, durcie par défaut (profil CIS, conformité FIPS 140-2 possible) et empaquetée en un seul binaire avec containerd. <strong>Rancher</strong> est la <strong>plateforme de gestion multi-clusters</strong> (interface, authentification centralisée, RBAC global, catalogue d'applications, import / provisionnement de clusters). Ce sont deux produits distincts qui s'associent bien.</div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th></th><th>RKE2</th><th>k3s</th><th>Rancher</th></tr></thead><tbody><tr><td>Nature</td><td>Distribution Kubernetes</td><td>Distribution légère</td><td>Plateforme de gestion</td></tr><tr><td>Cible</td><td>Datacenter, secteur public, durcissement</td><td>Edge, IoT, labo, petits clusters</td><td>Piloter plusieurs clusters (tous types)</td></tr><tr><td>Datastore</td><td>etcd</td><td>SQLite par défaut, etcd intégré possible</td><td>Tourne <em>sur</em> un cluster Kubernetes</td></tr><tr><td>Installation</td><td>Script + service systemd</td><td>Script + service systemd</td><td>Chart Helm sur un cluster</td></tr></tbody></table></div>
+
+      <h3>Architecture type d'un projet</h3>
+      <ol><li><strong>Cluster de management</strong> : RKE2 à 3 nœuds server qui héberge Rancher (Helm) : on n'y met <em>pas</em> d'applications métier</li><li><strong>Clusters downstream</strong> : clusters de production / test créés par Rancher (RKE2 sur VM, fournisseur cloud…) ou <em>importés</em> (clusters existants)</li><li><strong>Rancher</strong> déploie l'agent <code>cattle-cluster-agent</code> dans chaque cluster downstream pour communiquer avec lui</li></ol>
+      <div class="tip"><strong>Compatibilité :</strong> chaque version de Rancher certifie une plage de versions de Kubernetes pour le cluster de management (à lire dans la matrice de support Rancher avant d'installer). Au moment de la rédaction de cette fiche (nov. 2026), Rancher 2.15.x certifiait Kubernetes 1.34 à 1.36 : donc <strong>RKE2 en 1.36</strong> pour le cluster qui héberge Rancher. À re-vérifier à chaque installation.</div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section" id="s2">
+    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">Prérequis et dimensionnement</span><span class="section-nb">Préparation</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">OS</span><span class="tag">Réseau</span><span class="tag">DNS</span><span class="tag">Ressources</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Élément</th><th>Recommandation de départ</th></tr></thead><tbody><tr><td>Système</td><td>Linux supporté par la matrice (RHEL / Rocky / Alma, SLES, Ubuntu LTS) ; horloge synchronisée (chrony)</td></tr><tr><td>Cluster Rancher</td><td><strong>3 nœuds server</strong> (HA), environ 4 vCPU / 8 Go chacun pour un petit environnement</td></tr><tr><td>Cluster downstream</td><td>3 server (control plane + etcd) + N workers selon la charge</td></tr><tr><td>Stockage</td><td>Disques SSD / rapides pour etcd (la latence disque est la première cause d'instabilité)</td></tr><tr><td>Nom DNS</td><td>Un nom pour Rancher (<code>rancher.lab.local</code>) pointant vers le point d'entrée ; un nom stable pour l'API RKE2 (IP virtuelle ou load balancer)</td></tr><tr><td>Swap</td><td>Désactivé (<code>swapoff -a</code> + fstab) selon les recommandations Kubernetes</td></tr></tbody></table></div>
+
+      <h3>Préparation de l'OS</h3>
+      <div class="code-block"><code><span class="comment"># Désactiver le gestionnaire de pare-feu ou ouvrir les ports (voir section réseau)</span>
+systemctl disable --now firewalld ufw 2&gt;/dev/null
+
+<span class="comment"># NetworkManager : empêcher la gestion des interfaces du CNI (RHEL / Rocky)</span>
+cat &gt; /etc/NetworkManager/conf.d/rke2-canal.conf &lt;&lt;'EOF'
+[keyfile]
+unmanaged-devices=interface-name:flannel*;interface-name:cali*;interface-name:tunl*;interface-name:vxlan.calico;interface-name:vxlan-v6.calico;interface-name:wireguard.cali;interface-name:wg-v6.cali
+EOF
+systemctl reload NetworkManager
+
+<span class="comment"># Modules et sysctl usuels</span>
+modprobe br_netfilter overlay
+printf 'net.ipv4.ip_forward=1\n' &gt; /etc/sysctl.d/90-k8s.conf &amp;&amp; sysctl --system
+hostnamectl set-hostname rke2-s1                <span class="comment"># nom d'hôte unique par nœud</span></code></div>
+      <div class="warn"><strong>Si tu gardes un pare-feu</strong>, ouvre les ports de la section suivante. Beaucoup d'échecs d'installation viennent d'un port inter-nœuds fermé (9345, 6443, 2379-2380, 8472/udp).</div>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">Ports et flux réseau</span><span class="section-nb">Réseau</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">9345</span><span class="tag">6443</span><span class="tag">etcd</span><span class="tag">VXLAN</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Port</th><th>Sens</th><th>Usage</th></tr></thead><tbody><tr><td><strong>9345/TCP</strong></td><td>nœuds → server</td><td>API de supervision RKE2 (enregistrement des nœuds)</td></tr><tr><td><strong>6443/TCP</strong></td><td>clients, nœuds → server</td><td>API Kubernetes</td></tr><tr><td>10250/TCP</td><td>server ↔ nœuds</td><td>API kubelet (logs, exec, métriques)</td></tr><tr><td>2379 / 2380 / 2381/TCP</td><td>server ↔ server</td><td>etcd (client, pairs, métriques)</td></tr><tr><td>8472/UDP</td><td>tous les nœuds</td><td>VXLAN du CNI Canal (Flannel) ; Calico / Cilium ont leurs propres ports (Cilium : 4240/TCP, 8472/UDP selon la config)</td></tr><tr><td>30000-32767/TCP</td><td>entrant</td><td>Plage des NodePort</td></tr><tr><td>80 / 443/TCP</td><td>entrant</td><td>Ingress (Traefik ou autre) vers les nœuds qui l'hébergent</td></tr></tbody></table></div>
+      <div class="info">La liste exacte dépend de la version et du CNI : <strong>vérifie la page « Networking requirements » de la documentation RKE2</strong> de ta version avant de figer les règles de pare-feu.</div>
+      <ul><li>Pour Rancher : les clusters downstream doivent joindre Rancher en <strong>443/TCP</strong> (agents) ; Rancher n'a pas besoin de joindre les downstream pour les clusters importés (les agents sortent)</li><li>Prévoir une <strong>IP virtuelle</strong> (kube-vip) ou un load balancer pour l'API (6443) et le registration (9345)</li></ul>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section" id="s4">
+    <div class="section-header"><span class="section-num">4</span><span class="section-title-text">Installer un cluster RKE2 (1 puis 3 serveurs)</span><span class="section-nb">Installation</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Server</span><span class="tag">Agent</span><span class="tag">config.yaml</span><span class="tag">Token</span></div>
+
+      <h3>Premier nœud server</h3>
+      <div class="code-block"><code>mkdir -p /etc/rancher/rke2
+cat &gt; /etc/rancher/rke2/config.yaml &lt;&lt;'EOF'
+token: MON-SECRET-PARTAGE          <span class="comment"># facultatif : sinon généré dans node-token</span>
+tls-san:
+  - rke2.lab.local                 <span class="comment"># nom / IP virtuelle de l'API</span>
+  - 10.0.0.10
+write-kubeconfig-mode: "0640"
+EOF
+
+curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL=v1.36 sh -     <span class="comment"># ou INSTALL_RKE2_VERSION=...</span>
+systemctl enable --now rke2-server.service
+journalctl -u rke2-server -f                                 <span class="comment"># suivre le démarrage</span></code></div>
+
+      <h3>Accéder au cluster</h3>
+      <div class="code-block"><code>export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+export PATH=$PATH:/var/lib/rancher/rke2/bin        <span class="comment"># kubectl, crictl, ctr</span>
+kubectl get nodes -o wide
+cat /var/lib/rancher/rke2/server/node-token        <span class="comment"># jeton pour joindre d'autres nœuds</span></code></div>
+
+      <h3>Joindre les serveurs 2 et 3 (HA)</h3>
+      <div class="code-block"><code>cat &gt; /etc/rancher/rke2/config.yaml &lt;&lt;'EOF'
+server: https://rke2.lab.local:9345
+token: MON-SECRET-PARTAGE
+tls-san:
+  - rke2.lab.local
+EOF
+curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL=v1.36 sh -
+systemctl enable --now rke2-server.service           <span class="comment"># un nœud à la fois, attendre Ready</span></code></div>
+
+      <h3>Ajouter des workers</h3>
+      <div class="code-block"><code>curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE="agent" sh -
+cat &gt; /etc/rancher/rke2/config.yaml &lt;&lt;'EOF'
+server: https://rke2.lab.local:9345
+token: MON-SECRET-PARTAGE
+EOF
+systemctl enable --now rke2-agent.service</code></div>
+      <ul><li>Les serveurs rejoignent <strong>un par un</strong> ; tu dois avoir un nombre <strong>impair</strong> de serveurs (3 ou 5)</li><li><code>tls-san</code> doit contenir <strong>tous les noms / IP</strong> par lesquels on joint l'API, sinon erreurs de certificat</li><li>Le premier démarrage télécharge les images : prévoir quelques minutes (ou voir la section air-gap)</li></ul>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div class="section" id="s5">
+    <div class="section-header"><span class="section-num">5</span><span class="section-title-text">Configuration de RKE2 : config.yaml, CNI, composants</span><span class="section-nb">Config</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">config.yaml</span><span class="tag">Canal / Calico / Cilium</span><span class="tag">Taints</span><span class="tag">Labels</span></div>
+      <div class="code-block"><code><span class="comment"># /etc/rancher/rke2/config.yaml : exemple de serveur</span>
+token: MON-SECRET
+tls-san: [rke2.lab.local]
+cni: canal                         <span class="comment"># canal (défaut) | calico | cilium</span>
+cluster-cidr: 10.42.0.0/16
+service-cidr: 10.43.0.0/16
+profile: cis                       <span class="comment"># durcissement CIS (prérequis OS : voir doc)</span>
+selinux: true
+secrets-encryption: true           <span class="comment"># chiffrement des Secrets dans etcd</span>
+disable:
+  - rke2-ingress-nginx             <span class="comment"># exemple : désactiver un composant empaqueté</span>
+node-label:
+  - role=infra
+node-taint:
+  - dedicated=infra:NoSchedule
+etcd-snapshot-schedule-cron: "0 */6 * * *"
+etcd-snapshot-retention: 14</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Sujet</th><th>Point à connaître</th></tr></thead><tbody><tr><td><strong>CNI</strong></td><td>Canal par défaut (Flannel + Calico pour les politiques) ; Calico et Cilium en option ; <strong>choisir avant la création</strong> (changer est lourd)</td></tr><tr><td><strong>Ingress</strong></td><td>Selon ta version : <strong>ingress-nginx est en fin de vie</strong> (mars 2026) et Traefik devient le contrôleur par défaut à partir de RKE2 1.36 ; ingress-nginx autonome n'est plus supporté dès RKE2 1.37. Lire les notes de version de ta version</td></tr><tr><td><strong>Charts empaquetés</strong></td><td>CoreDNS, metrics-server, CNI, ingress… sont installés via des <code>HelmChart</code> dans <code>/var/lib/rancher/rke2/server/manifests/</code></td></tr><tr><td><strong>Personnaliser un chart empaqueté</strong></td><td>Créer un <code>HelmChartConfig</code> (même nom) avec <code>valuesContent</code> : survit aux mises à jour</td></tr><tr><td><strong>Secrets chiffrés</strong></td><td><code>secrets-encryption: true</code> chiffre les Secrets dans etcd</td></tr></tbody></table></div>
+      <div class="code-block"><code>apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-coredns
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    autoscaler:
+      enabled: true</code></div>
+      <div class="tip">Sauvegarde ton <code>config.yaml</code> dans Git (sans le token : utilise un gestionnaire de secrets) : c'est la définition de tes nœuds.</div>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="section" id="s6">
+    <div class="section-header"><span class="section-num">6</span><span class="section-title-text">Exploitation RKE2 : fichiers, journaux, outils</span><span class="section-nb">Exploitation</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Chemins</span><span class="tag">Journaux</span><span class="tag">crictl</span><span class="tag">Rotation</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Chemin / commande</th><th>Rôle</th></tr></thead><tbody><tr><td><code>/etc/rancher/rke2/config.yaml</code></td><td>Configuration du nœud (fichiers <code>config.yaml.d/*.yaml</code> possibles)</td></tr><tr><td><code>/etc/rancher/rke2/rke2.yaml</code></td><td>kubeconfig admin du cluster (<strong>secret</strong>)</td></tr><tr><td><code>/var/lib/rancher/rke2/bin/</code></td><td><code>kubectl</code>, <code>crictl</code>, <code>ctr</code></td></tr><tr><td><code>/var/lib/rancher/rke2/server/manifests/</code></td><td>Manifestes appliqués automatiquement</td></tr><tr><td><code>/var/lib/rancher/rke2/server/db/snapshots/</code></td><td>Snapshots etcd locaux par défaut</td></tr><tr><td><code>/var/lib/rancher/rke2/agent/images/</code></td><td>Archives d'images pour l'air-gap</td></tr><tr><td><code>/etc/rancher/rke2/registries.yaml</code></td><td>Miroirs / registres privés</td></tr><tr><td><code>journalctl -u rke2-server</code> / <code>-u rke2-agent</code></td><td>Journaux du service</td></tr><tr><td><code>/var/lib/rancher/rke2/agent/logs/kubelet.log</code></td><td>Journal du kubelet</td></tr></tbody></table></div>
+      <div class="code-block"><code>export CRI_CONFIG_FILE=/var/lib/rancher/rke2/agent/etc/crictl.yaml
+crictl ps ; crictl images ; crictl logs ID      <span class="comment"># runtime containerd</span>
+rke2 certificate rotate                           <span class="comment"># rotation des certificats (arrêter le service avant)</span>
+<span class="comment"># Désinstaller</span>
+rke2-killall.sh ; rke2-uninstall.sh              <span class="comment"># scripts installés dans /usr/local/bin</span>
+</code></div>
+      <div class="warn">Après <code>rke2-uninstall.sh</code> les données du nœud sont supprimées : ne l'exécute jamais sur un serveur dont tu as besoin pour le quorum etcd.</div>
+    </div>
+  </div>
+
+  <!-- S7 -->
+  <div class="section" id="s7">
+    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Sauvegarde et restauration etcd</span><span class="section-nb">Reprise</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Snapshot</span><span class="tag">S3</span><span class="tag">cluster-reset</span><span class="tag">Restauration</span></div>
+      <div class="info">Un snapshot etcd contient <strong>l'état du cluster</strong> (objets Kubernetes), <strong>pas</strong> les données des volumes. Par défaut RKE2 prend un snapshot toutes les 12 heures et en garde 5, sur chaque serveur.</div>
+      <div class="code-block"><code><span class="comment"># Snapshot à la demande</span>
+rke2 etcd-snapshot save --name avant-upgrade
+rke2 etcd-snapshot ls
+
+<span class="comment"># Planification et copie S3 (config.yaml)</span>
+etcd-snapshot-schedule-cron: "0 */6 * * *"
+etcd-snapshot-retention: 14
+etcd-s3: true
+etcd-s3-endpoint: s3.lab.local
+etcd-s3-bucket: rke2-snapshots
+etcd-s3-access-key: ...
+etcd-s3-secret-key: ...</code></div>
+
+      <h3>Restaurer (cluster à un seul serveur ou panne totale)</h3>
+      <ol><li>Arrêter <code>rke2-server</code> sur <strong>tous</strong> les serveurs (<code>rke2-killall.sh</code>)</li><li>Sur <strong>un seul</strong> serveur : <code>rke2 server --cluster-reset --cluster-reset-restore-path=/chemin/snapshot</code> (ou depuis S3 avec les options <code>--etcd-s3…</code>)</li><li>Redémarrer ce serveur : <code>systemctl start rke2-server</code></li><li>Sur les autres serveurs : supprimer <code>/var/lib/rancher/rke2/server/db</code> puis redémarrer pour qu'ils rejoignent le cluster restauré</li></ol>
+      <div class="warn">Procédure à <strong>répéter en labo</strong> avant d'en avoir besoin : l'ordre exact et les options varient selon la version, suis la page « Backup and Restore » de ta version. Restaure aussi les volumes avec l'outil de ton stockage (Longhorn snapshots / sauvegardes, Velero…).</div>
+    </div>
+  </div>
+
+  <!-- S8 -->
+  <div class="section" id="s8">
+    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Mises à jour et maintenance</span><span class="section-nb">Cycle de vie</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Upgrade</span><span class="tag">system-upgrade-controller</span><span class="tag">Drain</span><span class="tag">Manuel</span></div>
+      <ol><li>Lire les notes de version (ingress, CNI, API retirées) ; ne monter que d'<strong>une version mineure à la fois</strong></li><li>Prendre un <strong>snapshot etcd</strong> (<code>rke2 etcd-snapshot save</code>)</li><li>Mettre à jour les <strong>serveurs un par un</strong>, puis les workers</li><li>Vérifier <code>kubectl get nodes</code> et la santé des applications</li></ol>
+      <div class="code-block"><code><span class="comment"># Mise à jour manuelle d'un nœud</span>
+kubectl drain NOEUD --ignore-daemonsets --delete-emptydir-data
+curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION=v1.36.X+rke2r1 sh -    <span class="comment"># version à remplacer par la tienne</span>
+systemctl restart rke2-server        <span class="comment"># ou rke2-agent sur un worker</span>
+kubectl uncordon NOEUD</code></div>
+      <ul><li><strong>Automatisation :</strong> le <code>system-upgrade-controller</code> de Rancher applique des <code>Plan</code> (version cible, concurrence, drain) sur les nœuds</li><li>Pour un cluster provisionné <strong>par Rancher</strong>, la montée de version se fait depuis Rancher (édition du cluster) : ne mélange pas les deux méthodes</li><li>Planifier une fenêtre ; vérifier que les <strong>PDB</strong> n'empêchent pas le drain</li></ul>
+    </div>
+  </div>
+
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Air-gap, registres privés, durcissement CIS</span><span class="section-nb">Entreprise</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Air-gap</span><span class="tag">registries.yaml</span><span class="tag">CIS</span><span class="tag">SELinux</span></div>
+
+      <h3>Installation hors ligne</h3>
+      <ol><li>Télécharger sur une machine connectée : <code>rke2-images.linux-amd64.tar.zst</code> (ou le <code>.tar.gz</code>), <code>rke2.linux-amd64.tar.gz</code>, <code>sha256sum-amd64.txt</code> et <code>install.sh</code></li><li>Copier les archives d'images dans <code>/var/lib/rancher/rke2/agent/images/</code> sur chaque nœud</li><li>Lancer l'installeur en mode tarball : <code>INSTALL_RKE2_ARTIFACT_PATH=/chemin sh install.sh</code></li><li>Démarrer le service ; les images sont chargées localement</li></ol>
+      <div class="code-block"><code><span class="comment"># /etc/rancher/rke2/registries.yaml : miroir et authentification</span>
+mirrors:
+  docker.io:
+    endpoint:
+      - "https://registry.lab.local"
+configs:
+  "registry.lab.local":
+    auth:
+      username: robot
+      password: ...
+    tls:
+      ca_file: /etc/ssl/certs/registry-ca.pem</code></div>
+
+      <h3>Durcissement CIS</h3>
+      <ul><li><code>profile: cis</code> active les contrôles du référentiel CIS ; <strong>nécessite des réglages OS</strong> préalables (utilisateur <code>etcd</code>, paramètres <code>sysctl</code> : voir la page « CIS Hardening Guide » de ta version)</li><li>Active aussi la Pod Security par défaut et des NetworkPolicies de base : certaines applications devront recevoir leurs propres politiques</li><li>RKE2 fournit un rapport de conformité via <strong>kube-bench</strong> (aussi disponible dans Rancher : CIS Scan)</li><li>SELinux en mode <em>enforcing</em> supporté sur RHEL-like (<code>selinux: true</code>)</li></ul>
+    </div>
+  </div>
+
+  <!-- S10 -->
+  <div class="section" id="s10">
+    <div class="section-header"><span class="section-num">10</span><span class="section-title-text">Rancher : installation en HA sur RKE2</span><span class="section-nb">Rancher</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Helm</span><span class="tag">cert-manager</span><span class="tag">hostname</span><span class="tag">HA</span></div>
+      <ol><li>Cluster RKE2 de management (3 serveurs, version certifiée par Rancher) opérationnel</li><li>Installer <strong>cert-manager</strong> (Helm)</li><li>Installer <strong>Rancher</strong> (Helm) avec le nom DNS voulu</li><li>Se connecter, définir le mot de passe, vérifier l'URL du serveur</li></ol>
+      <div class="code-block"><code><span class="comment"># 1) cert-manager</span>
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+helm install cert-manager jetstack/cert-manager -n cert-manager --create-namespace --set crds.enabled=true
+
+<span class="comment"># 2) Rancher (canal 'latest' ou 'stable')</span>
+helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+helm repo update
+helm install rancher rancher-latest/rancher -n cattle-system --create-namespace \
+  --set hostname=rancher.lab.local \
+  --set replicas=3 \
+  --set bootstrapPassword=ChangeMoi-123
+
+kubectl -n cattle-system rollout status deploy/rancher
+kubectl -n cattle-system get pods</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Option TLS</th><th>Principe</th><th>Quand</th></tr></thead><tbody><tr><td><strong>Rancher généré</strong> (défaut)</td><td>cert-manager émet un certificat via une CA auto-signée Rancher</td><td>Labo, tests</td></tr><tr><td><strong>Let's Encrypt</strong></td><td><code>--set ingress.tls.source=letsEncrypt --set letsEncrypt.email=… --set letsEncrypt.ingress.class=…</code></td><td>Rancher joignable depuis Internet</td></tr><tr><td><strong>Certificat fourni</strong></td><td><code>--set ingress.tls.source=secret</code> + Secret <code>tls-rancher-ingress</code> (et <code>tls-ca</code> si CA privée)</td><td>Entreprise (CA interne)</td></tr></tbody></table></div>
+      <ul><li>Nom de <strong>hostname</strong> définitif dès le départ : le changer ensuite est pénible</li><li>Le chart crée un Ingress : <strong>vérifie la compatibilité avec le contrôleur d'ingress de ton RKE2</strong> (classe d'ingress, Traefik ou autre selon la version) : à valider en labo</li><li>Pointer le DNS vers l'IP virtuelle / load balancer des nœuds d'ingress</li><li>Fixer la version du chart (<code>--version</code>) et la noter</li></ul>
+    </div>
+  </div>
+
+  <!-- S11 -->
+  <div class="section" id="s11">
+    <div class="section-header"><span class="section-num">11</span><span class="section-title-text">Rancher : clusters, authentification, RBAC, Fleet</span><span class="section-nb">Rancher</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Import</span><span class="tag">Provisionnement</span><span class="tag">RBAC global</span><span class="tag">Fleet</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Fonction</th><th>Description</th></tr></thead><tbody><tr><td><strong>Importer</strong> un cluster existant</td><td>Rancher génère une commande <code>kubectl apply</code> qui installe l'agent dans le cluster cible : aucune modification du cluster</td></tr><tr><td><strong>Créer</strong> un cluster RKE2 / k3s</td><td><em>Custom</em> (tu exécutes une commande d'enregistrement sur des VM existantes) ou via un <em>node driver</em> / fournisseur (vSphere, Harvester, cloud…)</td></tr><tr><td><strong>Authentification</strong></td><td>Locale, Active Directory / LDAP, OIDC / SAML (Keycloak, Entra ID…), GitHub…</td></tr><tr><td><strong>RBAC Rancher</strong></td><td>Rôles globaux, de cluster et de projet ; groupes issus du fournisseur d'identité</td></tr><tr><td><strong>Projets</strong></td><td>Regroupement de namespaces avec quotas, rôles et politiques réseau communs</td></tr><tr><td><strong>Fleet</strong></td><td>GitOps intégré : <code>GitRepo</code> déployés sur des groupes de clusters</td></tr><tr><td><strong>Catalogue</strong> / Apps</td><td>Installation de charts Helm depuis l'interface (monitoring, logging, Longhorn…)</td></tr><tr><td><strong>Monitoring / Logging</strong></td><td>Charts Rancher (Prometheus + Grafana, collecte de logs) à activer par cluster</td></tr></tbody></table></div>
+      <div class="code-block"><code><span class="comment"># Exemple Fleet : dépôt Git déployé sur les clusters étiquetés env=prod</span>
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata: { name: apps, namespace: fleet-default }
+spec:
+  repo: https://git.lab.local/infra/apps.git
+  branch: main
+  paths: [ base ]
+  targets:
+    - clusterSelector: { matchLabels: { env: prod } }</code></div>
+      <ul><li>Séparer <strong>management</strong> et <strong>charges de travail</strong> : ne déploie pas d'applications sur le cluster Rancher</li><li>Utiliser des <strong>groupes</strong> du fournisseur d'identité, pas des comptes locaux</li><li>Vérifier les rôles de chaque cluster importé : l'agent a des droits élevés sur le cluster cible</li></ul>
+    </div>
+  </div>
+
+  <!-- S12 -->
+  <div class="section" id="s12">
+    <div class="section-header"><span class="section-num">12</span><span class="section-title-text">Stockage et réseau complémentaires : Longhorn, kube-vip, MetalLB</span><span class="section-nb">Compléments</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Longhorn</span><span class="tag">kube-vip</span><span class="tag">MetalLB</span><span class="tag">Velero</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Besoin</th><th>Solution courante</th><th>Remarques</th></tr></thead><tbody><tr><td>Stockage persistant réparti</td><td><strong>Longhorn</strong> (projet SUSE / Rancher)</td><td>Réplication entre nœuds, snapshots, sauvegardes S3 / NFS, RWX via NFS ; prérequis OS : <code>open-iscsi</code>, <code>nfs-common</code></td></tr><tr><td>IP virtuelle de l'API</td><td><strong>kube-vip</strong></td><td>ARP ou BGP ; peut aussi fournir des Services <code>LoadBalancer</code></td></tr><tr><td>Services LoadBalancer</td><td><strong>MetalLB</strong> ou kube-vip</td><td>Plage d'adresses réservée</td></tr><tr><td>Sauvegarde applicative</td><td><strong>Velero</strong> (+ snapshots CSI)</td><td>Objets Kubernetes + volumes</td></tr><tr><td>Sauvegarde de Rancher</td><td><strong>Rancher Backups</strong> (opérateur)</td><td>Sauvegarde les objets de Rancher vers S3 ou volume : voir ci-dessous</td></tr></tbody></table></div>
+      <div class="code-block"><code><span class="comment"># Longhorn (Helm) : à vérifier dans la doc de ta version</span>
+helm repo add longhorn https://charts.longhorn.io &amp;&amp; helm repo update
+helm install longhorn longhorn/longhorn -n longhorn-system --create-namespace</code></div>
+      <div class="warn"><strong>À vérifier :</strong> les noms exacts des charts et des CRD de l'opérateur <em>Rancher Backups</em> (<code>rancher-backup</code>, <code>rancher-backup-crd</code>, objet <code>Backup</code> / <code>Restore</code> du groupe <code>resources.cattle.io</code>) sont donnés de mémoire dans cette fiche : relis la page « Backup and Restore » de ta version de Rancher. Le principe reste : sauvegarder <strong>régulièrement</strong> Rancher <em>et</em> etcd du cluster qui l'héberge.</div>
+    </div>
+  </div>
+
+  <!-- S13 -->
+  <div class="section" id="s13">
+    <div class="section-header"><span class="section-num">13</span><span class="section-title-text">Dépannage RKE2 et Rancher</span><span class="section-nb">Dépannage</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Journaux</span><span class="tag">etcd</span><span class="tag">Agents</span><span class="tag">Certificats</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Symptôme</th><th>Causes fréquentes</th><th>Vérifier</th></tr></thead><tbody><tr><td>Le serveur ne démarre pas</td><td>Port occupé / pare-feu, <code>config.yaml</code> invalide, disque plein</td><td><code>journalctl -u rke2-server -n 200</code></td></tr><tr><td>Un nœud n'arrive pas à rejoindre</td><td>Mauvais jeton, 9345 fermé, DNS du <code>server:</code>, horloge</td><td>Journal de <code>rke2-agent</code>, <code>curl -k https://serveur:9345/ping</code></td></tr><tr><td>Erreur de certificat sur l'API</td><td>Nom absent de <code>tls-san</code></td><td>Ajouter le nom, supprimer le certificat serving puis redémarrer (voir doc)</td></tr><tr><td>etcd lent / instable</td><td>Disque lent, latence réseau, 2 serveurs seulement</td><td><code>etcdctl</code> (certificats RKE2), métriques etcd</td></tr><tr><td>Pods en <code>ContainerCreating</code></td><td>CNI non prêt, 8472/udp bloqué, NetworkManager</td><td>Pods <code>kube-system</code> (canal), <code>crictl</code></td></tr><tr><td>Rancher inaccessible</td><td>Ingress / DNS, certificat, Pods <code>cattle-system</code></td><td><code>kubectl -n cattle-system get pods,ing</code></td></tr><tr><td>Cluster downstream « Unavailable »</td><td>Agent coupé, URL du serveur Rancher injoignable, certificat CA</td><td>Pods <code>cattle-cluster-agent</code> du cluster cible</td></tr><tr><td>Mise à jour bloquée</td><td>PDB, drain impossible, Plan en échec</td><td><code>kubectl get plans -A</code>, événements des nœuds</td></tr></tbody></table></div>
+      <div class="code-block"><code>kubectl -n cattle-system logs deploy/rancher --tail=100
+kubectl -n cattle-system get pods -o wide
+kubectl get nodes ; kubectl get pods -A | grep -v Running
+journalctl -u rke2-server --since '-30min' | tail -100</code></div>
+    </div>
+  </div>
+
+  <!-- S14 -->
+  <div class="section" id="s14">
+    <div class="section-header"><span class="section-num">14</span><span class="section-title-text">Check-list de mise en production</span><span class="section-nb">Production</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">HA</span><span class="tag">Sauvegardes</span><span class="tag">Sécurité</span><span class="tag">Documentation</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Domaine</th><th>Point à valider</th></tr></thead><tbody><tr><td>Architecture</td><td>3 serveurs, IP virtuelle / LB pour l'API, workers séparés, cluster Rancher dédié</td></tr><tr><td>Versions</td><td>Matrice Rancher ↔ Kubernetes respectée ; versions fixées (RKE2, charts)</td></tr><tr><td>Sauvegardes</td><td>Snapshots etcd planifiés + copie S3 ; Rancher Backups ; volumes ; <strong>restauration testée</strong></td></tr><tr><td>Sécurité</td><td><code>profile: cis</code> si exigé, chiffrement des Secrets, SSO + groupes, NetworkPolicies, Pod Security, registre privé</td></tr><tr><td>Réseau</td><td>CNI choisi, pare-feu validé, DNS et certificats (CA interne ou Let's Encrypt)</td></tr><tr><td>Exploitation</td><td>Monitoring et logs, alertes, procédure de mise à jour, fenêtre de maintenance</td></tr><tr><td>Automatisation</td><td><code>config.yaml</code> et values Helm dans Git, déploiement des nœuds reproductible (Ansible / Terraform), GitOps (Fleet / Argo CD)</td></tr><tr><td>Documentation</td><td>Schéma, inventaire, runbooks de panne et de restauration</td></tr></tbody></table></div>
+      <div class="tip">Pour industrialiser la création des VM et l'installation de RKE2, relie cette fiche à <a href="../proxmox-devops/fiche.html">Proxmox DevOps</a> (Terraform + cloud-init + Ansible) : un cluster RKE2 complet peut se déployer par code sur Proxmox.</div>
+    </div>
+  </div>
+
+  <!-- S15 -->
+  <div class="section" id="s15">
+    <div class="section-header"><span class="section-num">15</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">27 questions</span></div>
+
+      <h3>Plan de labo en 7 séances</h3>
+      <ol><li><strong>Séance 1 : un serveur RKE2.</strong> Installer, récupérer le kubeconfig, déployer une application simple, explorer <code>/var/lib/rancher/rke2</code></li><li><strong>Séance 2 : HA.</strong> 3 serveurs + 1 worker, IP virtuelle (kube-vip), couper un serveur et vérifier le quorum</li><li><strong>Séance 3 : sauvegarde.</strong> Snapshot etcd, supprimer un namespace, restaurer ; planifier + copier vers S3 / MinIO</li><li><strong>Séance 4 : Rancher.</strong> cert-manager + Rancher en Helm sur le cluster de management, accès par nom DNS</li><li><strong>Séance 5 : clusters.</strong> Importer un cluster existant, créer un cluster downstream RKE2 (custom), SSO et rôles</li><li><strong>Séance 6 : exploitation.</strong> Mise à jour d'une version mineure (drain), Longhorn, monitoring, Fleet avec un dépôt Git</li><li><strong>Séance 7 : durcissement.</strong> <code>profile: cis</code>, scan CIS, air-gap avec registre privé</li></ol>
+
+      <h3>Auto-évaluation — clique pour voir la réponse</h3>
+      <div class="qr-list">
+        <details><summary>Qu'est-ce que RKE2 ?</summary><p>Une distribution Kubernetes certifiée CNCF, durcie par défaut (CIS, FIPS possible), en un binaire avec containerd et etcd.</p></details>
+        <details><summary>Quelle différence entre RKE2 et Rancher ?</summary><p>RKE2 est le moteur Kubernetes ; Rancher est la plateforme de gestion multi-clusters (interface, SSO, RBAC, catalogue) qui s'installe sur un cluster.</p></details>
+        <details><summary>Quelle différence entre RKE2 et k3s ?</summary><p>k3s est léger (edge, labo, SQLite par défaut) ; RKE2 est orienté datacenter et durcissement, avec etcd.</p></details>
+        <details><summary>Combien de serveurs pour la haute disponibilité ?</summary><p>3 (impair) : le quorum etcd tolère la perte d'un serveur ; 5 tolèrent 2 pannes.</p></details>
+        <details><summary>À quoi servent les ports 9345 et 6443 ?</summary><p>9345 : API de supervision RKE2 (enregistrement des nœuds) ; 6443 : API Kubernetes.</p></details>
+        <details><summary>Où se trouve le kubeconfig d'un cluster RKE2 ?</summary><p>/etc/rancher/rke2/rke2.yaml sur un serveur ; kubectl se trouve dans /var/lib/rancher/rke2/bin.</p></details>
+        <details><summary>Comment un worker rejoint-il le cluster ?</summary><p>Installer avec INSTALL_RKE2_TYPE=agent, renseigner server: https://…:9345 et token dans config.yaml, démarrer rke2-agent.</p></details>
+        <details><summary>À quoi sert tls-san ?</summary><p>Lister tous les noms et IP par lesquels on joint l'API, pour qu'ils figurent dans le certificat.</p></details>
+        <details><summary>Où est stocké le jeton des nœuds ?</summary><p>Dans /var/lib/rancher/rke2/server/node-token sur un serveur (ou défini dans config.yaml).</p></details>
+        <details><summary>Quel CNI par défaut et quelles alternatives ?</summary><p>Canal (Flannel + Calico). Alternatives : Calico, Cilium. À choisir avant la création du cluster.</p></details>
+        <details><summary>Que devient l'ingress dans les versions récentes ?</summary><p>ingress-nginx est en fin de vie depuis mars 2026 ; Traefik devient le contrôleur par défaut à partir de RKE2 1.36. À vérifier dans les notes de ta version.</p></details>
+        <details><summary>Comment personnaliser un chart empaqueté ?</summary><p>Avec un HelmChartConfig du même nom dans /var/lib/rancher/rke2/server/manifests/, champ valuesContent.</p></details>
+        <details><summary>Quelle est la politique de snapshots par défaut ?</summary><p>Un snapshot etcd toutes les 12 heures, 5 conservés, dans /var/lib/rancher/rke2/server/db/snapshots.</p></details>
+        <details><summary>Comment prendre un snapshot à la demande ?</summary><p>rke2 etcd-snapshot save --name NOM ; lister avec rke2 etcd-snapshot ls.</p></details>
+        <details><summary>Comment restaurer etcd ?</summary><p>Arrêter tous les serveurs, puis sur un seul : rke2 server --cluster-reset --cluster-reset-restore-path=…, redémarrer, et réinitialiser le dossier db des autres serveurs pour qu'ils rejoignent.</p></details>
+        <details><summary>Un snapshot etcd sauvegarde-t-il les volumes ?</summary><p>Non : seulement l'état du cluster. Les volumes se sauvegardent avec l'outil de stockage ou Velero.</p></details>
+        <details><summary>Comment mettre à jour RKE2 ?</summary><p>Snapshot, une version mineure à la fois, serveurs un par un puis workers, avec drain / installateur avec INSTALL_RKE2_VERSION / restart / uncordon, ou via system-upgrade-controller.</p></details>
+        <details><summary>Comment installer RKE2 hors ligne ?</summary><p>Copier les archives d'images dans /var/lib/rancher/rke2/agent/images/, installer par tarball (INSTALL_RKE2_ARTIFACT_PATH) et configurer registries.yaml pour un registre privé.</p></details>
+        <details><summary>Que fait profile: cis ?</summary><p>Active les contrôles du référentiel CIS (dont Pod Security et NetworkPolicies de base) ; demande des réglages préalables de l'OS.</p></details>
+        <details><summary>Quelle version de RKE2 choisir pour héberger Rancher ?</summary><p>Une version de Kubernetes certifiée par la version de Rancher visée (matrice de support). Fin 2026, Rancher 2.15.x certifiait Kubernetes 1.34 à 1.36.</p></details>
+        <details><summary>Quels sont les prérequis de l'installation Helm de Rancher ?</summary><p>Un cluster RKE2 sain, cert-manager, un nom DNS (hostname), le dépôt de charts Rancher et un mot de passe d'amorçage.</p></details>
+        <details><summary>Quelles sont les options de certificat pour Rancher ?</summary><p>Auto-signé géré par Rancher (défaut), Let's Encrypt, ou certificat fourni dans un Secret (CA privée avec tls-ca).</p></details>
+        <details><summary>Comment ajouter un cluster existant à Rancher ?</summary><p>L'importer : Rancher fournit une commande kubectl apply qui déploie l'agent cattle-cluster-agent dans le cluster cible.</p></details>
+        <details><summary>À quoi sert Fleet ?</summary><p>GitOps intégré à Rancher : des GitRepo déployés sur des groupes de clusters sélectionnés par labels.</p></details>
+        <details><summary>Pourquoi ne pas déployer d'applications sur le cluster Rancher ?</summary><p>Pour isoler la plateforme de gestion : stabilité, sécurité, mises à jour indépendantes.</p></details>
+        <details><summary>Que sauvegarder pour reconstruire Rancher ?</summary><p>L'etcd du cluster qui l'héberge et l'opérateur Rancher Backups vers S3, plus config.yaml et les values Helm dans Git.</p></details>
+        <details><summary>Un nœud ne rejoint pas le cluster : que vérifier ?</summary><p>Le jeton, le port 9345, le nom DNS de server:, l'horloge, puis le journal de rke2-agent.</p></details>
+      </div>
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)">
+    Fiche RKE2 et Rancher ·
+    <a href="https://docs.rke2.io/" target="_blank" style="color:var(--accent);text-decoration:none">Documentation RKE2</a> ·
+    <a href="https://ranchermanager.docs.rancher.com/" target="_blank" style="color:var(--accent);text-decoration:none">Documentation Rancher</a> ·
+    <a href="https://www.suse.com/suse-rancher/support-matrix/all-supported-versions" target="_blank" style="color:var(--accent);text-decoration:none">Matrice de support</a>
+  </footer>
+
+</div>
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("rke2-rancher-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("rke2-rancher-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>

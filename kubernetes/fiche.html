@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#326ce5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche Kubernetes — Formation globale</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#326ce5;--accent-soft:#e6eefd;
+  --ps:#2b2f36;--ps-mid:#326ce5;--ps-light:#f6d9b8;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#6ea0ff;--accent-soft:#14213d;
+  --ps:#3a3f48;--ps-mid:#6ea0ff;--ps-light:#14213d;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#6ea0ff;--accent-soft:#14213d;
+  --ps:#3a3f48;--ps-mid:#6ea0ff;--ps-light:#14213d;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.8rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+h4{font-size:.9rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--f-mono)}
+p{margin:6px 0 10px}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Header */
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.top-actions{display:flex;gap:8px;align-items:center}
+details{border:1px solid var(--line);border-radius:7px;padding:9px 14px;margin:8px 0;background:var(--sheet)}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details[open] summary{color:var(--accent);margin-bottom:6px}
+details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PS Banner */
+.ps-banner{background:var(--ps);border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.ps-banner-left .label{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ps-banner-left h1{color:#fff;font-size:1.5rem}
+.ps-banner-left p{color:rgba(255,255,255,.7);font-size:.88rem;margin:4px 0 0}
+.ps-stats{display:flex;gap:16px;flex-wrap:wrap}
+.ps-stat{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;text-align:center;min-width:80px}
+.ps-stat b{display:block;font:700 1.3rem var(--f-mono);color:#fff}
+.ps-stat span{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em}
+
+/* Sommaire rapide */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:28px}
+.toc h4{margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;text-decoration:none;color:var(--ink);font-size:.85rem;transition:background .15s}
+.toc-item:hover{background:var(--accent-soft);color:var(--accent)}
+.toc-num{font:600 .7rem var(--f-mono);background:var(--ps-light);color:var(--ps-mid);padding:1px 6px;border-radius:3px;min-width:28px;text-align:center}
+
+/* Sections */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.section-header{background:var(--ps);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.section-num{font:700 .75rem var(--f-mono);background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:4px}
+.section-title-text{font:700 1rem var(--f-display);color:#fff;flex:1}
+.section-nb{font:500 .7rem var(--f-mono);color:rgba(255,255,255,.55)}
+.section-body{padding:20px}
+
+/* Blocs de contenu */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.concept-card{border:1px solid var(--line);border-radius:7px;padding:12px 14px}
+.concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
+.concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
+.concept-card ul li{margin:2px 0}
+.concept-card.warn{border-left:3px solid var(--warn);border-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+
+/* Cmdlets */
+.cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+.cmdlet-table th{text-align:left;padding:7px 10px;background:var(--accent-soft);color:var(--accent);font:600 .72rem var(--f-mono);letter-spacing:.05em;border-bottom:2px solid var(--line)}
+.cmdlet-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmdlet-table tr:last-child td{border-bottom:0}
+.cmdlet-table td:first-child{font:500 .85rem var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmdlet-table td:last-child{color:var(--muted)}
+.cmdlet-table td:nth-child(2){color:var(--ink)}
+.cmdlet-table-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+
+/* Code blocks */
+.code-block{background:var(--ps);border-radius:7px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.code-block code{font:500 .85rem var(--f-mono);color:#f6d9b8;white-space:pre;display:block;line-height:1.6}
+.code-block .comment{color:rgba(255,255,255,.4)}
+.code-block .keyword{color:#9cdcfe}
+.code-block .string{color:#ce9178}
+.code-block .cmdlet{color:#dcdcaa}
+.code-block .param{color:#9cdcfe}
+
+/* Astuce / Attention */
+.tip{background:var(--ok-soft);border-left:3px solid var(--ok);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.tip strong{color:var(--ok)}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.warn strong{color:var(--warn)}
+.info{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.info strong{color:var(--accent)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font:500 .72rem var(--f-mono);padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.admin{background:var(--ok-soft);color:var(--ok)}
+.tag.cloud{background:#e6eefd;color:#326ce5}
+.tag.script{background:#f3e8ff;color:#6b21a8}
+
+/* Comparatif */
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.compare-table th{padding:7px 10px;text-align:left;border-bottom:2px solid var(--line);font:600 .72rem var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.compare-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table td:first-child{font:600 .85rem var(--f-mono);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  h1{font-size:1.3rem}
+  .ps-banner{padding:14px 16px}
+  .ps-banner-left h1{font-size:1.2rem}
+  .ps-stats{gap:8px}
+  .ps-stat{padding:8px 10px;min-width:64px}
+  .ps-stat b{font-size:1rem}
+  .concept-grid{grid-template-columns:1fr}
+  .toc-grid{grid-template-columns:1fr}
+  .section-body{padding:14px}
+  .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">Conteneurs · Kubernetes</div>
+      <h1>Fiche — Kubernetes (formation globale)</h1>
+    </div>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="ps-banner">
+    <div class="ps-banner-left">
+      <div class="label">Formation autonome · Socle commun pour RKE2 et Rancher</div>
+      <h1>Kubernetes — comprendre, déployer, exploiter</h1>
+      <p>Architecture · Workloads · Réseau · Stockage · Sécurité · Helm · Dépannage · CKA</p>
+    </div>
+    <div class="ps-stats">
+      <div class="ps-stat"><b>15</b><span>Sections</span></div>
+      <div class="ps-stat"><b>1.3x</b><span>Version</span></div>
+      <div class="ps-stat"><b>29</b><span>Q/R</span></div>
+    </div>
+  </div>
+
+  <div class="info"><strong>Sources :</strong> documentation officielle Kubernetes (kubernetes.io), documentation RKE2 pour l'état de l'écosystème des ingress, politique de versions. <strong>Les versions évoluent vite</strong> (environ 3 versions mineures par an) : vérifie toujours la version de ta distribution et les API déprécées. Les exemples sont des points de départ à tester sur un cluster de labo. <strong>Suite :</strong> <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a>.</div>
+
+  <div class="toc">
+    <h4>Sommaire</h4>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">1</span>Vue d'ensemble et architecture</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>kubectl, kubeconfig et YAML</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>Workloads : Pods, Deployments, Jobs</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">4</span>Configuration : ConfigMap et Secret</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">5</span>Réseau : Services, Ingress, NetworkPolicy</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">6</span>Stockage : PV, PVC, StorageClass</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Ordonnancement et ressources</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Sécurité : RBAC et Pod Security</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Helm, Kustomize et GitOps</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span>Observabilité et dépannage</a>
+      <a href="#s11" class="toc-item"><span class="toc-num">11</span>Administration : etcd, certificats, upgrades</a>
+      <a href="#s12" class="toc-item"><span class="toc-num">12</span>Extensions : CRD, Operators, admission</a>
+      <a href="#s13" class="toc-item"><span class="toc-num">13</span>Pièges et aide-mémoire</a>
+      <a href="#s14" class="toc-item"><span class="toc-num">14</span>Certifications CKA, CKAD, CKS</a>
+      <a href="#s15" class="toc-item"><span class="toc-num">15</span>Plan de labo et Q/R</a>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div class="section" id="s1">
+    <div class="section-header"><span class="section-num">1</span><span class="section-title-text">Vue d'ensemble et architecture</span><span class="section-nb">Fondations</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Control plane</span><span class="tag">Nœuds</span><span class="tag">etcd</span><span class="tag">Déclaratif</span></div>
+      <div class="info"><strong>Kubernetes (K8s)</strong> est un orchestrateur de conteneurs : tu <strong>déclares l'état voulu</strong> (3 réplicas de cette application), et des <strong>contrôleurs</strong> font converger l'état réel vers l'état voulu en boucle, en permanence. C'est le même esprit que Terraform, mais en continu.</div>
+
+      <h3>Les composants</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Composant</th><th>Où</th><th>Rôle</th></tr></thead><tbody><tr><td><strong>kube-apiserver</strong></td><td>Control plane</td><td>Seul point d'entrée (API REST) : tout passe par lui (kubectl, contrôleurs, kubelet)</td></tr><tr><td><strong>etcd</strong></td><td>Control plane</td><td>Base clé-valeur distribuée : <strong>tout l'état du cluster</strong>. À sauvegarder ; nombre impair de membres</td></tr><tr><td><strong>kube-scheduler</strong></td><td>Control plane</td><td>Choisit le nœud d'un Pod non placé (ressources, affinités, taints)</td></tr><tr><td><strong>kube-controller-manager</strong></td><td>Control plane</td><td>Boucles de contrôle : Deployment, ReplicaSet, Node, Job, EndpointSlice…</td></tr><tr><td><strong>cloud-controller-manager</strong></td><td>Control plane (cloud)</td><td>Intègre le fournisseur : load balancers, nœuds, volumes</td></tr><tr><td><strong>kubelet</strong></td><td>Chaque nœud</td><td>Agent : démarre les Pods voulus via le runtime, remonte l'état</td></tr><tr><td><strong>Runtime de conteneurs</strong></td><td>Chaque nœud</td><td>containerd ou CRI-O (interface CRI) ; Docker n'est plus un runtime direct</td></tr><tr><td><strong>kube-proxy</strong></td><td>Chaque nœud</td><td>Règles réseau pour les Services (iptables / IPVS / nftables selon le CNI)</td></tr><tr><td><strong>CNI</strong> (plugin réseau)</td><td>Chaque nœud</td><td>Réseau des Pods (Calico, Cilium, Flannel, Canal…)</td></tr><tr><td><strong>CoreDNS</strong></td><td>Dans le cluster</td><td>DNS interne : <code>service.namespace.svc.cluster.local</code></td></tr></tbody></table></div>
+
+      <h3>Ce qui se passe quand tu appliques un fichier</h3>
+      <ol><li><code>kubectl apply -f app.yaml</code> envoie l'objet à l'API (authentification, autorisation RBAC, admission)</li><li>L'objet est écrit dans <strong>etcd</strong></li><li>Le contrôleur Deployment crée un ReplicaSet, qui crée des Pods</li><li>Le <strong>scheduler</strong> affecte chaque Pod à un nœud</li><li>Le <strong>kubelet</strong> du nœud demande au runtime de lancer les conteneurs (images tirées du registre)</li><li>Le CNI donne une IP au Pod ; les Services et le DNS rendent l'application joignable</li></ol>
+
+      <h3>Vocabulaire minimal</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Sens</th></tr></thead><tbody><tr><td>Cluster</td><td>Control plane + nœuds de travail (workers)</td></tr><tr><td>Namespace</td><td>Espace de noms logique pour isoler et organiser (pas une isolation de sécurité forte seule)</td></tr><tr><td>Pod</td><td>Plus petite unité déployable : un ou plusieurs conteneurs qui partagent réseau et volumes</td></tr><tr><td>Label / sélecteur</td><td>Étiquettes clé=valeur et requêtes sur ces étiquettes : colle tout ensemble</td></tr><tr><td>Manifeste</td><td>Fichier YAML décrivant un objet (<code>apiVersion</code>, <code>kind</code>, <code>metadata</code>, <code>spec</code>)</td></tr></tbody></table></div>
+      <div class="tip"><strong>Versions :</strong> Kubernetes sort environ <strong>3 versions mineures par an</strong> ; seules les 3 plus récentes reçoivent des correctifs. Vérifier la version supportée et la compatibilité de ta distribution sur <a href="https://kubernetes.io/releases/">kubernetes.io/releases</a> avant de choisir.</div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section" id="s2">
+    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">kubectl, kubeconfig et manifestes YAML</span><span class="section-nb">Outil</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">kubectl</span><span class="tag">kubeconfig</span><span class="tag">YAML</span><span class="tag">Namespaces</span></div>
+
+      <h3>kubeconfig et contextes</h3>
+      <ul><li><code>~/.kube/config</code> (ou variable <code>KUBECONFIG</code>) contient clusters, utilisateurs et <strong>contextes</strong> (cluster + utilisateur + namespace)</li><li><code>kubectl config get-contexts</code> · <code>kubectl config use-context NOM</code> · <code>kubectl config set-context --current --namespace=NS</code></li><li><strong>Un kubeconfig est un secret</strong> : il donne accès au cluster</li></ul>
+
+      <h3>Commandes du quotidien</h3>
+      <div class="code-block"><code><span class="comment"># Lire</span>
+kubectl get nodes -o wide
+kubectl get pods -A                       <span class="comment"># -A = tous les namespaces</span>
+kubectl get deploy,svc,ing -n monapp
+kubectl get pod web-1 -o yaml
+kubectl describe pod web-1                 <span class="comment"># événements en bas : la 1re chose à lire</span>
+kubectl logs web-1 -c app --tail=100 -f    <span class="comment"># -p = conteneur précédent</span>
+kubectl explain deployment.spec.strategy   <span class="comment"># documentation intégrée</span>
+
+<span class="comment"># Écrire</span>
+kubectl apply -f dossier/                   <span class="comment"># déclaratif (recommandé)</span>
+kubectl diff -f dossier/                    <span class="comment"># voir avant d'appliquer</span>
+kubectl delete -f dossier/
+kubectl create deployment web --image=nginx --replicas=3 --dry-run=client -o yaml &gt; web.yaml
+kubectl scale deploy web --replicas=5
+kubectl rollout status deploy/web ; kubectl rollout undo deploy/web
+kubectl set image deploy/web app=nginx:1.27
+
+<span class="comment"># Entrer / tester</span>
+kubectl exec -it web-1 -- sh
+kubectl port-forward svc/web 8080:80
+kubectl run tmp --rm -it --image=busybox -- sh
+kubectl top nodes ; kubectl top pods         <span class="comment"># nécessite metrics-server</span>
+kubectl api-resources ; kubectl api-versions</code></div>
+
+      <h3>Anatomie d'un manifeste</h3>
+      <div class="code-block"><code>apiVersion: apps/v1          <span class="comment"># groupe d'API / version</span>
+kind: Deployment
+metadata:
+  name: web
+  namespace: monapp
+  labels: { app: web }
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: web }   <span class="comment"># doit correspondre aux labels du modèle de Pod</span>
+  template:
+    metadata:
+      labels: { app: web }
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27
+          ports: [{ containerPort: 80 }]</code></div>
+      <ul><li><strong>Impératif</strong> (<code>create</code>, <code>run</code>) : rapide pour tester ou générer un squelette avec <code>--dry-run=client -o yaml</code></li><li><strong>Déclaratif</strong> (<code>apply</code>) : la référence en production, versionné dans Git</li><li><strong>Server-side apply</strong> (<code>--server-side</code>) : l'API gère les conflits de champs, utile quand plusieurs outils modifient le même objet</li><li>Toujours mettre un <strong>tag d'image précis</strong> (jamais <code>latest</code> en production)</li></ul>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">Workloads : Pods, Deployments, StatefulSets, Jobs</span><span class="section-nb">Charges</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Deployment</span><span class="tag">StatefulSet</span><span class="tag">DaemonSet</span><span class="tag">Probes</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Objet</th><th>Pour quoi faire</th><th>À retenir</th></tr></thead><tbody><tr><td><strong>Pod</strong></td><td>Un ou plusieurs conteneurs liés</td><td>Éphémère : un Pod supprimé n'est pas « réparé », il est remplacé</td></tr><tr><td><strong>ReplicaSet</strong></td><td>Maintient N Pods identiques</td><td>Rarement utilisé directement</td></tr><tr><td><strong>Deployment</strong></td><td>Applications <em>sans état</em> : mises à jour progressives, retour arrière</td><td>Stratégie <code>RollingUpdate</code> (<code>maxSurge</code>, <code>maxUnavailable</code>)</td></tr><tr><td><strong>StatefulSet</strong></td><td>Applications <em>avec état</em> (bases de données)</td><td>Identité stable (<code>db-0</code>, <code>db-1</code>), stockage par réplica (<code>volumeClaimTemplates</code>), démarrage ordonné, Service <em>headless</em></td></tr><tr><td><strong>DaemonSet</strong></td><td>Un Pod <strong>par nœud</strong></td><td>Agents de logs, de supervision, CNI</td></tr><tr><td><strong>Job</strong> / <strong>CronJob</strong></td><td>Tâche ponctuelle / planifiée</td><td><code>backoffLimit</code>, <code>ttlSecondsAfterFinished</code>, <code>concurrencyPolicy</code></td></tr></tbody></table></div>
+
+      <h3>Sondes (probes) et ressources</h3>
+      <div class="concept-grid"><div class="concept-card"><h4>Les 3 sondes</h4><ul><li><strong>readiness</strong> : le Pod reçoit-il du trafic ? (retiré des Services s'il échoue)</li><li><strong>liveness</strong> : faut-il redémarrer le conteneur ?</li><li><strong>startup</strong> : pour les démarrages longs (suspend les deux autres)</li></ul></div><div class="concept-card"><h4>Requests et limits</h4><ul><li><strong>requests</strong> : ce que le scheduler <em>réserve</em> pour placer le Pod</li><li><strong>limits</strong> : plafond ; dépasser la mémoire = <strong>OOMKilled</strong> ; dépasser le CPU = bridé (throttling)</li><li>Classes de QoS : <em>Guaranteed</em>, <em>Burstable</em>, <em>BestEffort</em> (évincé en premier)</li></ul></div><div class="concept-card"><h4>Cycle de vie</h4><ul><li><strong>initContainers</strong> : tâches préalables, séquentielles</li><li>Sidecars (journalisation, proxy)</li><li><code>terminationGracePeriodSeconds</code> + <code>preStop</code> pour un arrêt propre</li></ul></div></div>
+      <div class="code-block"><code>containers:
+  - name: app
+    image: monapp:1.4.2
+    resources:
+      requests: { cpu: 250m, memory: 256Mi }
+      limits:   { memory: 512Mi }
+    readinessProbe:
+      httpGet: { path: /ready, port: 8080 }
+      periodSeconds: 5
+    livenessProbe:
+      httpGet: { path: /healthz, port: 8080 }
+      initialDelaySeconds: 15</code></div>
+      <div class="warn"><strong>Piège classique :</strong> une liveness trop agressive redémarre en boucle une application lente au démarrage. Utiliser une <code>startupProbe</code>, et ne pas faire dépendre la liveness d'une base de données externe.</div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section" id="s4">
+    <div class="section-header"><span class="section-num">4</span><span class="section-title-text">Configuration : ConfigMap, Secret, variables, labels</span><span class="section-nb">Config</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">ConfigMap</span><span class="tag">Secret</span><span class="tag">Labels</span><span class="tag">Annotations</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Objet</th><th>Contenu</th><th>Remarques</th></tr></thead><tbody><tr><td><strong>ConfigMap</strong></td><td>Configuration non sensible (clé=valeur, fichiers)</td><td>Injectée en variables d'environnement ou montée en fichiers ; les fichiers montés sont mis à jour, pas les variables</td></tr><tr><td><strong>Secret</strong></td><td>Données sensibles (mots de passe, jetons, certificats)</td><td><strong>Encodé en base64, pas chiffré</strong> : sécuriser via RBAC, chiffrement d'etcd au repos, ou un gestionnaire externe (Vault, External Secrets, Sealed Secrets)</td></tr></tbody></table></div>
+      <div class="code-block"><code>kubectl create configmap app-conf --from-file=app.properties
+kubectl create secret generic db --from-literal=password='…'   <span class="comment"># évite d'écrire le secret dans un fichier</span>
+kubectl get secret db -o jsonpath='{.data.password}' | base64 -d</code></div>
+      <ul><li><strong>Labels</strong> : identifient et sélectionnent (<code>app</code>, <code>tier</code>, <code>env</code>) ; les Services et Deployments s'en servent. <strong>Annotations</strong> : métadonnées non sélectionnables (outils, liens)</li><li>Libellés recommandés : <code>app.kubernetes.io/name</code>, <code>/instance</code>, <code>/version</code>, <code>/component</code></li><li><strong>Immutabilité</strong> : un ConfigMap/Secret <code>immutable: true</code> évite les changements accidentels</li><li>Un changement de ConfigMap ne redémarre <strong>pas</strong> les Pods : utiliser un hash en annotation (Helm <code>checksum/config</code>) ou <code>kubectl rollout restart</code></li></ul>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div class="section" id="s5">
+    <div class="section-header"><span class="section-num">5</span><span class="section-title-text">Réseau : Services, Ingress, Gateway API, NetworkPolicy</span><span class="section-nb">Réseau</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Service</span><span class="tag">Ingress</span><span class="tag">Gateway API</span><span class="tag">CNI</span></div>
+      <div class="info"><strong>Modèle réseau :</strong> chaque Pod a sa propre IP ; tous les Pods peuvent se joindre sans NAT ; les IP de Pods changent, d'où les <strong>Services</strong> : une adresse stable (ClusterIP) et un nom DNS devant un ensemble de Pods sélectionnés par labels.</div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Type de Service</th><th>Accès</th><th>Usage</th></tr></thead><tbody><tr><td><code>ClusterIP</code> (défaut)</td><td>Interne au cluster</td><td>Communication entre applications</td></tr><tr><td><code>NodePort</code></td><td>Port 30000–32767 sur chaque nœud</td><td>Tests, ou derrière un load balancer externe</td></tr><tr><td><code>LoadBalancer</code></td><td>IP externe fournie par le cloud ou par un outil (MetalLB, kube-vip)</td><td>Exposer un service en TCP/UDP directement</td></tr><tr><td><code>ExternalName</code></td><td>Alias DNS vers un nom externe</td><td>Pointer un service hors cluster</td></tr><tr><td><em>Headless</em> (<code>clusterIP: None</code>)</td><td>DNS renvoie les IP des Pods</td><td>StatefulSets, découverte directe</td></tr></tbody></table></div>
+
+      <h3>Exposer du HTTP : Ingress ou Gateway API</h3>
+      <ul><li><strong>Ingress</strong> : règles HTTP(S) (hôtes, chemins, TLS) <em>appliquées par un contrôleur d'ingress</em> (il faut en installer un)</li><li><strong>Gateway API</strong> : successeur plus expressif (<code>GatewayClass</code>, <code>Gateway</code>, <code>HTTPRoute</code>), séparation des rôles infra / applications ; à privilégier pour les nouveaux projets</li><li><strong>ingress-nginx est en fin de vie depuis mars 2026</strong> (plus de correctifs) : privilégier Traefik, un contrôleur compatible Gateway API (Cilium, Envoy Gateway, NGINX Gateway Fabric…) selon ta plateforme</li></ul>
+      <div class="code-block"><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: { name: web, namespace: monapp }
+spec:
+  ingressClassName: traefik
+  tls: [{ hosts: [app.lab.local], secretName: app-tls }]
+  rules:
+    - host: app.lab.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: web, port: { number: 80 } } }</code></div>
+
+      <h3>NetworkPolicy et CNI</h3>
+      <ul><li>Par défaut, <strong>tout est ouvert</strong> entre Pods. Une <code>NetworkPolicy</code> restreint (entrée / sortie) ; elle n'a d'effet que si le <strong>CNI la supporte</strong> (Calico, Cilium, Canal : oui ; Flannel seul : non)</li><li>Bonne pratique : une politique « tout refuser » par namespace, puis des autorisations ciblées (<code>podSelector</code>, <code>namespaceSelector</code>)</li><li>CNI courants : <strong>Calico</strong> (politiques, BGP), <strong>Cilium</strong> (eBPF, observabilité), <strong>Flannel</strong> (simple), <strong>Canal</strong> (Flannel + Calico)</li><li>Bare metal / VM sans cloud : <strong>MetalLB</strong> ou <strong>kube-vip</strong> pour les Services <code>LoadBalancer</code></li></ul>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="section" id="s6">
+    <div class="section-header"><span class="section-num">6</span><span class="section-title-text">Stockage : Volumes, PV, PVC, StorageClass, CSI</span><span class="section-nb">Données</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">PV</span><span class="tag">PVC</span><span class="tag">StorageClass</span><span class="tag">CSI</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Objet</th><th>Rôle</th></tr></thead><tbody><tr><td><strong>PersistentVolume (PV)</strong></td><td>Un morceau de stockage du cluster (créé à la main ou dynamiquement)</td></tr><tr><td><strong>PersistentVolumeClaim (PVC)</strong></td><td>La <em>demande</em> de l'application : taille, mode d'accès, classe</td></tr><tr><td><strong>StorageClass</strong></td><td>Modèle de provisionnement dynamique (provisioner CSI, paramètres, politique)</td></tr><tr><td><strong>CSI</strong></td><td>Interface standard des pilotes de stockage</td></tr><tr><td><strong>VolumeSnapshot</strong></td><td>Instantané d'un PVC (si le pilote CSI le gère)</td></tr></tbody></table></div>
+      <div class="code-block"><code>apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: data, namespace: monapp }
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: longhorn
+  resources: { requests: { storage: 10Gi } }</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Mode d'accès</th><th>Sens</th></tr></thead><tbody><tr><td><code>ReadWriteOnce</code> (RWO)</td><td>Lecture-écriture par <strong>un seul nœud</strong></td></tr><tr><td><code>ReadWriteOncePod</code> (RWOP)</td><td>Un seul <strong>Pod</strong></td></tr><tr><td><code>ReadOnlyMany</code> (ROX)</td><td>Lecture seule par plusieurs nœuds</td></tr><tr><td><code>ReadWriteMany</code> (RWX)</td><td>Lecture-écriture par plusieurs nœuds (NFS, CephFS, Longhorn RWX…)</td></tr></tbody></table></div>
+      <ul><li><strong>reclaimPolicy</strong> : <code>Delete</code> (le volume disparaît avec le PVC) ou <code>Retain</code> (conservé) : choisir <code>Retain</code> pour les données importantes</li><li><code>volumeBindingMode: WaitForFirstConsumer</code> place le volume près du Pod ; <code>allowVolumeExpansion: true</code> autorise l'agrandissement</li><li>Options sur site : <strong>Longhorn</strong> (stockage réparti simple, Rancher), <strong>Rook/Ceph</strong>, NFS (<code>nfs-subdir-external-provisioner</code>), pilotes CSI de baies SAN</li><li><strong>Un PVC n'est pas une sauvegarde</strong> : prévoir snapshots + sauvegarde externe (Velero, outil du stockage)</li></ul>
+    </div>
+  </div>
+
+  <!-- S7 -->
+  <div class="section" id="s7">
+    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Ordonnancement et ressources du cluster</span><span class="section-nb">Placement</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Scheduler</span><span class="tag">Taints</span><span class="tag">Affinités</span><span class="tag">Autoscaling</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Mécanisme</th><th>Effet</th></tr></thead><tbody><tr><td><code>nodeSelector</code></td><td>Place le Pod sur les nœuds ayant ce label</td></tr><tr><td><code>nodeAffinity</code></td><td>Règles plus souples (requis ou préféré)</td></tr><tr><td><code>podAffinity</code> / <code>podAntiAffinity</code></td><td>Rapprocher ou <strong>éloigner</strong> des Pods (ex. répartir les réplicas sur des nœuds différents)</td></tr><tr><td><strong>Taints</strong> (nœud) + <strong>tolerations</strong> (Pod)</td><td>Le nœud repousse les Pods, sauf ceux qui le tolèrent (nœuds dédiés, control plane)</td></tr><tr><td><code>topologySpreadConstraints</code></td><td>Répartition équilibrée par nœud / zone</td></tr><tr><td><code>priorityClassName</code></td><td>Priorité et préemption quand le cluster est plein</td></tr></tbody></table></div>
+
+      <h3>Maintenance des nœuds et quotas</h3>
+      <div class="code-block"><code>kubectl cordon w1               <span class="comment"># plus de nouveaux Pods sur ce nœud</span>
+kubectl drain w1 --ignore-daemonsets --delete-emptydir-data   <span class="comment"># évacue proprement</span>
+kubectl uncordon w1
+kubectl taint nodes w1 dedicated=db:NoSchedule</code></div>
+      <ul><li><strong>PodDisruptionBudget (PDB)</strong> : nombre minimum de Pods toujours disponibles pendant un <code>drain</code> (sans PDB, une évacuation peut tout couper)</li><li><strong>ResourceQuota</strong> : plafonne un namespace (CPU, mémoire, nombre d'objets) ; <strong>LimitRange</strong> : valeurs par défaut et bornes par conteneur</li><li><strong>HPA</strong> (Horizontal Pod Autoscaler) : ajuste les réplicas selon CPU / mémoire / métriques ; <strong>VPA</strong> : ajuste requests ; <strong>Cluster Autoscaler</strong> / Karpenter : ajoutent des nœuds (cloud)</li><li>HPA exige des <strong>requests</strong> définies et <strong>metrics-server</strong></li></ul>
+    </div>
+  </div>
+
+  <!-- S8 -->
+  <div class="section" id="s8">
+    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Sécurité : RBAC, comptes de service, Pod Security</span><span class="section-nb">Sécurité</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">RBAC</span><span class="tag">ServiceAccount</span><span class="tag">Pod Security</span><span class="tag">Secrets</span></div>
+
+      <h3>RBAC : qui peut faire quoi</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Objet</th><th>Portée</th><th>Rôle</th></tr></thead><tbody><tr><td><code>Role</code></td><td>Un namespace</td><td>Liste de droits (verbes sur des ressources)</td></tr><tr><td><code>ClusterRole</code></td><td>Tout le cluster (ou réutilisable)</td><td>Droits cluster ou modèle à lier par namespace</td></tr><tr><td><code>RoleBinding</code></td><td>Un namespace</td><td>Attribue un Role / ClusterRole à un utilisateur, groupe ou ServiceAccount</td></tr><tr><td><code>ClusterRoleBinding</code></td><td>Tout le cluster</td><td>Attribution globale</td></tr><tr><td><code>ServiceAccount</code></td><td>Un namespace</td><td>Identité d'un <strong>Pod</strong> pour appeler l'API</td></tr></tbody></table></div>
+      <div class="code-block"><code>kubectl create role pod-reader --verb=get,list,watch --resource=pods -n monapp
+kubectl create rolebinding lire --role=pod-reader --user=alice -n monapp
+kubectl auth can-i delete pods -n monapp --as alice     <span class="comment"># tester un droit</span>
+kubectl auth can-i --list -n monapp</code></div>
+      <div class="concept-grid"><div class="concept-card"><h4>Bonnes pratiques RBAC</h4><ul><li>Principe du <strong>moindre privilège</strong> ; éviter <code>cluster-admin</code> et les jokers (<code>*</code>)</li><li>Passer par des <strong>groupes</strong> (AD / OIDC) plutôt que des utilisateurs individuels</li><li><code>automountServiceAccountToken: false</code> si le Pod n'appelle pas l'API</li></ul></div><div class="concept-card"><h4>Pod Security Admission</h4><ul><li>Trois profils : <strong>privileged</strong>, <strong>baseline</strong>, <strong>restricted</strong></li><li>Appliqué par label de namespace : <code>pod-security.kubernetes.io/enforce=restricted</code></li><li>Remplace les PodSecurityPolicies (supprimées)</li></ul></div><div class="concept-card"><h4>securityContext conseillé</h4><ul><li><code>runAsNonRoot: true</code>, UID non nul</li><li><code>allowPrivilegeEscalation: false</code></li><li><code>readOnlyRootFilesystem: true</code></li><li><code>capabilities: drop: [ALL]</code>, <code>seccompProfile: RuntimeDefault</code></li></ul></div></div>
+      <ul><li><strong>Chaîne d'approvisionnement</strong> : images signées et scannées, registre privé, pas de <code>latest</code></li><li><strong>Secrets</strong> : chiffrement au repos d'etcd, RBAC strict sur <code>secrets</code>, gestionnaire externe</li><li><strong>Réseau</strong> : NetworkPolicies, pas d'API exposée sur Internet</li><li><strong>Audit</strong> de l'API et référentiel <strong>CIS Kubernetes Benchmark</strong> (outils : kube-bench, kubescape, Trivy)</li></ul>
+    </div>
+  </div>
+
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Helm, Kustomize et GitOps</span><span class="section-nb">Déploiement</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Helm</span><span class="tag">Kustomize</span><span class="tag">Argo CD</span><span class="tag">Flux</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Outil</th><th>Principe</th><th>Quand</th></tr></thead><tbody><tr><td><strong>Helm</strong></td><td>Gestionnaire de paquets : <em>charts</em> modélisés (Go templates) + <code>values.yaml</code> ; releases versionnées</td><td>Installer des logiciels tiers (cert-manager, Rancher, Prometheus…) et packager ses applications</td></tr><tr><td><strong>Kustomize</strong></td><td>Superpositions (<code>base</code> + <code>overlays</code>) de YAML, sans templates ; intégré à <code>kubectl -k</code></td><td>Variantes dev / prod d'un même manifeste</td></tr><tr><td><strong>Argo CD</strong> / <strong>Flux</strong></td><td><strong>GitOps</strong> : le cluster se synchronise sur Git (état voulu = dépôt)</td><td>Déploiement continu, détection de dérive, retour arrière par <code>git revert</code></td></tr></tbody></table></div>
+      <div class="code-block"><code>helm repo add jetstack https://charts.jetstack.io &amp;&amp; helm repo update
+helm search repo cert-manager
+helm show values jetstack/cert-manager &gt; values.yaml
+helm install cert-manager jetstack/cert-manager -n cert-manager --create-namespace --set crds.enabled=true
+helm upgrade --install monapp ./chart -f values-prod.yaml -n monapp
+helm list -A ; helm history monapp -n monapp ; helm rollback monapp 1 -n monapp
+helm template ./chart -f values.yaml | kubectl apply --dry-run=server -f -</code></div>
+      <ul><li>Toujours <strong>fixer la version du chart</strong> (<code>--version</code>) et conserver les <code>values</code> dans Git</li><li>Les <strong>CRD</strong> posent problème aux mises à jour Helm : lire les notes de version du chart</li><li><code>helm template</code> + revue du résultat avant un déploiement sensible</li></ul>
+    </div>
+  </div>
+
+  <!-- S10 -->
+  <div class="section" id="s10">
+    <div class="section-header"><span class="section-num">10</span><span class="section-title-text">Observabilité et dépannage</span><span class="section-nb">Exploitation</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Logs</span><span class="tag">Métriques</span><span class="tag">Events</span><span class="tag">Debug</span></div>
+      <div class="concept-grid"><div class="concept-card"><h4>Les trois piliers</h4><ul><li><strong>Métriques</strong> : metrics-server (<code>kubectl top</code>), Prometheus + Grafana, kube-state-metrics</li><li><strong>Journaux</strong> : <code>kubectl logs</code>, collecte centralisée (Loki, Elastic, Fluent Bit)</li><li><strong>Traces</strong> : OpenTelemetry</li></ul></div><div class="concept-card"><h4>Où regarder</h4><ul><li><code>kubectl describe</code> (section <em>Events</em>)</li><li><code>kubectl get events -A --sort-by=.lastTimestamp</code></li><li>Journaux du kubelet / du runtime sur le nœud (<code>journalctl -u kubelet</code>)</li></ul></div></div>
+
+      <h3>Tableau de dépannage</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Symptôme</th><th>Causes fréquentes</th><th>Vérifier</th></tr></thead><tbody><tr><td><strong>Pending</strong></td><td>Pas de nœud avec assez de CPU / mémoire, taint, PVC non lié, affinité impossible</td><td><code>describe pod</code> : « 0/3 nodes are available… »</td></tr><tr><td><strong>ImagePullBackOff</strong> / <strong>ErrImagePull</strong></td><td>Mauvais nom ou tag, registre privé sans <code>imagePullSecret</code>, réseau</td><td>Nom exact de l'image, secret, DNS du nœud</td></tr><tr><td><strong>CrashLoopBackOff</strong></td><td>L'application plante : config, dépendance, liveness trop stricte</td><td><code>logs --previous</code>, code de sortie</td></tr><tr><td><strong>OOMKilled</strong></td><td>Limite de mémoire dépassée</td><td><code>describe</code> : Last State ; ajuster limits ou corriger l'appli</td></tr><tr><td><strong>Running mais injoignable</strong></td><td>Sélecteur du Service ≠ labels, readiness échoue, NetworkPolicy, mauvais port</td><td><code>kubectl get endpoints svc</code> (vide = pas de Pods sélectionnés)</td></tr><tr><td><strong>Nœud NotReady</strong></td><td>kubelet arrêté, disque plein, réseau, runtime</td><td><code>describe node</code>, <code>journalctl -u kubelet</code></td></tr><tr><td><strong>Terminating</strong> bloqué</td><td>Finalizers, volume non détaché, nœud perdu</td><td><code>get pod -o yaml</code> (finalizers) ; forcer en dernier recours</td></tr></tbody></table></div>
+      <div class="code-block"><code>kubectl debug -it web-1 --image=busybox --target=app    <span class="comment"># conteneur éphémère dans le Pod</span>
+kubectl debug node/w1 -it --image=ubuntu                 <span class="comment"># shell sur un nœud</span>
+kubectl run dns --rm -it --image=busybox:1.36 -- nslookup web.monapp.svc.cluster.local</code></div>
+    </div>
+  </div>
+
+  <!-- S11 -->
+  <div class="section" id="s11">
+    <div class="section-header"><span class="section-num">11</span><span class="section-title-text">Administration du cluster : etcd, certificats, mises à jour</span><span class="section-nb">Admin</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">etcd</span><span class="tag">Certificats</span><span class="tag">Upgrade</span><span class="tag">HA</span></div>
+      <div class="concept-grid"><div class="concept-card"><h4>Haute disponibilité du control plane</h4><ul><li><strong>3 nœuds control plane</strong> (impair) avec etcd empilé (« stacked ») ou etcd externe</li><li>Point d'accès unique à l'API : load balancer / IP virtuelle (kube-vip, HAProxy)</li><li>Quorum etcd : (n/2)+1 ; 3 nœuds tolèrent 1 panne, 5 en tolèrent 2</li></ul></div><div class="concept-card"><h4>Sauvegarde etcd</h4><ul><li>Un instantané etcd = <strong>l'état du cluster</strong> (pas les données des volumes)</li><li>kubeadm : <code>etcdctl snapshot save</code> ; distributions (RKE2, k3s) : outil intégré</li><li>Tester la <strong>restauration</strong> régulièrement</li></ul></div><div class="concept-card"><h4>Certificats</h4><ul><li>Les certificats du control plane expirent (souvent <strong>1 an</strong> par défaut)</li><li>Surveiller : <code>kubeadm certs check-expiration</code> ; renouvellement automatique lors des mises à jour</li><li>Les distributions ont leurs propres commandes de rotation</li></ul></div></div>
+
+      <h3>Mettre à jour un cluster</h3>
+      <ol><li>Lire les <strong>notes de version</strong> et les API supprimées (<code>kubectl convert</code>, outils comme pluto)</li><li><strong>Sauvegarder etcd</strong></li><li>Respecter la politique de <strong>décalage de versions</strong> : une version mineure à la fois ; kubelet jusqu'à quelques versions derrière l'API, jamais devant</li><li>Control plane d'abord (un nœud à la fois), puis les workers par lots : <code>cordon</code> / <code>drain</code> → mise à jour → <code>uncordon</code></li><li>Vérifier : <code>kubectl get nodes</code>, santé des applications, PDB respectés</li></ol>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Façon de déployer</th><th>Exemples</th><th>Remarque</th></tr></thead><tbody><tr><td>Distribution à installer soi-même</td><td><strong>kubeadm</strong>, <strong>RKE2</strong>, k3s, Talos, OpenShift</td><td>RKE2 : voir la fiche dédiée</td></tr><tr><td>Service managé</td><td>EKS, AKS, GKE</td><td>Le fournisseur gère le control plane</td></tr><tr><td>Plateforme de gestion multi-clusters</td><td><strong>Rancher</strong>, OpenShift ACM, Cluster API</td><td>Rancher : voir la fiche dédiée</td></tr><tr><td>Poste de dev</td><td>kind, minikube, k3d, Docker Desktop</td><td>Labo jetable</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S12 -->
+  <div class="section" id="s12">
+    <div class="section-header"><span class="section-num">12</span><span class="section-title-text">Extensions : CRD, Operators, admission et Gateway API</span><span class="section-nb">Avancé</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">CRD</span><span class="tag">Operator</span><span class="tag">Webhooks</span><span class="tag">cert-manager</span></div>
+      <ul><li><strong>CustomResourceDefinition (CRD)</strong> : ajoute de nouveaux types d'objets à l'API (<code>Certificate</code>, <code>Cluster</code> d'un opérateur de base de données…)</li><li><strong>Operator</strong> = CRD + contrôleur qui automatise l'exploitation d'une application (déploiement, sauvegarde, bascule) : bases de données, Prometheus, cert-manager…</li><li><strong>Admission</strong> : webhooks qui valident ou modifient les objets à la création ; outils de politiques : <strong>Kyverno</strong>, OPA Gatekeeper, <em>ValidatingAdmissionPolicy</em> (natif)</li><li><strong>cert-manager</strong> : émission et renouvellement automatiques de certificats (Let's Encrypt, CA interne)</li><li><strong>Service mesh</strong> (Istio, Linkerd, Cilium) : chiffrement mTLS, observabilité, trafic : à n'ajouter que si le besoin est réel</li></ul>
+      <div class="tip"><strong>Règle de prudence :</strong> chaque extension ajoute des composants à exploiter et à mettre à jour. Garder un cluster simple tant que le besoin n'est pas démontré.</div>
+    </div>
+  </div>
+
+  <!-- S13 -->
+  <div class="section" id="s13">
+    <div class="section-header"><span class="section-num">13</span><span class="section-title-text">Pièges et aide-mémoire</span><span class="section-nb">Révision</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pièges</span><span class="tag">Ports</span><span class="tag">Fichiers</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Piège</th><th>Conséquence</th><th>Parade</th></tr></thead><tbody><tr><td>Pas de <code>requests</code> / <code>limits</code></td><td>Voisins bruyants, OOM, placement mauvais</td><td>Définir des requests réalistes et une limite mémoire</td></tr><tr><td>Tag <code>latest</code></td><td>Déploiements non reproductibles</td><td>Tag précis ou digest</td></tr><tr><td>Un seul réplica sans PDB</td><td>Coupure à chaque drain</td><td>≥ 2 réplicas + PodDisruptionBudget</td></tr><tr><td>Secret considéré « chiffré »</td><td>Fuite via lecture RBAC ou etcd</td><td>RBAC strict, chiffrement au repos, gestionnaire externe</td></tr><tr><td>Pas de sauvegarde etcd testée</td><td>Cluster irrécupérable</td><td>Snapshots planifiés + restauration testée</td></tr><tr><td>Mise à jour en sautant une version mineure</td><td>API manquantes, composants incompatibles</td><td>Une mineure à la fois</td></tr><tr><td>NetworkPolicy avec un CNI qui ne la gère pas</td><td>Fausse impression de sécurité</td><td>Vérifier le support du CNI</td></tr><tr><td><code>cluster-admin</code> donné largement</td><td>Compromission totale possible</td><td>Rôles ciblés, groupes</td></tr><tr><td>Service sans Pods (labels différents)</td><td>« Connection refused »</td><td><code>kubectl get endpoints</code></td></tr><tr><td>ingress-nginx maintenu en production</td><td>Plus de correctifs de sécurité</td><td>Migrer vers Traefik / Gateway API</td></tr></tbody></table></div>
+
+      <h3>Aide-mémoire : ports du cluster (kubeadm / généraux)</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Port</th><th>Usage</th></tr></thead><tbody><tr><td>6443/TCP</td><td>API Kubernetes</td></tr><tr><td>2379-2380/TCP</td><td>etcd (client / pairs)</td></tr><tr><td>10250/TCP</td><td>kubelet API</td></tr><tr><td>10257 / 10259/TCP</td><td>controller-manager / scheduler (locaux)</td></tr><tr><td>30000-32767/TCP</td><td>Plage des NodePort</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S14 -->
+  <div class="section" id="s14">
+    <div class="section-header"><span class="section-num">14</span><span class="section-title-text">Passer les certifications Kubernetes (CKA, CKAD, CKS)</span><span class="section-nb">Certifs</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">CKA</span><span class="tag">CKAD</span><span class="tag">CKS</span><span class="tag">Examen pratique</span></div>
+      <div class="info">Les certifications de la <strong>Linux Foundation / CNCF</strong> sont des <strong>examens pratiques en ligne de commande</strong> (pas des QCM) : on résout des tâches sur de vrais clusters. Vérifier toujours le <strong>programme à jour</strong>, la version de Kubernetes de l'examen et les règles sur <a href="https://training.linuxfoundation.org/">training.linuxfoundation.org</a>.</div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Certification</th><th>Public</th><th>Contenu</th></tr></thead><tbody><tr><td><strong>CKA</strong> (Administrator)</td><td>Administrateurs</td><td>Installation et configuration du cluster, workloads, services et réseau, stockage, <strong>dépannage</strong> (domaine le plus lourd)</td></tr><tr><td><strong>CKAD</strong> (Developer)</td><td>Développeurs</td><td>Concevoir et déployer des applications : Pods, config, observabilité, services, réseau</td></tr><tr><td><strong>CKS</strong> (Security Specialist)</td><td>Administrateurs expérimentés</td><td>Durcissement, supply chain, runtime, politiques ; <strong>exige la CKA</strong></td></tr></tbody></table></div>
+      <ul><li><strong>Entraînement :</strong> faire <em>à la main</em> tout ce que cette fiche décrit, sans copier-coller, avec <code>kubectl explain</code> et la documentation officielle (autorisée pendant l'examen selon les règles en vigueur)</li><li>Maîtriser le <strong>mode impératif</strong> (<code>kubectl create … --dry-run=client -o yaml</code>) pour générer des squelettes vite</li><li>Alias et complétion : <code>alias k=kubectl</code>, <code>source &lt;(kubectl completion bash)</code></li><li>Se chronométrer : le <strong>temps</strong> est la vraie contrainte</li></ul>
+    </div>
+  </div>
+
+  <!-- S15 -->
+  <div class="section" id="s15">
+    <div class="section-header"><span class="section-num">15</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">29 questions</span></div>
+
+      <h3>Plan de labo en 6 séances</h3>
+      <ol><li><strong>Séance 1 : cluster jetable.</strong> kind ou minikube ; explorer <code>kubectl get nodes</code>, <code>api-resources</code>, <code>explain</code></li><li><strong>Séance 2 : workloads.</strong> Deployment avec probes et limits, mise à jour progressive, <code>rollout undo</code>, Job et CronJob</li><li><strong>Séance 3 : réseau.</strong> Service ClusterIP / NodePort, Ingress ou Gateway, NetworkPolicy « tout refuser » puis ouvertures ciblées</li><li><strong>Séance 4 : stockage.</strong> PVC dynamique, StatefulSet à 3 réplicas, supprimer un Pod et vérifier la persistance</li><li><strong>Séance 5 : sécurité.</strong> RBAC (Role + RoleBinding + <code>auth can-i</code>), Pod Security <em>restricted</em>, Secret en volume</li><li><strong>Séance 6 : exploitation.</strong> <code>drain</code> + PDB, HPA, panne simulée et dépannage (Pending, CrashLoopBackOff), snapshot etcd. Puis passer à la fiche <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a></li></ol>
+
+      <h3>Auto-évaluation — clique pour voir la réponse</h3>
+      <div class="qr-list">
+        <details><summary>Quelle est la différence entre un Pod et un Deployment ?</summary><p>Un Pod est l'unité qui exécute les conteneurs, éphémère ; un Deployment maintient un nombre voulu de Pods identiques et gère les mises à jour progressives et les retours arrière.</p></details>
+        <details><summary>Quel composant stocke l'état du cluster ?</summary><p>etcd : base clé-valeur distribuée, accessible seulement via l'API ; à sauvegarder.</p></details>
+        <details><summary>Que fait le scheduler ?</summary><p>Il choisit le nœud d'un Pod non placé selon les ressources demandées, affinités, taints et contraintes.</p></details>
+        <details><summary>Qu'est-ce que le modèle déclaratif ?</summary><p>On décrit l'état voulu ; des contrôleurs font converger l'état réel vers lui en boucle.</p></details>
+        <details><summary>Quelles sont les trois sondes et leur rôle ?</summary><p>readiness (reçoit du trafic ?), liveness (faut-il redémarrer ?), startup (démarrage long : suspend les deux autres).</p></details>
+        <details><summary>Quelle différence entre requests et limits ?</summary><p>Les requests sont réservées pour le placement ; les limits sont un plafond. Dépasser la mémoire = OOMKilled, dépasser le CPU = bridage.</p></details>
+        <details><summary>Quand utiliser un StatefulSet plutôt qu'un Deployment ?</summary><p>Pour des applications avec état : identité stable, stockage par réplica, démarrage ordonné, Service headless.</p></details>
+        <details><summary>Les Secrets Kubernetes sont-ils chiffrés ?</summary><p>Non par défaut : ils sont seulement encodés en base64. Il faut RBAC strict, chiffrement d'etcd au repos ou un gestionnaire externe.</p></details>
+        <details><summary>À quoi sert un Service ?</summary><p>À donner une adresse et un nom DNS stables devant un ensemble de Pods sélectionnés par labels.</p></details>
+        <details><summary>Que vaut le type de Service par défaut et que fait NodePort ?</summary><p>ClusterIP (interne). NodePort ouvre un port 30000-32767 sur chaque nœud.</p></details>
+        <details><summary>Quelle différence entre Ingress et Gateway API ?</summary><p>Ingress : règles HTTP simples appliquées par un contrôleur. Gateway API : successeur plus expressif avec séparation des rôles (GatewayClass, Gateway, HTTPRoute).</p></details>
+        <details><summary>Pourquoi éviter ingress-nginx pour un nouveau projet ?</summary><p>Il est en fin de vie depuis mars 2026 : plus de correctifs. Préférer Traefik ou un contrôleur compatible Gateway API.</p></details>
+        <details><summary>Une NetworkPolicy suffit-elle à restreindre le trafic ?</summary><p>Seulement si le CNI la supporte (Calico, Cilium, Canal) ; avec Flannel seul elle n'a aucun effet.</p></details>
+        <details><summary>Que signifie PV, PVC et StorageClass ?</summary><p>PV : volume du cluster ; PVC : demande d'une application ; StorageClass : modèle de provisionnement dynamique.</p></details>
+        <details><summary>Quelle différence entre RWO et RWX ?</summary><p>RWO : lecture-écriture par un seul nœud. RWX : par plusieurs nœuds (NFS, CephFS…).</p></details>
+        <details><summary>Que fait kubectl drain et à quoi sert un PDB ?</summary><p>drain évacue un nœud proprement après cordon ; le PodDisruptionBudget garantit un minimum de Pods disponibles pendant l'évacuation.</p></details>
+        <details><summary>Quelle différence entre Role et ClusterRole ?</summary><p>Role : droits dans un namespace. ClusterRole : droits cluster-wide ou modèle réutilisable ; on les attribue par RoleBinding / ClusterRoleBinding.</p></details>
+        <details><summary>Comment vérifier un droit RBAC ?</summary><p>kubectl auth can-i VERBE RESSOURCE -n NS --as UTILISATEUR.</p></details>
+        <details><summary>Quels sont les profils de Pod Security ?</summary><p>privileged, baseline, restricted, appliqués par label de namespace.</p></details>
+        <details><summary>Quelle commande installer un logiciel avec Helm en fixant sa version ?</summary><p>helm install NOM DÉPÔT/CHART --version X -n NS --create-namespace -f values.yaml (ou helm upgrade --install).</p></details>
+        <details><summary>Qu'est-ce que le GitOps ?</summary><p>L'état voulu du cluster est dans Git et un outil (Argo CD, Flux) synchronise le cluster, détecte la dérive et permet le retour arrière par Git.</p></details>
+        <details><summary>Un Pod est Pending : où regarder ?</summary><p>kubectl describe pod : section Events (ressources insuffisantes, taints, PVC non lié, affinité impossible).</p></details>
+        <details><summary>Un Service renvoie « connection refused » alors que les Pods tournent : que vérifier ?</summary><p>kubectl get endpoints : vide = sélecteur du Service différent des labels ; sinon readiness ou port.</p></details>
+        <details><summary>Pourquoi sauvegarder etcd et que ne contient pas cette sauvegarde ?</summary><p>Il contient l'état du cluster (objets). Il ne contient pas les données des volumes persistants.</p></details>
+        <details><summary>Combien de nœuds control plane pour la haute disponibilité ?</summary><p>3 (nombre impair) : quorum de 2, tolère 1 panne ; 5 tolèrent 2 pannes.</p></details>
+        <details><summary>Comment mettre à jour un cluster en sécurité ?</summary><p>Sauvegarder etcd, lire les notes, une version mineure à la fois, control plane puis workers avec cordon/drain/uncordon.</p></details>
+        <details><summary>Qu'est-ce qu'un Operator ?</summary><p>Un CRD plus un contrôleur qui automatise l'exploitation d'une application (déploiement, sauvegarde, bascule).</p></details>
+        <details><summary>À quoi sert cert-manager ?</summary><p>À émettre et renouveler automatiquement des certificats (Let's Encrypt, CA interne).</p></details>
+        <details><summary>Comment les certifications CKA/CKAD/CKS sont-elles évaluées ?</summary><p>Par des examens pratiques en ligne de commande sur de vrais clusters, pas par des QCM.</p></details>
+      </div>
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)">
+    Fiche Kubernetes ·
+    <a href="https://kubernetes.io/docs/home/" target="_blank" style="color:var(--accent);text-decoration:none">kubernetes.io/docs</a> ·
+    <a href="https://kubernetes.io/docs/reference/kubectl/" target="_blank" style="color:var(--accent);text-decoration:none">Référence kubectl</a> ·
+    <a href="https://kubernetes.io/releases/" target="_blank" style="color:var(--accent);text-decoration:none">Versions</a>
+  </footer>
+
+</div>
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("kubernetes-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("kubernetes-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>
