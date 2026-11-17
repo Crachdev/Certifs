@@ -543,8 +543,9 @@ function planHTML(){
   const rulesHTML=META.rules?META.rules.map(r=>`<div><b class="num">${r[0]}</b><span>${r[1]}</span></div>`).join(""):`<div><b class="num">–</b><span>voir plan ci-dessous</span></div>`;
   const nbJours=PLAN.length;
   const dureeLabel=nbJours===7?"Une semaine":nbJours===14?"Deux semaines":nbJours===15?"Quinze jours":nbJours===30?"Trente jours":`${nbJours} jours`;
-  return `<p class="intro">${dureeLabel}, un bloc de domaine par jour, pondéré comme l'examen. Chaque jour est découpé en <b>5 modules de 10 questions</b>. Lis ${ficheLink}, puis fais les modules un par un.</p>
+  return `<p class="intro">${dureeLabel}, un bloc de domaine par jour, pondéré comme l'examen. Chaque jour est découpé en <b>modules de ${MOD_SIZE} questions</b>. Lis ${ficheLink}, puis fais les modules un par un.</p>
   <div class="rules">${rulesHTML}</div>
+  ${META.roadmap?`<div class="roadmap">${META.roadmap}</div>`:""}
   <ol class="days">${PLAN.map(p=>{
     const s=dayStats(p.d),pct=s.n>0?Math.round(s.done/s.n*100):0;
     const nm=dayModCount(p.d);
@@ -579,6 +580,7 @@ function planHTML(){
       }).join("")}</ul></div>`:"";
     return `<li class="day"><div class="tag"><span>Jour</span><b>${p.d}</b></div><div class="body">
       <div><h2>${esc(p.theme)}</h2><div class="chips" style="margin-top:6px">${(p.dom||[]).map(x=>`<span class="chip">${x}</span>`).join("")}${p.time?`<span class="chip" style="background:transparent;color:var(--muted)">${p.time}</span>`:""}</div></div>
+      ${p.visual?`<details class="dayvis" open><summary>🖼 Schéma du jour</summary>${p.visual}</details>`:""}
       ${ficheBlock}<div class="cols"><div><h3>À lire</h3><ul>${(p.read||p.topics||[]).map(r=>`<li>${esc(r)}</li>`).join("")}${(p.links||[]).map(l=>Array.isArray(l)?`<li><a href="${l[1]}" target="_blank" rel="noopener">${esc(l[0])}</a></li>`:`<li><a href="${l.u}" target="_blank" rel="noopener">${esc(l.l)}</a></li>`).join("")}</ul></div>
       <div><h3>À retenir</h3><ul>${(p.focus||[]).map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div></div>
       ${p.extra?`<div style="font-size:.88rem"><b>+</b> ${esc(p.extra)}</div>`:""}
