@@ -156,6 +156,28 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
   .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* --- Schémas SVG --- */
+.fig{margin:16px 0;padding:12px 10px 10px;background:var(--sheet);border:1px solid var(--line);border-radius:8px}
+.fig svg{display:block;width:100%;height:auto;max-width:640px;margin:0 auto}
+.fig figcaption{font-size:.8rem;color:var(--muted);text-align:center;margin-top:8px;line-height:1.4}
+.fig .f-n{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.4}
+.fig .f-nb{fill:var(--paper);stroke:var(--line);stroke-width:1.4}
+.fig .f-ok{fill:var(--ok-soft);stroke:var(--ok);stroke-width:1.4}
+.fig .f-ko{fill:var(--ko-soft);stroke:var(--ko);stroke-width:1.4}
+.fig .f-wn{fill:var(--warn-soft);stroke:var(--warn);stroke-width:1.4}
+.fig .f-ac{fill:var(--accent);stroke:var(--accent);stroke-width:1.4}
+.fig .f-g{fill:none;stroke:var(--muted);stroke-width:1.2;stroke-dasharray:5 4}
+.fig .f-t{fill:var(--ink);font:600 13px var(--f-body)}
+.fig .f-ts{fill:var(--muted);font:500 11px var(--f-body)}
+.fig .f-tw{fill:var(--sheet);font:700 13px var(--f-body)}
+.fig .f-tm{fill:var(--ink);font:500 12px var(--f-mono)}
+.fig .f-tg{fill:var(--muted);font:700 11px var(--f-body);letter-spacing:.04em}
+.fig .f-a{stroke:var(--muted);stroke-width:1.6;fill:none}
+.fig .f-ad{stroke:var(--muted);stroke-width:1.6;fill:none;stroke-dasharray:5 4}
+.fig .f-ar{fill:var(--muted)}
+.fig .f-tws{fill:var(--sheet);opacity:.9;font:500 11px var(--f-body)}
+/* --- /Schémas SVG --- */
 </style>
 </head>
 <body>
@@ -210,6 +232,7 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
     <div class="section-header"><span class="section-num">1</span><span class="section-title-text">Pourquoi automatiser Proxmox (vue d'ensemble DevOps)</span><span class="section-nb">Les outils</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">IaC</span><span class="tag">Packer</span><span class="tag">Terraform</span><span class="tag">Ansible</span></div>
+      <figure class="fig"><svg viewBox="0 0 560 230" role="img" aria-label="La chaîne d'automatisation de Proxmox"><defs><marker id="ar34" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="f-ar" d="M0 0 L10 5 L0 10 z"/></marker><marker id="ar34s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="f-ar" d="M10 0 L0 5 L10 10 z"/></marker></defs><rect class="f-n" x="0" y="50" width="100" height="64" rx="7"/><text class="f-t" x="50.0" y="78.5" text-anchor="middle">Packer</text><text class="f-ts" x="50.0" y="94.5" text-anchor="middle">crée le modèle</text><path class="f-a" d="M100 82 L115 82" marker-end="url(#ar34)"/><rect class="f-wn" x="115" y="50" width="100" height="64" rx="7"/><text class="f-t" x="165.0" y="70.5" text-anchor="middle">Modèle</text><text class="f-t" x="165.0" y="86.5" text-anchor="middle">cloud-init</text><text class="f-ts" x="165.0" y="102.5" text-anchor="middle">VM de référence</text><path class="f-a" d="M215 82 L230 82" marker-end="url(#ar34)"/><rect class="f-ac" x="230" y="50" width="100" height="64" rx="7"/><text class="f-tw" x="280.0" y="78.5" text-anchor="middle">Terraform</text><text class="f-tws" x="280.0" y="94.5" text-anchor="middle">crée les VM</text><path class="f-a" d="M330 82 L345 82" marker-end="url(#ar34)"/><rect class="f-n" x="345" y="50" width="100" height="64" rx="7"/><text class="f-t" x="395.0" y="78.5" text-anchor="middle">Ansible</text><text class="f-ts" x="395.0" y="94.5" text-anchor="middle">les configure</text><path class="f-a" d="M445 82 L460 82" marker-end="url(#ar34)"/><rect class="f-ok" x="460" y="50" width="100" height="64" rx="7"/><text class="f-t" x="510.0" y="78.5" text-anchor="middle">Supervision</text><text class="f-ts" x="510.0" y="94.5" text-anchor="middle">les surveille</text><rect class="f-g" x="10" y="140" width="540" height="78" rx="9"/><text class="f-tg" x="20" y="156">AUTOUR DE LA CHAÎNE</text><rect class="f-nb" x="24" y="168" width="150" height="36" rx="7"/><text class="f-t" x="99.0" y="190.5" text-anchor="middle">Git : tout versionné</text><rect class="f-nb" x="190" y="168" width="170" height="36" rx="7"/><text class="f-t" x="275.0" y="190.5" text-anchor="middle">CI/CD : validation</text><rect class="f-ko" x="376" y="168" width="160" height="36" rx="7"/><text class="f-t" x="456.0" y="190.5" text-anchor="middle">Secrets : jetons</text></svg><figcaption>Du modèle à la VM configurée et surveillée : chaque étape est du code, rejouable.</figcaption></figure>
       <div class="info"><strong>Idée :</strong> décrire l'infrastructure dans des fichiers versionnés (Git) plutôt que de cliquer. On passe de « je crée une VM » à « je déclare ce que je veux, l'outil s'occupe du reste, et je peux le refaire à l'identique ». Les versions d'outils changent vite : <strong>les exemples sont à valider avec <code>terraform validate</code> / <code>ansible-lint</code></strong> sur ta version.</div>
 
       <h3>Qui fait quoi</h3>
