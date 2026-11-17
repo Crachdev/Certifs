@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#8a6100">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche Linux — Débutant et boîte à outils admin</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#8a6100;--accent-soft:#fbf1d6;
+  --ps:#2b2f36;--ps-mid:#8a6100;--ps-light:#f6d9b8;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#f2c14e;--accent-soft:#2b2410;
+  --ps:#3a3f48;--ps-mid:#f2c14e;--ps-light:#2b2410;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#f2c14e;--accent-soft:#2b2410;
+  --ps:#3a3f48;--ps-mid:#f2c14e;--ps-light:#2b2410;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.8rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+h4{font-size:.9rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--f-mono)}
+p{margin:6px 0 10px}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Header */
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.top-actions{display:flex;gap:8px;align-items:center}
+details{border:1px solid var(--line);border-radius:7px;padding:9px 14px;margin:8px 0;background:var(--sheet)}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details[open] summary{color:var(--accent);margin-bottom:6px}
+details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PS Banner */
+.ps-banner{background:var(--ps);border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.ps-banner-left .label{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ps-banner-left h1{color:#fff;font-size:1.5rem}
+.ps-banner-left p{color:rgba(255,255,255,.7);font-size:.88rem;margin:4px 0 0}
+.ps-stats{display:flex;gap:16px;flex-wrap:wrap}
+.ps-stat{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;text-align:center;min-width:80px}
+.ps-stat b{display:block;font:700 1.3rem var(--f-mono);color:#fff}
+.ps-stat span{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em}
+
+/* Sommaire rapide */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:28px}
+.toc h4{margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;text-decoration:none;color:var(--ink);font-size:.85rem;transition:background .15s}
+.toc-item:hover{background:var(--accent-soft);color:var(--accent)}
+.toc-num{font:600 .7rem var(--f-mono);background:var(--ps-light);color:var(--ps-mid);padding:1px 6px;border-radius:3px;min-width:28px;text-align:center}
+
+/* Sections */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.section-header{background:var(--ps);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.section-num{font:700 .75rem var(--f-mono);background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:4px}
+.section-title-text{font:700 1rem var(--f-display);color:#fff;flex:1}
+.section-nb{font:500 .7rem var(--f-mono);color:rgba(255,255,255,.55)}
+.section-body{padding:20px}
+
+/* Blocs de contenu */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.concept-card{border:1px solid var(--line);border-radius:7px;padding:12px 14px}
+.concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
+.concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
+.concept-card ul li{margin:2px 0}
+.concept-card.warn{border-left:3px solid var(--warn);border-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+
+/* Cmdlets */
+.cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+.cmdlet-table th{text-align:left;padding:7px 10px;background:var(--accent-soft);color:var(--accent);font:600 .72rem var(--f-mono);letter-spacing:.05em;border-bottom:2px solid var(--line)}
+.cmdlet-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmdlet-table tr:last-child td{border-bottom:0}
+.cmdlet-table td:first-child{font:500 .85rem var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmdlet-table td:last-child{color:var(--muted)}
+.cmdlet-table td:nth-child(2){color:var(--ink)}
+.cmdlet-table-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+
+/* Code blocks */
+.code-block{background:var(--ps);border-radius:7px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.code-block code{font:500 .85rem var(--f-mono);color:#f6d9b8;white-space:pre;display:block;line-height:1.6}
+.code-block .comment{color:rgba(255,255,255,.4)}
+.code-block .keyword{color:#9cdcfe}
+.code-block .string{color:#ce9178}
+.code-block .cmdlet{color:#dcdcaa}
+.code-block .param{color:#9cdcfe}
+
+/* Astuce / Attention */
+.tip{background:var(--ok-soft);border-left:3px solid var(--ok);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.tip strong{color:var(--ok)}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.warn strong{color:var(--warn)}
+.info{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.info strong{color:var(--accent)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font:500 .72rem var(--f-mono);padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.admin{background:var(--ok-soft);color:var(--ok)}
+.tag.cloud{background:#fbf1d6;color:#8a6100}
+.tag.script{background:#f3e8ff;color:#6b21a8}
+
+/* Comparatif */
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.compare-table th{padding:7px 10px;text-align:left;border-bottom:2px solid var(--line);font:600 .72rem var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.compare-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table td:first-child{font:600 .85rem var(--f-mono);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  h1{font-size:1.3rem}
+  .ps-banner{padding:14px 16px}
+  .ps-banner-left h1{font-size:1.2rem}
+  .ps-stats{gap:8px}
+  .ps-stat{padding:8px 10px;min-width:64px}
+  .ps-stat b{font-size:1rem}
+  .concept-grid{grid-template-columns:1fr}
+  .toc-grid{grid-template-columns:1fr}
+  .section-body{padding:14px}
+  .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">Systèmes · Linux</div>
+      <h1>Fiche — Linux débutant et boîte à outils admin</h1>
+    </div>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="ps-banner">
+    <div class="ps-banner-left">
+      <div class="label">Débutant · Programme LFCA · Boîte à outils</div>
+      <h1>Linux — des bases à la boîte à outils d'admin</h1>
+      <p>Shell · Droits · systemd · Disques · Réseau · SSH · Sécurité · Sauvegarde · LFCA</p>
+    </div>
+    <div class="ps-stats">
+      <div class="ps-stat"><b>19</b><span>Sections</span></div>
+      <div class="ps-stat"><b>LFCA</b><span>Version</span></div>
+      <div class="ps-stat"><b>32</b><span>Q/R</span></div>
+    </div>
+  </div>
+
+  <div class="info"><strong>Sources :</strong> page officielle de la <a href="https://training.linuxfoundation.org/certification/certified-it-associate/">Linux Foundation Certified IT Associate (LFCA)</a> pour les domaines et pondérations (consultée le 17/11/2026) ; pratiques d'administration courantes Debian / Ubuntu et RHEL / Rocky. <strong>Les commandes sont à tester sur des VM jetables</strong> ; les noms de paquets, de fichiers et d'options varient selon la distribution et la version. Les domaines cloud, DevOps et gestion de projet de la LFCA ne sont couverts qu'au niveau des notions (sections 15 et 16). <strong>Suite :</strong> <a href="../kubernetes/fiche.html">Kubernetes</a>.</div>
+
+  <div class="toc">
+    <h4>Sommaire</h4>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">1</span>Panorama et certification LFCA</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>Distributions et installation</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>Shell et commandes de base</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">4</span>Arborescence, droits et liens</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">5</span>Texte, filtres et pipes</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">6</span>Utilisateurs, groupes et sudo</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Processus, systemd et cron</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Paquets et mises à jour</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Disques, LVM et fstab</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span>Réseau et SSH</a>
+      <a href="#s11" class="toc-item"><span class="toc-num">11</span>Sécurité de base</a>
+      <a href="#s12" class="toc-item"><span class="toc-num">12</span>Scripts bash</a>
+      <a href="#s13" class="toc-item"><span class="toc-num">13</span>Journaux et performances</a>
+      <a href="#s14" class="toc-item"><span class="toc-num">14</span>Sauvegarde et reprise</a>
+      <a href="#s15" class="toc-item"><span class="toc-num">15</span>Cloud, conteneurs, Git, DevOps</a>
+      <a href="#s16" class="toc-item"><span class="toc-num">16</span>Gestion de projet et licences</a>
+      <a href="#s17" class="toc-item"><span class="toc-num">17</span>Dépannage méthodique</a>
+      <a href="#s18" class="toc-item"><span class="toc-num">18</span>Aide-mémoire de l'admin</a>
+      <a href="#s19" class="toc-item"><span class="toc-num">19</span>Plan de labo et Q/R</a>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div class="section" id="s1">
+    <div class="section-header"><span class="section-num">1</span><span class="section-title-text">Panorama et certification LFCA</span><span class="section-nb">Fondations</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">LFCA</span><span class="tag">Linux</span><span class="tag">Open source</span></div>
+      <div class="info"><strong>Linux</strong> est un noyau libre ; une <strong>distribution</strong> y ajoute outils, gestionnaire de paquets et configuration par défaut. Cette fiche vise un débutant (ex-Windows Server) qui doit devenir autonome en administration, et couvre le programme de la <strong>Linux Foundation Certified IT Associate (LFCA)</strong>.</div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Domaine LFCA</th><th>Poids</th><th>Sections de cette fiche</th></tr></thead><tbody><tr><td>Linux Fundamentals</td><td>16 %</td><td>2 à 5</td></tr><tr><td>System Administration Fundamentals</td><td>30 %</td><td>6 à 12</td></tr><tr><td>Cloud Computing Fundamentals</td><td>18 %</td><td>15</td></tr><tr><td>Security Fundamentals</td><td>14 %</td><td>11</td></tr><tr><td>DevOps Fundamentals</td><td>12 %</td><td>15</td></tr><tr><td>IT Project Management Fundamentals</td><td>10 %</td><td>16</td></tr></tbody></table></div>
+      <ul><li>Examen <strong>en ligne surveillé, 90 minutes, QCM</strong>, sans prérequis, validité 2 ans (page officielle consultée le 17/11/2026 : <strong>vérifier prix et nombre de questions</strong> avant de t'inscrire)</li><li>Le domaine <em>administration système</em> pèse le plus (30 %) : c'est là qu'il faut être solide</li><li>Le kit « admin » des sections 17 à 19 va au-delà de l'examen : c'est ta boîte à outils de terrain</li></ul>
+
+      <h3>Pour un admin Windows : correspondances</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Windows</th><th>Linux</th></tr></thead><tbody><tr><td>Explorateur, PowerShell</td><td>Shell (bash), <code>ls</code>, <code>cd</code></td></tr><tr><td>Services (services.msc)</td><td><code>systemctl</code> (systemd)</td></tr><tr><td>Observateur d'événements</td><td><code>journalctl</code>, <code>/var/log</code></td></tr><tr><td>Gestion des disques / NTFS</td><td><code>lsblk</code>, LVM, ext4 / XFS</td></tr><tr><td>Active Directory (GPO)</td><td>LDAP / SSSD, Ansible pour la config</td></tr><tr><td>Pare-feu Windows</td><td><code>firewalld</code> / <code>ufw</code> / nftables</td></tr><tr><td>Tâches planifiées</td><td>cron et timers systemd</td></tr><tr><td>RDP</td><td>SSH</td></tr><tr><td>Windows Update</td><td><code>apt</code> / <code>dnf</code></td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section" id="s2">
+    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">Distributions, installation et premier démarrage</span><span class="section-nb">Linux</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Debian</span><span class="tag">RHEL</span><span class="tag">Ubuntu</span><span class="tag">Installation</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Famille</th><th>Exemples</th><th>Paquets</th><th>Usage</th></tr></thead><tbody><tr><td>Debian</td><td>Debian, <strong>Ubuntu</strong>, Mint</td><td><code>apt</code> / <code>.deb</code></td><td>Serveurs et postes, très répandu</td></tr><tr><td>Red Hat</td><td>RHEL, <strong>Rocky</strong>, AlmaLinux, Fedora</td><td><code>dnf</code> / <code>.rpm</code></td><td>Entreprise (support, SELinux)</td></tr><tr><td>SUSE</td><td>SLES, openSUSE</td><td><code>zypper</code> / <code>.rpm</code></td><td>Entreprise (SAP, Rancher)</td></tr><tr><td>Autres</td><td>Arch, Alpine</td><td><code>pacman</code>, <code>apk</code></td><td>Avancé ; Alpine = conteneurs</td></tr></tbody></table></div>
+      <ul><li><strong>LTS</strong> (support long) pour la production : Ubuntu LTS, Debian stable, Rocky / Alma</li><li>Installation serveur : <em>minimal</em>, SSH activé, partitionnement réfléchi (section 9), mises à jour immédiates</li><li>Premières actions : mettre à jour, créer un utilisateur admin, clé SSH, fuseau et NTP (<code>timedatectl</code>), nom d'hôte (<code>hostnamectl</code>)</li></ul>
+      <div class="code-block"><code>cat /etc/os-release           <span class="comment"># distribution et version</span>
+uname -r                        <span class="comment"># version du noyau</span>
+hostnamectl ; timedatectl
+lscpu ; free -h ; lsblk ; ip -br a</code></div>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">Le shell et les commandes de base</span><span class="section-nb">Linux</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">bash</span><span class="tag">Navigation</span><span class="tag">Aide</span><span class="tag">Alias</span></div>
+      <div class="code-block"><code>pwd ; ls -lah ; cd /var/log ; cd ~ ; cd -
+mkdir -p a/b/c ; touch f ; cp -r src dst ; mv a b ; rm -r dossier
+cat f ; less f ; head -n 20 f ; tail -f /var/log/syslog
+find / -name '*.conf' -mtime -1 2&gt;/dev/null
+which cmd ; type cmd ; whereis cmd
+man ls ; ls --help ; apropos réseau      <span class="comment"># l'aide intégrée, à lire en premier</span>
+history ; !! ; Ctrl+R                      <span class="comment"># historique et recherche</span>
+alias ll='ls -lah'</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Raccourci</th><th>Effet</th></tr></thead><tbody><tr><td><code>Tab</code></td><td>Complétion (à utiliser sans modération)</td></tr><tr><td><code>Ctrl+C</code></td><td>Interrompre</td></tr><tr><td><code>Ctrl+D</code></td><td>Fin d'entrée / déconnexion</td></tr><tr><td><code>Ctrl+R</code></td><td>Recherche dans l'historique</td></tr><tr><td><code>Ctrl+A / E</code></td><td>Début / fin de ligne</td></tr></tbody></table></div>
+      <ul><li><strong>Tout est fichier</strong> (disques, terminaux, processus via <code>/proc</code>)</li><li>Sensible à la casse ; pas de lettres de lecteur : une seule arborescence</li><li><code>rm -rf</code> n'a <strong>pas de corbeille</strong> : relire la commande avant Entrée, éviter <code>rm -rf /chemin/*</code> avec une variable vide</li></ul>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section" id="s4">
+    <div class="section-header"><span class="section-num">4</span><span class="section-title-text">Arborescence, droits, liens et fichiers</span><span class="section-nb">Linux</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">FHS</span><span class="tag">chmod</span><span class="tag">chown</span><span class="tag">ACL</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Dossier</th><th>Contenu</th></tr></thead><tbody><tr><td><code>/etc</code></td><td>Configuration</td></tr><tr><td><code>/var</code></td><td>Données variables : logs (<code>/var/log</code>), spools, bases</td></tr><tr><td><code>/home</code>, <code>/root</code></td><td>Utilisateurs, administrateur</td></tr><tr><td><code>/usr</code>, <code>/opt</code></td><td>Logiciels</td></tr><tr><td><code>/tmp</code></td><td>Temporaire</td></tr><tr><td><code>/proc</code>, <code>/sys</code></td><td>Vues du noyau (virtuelles)</td></tr><tr><td><code>/dev</code></td><td>Périphériques</td></tr><tr><td><code>/boot</code></td><td>Noyau et chargeur</td></tr><tr><td><code>/mnt</code>, <code>/media</code></td><td>Points de montage</td></tr></tbody></table></div>
+
+      <h3>Droits</h3>
+      <div class="code-block"><code>ls -l fichier          <span class="comment"># -rwxr-x--- 1 user groupe ...</span>
+chmod 640 f ; chmod u+x script.sh ; chmod -R g+w dossier
+chown user:groupe f ; chown -R www-data: /var/www
+umask 022                <span class="comment"># masque par défaut</span>
+setfacl -m u:alice:rw f ; getfacl f    <span class="comment"># ACL</span>
+ln -s cible lien        <span class="comment"># lien symbolique ; sans -s : lien dur</span>
+stat f ; file f</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Valeur</th><th>Droit</th><th>Sur un fichier</th><th>Sur un dossier</th></tr></thead><tbody><tr><td>4 (r)</td><td>lecture</td><td>lire</td><td>lister</td></tr><tr><td>2 (w)</td><td>écriture</td><td>modifier</td><td>créer / supprimer dedans</td></tr><tr><td>1 (x)</td><td>exécution</td><td>exécuter</td><td>traverser (cd)</td></tr></tbody></table></div>
+      <ul><li>Trois cibles : propriétaire (u), groupe (g), autres (o) → <code>640</code> = rw- r-- ---</li><li>Bits spéciaux : <strong>setuid</strong> (4), <strong>setgid</strong> (2), <strong>sticky</strong> (1, ex. <code>/tmp</code>)</li><li>Éviter <code>chmod 777</code> : corriger plutôt le propriétaire ou le groupe</li></ul>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div class="section" id="s5">
+    <div class="section-header"><span class="section-num">5</span><span class="section-title-text">Texte, filtres, redirections et pipes</span><span class="section-nb">Linux</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">grep</span><span class="tag">sed</span><span class="tag">awk</span><span class="tag">Pipes</span></div>
+      <div class="code-block"><code>cmd &gt; f ; cmd &gt;&gt; f ; cmd 2&gt; err ; cmd &gt; f 2&gt;&amp;1 ; cmd &amp;&gt; f
+cmd1 | cmd2                 <span class="comment"># la sortie de 1 devient l'entrée de 2</span>
+grep -rin 'erreur' /var/log ; grep -v '^#' f ; grep -E 'a|b' f
+sed -i 's/ancien/nouveau/g' f   <span class="comment"># remplacer dans le fichier</span>
+awk '{print $1, $3}' f ; awk -F: '{print $1}' /etc/passwd
+cut -d: -f1 /etc/passwd ; sort | uniq -c | sort -nr
+wc -l f ; tr 'a-z' 'A-Z' ; tee f ; xargs
+vim f ; nano f              <span class="comment"># éditeurs : apprendre au moins nano et les bases de vim</span></code></div>
+      <div class="tip">Exemple utile : <code>journalctl -u ssh | grep Failed | awk '{print $(NF-3)}' | sort | uniq -c | sort -nr | head</code> (IP qui échouent le plus en SSH). Les pipes sont le « PowerShell » de Linux, mais sur du <strong>texte</strong> et non des objets.</div>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="section" id="s6">
+    <div class="section-header"><span class="section-num">6</span><span class="section-title-text">Utilisateurs, groupes et sudo</span><span class="section-nb">Administration</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">useradd</span><span class="tag">sudo</span><span class="tag">passwd</span><span class="tag">PAM</span></div>
+      <div class="code-block"><code>id ; whoami ; groups ; who ; last
+sudo useradd -m -s /bin/bash -G sudo alice     <span class="comment"># Debian : groupe sudo ; RHEL : wheel</span>
+sudo passwd alice ; sudo chage -l alice         <span class="comment"># expiration</span>
+sudo usermod -aG docker alice ; sudo userdel -r alice
+sudo groupadd equipe ; sudo gpasswd -a alice equipe
+sudo visudo ; sudo -l                           <span class="comment"># éditer / lister les droits sudo</span>
+su - alice ; sudo -u alice cmd</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Fichier</th><th>Rôle</th></tr></thead><tbody><tr><td><code>/etc/passwd</code></td><td>Comptes (pas de mots de passe)</td></tr><tr><td><code>/etc/shadow</code></td><td>Empreintes de mots de passe (lisible root)</td></tr><tr><td><code>/etc/group</code></td><td>Groupes</td></tr><tr><td><code>/etc/sudoers</code>, <code>/etc/sudoers.d/</code></td><td>Règles sudo (toujours via <code>visudo</code>)</td></tr></tbody></table></div>
+      <ul><li><strong>Pas de connexion root directe</strong> : utilisateur nominatif + sudo</li><li>UID &lt; 1000 : comptes système ; comptes de service avec shell <code>/usr/sbin/nologin</code></li><li>Annuaire d'entreprise : <strong>SSSD</strong> / <code>realmd</code> pour joindre Active Directory ou LDAP</li></ul>
+    </div>
+  </div>
+
+  <!-- S7 -->
+  <div class="section" id="s7">
+    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Processus, services systemd, cron</span><span class="section-nb">Administration</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">systemctl</span><span class="tag">journalctl</span><span class="tag">Timers</span><span class="tag">Signaux</span></div>
+      <div class="code-block"><code>ps aux ; ps -ef --forest ; top ; htop ; pgrep nginx
+kill PID ; kill -9 PID ; pkill nom ; nice -n 10 cmd ; renice
+jobs ; bg ; fg ; cmd &amp; ; nohup cmd &amp; ; tmux
+
+systemctl status sshd ; systemctl start|stop|restart|reload nginx
+systemctl enable --now nginx ; systemctl disable nginx
+systemctl list-units --failed ; systemctl list-timers
+systemctl cat nginx ; systemctl daemon-reload
+journalctl -u nginx -f ; journalctl -p err -b ; journalctl --since '1 hour ago'</code></div>
+
+      <h3>Écrire un service</h3>
+      <div class="code-block"><code><span class="comment"># /etc/systemd/system/monapp.service</span>
+[Unit]
+Description=Mon application
+After=network-online.target
+
+[Service]
+User=monapp
+ExecStart=/opt/monapp/run
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target</code></div>
+      <ul><li>Après modification : <code>systemctl daemon-reload</code> puis <code>enable --now</code></li><li><strong>cron</strong> : <code>crontab -e</code> (minute heure jour mois jour-semaine) ; alternative moderne : <strong>timers systemd</strong> (journalisation, dépendances)</li><li>Signaux : <code>SIGTERM</code> (15, arrêt propre) avant <code>SIGKILL</code> (9, brutal)</li></ul>
+    </div>
+  </div>
+
+  <!-- S8 -->
+  <div class="section" id="s8">
+    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Gestion des paquets et mises à jour</span><span class="section-nb">Administration</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">apt</span><span class="tag">dnf</span><span class="tag">Dépôts</span><span class="tag">Mises à jour</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Action</th><th>Debian / Ubuntu</th><th>RHEL / Rocky</th></tr></thead><tbody><tr><td>Rafraîchir l'index</td><td><code>apt update</code></td><td>(automatique) <code>dnf check-update</code></td></tr><tr><td>Mettre à jour</td><td><code>apt upgrade</code> / <code>full-upgrade</code></td><td><code>dnf upgrade</code></td></tr><tr><td>Installer</td><td><code>apt install nginx</code></td><td><code>dnf install nginx</code></td></tr><tr><td>Supprimer</td><td><code>apt remove</code> / <code>purge</code></td><td><code>dnf remove</code></td></tr><tr><td>Chercher</td><td><code>apt search</code>, <code>apt show</code></td><td><code>dnf search</code>, <code>dnf info</code></td></tr><tr><td>Quel paquet fournit ce fichier ?</td><td><code>dpkg -S /chemin</code></td><td><code>dnf provides /chemin</code></td></tr><tr><td>Lister installés</td><td><code>dpkg -l</code></td><td><code>rpm -qa</code></td></tr><tr><td>Dépôts</td><td><code>/etc/apt/sources.list*</code></td><td><code>/etc/yum.repos.d/</code></td></tr><tr><td>Mises à jour auto</td><td><code>unattended-upgrades</code></td><td><code>dnf-automatic</code></td></tr></tbody></table></div>
+      <ul><li>Ne mettre à jour la production qu'après test ; <strong>figer</strong> les versions critiques (<code>apt-mark hold</code>, <code>dnf versionlock</code>)</li><li>Ajouter un dépôt tiers = ajouter de la <strong>confiance</strong> : vérifier la clé de signature</li><li>Redémarrage nécessaire après noyau : <code>needrestart</code> (Debian), <code>dnf needs-restarting -r</code> (RHEL)</li><li>Autres formats : Snap, Flatpak, AppImage ; compilation depuis les sources en dernier recours</li></ul>
+    </div>
+  </div>
+
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Disques, partitions, LVM et systèmes de fichiers</span><span class="section-nb">Administration</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">lsblk</span><span class="tag">LVM</span><span class="tag">ext4 / XFS</span><span class="tag">fstab</span></div>
+      <div class="code-block"><code>lsblk -f ; blkid ; df -hT ; du -sh /var/* | sort -h ; findmnt
+sudo fdisk /dev/sdb         <span class="comment"># ou parted / gdisk (GPT)</span>
+sudo mkfs.ext4 /dev/sdb1    <span class="comment"># ou mkfs.xfs</span>
+sudo mount /dev/sdb1 /mnt/data ; sudo umount /mnt/data
+<span class="comment"># /etc/fstab : monter au démarrage (de préférence par UUID)</span>
+UUID=xxxx-xxxx  /mnt/data  ext4  defaults,nofail  0  2
+sudo mount -a               <span class="comment"># tester fstab avant de redémarrer !</span></code></div>
+
+      <h3>LVM : volumes extensibles</h3>
+      <div class="code-block"><code>pvcreate /dev/sdb ; vgcreate vg_data /dev/sdb ; lvcreate -L 20G -n lv_app vg_data
+mkfs.xfs /dev/vg_data/lv_app
+<span class="comment"># Agrandir à chaud</span>
+lvextend -L +10G -r /dev/vg_data/lv_app      <span class="comment"># -r agrandit aussi le système de fichiers</span>
+pvs ; vgs ; lvs</code></div>
+      <ul><li><strong>ext4</strong> (polyvalent, réductible) ; <strong>XFS</strong> (gros volumes, agrandissable mais <em>non réductible</em>) ; Btrfs / ZFS (snapshots)</li><li>Une erreur dans <code>fstab</code> peut empêcher le démarrage : <code>nofail</code> pour les disques secondaires et test par <code>mount -a</code></li><li>Disque plein : <code>df -h</code> (espace) <em>et</em> <code>df -i</code> (inodes) ; <code>lsof +L1</code> pour les fichiers supprimés mais ouverts</li><li>RAID logiciel : <code>mdadm</code> ; chiffrement : LUKS (<code>cryptsetup</code>)</li></ul>
+    </div>
+  </div>
+
+  <!-- S10 -->
+  <div class="section" id="s10">
+    <div class="section-header"><span class="section-num">10</span><span class="section-title-text">Réseau et SSH</span><span class="section-nb">Administration</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">ip</span><span class="tag">DNS</span><span class="tag">ss</span><span class="tag">SSH</span></div>
+      <div class="code-block"><code>ip -br a ; ip r ; ip link ; resolvectl status
+ss -tulpn                   <span class="comment"># ports en écoute et processus</span>
+ping -c3 host ; traceroute host ; mtr host
+dig +short a.exemple.fr ; nslookup host ; getent hosts host
+curl -I https://site ; curl -v telnet://host:443 ; nc -zv host 22
+sudo ip addr add 10.0.0.5/24 dev eth0      <span class="comment"># temporaire (perdu au redémarrage)</span></code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Configuration persistante</th><th>Où</th></tr></thead><tbody><tr><td>Ubuntu serveur</td><td><strong>netplan</strong> : <code>/etc/netplan/*.yaml</code> puis <code>netplan apply</code></td></tr><tr><td>RHEL / Rocky</td><td><strong>NetworkManager</strong> : <code>nmcli</code>, <code>nmtui</code></td></tr><tr><td>DNS</td><td><code>/etc/resolv.conf</code> (souvent géré par systemd-resolved), <code>/etc/hosts</code></td></tr><tr><td>Nom d'hôte</td><td><code>hostnamectl set-hostname</code></td></tr></tbody></table></div>
+
+      <h3>SSH</h3>
+      <div class="code-block"><code>ssh-keygen -t ed25519 -C "alice@poste"
+ssh-copy-id alice@serveur ; ssh alice@serveur
+scp f alice@serveur:/tmp ; rsync -avz dossier/ alice@serveur:/data/
+ssh -L 8080:localhost:80 alice@serveur         <span class="comment"># tunnel local</span>
+ssh -J bastion alice@interne                    <span class="comment"># saut par un bastion</span>
+<span class="comment"># /etc/ssh/sshd_config : durcissement de base</span>
+PermitRootLogin no
+PasswordAuthentication no
+AllowUsers alice bob
+sudo sshd -t &amp;&amp; sudo systemctl reload sshd     <span class="comment"># tester avant de recharger, garder une 2e session ouverte</span></code></div>
+      <div class="warn">Ne coupe jamais l'authentification par mot de passe sans avoir <strong>vérifié que ta clé fonctionne</strong> dans une seconde session.</div>
+    </div>
+  </div>
+
+  <!-- S11 -->
+  <div class="section" id="s11">
+    <div class="section-header"><span class="section-num">11</span><span class="section-title-text">Sécurité de base</span><span class="section-nb">Sécurité</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pare-feu</span><span class="tag">SELinux</span><span class="tag">Fail2ban</span><span class="tag">Moindre privilège</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Mesure</th><th>Outil / geste</th></tr></thead><tbody><tr><td>Pare-feu</td><td><code>ufw allow 22/tcp ; ufw enable</code> (Ubuntu) · <code>firewall-cmd --add-service=https --permanent ; firewall-cmd --reload</code> (RHEL) · nftables en dessous</td></tr><tr><td>Contrôle d'accès obligatoire</td><td><strong>SELinux</strong> (RHEL : <code>getenforce</code>, <code>setenforce</code>, <code>ausearch -m avc</code>, <code>restorecon</code>) · <strong>AppArmor</strong> (Ubuntu : <code>aa-status</code>)</td></tr><tr><td>Anti-bruteforce</td><td><code>fail2ban</code> ; clés SSH uniquement</td></tr><tr><td>Mises à jour de sécurité</td><td>Automatiques pour les correctifs, suivi des CVE</td></tr><tr><td>Moindre privilège</td><td>Comptes nominatifs, sudo ciblé, services non root, droits stricts sur les secrets</td></tr><tr><td>Surface d'attaque</td><td>Désinstaller le superflu, <code>ss -tulpn</code> pour voir ce qui écoute</td></tr><tr><td>Audit et journaux</td><td><code>auditd</code>, journaux centralisés, <code>last</code> / <code>lastb</code></td></tr><tr><td>Chiffrement</td><td>LUKS (disques), TLS (services), <code>gpg</code></td></tr><tr><td>Secrets</td><td>Jamais dans Git ni en clair : gestionnaire de secrets, variables protégées</td></tr></tbody></table></div>
+      <ul><li><strong>Ne désactive pas SELinux</strong> pour « faire marcher » : lire l'alerte, ajuster le contexte ou un booléen</li><li>Référentiels : <strong>CIS Benchmarks</strong>, ANSSI (guide d'hygiène) ; outil d'audit : <code>lynis</code></li><li>Notions LFCA : confidentialité / intégrité / disponibilité, données sensibles, conformité (RGPD)</li></ul>
+    </div>
+  </div>
+
+  <!-- S12 -->
+  <div class="section" id="s12">
+    <div class="section-header"><span class="section-num">12</span><span class="section-title-text">Scripts bash et automatisation</span><span class="section-nb">Administration</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">bash</span><span class="tag">Variables</span><span class="tag">Boucles</span><span class="tag">cron</span></div>
+      <div class="code-block"><code>#!/usr/bin/env bash
+set -euo pipefail                 <span class="comment"># arrêt sur erreur, variable non définie, erreur dans un pipe</span>
+
+SRC="${1:?usage: $0 dossier}"
+DEST="/backup/$(date +%F)"
+mkdir -p "$DEST"
+
+for f in "$SRC"/*.log; do
+  [[ -e "$f" ]] || continue
+  gzip -c "$f" &gt; "$DEST/$(basename "$f").gz"
+done
+
+if ! df -h /backup | awk 'NR==2{exit ($5+0 &gt; 90)}'; then
+  echo "Disque presque plein" &gt;&amp;2 ; exit 1
+fi
+echo "OK"</code></div>
+      <ul><li><strong>Toujours</strong> mettre les variables entre guillemets (<code>"$var"</code>) ; tester avec <code>shellcheck</code></li><li><code>$?</code> = code retour ; <code>$1 $@ $#</code> = arguments ; <code>[[ ]]</code> = tests ; <code>$(cmd)</code> = substitution</li><li>Rendre exécutable : <code>chmod +x</code> ; planifier avec cron ou un timer systemd</li><li>Au-delà de quelques dizaines de lignes ou pour plusieurs serveurs : <strong>Ansible</strong> (section 15)</li></ul>
+    </div>
+  </div>
+
+  <!-- S13 -->
+  <div class="section" id="s13">
+    <div class="section-header"><span class="section-num">13</span><span class="section-title-text">Journaux, supervision et performances</span><span class="section-nb">Exploitation</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Logs</span><span class="tag">top</span><span class="tag">iostat</span><span class="tag">logrotate</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Journal</th><th>Contenu</th></tr></thead><tbody><tr><td><code>journalctl</code></td><td>Journal systemd (tout)</td></tr><tr><td><code>/var/log/syslog</code> / <code>/var/log/messages</code></td><td>Système (Debian / RHEL)</td></tr><tr><td><code>/var/log/auth.log</code> / <code>/var/log/secure</code></td><td>Authentifications, sudo, SSH</td></tr><tr><td><code>/var/log/nginx/</code> etc.</td><td>Applications</td></tr><tr><td><code>dmesg -T</code></td><td>Noyau, matériel</td></tr></tbody></table></div>
+      <div class="code-block"><code>uptime ; free -h ; vmstat 1 5 ; iostat -xz 1 ; sar -u 1 3
+top ; htop ; ps aux --sort=-%mem | head ; ss -s
+df -h ; du -xh / --max-depth=1 | sort -h | tail
+lsof -i :80 ; lsof -p PID ; strace -p PID</code></div>
+      <ul><li><strong>Load average</strong> : à comparer au nombre de CPU (<code>nproc</code>) ; <code>wa</code> élevé = attente disque</li><li>Mémoire : « available » compte, pas « free » ; swap qui sature = problème</li><li><code>logrotate</code> (<code>/etc/logrotate.d/</code>) évite de remplir le disque</li><li>Supervision continue : Prometheus + Grafana, Zabbix, Netdata ; journaux centralisés : Loki, ELK, rsyslog</li></ul>
+    </div>
+  </div>
+
+  <!-- S14 -->
+  <div class="section" id="s14">
+    <div class="section-header"><span class="section-num">14</span><span class="section-title-text">Sauvegarde, restauration et reprise après sinistre</span><span class="section-nb">Exploitation</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">rsync</span><span class="tag">tar</span><span class="tag">restic</span><span class="tag">PRA</span></div>
+      <div class="code-block"><code>tar czf /backup/etc-$(date +%F).tgz /etc
+rsync -aHAX --delete --dry-run /data/ /backup/data/        <span class="comment"># --dry-run d'abord !</span>
+rsync -aHAX --delete /data/ backup@srv:/backup/data/
+restic -r sftp:backup@srv:/restic init ; restic backup /data ; restic snapshots ; restic restore latest --target /restore</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Notion</th><th>Sens</th></tr></thead><tbody><tr><td><strong>3-2-1</strong></td><td>3 copies, 2 supports, 1 hors site</td></tr><tr><td><strong>RPO</strong></td><td>Perte de données acceptable (âge max de la sauvegarde)</td></tr><tr><td><strong>RTO</strong></td><td>Durée acceptable pour rétablir le service</td></tr><tr><td>Sauvegarde ≠ réplication</td><td>Une réplication copie aussi les erreurs et suppressions</td></tr><tr><td>Test de restauration</td><td>Seule preuve qu'une sauvegarde fonctionne</td></tr></tbody></table></div>
+      <ul><li>Sauvegarder : <code>/etc</code>, données, bases (dumps cohérents), liste des paquets, scripts</li><li>Snapshots LVM / Btrfs / ZFS pour la cohérence ; chiffrer les sauvegardes</li><li>Documenter et <strong>répéter</strong> le plan de reprise (PRA) ; alerter si une sauvegarde échoue</li></ul>
+    </div>
+  </div>
+
+  <!-- S15 -->
+  <div class="section" id="s15">
+    <div class="section-header"><span class="section-num">15</span><span class="section-title-text">Cloud, conteneurs, Git et DevOps (domaines LFCA)</span><span class="section-nb">Au-delà</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Cloud</span><span class="tag">Docker</span><span class="tag">Git</span><span class="tag">Ansible</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Notion</th><th>À savoir</th></tr></thead><tbody><tr><td>Modèles de service</td><td><strong>IaaS</strong> (VM), <strong>PaaS</strong> (plateforme), <strong>SaaS</strong> (logiciel) ; responsabilité partagée</td></tr><tr><td>Modèles de déploiement</td><td>Public, privé, hybride, multi-cloud</td></tr><tr><td>Caractéristiques</td><td>Libre-service, élasticité, mesure de l'usage, mutualisation ; notions de coût (FinOps)</td></tr><tr><td>Conteneurs</td><td>Processus isolés (namespaces, cgroups) ; images ; Docker / Podman ; orchestration Kubernetes</td></tr><tr><td>DevOps</td><td>Culture et pratiques : intégration / livraison continues (CI/CD), infrastructure as code, supervision</td></tr><tr><td>Git</td><td>Versionner le code <em>et</em> la configuration</td></tr></tbody></table></div>
+      <div class="code-block"><code>git init ; git clone URL ; git status ; git add -p ; git commit -m 'message' ; git push
+git switch -c feature ; git log --oneline --graph ; git diff ; git pull --rebase
+
+docker run -d --name web -p 8080:80 nginx ; docker ps ; docker logs web ; docker exec -it web sh
+<span class="comment"># Ansible : configuration sans agent par SSH</span>
+ansible all -i hotes.ini -m ping
+ansible-playbook -i hotes.ini site.yml --check --diff</code></div>
+      <div class="tip">Suite logique : <a href="../kubernetes/fiche.html">fiche Kubernetes</a>, <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a> et <a href="../proxmox-devops/fiche.html">Proxmox DevOps</a> (Terraform, Ansible).</div>
+    </div>
+  </div>
+
+  <!-- S16 -->
+  <div class="section" id="s16">
+    <div class="section-header"><span class="section-num">16</span><span class="section-title-text">Gestion de projet, open source et licences</span><span class="section-nb">Au-delà</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Agile</span><span class="tag">ITIL</span><span class="tag">Licences</span><span class="tag">Documentation</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Sujet</th><th>Notions</th></tr></thead><tbody><tr><td>Méthodes</td><td>Cascade (waterfall) vs <strong>agile</strong> (Scrum, Kanban) ; sprints, backlog, rétrospective</td></tr><tr><td>Cycle de vie</td><td>Cadrage, conception, réalisation, tests, mise en production, maintenance</td></tr><tr><td>Parties prenantes</td><td>Sponsor, équipe, utilisateurs : communication et gestion des attentes</td></tr><tr><td>Risques et budget</td><td>Identifier, évaluer, traiter ; coûts directs / indirects, TCO</td></tr><tr><td>Exploitation (ITSM)</td><td>Incident, problème, changement (ITIL) ; SLA, SLO ; astreinte</td></tr><tr><td>Architecture applicative</td><td>Monolithe vs microservices, 3-tier, API, bases de données</td></tr></tbody></table></div>
+
+      <h3>Licences open source</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Type</th><th>Exemples</th><th>Idée</th></tr></thead><tbody><tr><td><strong>Copyleft fort</strong></td><td>GPL</td><td>Les œuvres dérivées distribuées doivent rester sous la même licence</td></tr><tr><td>Copyleft faible</td><td>LGPL, MPL</td><td>Copyleft limité aux fichiers / à la bibliothèque</td></tr><tr><td><strong>Permissive</strong></td><td>MIT, BSD, Apache 2.0</td><td>Réutilisation très libre (Apache : clause de brevets)</td></tr></tbody></table></div>
+      <ul><li>Open source ≠ gratuit ≠ domaine public : la licence fixe les droits</li><li>Contribuer : issues, pull requests, documentation, communauté ; gouvernance par des fondations (Linux Foundation, Apache, CNCF)</li><li>Respecter les licences des dépendances (inventaire / SBOM)</li></ul>
+    </div>
+  </div>
+
+  <!-- S17 -->
+  <div class="section" id="s17">
+    <div class="section-header"><span class="section-num">17</span><span class="section-title-text">Dépannage méthodique</span><span class="section-nb">Boîte à outils</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Méthode</span><span class="tag">Boot</span><span class="tag">Réseau</span><span class="tag">Disque</span></div>
+      <ol><li><strong>Définir</strong> le symptôme (quoi, depuis quand, qui est touché)</li><li><strong>Qu'est-ce qui a changé ?</strong> (mise à jour, config, déploiement)</li><li>Lire les <strong>journaux</strong> : <code>journalctl -xe</code>, <code>systemctl status</code></li><li>Isoler par couche : <strong>service → processus → ressources → réseau → matériel</strong></li><li>Corriger <em>une chose à la fois</em>, tester, <strong>documenter</strong></li></ol>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Symptôme</th><th>Premiers gestes</th></tr></thead><tbody><tr><td>Service ne démarre pas</td><td><code>systemctl status</code>, <code>journalctl -u svc -n 100</code>, tester la config (<code>nginx -t</code>, <code>sshd -t</code>)</td></tr><tr><td>Plus d'espace</td><td><code>df -h</code> / <code>df -i</code>, <code>du</code> par dossier, logs énormes, <code>lsof +L1</code></td></tr><tr><td>Lenteur</td><td><code>top</code> / <code>iostat</code> / <code>free</code> : CPU, attente disque, swap</td></tr><tr><td>Réseau coupé</td><td><code>ip a</code>, <code>ip r</code>, ping passerelle puis IP externe puis nom (DNS), <code>ss</code>, pare-feu</td></tr><tr><td>Connexion SSH refusée</td><td>Service actif ? port ? pare-feu ? <code>/var/log/auth.log</code>, droits de <code>~/.ssh</code> (700) et <code>authorized_keys</code> (600)</td></tr><tr><td>Ne démarre plus</td><td>Menu GRUB → ancien noyau, mode secours (<code>rescue.target</code>), live USB + chroot, vérifier <code>fstab</code></td></tr><tr><td>Mot de passe root perdu</td><td>Mode secours / <code>init=/bin/bash</code> (selon la distribution) : protéger l'accès physique</td></tr><tr><td>« Permission denied »</td><td>Droits, propriétaire, ACL, <strong>SELinux / AppArmor</strong>, montage <code>noexec</code></td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S18 -->
+  <div class="section" id="s18">
+    <div class="section-header"><span class="section-num">18</span><span class="section-title-text">Aide-mémoire : la boîte à outils de l'admin</span><span class="section-nb">Boîte à outils</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">One-liners</span><span class="tag">Outils</span><span class="tag">Habitudes</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Besoin</th><th>Commande</th></tr></thead><tbody><tr><td>Gros fichiers</td><td><code>find / -xdev -type f -size +500M -exec ls -lh {} + 2>/dev/null</code></td></tr><tr><td>Dossiers lourds</td><td><code>du -xh / --max-depth=2 | sort -h | tail -20</code></td></tr><tr><td>Qui écoute sur un port ?</td><td><code>ss -tulpn | grep :443</code></td></tr><tr><td>Dernières erreurs</td><td><code>journalctl -p err -b --no-pager | tail -50</code></td></tr><tr><td>Services en échec</td><td><code>systemctl --failed</code></td></tr><tr><td>Connexions SSH échouées</td><td><code>journalctl -u ssh | grep -c Failed</code></td></tr><tr><td>Processus gourmands</td><td><code>ps aux --sort=-%cpu | head</code></td></tr><tr><td>Fichiers modifiés récemment</td><td><code>find /etc -mtime -1 -type f</code></td></tr><tr><td>Tester un certificat</td><td><code>openssl s_client -connect host:443 -servername host &lt;/dev/null | openssl x509 -noout -dates</code></td></tr><tr><td>Comparer des dossiers</td><td><code>diff -ru a/ b/</code>, <code>rsync -avn a/ b/</code></td></tr><tr><td>Copier la config avant édition</td><td><code>cp -a f f.$(date +%F).bak</code></td></tr><tr><td>Exécuter sur plusieurs hôtes</td><td><code>ansible all -m shell -a 'uptime'</code></td></tr></tbody></table></div>
+
+      <h3>Outils à installer sur une machine d'admin</h3>
+      <ul><li><code>tmux</code>, <code>vim</code> / <code>nano</code>, <code>htop</code>, <code>iotop</code>, <code>ncdu</code>, <code>tree</code>, <code>jq</code> (JSON), <code>curl</code>, <code>rsync</code>, <code>git</code></li><li>Réseau : <code>mtr</code>, <code>nmap</code>, <code>tcpdump</code>, <code>dig</code>, <code>nc</code>, <code>iperf3</code></li><li>Qualité : <code>shellcheck</code>, <code>lynis</code>, <code>ansible</code>, <code>restic</code></li></ul>
+
+      <h3>Bonnes habitudes</h3>
+      <ul><li>Changer la config sur un <strong>test</strong> d'abord, sauvegarder le fichier avant (<code>cp -a</code>), tester la syntaxe avant de recharger</li><li>Garder une <strong>seconde session</strong> ouverte pour SSH / pare-feu / réseau</li><li>Tout noter (tickets, runbooks), versionner la config dans Git</li><li>Automatiser dès la 3e répétition ; préférer la lecture de la doc (<code>man</code>) à la copie de commandes inconnues</li></ul>
+    </div>
+  </div>
+
+  <!-- S19 -->
+  <div class="section" id="s19">
+    <div class="section-header"><span class="section-num">19</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">32 questions</span></div>
+
+      <h3>Plan de labo en 8 séances (2 VM : Rocky et Ubuntu)</h3>
+      <ol><li><strong>Séance 1 : prise en main.</strong> Installer les 2 VM, naviguer, <code>man</code>, redirections, pipes, <code>grep</code> / <code>awk</code> sur des journaux</li><li><strong>Séance 2 : fichiers et droits.</strong> Arborescence, <code>chmod</code> / <code>chown</code>, ACL, liens, un dossier partagé par groupe</li><li><strong>Séance 3 : utilisateurs et sudo.</strong> Créer comptes et groupes, règles <code>sudoers.d</code>, politique de mots de passe</li><li><strong>Séance 4 : services.</strong> Installer nginx, écrire un service systemd et un timer, lire les journaux, provoquer une panne</li><li><strong>Séance 5 : disques.</strong> Ajouter un disque, partitionner, LVM, <code>fstab</code>, agrandir à chaud, remplir un disque et le diagnostiquer</li><li><strong>Séance 6 : réseau et SSH.</strong> IP statique, DNS, clés SSH, durcissement <code>sshd</code>, tunnel, bastion</li><li><strong>Séance 7 : sécurité et sauvegarde.</strong> Pare-feu, fail2ban, SELinux (passer en enforcing et résoudre un refus), rsync / restic avec <strong>restauration</strong></li><li><strong>Séance 8 : automatisation.</strong> Script bash robuste, playbook Ansible sur les 2 VM, dépôt Git. Puis blanc LFCA sur les domaines cloud, DevOps et gestion de projet</li></ol>
+
+      <h3>Auto-évaluation — clique pour voir la réponse</h3>
+      <div class="qr-list">
+        <details><summary>Quelle est la différence entre Linux, une distribution et un shell ?</summary><p>Linux est le noyau ; une distribution y ajoute outils et paquets ; le shell (bash) est l'interpréteur de commandes.</p></details>
+        <details><summary>Quelle commande affiche la version de la distribution ?</summary><p>cat /etc/os-release (et uname -r pour le noyau).</p></details>
+        <details><summary>Quelle est la différence entre apt et dnf ?</summary><p>apt gère les paquets .deb (Debian, Ubuntu) ; dnf gère les .rpm (RHEL, Rocky, Fedora).</p></details>
+        <details><summary>Que signifie le droit 640 ?</summary><p>Propriétaire : lecture-écriture ; groupe : lecture ; autres : aucun accès.</p></details>
+        <details><summary>À quoi sert le bit sticky sur /tmp ?</summary><p>Seul le propriétaire d'un fichier (ou root) peut le supprimer ou le renommer dans le dossier.</p></details>
+        <details><summary>Différence entre lien dur et lien symbolique ?</summary><p>Le lien dur est un second nom du même inode (même système de fichiers) ; le lien symbolique est un fichier pointant vers un chemin.</p></details>
+        <details><summary>Que font >, >>, 2> et | ?</summary><p>Rediriger en écrasant, en ajoutant, rediriger les erreurs, relier la sortie d'une commande à l'entrée d'une autre.</p></details>
+        <details><summary>Comment lire un journal en continu ?</summary><p>tail -f fichier, ou journalctl -f (journalctl -u service -f pour un service).</p></details>
+        <details><summary>Où sont les mots de passe des utilisateurs ?</summary><p>Sous forme d'empreintes dans /etc/shadow, lisible seulement par root ; /etc/passwd ne contient pas de mots de passe.</p></details>
+        <details><summary>Comment donner les droits d'administration à un utilisateur ?</summary><p>L'ajouter au groupe sudo (Debian) ou wheel (RHEL), ou une règle dans /etc/sudoers.d via visudo.</p></details>
+        <details><summary>Comment démarrer un service et l'activer au boot ?</summary><p>systemctl enable --now nom ; vérifier avec systemctl status nom.</p></details>
+        <details><summary>Que faire après avoir modifié un fichier .service ?</summary><p>systemctl daemon-reload puis redémarrer le service.</p></details>
+        <details><summary>Quelle différence entre SIGTERM et SIGKILL ?</summary><p>SIGTERM (15) demande un arrêt propre ; SIGKILL (9) tue immédiatement sans nettoyage.</p></details>
+        <details><summary>Comment planifier une tâche ?</summary><p>Avec cron (crontab -e) ou un timer systemd (unit .timer associée à un .service).</p></details>
+        <details><summary>Comment voir quels ports sont ouverts et par qui ?</summary><p>ss -tulpn.</p></details>
+        <details><summary>Que contient /etc/fstab et quel risque ?</summary><p>Les montages au démarrage ; une erreur peut bloquer le boot : tester avec mount -a et utiliser nofail pour les disques secondaires.</p></details>
+        <details><summary>Pourquoi utiliser LVM ?</summary><p>Pour redimensionner les volumes à chaud, regrouper des disques et faire des snapshots.</p></details>
+        <details><summary>Un disque est plein alors que du est faible : pourquoi ?</summary><p>Inodes épuisés (df -i) ou fichiers supprimés mais encore ouverts (lsof +L1).</p></details>
+        <details><summary>Quelle différence entre ext4 et XFS ?</summary><p>ext4 : polyvalent et réductible ; XFS : performant sur gros volumes, agrandissable mais non réductible.</p></details>
+        <details><summary>Comment sécuriser SSH ?</summary><p>Clés plutôt que mots de passe, PermitRootLogin no, AllowUsers, fail2ban, pare-feu ; tester sshd -t et garder une seconde session.</p></details>
+        <details><summary>Quel pare-feu sur Ubuntu et sur RHEL ?</summary><p>ufw (Ubuntu) ; firewalld (RHEL) ; tous deux au-dessus de nftables.</p></details>
+        <details><summary>Que sont SELinux et AppArmor ?</summary><p>Des contrôles d'accès obligatoires qui restreignent ce que les processus peuvent faire, même en tant que root.</p></details>
+        <details><summary>Que faire quand SELinux bloque une application ?</summary><p>Lire l'alerte (ausearch, journalctl), corriger le contexte (restorecon) ou un booléen ; ne pas le désactiver.</p></details>
+        <details><summary>Que signifie la règle 3-2-1 ?</summary><p>3 copies, sur 2 supports différents, dont 1 hors site.</p></details>
+        <details><summary>Différence entre RPO et RTO ?</summary><p>RPO : perte de données acceptable ; RTO : délai acceptable de reprise du service.</p></details>
+        <details><summary>Pourquoi une réplication n'est-elle pas une sauvegarde ?</summary><p>Elle réplique aussi les suppressions et corruptions ; il faut des versions et un test de restauration.</p></details>
+        <details><summary>Que fait set -euo pipefail dans un script ?</summary><p>Arrêt sur erreur, sur variable non définie et sur échec dans un pipe.</p></details>
+        <details><summary>Que sont IaaS, PaaS et SaaS ?</summary><p>Niveaux de service cloud : infrastructure (VM), plateforme (exécution d'applications), logiciel complet.</p></details>
+        <details><summary>Quelle différence entre conteneur et machine virtuelle ?</summary><p>Un conteneur partage le noyau de l'hôte (processus isolés) ; une VM embarque son propre système.</p></details>
+        <details><summary>Qu'est-ce que l'infrastructure as code ?</summary><p>Décrire l'infrastructure dans des fichiers versionnés et l'appliquer automatiquement (Terraform, Ansible).</p></details>
+        <details><summary>Quelle licence est copyleft fort et lesquelles sont permissives ?</summary><p>GPL est copyleft fort ; MIT, BSD et Apache 2.0 sont permissives.</p></details>
+        <details><summary>Quelle méthode pour dépanner ?</summary><p>Définir le symptôme, chercher ce qui a changé, lire les journaux, isoler par couche, corriger un point à la fois et documenter.</p></details>
+      </div>
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)">
+    Fiche Linux ·
+    <a href="https://training.linuxfoundation.org/certification/certified-it-associate/" target="_blank" style="color:var(--accent);text-decoration:none">LFCA (Linux Foundation)</a> ·
+    <a href="https://man7.org/linux/man-pages/" target="_blank" style="color:var(--accent);text-decoration:none">Pages de manuel (man7)</a> ·
+    <a href="https://documentation.ubuntu.com/server/" target="_blank" style="color:var(--accent);text-decoration:none">Documentation Ubuntu Server</a>
+  </footer>
+
+</div>
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("linux-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("linux-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>
