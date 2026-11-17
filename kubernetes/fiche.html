@@ -179,32 +179,34 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
       <p>Architecture · Workloads · Réseau · Stockage · Sécurité · Helm · Dépannage · CKA</p>
     </div>
     <div class="ps-stats">
-      <div class="ps-stat"><b>15</b><span>Sections</span></div>
+      <div class="ps-stat"><b>17</b><span>Sections</span></div>
       <div class="ps-stat"><b>1.3x</b><span>Version</span></div>
-      <div class="ps-stat"><b>29</b><span>Q/R</span></div>
+      <div class="ps-stat"><b>34</b><span>Q/R</span></div>
     </div>
   </div>
 
-  <div class="info"><strong>Sources :</strong> documentation officielle Kubernetes (kubernetes.io), documentation RKE2 pour l'état de l'écosystème des ingress, politique de versions. <strong>Les versions évoluent vite</strong> (environ 3 versions mineures par an) : vérifie toujours la version de ta distribution et les API déprécées. Les exemples sont des points de départ à tester sur un cluster de labo. <strong>Suite :</strong> <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a>.</div>
+  <div class="info"><strong>Sources :</strong> documentation officielle Kubernetes (kubernetes.io), documentation RKE2 pour l'état de l'écosystème des ingress, politique de versions. <strong>Les versions évoluent vite</strong> (environ 3 versions mineures par an) : vérifie toujours la version de ta distribution et les API déprécées. Les analogies (restaurant) aident à comprendre mais ne remplacent pas les définitions. Les exemples sont des points de départ à tester sur un cluster de labo. <strong>Suite :</strong> <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a>.</div>
 
   <div class="toc">
     <h4>Sommaire</h4>
     <div class="toc-grid">
       <a href="#s1" class="toc-item"><span class="toc-num">1</span>Vue d'ensemble et architecture</a>
-      <a href="#s2" class="toc-item"><span class="toc-num">2</span>kubectl, kubeconfig et YAML</a>
-      <a href="#s3" class="toc-item"><span class="toc-num">3</span>Workloads : Pods, Deployments, Jobs</a>
-      <a href="#s4" class="toc-item"><span class="toc-num">4</span>Configuration : ConfigMap et Secret</a>
-      <a href="#s5" class="toc-item"><span class="toc-num">5</span>Réseau : Services, Ingress, NetworkPolicy</a>
-      <a href="#s6" class="toc-item"><span class="toc-num">6</span>Stockage : PV, PVC, StorageClass</a>
-      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Ordonnancement et ressources</a>
-      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Sécurité : RBAC et Pod Security</a>
-      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Helm, Kustomize et GitOps</a>
-      <a href="#s10" class="toc-item"><span class="toc-num">10</span>Observabilité et dépannage</a>
-      <a href="#s11" class="toc-item"><span class="toc-num">11</span>Administration : etcd, certificats, upgrades</a>
-      <a href="#s12" class="toc-item"><span class="toc-num">12</span>Extensions : CRD, Operators, admission</a>
-      <a href="#s13" class="toc-item"><span class="toc-num">13</span>Pièges et aide-mémoire</a>
-      <a href="#s14" class="toc-item"><span class="toc-num">14</span>Certifications CKA, CKAD, CKS</a>
-      <a href="#s15" class="toc-item"><span class="toc-num">15</span>Plan de labo et Q/R</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>Panorama : K8s, K3s, RKE2, K9s, K6</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>Glossaire illustré par analogies</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">4</span>kubectl, kubeconfig et YAML</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">5</span>Workloads : Pods, Deployments, Jobs</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">6</span>Configuration : ConfigMap et Secret</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Réseau : Services, Ingress, NetworkPolicy</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Stockage : PV, PVC, StorageClass</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Ordonnancement et ressources</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span>Sécurité : RBAC et Pod Security</a>
+      <a href="#s11" class="toc-item"><span class="toc-num">11</span>Helm, Kustomize et GitOps</a>
+      <a href="#s12" class="toc-item"><span class="toc-num">12</span>Observabilité et dépannage</a>
+      <a href="#s13" class="toc-item"><span class="toc-num">13</span>Administration : etcd, certificats, upgrades</a>
+      <a href="#s14" class="toc-item"><span class="toc-num">14</span>Extensions : CRD, Operators, admission</a>
+      <a href="#s15" class="toc-item"><span class="toc-num">15</span>Pièges et aide-mémoire</a>
+      <a href="#s16" class="toc-item"><span class="toc-num">16</span>Certifications CKA, CKAD, CKS</a>
+      <a href="#s17" class="toc-item"><span class="toc-num">17</span>Plan de labo et Q/R</a>
     </div>
   </div>
 
@@ -229,7 +231,61 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
 
   <!-- S2 -->
   <div class="section" id="s2">
-    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">kubectl, kubeconfig et manifestes YAML</span><span class="section-nb">Outil</span></div>
+    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">Panorama de l'écosystème : K8s, K3s, RKE2, K9s, K6…</span><span class="section-nb">Fondations</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">K8s</span><span class="tag">K3s</span><span class="tag">RKE2</span><span class="tag">K9s</span><span class="tag">K6</span></div>
+      <div class="info"><strong>Analogie de départ (filée dans toute la fiche) :</strong> un <strong>restaurant</strong>. Kubernetes est la <em>direction de salle</em> : elle ne cuisine pas, mais elle décide qui travaille à quel poste, remplace un cuisinier absent, ajuste les effectifs au coup de feu et garde le registre de tout. Les conteneurs sont les cuisiniers ; les nœuds, les postes de cuisine.</div>
+
+      <h3>Ces noms ne sont pas des concurrents : ce sont 5 familles</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Famille</th><th>Analogie</th><th>Exemples</th><th>Rôle</th></tr></thead><tbody><tr><td><strong>Le projet de base</strong></td><td>Le <em>concept</em> du restaurant : le règlement, la méthode de travail</td><td><strong>Kubernetes</strong>, écrit <strong>K8s</strong> (K + 8 lettres + s)</td><td>Le logiciel d'orchestration lui-même, standard de l'industrie (projet CNCF)</td></tr><tr><td><strong>Les distributions</strong></td><td>Des <em>enseignes</em> qui appliquent ce concept : même règlement, équipement différent</td><td><strong>K3s</strong>, <strong>RKE2</strong>, kubeadm, MicroK8s, Talos, OpenShift</td><td>Kubernetes « prêt à installer » : binaires, composants par défaut, réglages</td></tr><tr><td><strong>Les services managés</strong></td><td>Un restaurant <em>géré par un prestataire</em> : tu viens juste cuisiner</td><td>EKS (AWS), AKS (Azure), GKE (Google)</td><td>Le fournisseur exploite le control plane pour toi</td></tr><tr><td><strong>Les clusters de poche</strong></td><td>La <em>cuisine d'entraînement</em> pour apprendre sans risque</td><td>kind, minikube, k3d, Docker Desktop</td><td>Un cluster jetable sur ton poste</td></tr><tr><td><strong>Les outils autour</strong></td><td>Le <em>matériel du personnel</em> : talkie-walkie, tablette, balance</td><td><strong>kubectl</strong>, <strong>K9s</strong>, Helm, Lens / Headlamp, kubectx, stern, <strong>K6</strong></td><td>Piloter, observer, déployer, tester (sans être Kubernetes)</td></tr></tbody></table></div>
+
+      <h3>Les 5 noms qui t'ont troublé, un par un</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Nom</th><th>C'est quoi ?</th><th>Analogie</th></tr></thead><tbody><tr><td><strong>K8s</strong></td><td>Abréviation de Kubernetes (numéronyme, comme « i18n »)</td><td>Le <em>nom de l'activité</em> : « restauration »</td></tr><tr><td><strong>K3s</strong></td><td>Distribution Kubernetes <strong>légère</strong> (un seul binaire, peu de RAM ; SQLite par défaut ou etcd intégré) ; Traefik et un répartiteur de charge simple inclus ; idéale labo, edge, petits clusters</td><td>Un <strong>food truck</strong> : même cuisine professionnelle, mais compact, démarrage rapide, peu de personnel</td></tr><tr><td><strong>RKE2</strong></td><td>Distribution Kubernetes <strong>durcie</strong> (etcd, containerd, profil CIS, FIPS possible) ; pour datacenters et secteur public</td><td>Un <strong>restaurant labellisé haute sécurité</strong> : chambres froides surveillées, registres d'hygiène, audits</td></tr><tr><td><strong>K9s</strong></td><td>Interface <strong>en terminal</strong> pour parcourir un cluster (pods, logs, shell, suppression…) : un client, pas une distribution</td><td>La <strong>tablette du chef de salle</strong> : voir toutes les tables et leur état d'un coup d'œil, au lieu de poser des questions une à une</td></tr><tr><td><strong>K6</strong></td><td>Outil de <strong>test de charge</strong> (Grafana k6) : simule des milliers d'utilisateurs sur une application ; sans lien avec Kubernetes, bien qu'il puisse s'y exécuter</td><td>Un <strong>« faux service du samedi soir »</strong> : on envoie 500 faux clients pour voir si la cuisine tient</td></tr></tbody></table></div>
+
+      <h3>K3s ou RKE2 ? Le comparatif</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Critère</th><th>K3s</th><th>RKE2</th></tr></thead><tbody><tr><td>Philosophie</td><td>Léger et simple</td><td>Durci et conforme</td></tr><tr><td>Cible</td><td>Edge, IoT, labo, petits clusters</td><td>Datacenter, public, environnements réglementés</td></tr><tr><td>Stockage de l'état</td><td>SQLite (défaut), etcd intégré ou base externe</td><td>etcd</td></tr><tr><td>CNI par défaut</td><td>Flannel</td><td>Canal (Flannel + Calico)</td></tr><tr><td>Sécurité</td><td>Correcte, à durcir soi-même</td><td>Profil CIS, SELinux, chiffrement des Secrets, images vérifiées</td></tr><tr><td>Ressources</td><td>Très faibles</td><td>Plus gourmand</td></tr><tr><td>Kubernetes standard ?</td><td>Oui (certifié CNCF)</td><td>Oui (certifié CNCF)</td></tr><tr><td>Pilotable par Rancher ?</td><td>Oui</td><td>Oui</td></tr></tbody></table></div>
+      <div class="info"><strong>Retiens ceci :</strong> avec K3s comme avec RKE2, tout ce que tu apprends sur Pods, Deployments, Services ou RBAC reste valable. Ce qui change : l'<em>installation</em>, les réglages par défaut et les composants fournis.</div>
+
+      <h3>Les autres distributions et clusters de poche en une phrase</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Nom</th><th>En une phrase</th><th>Analogie</th></tr></thead><tbody><tr><td><strong>kubeadm</strong></td><td>Installeur officiel, on assemble chaque composant soi-même</td><td>Monter son restaurant <em>brique par brique</em></td></tr><tr><td><strong>MicroK8s</strong></td><td>Kubernetes de Canonical installé par <code>snap</code>, modules activables</td><td>Un restaurant <em>en kit</em> avec options à cocher</td></tr><tr><td><strong>Talos</strong></td><td>Système d'exploitation minimal dédié à Kubernetes, géré par API (pas de SSH)</td><td>Une cuisine <em>scellée</em> : on ne l'ouvre qu'avec l'outil prévu</td></tr><tr><td><strong>OpenShift</strong></td><td>Plateforme Kubernetes de Red Hat très cadrée (sécurité, console, pipelines)</td><td>Une <em>franchise clé en main</em> avec son cahier des charges</td></tr><tr><td><strong>Rancher</strong></td><td>Console pour <strong>gérer plusieurs clusters</strong> (SSO, RBAC, catalogue) ; ce n'est pas une distribution</td><td>La <em>direction du groupe</em> qui supervise tous les restaurants</td></tr><tr><td><strong>kind / minikube / k3d</strong></td><td>Mini-clusters jetables sur poste</td><td>La <em>cuisine d'entraînement</em></td></tr></tbody></table></div>
+
+      <h3>Que choisir ?</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Ton besoin</th><th>Choix courant</th></tr></thead><tbody><tr><td>Apprendre, tester une idée</td><td>kind, minikube ou K3s dans une VM</td></tr><tr><td>Petit serveur, edge, maison</td><td>K3s</td></tr><tr><td>Production en datacenter, exigences de sécurité</td><td>RKE2 (+ Rancher pour piloter plusieurs clusters)</td></tr><tr><td>Pas envie d'exploiter le control plane</td><td>Service managé (EKS / AKS / GKE)</td></tr><tr><td>Environnement très réglementé avec support éditeur</td><td>OpenShift ou RKE2 avec support commercial</td></tr><tr><td>Passer la CKA</td><td>kubeadm + kubectl : c'est ce que l'examen manipule</td></tr></tbody></table></div>
+      <div class="tip"><strong>Pour ton parcours :</strong> apprends sur K3s ou kind, passe à RKE2 pour le projet réel, ajoute Rancher quand tu as plusieurs clusters, et garde K9s dans ta boîte à outils dès le premier jour.</div>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">Glossaire illustré : chaque terme, son analogie</span><span class="section-nb">Fondations</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Glossaire</span><span class="tag">Analogies</span><span class="tag">Vocabulaire</span></div>
+      <div class="info">Fil rouge : <strong>le restaurant</strong>. Quand un terme te paraît abstrait, retrouve-le ici. L'analogie a des limites (elle aide à comprendre, pas à décider d'une architecture) : la définition technique prime toujours.</div>
+
+      <h3>1. L'architecture : qui fait quoi</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Définition courte</th><th>Analogie restaurant</th></tr></thead><tbody><tr><td><strong>Cluster</strong></td><td>Ensemble control plane + nœuds</td><td>Le <strong>restaurant entier</strong></td></tr><tr><td><strong>Control plane</strong></td><td>Le « cerveau » : API, scheduler, contrôleurs, etcd</td><td>La <strong>direction et la salle de pilotage</strong></td></tr><tr><td><strong>Nœud (node)</strong></td><td>Machine qui exécute les Pods (worker)</td><td>Un <strong>poste de cuisine</strong> (avec ses plaques et son plan de travail)</td></tr><tr><td><strong>kube-apiserver</strong></td><td>Seule porte d'entrée de toutes les demandes</td><td>Le <strong>guichet de la direction</strong> : tout passe par lui</td></tr><tr><td><strong>etcd</strong></td><td>Base clé-valeur qui contient l'état du cluster</td><td>Le <strong>cahier de bord officiel</strong> de la direction</td></tr><tr><td><strong>Scheduler</strong></td><td>Choisit le nœud d'un Pod</td><td>Le <strong>chef de passe</strong> qui répartit les commandes sur les postes</td></tr><tr><td><strong>Controller manager</strong></td><td>Boucles qui ramènent le réel vers le voulu</td><td>Le <strong>contrôleur de salle</strong> qui compte les cuisiniers et relance un remplaçant</td></tr><tr><td><strong>kubelet</strong></td><td>Agent de chaque nœud</td><td>Le <strong>chef de poste</strong>, qui exécute les ordres</td></tr><tr><td><strong>Container runtime</strong> (containerd)</td><td>Moteur qui lance les conteneurs</td><td>Les <strong>fourneaux</strong> eux-mêmes</td></tr><tr><td><strong>kube-proxy</strong></td><td>Règles réseau des Services</td><td>Le <strong>plan de circulation</strong> des serveurs</td></tr><tr><td><strong>CNI</strong></td><td>Plugin réseau des Pods</td><td>Le <strong>réseau de couloirs et d'interphones</strong></td></tr><tr><td><strong>CoreDNS</strong></td><td>Annuaire de noms interne</td><td>L'<strong>annuaire interne</strong> (« poste grill = poste 12 »)</td></tr></tbody></table></div>
+
+      <h3>2. Les charges : ce qu'on fait tourner</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Définition courte</th><th>Analogie restaurant</th></tr></thead><tbody><tr><td><strong>Image</strong></td><td>Modèle figé d'une application et de ses dépendances</td><td>La <strong>recette</strong>, écrite et immuable</td></tr><tr><td><strong>Conteneur</strong></td><td>Image en cours d'exécution</td><td>Un <strong>cuisinier</strong> qui applique la recette</td></tr><tr><td><strong>Registre</strong></td><td>Dépôt d'images</td><td>La <strong>bibliothèque de recettes</strong></td></tr><tr><td><strong>Pod</strong></td><td>1 ou plusieurs conteneurs liés, mêmes réseau et volumes</td><td>Un <strong>binôme au même plan de travail</strong> (cuisinier + commis)</td></tr><tr><td><strong>ReplicaSet</strong></td><td>Maintient N Pods identiques</td><td>« Toujours <strong>3 cuisiniers</strong> sur ce poste »</td></tr><tr><td><strong>Deployment</strong></td><td>ReplicaSet + mises à jour progressives et retour arrière</td><td>Le <strong>planning d'équipe</strong> : on change l'équipe peu à peu sans fermer</td></tr><tr><td><strong>StatefulSet</strong></td><td>Pods avec identité et stockage stables</td><td>Des <strong>cuisiniers nominatifs avec leur propre casier</strong> (le pâtissier est toujours le même)</td></tr><tr><td><strong>DaemonSet</strong></td><td>Un Pod par nœud</td><td>Un <strong>agent d'hygiène à chaque poste</strong></td></tr><tr><td><strong>Job</strong> / <strong>CronJob</strong></td><td>Tâche unique / planifiée</td><td>Un <strong>nettoyage exceptionnel</strong> / le <strong>ménage de chaque soir</strong></td></tr><tr><td><strong>Probe</strong></td><td>Test de santé (readiness, liveness, startup)</td><td>« Le cuisinier est-il <strong>prêt à servir</strong> ? <strong>vivant</strong> ? »</td></tr><tr><td><strong>Requests / limits</strong></td><td>Ressources réservées / plafond</td><td>Place réservée sur le plan de travail / <strong>plafond de gaz</strong> autorisé</td></tr><tr><td><strong>HPA</strong></td><td>Ajuste le nombre de Pods à la charge</td><td>Des <strong>renforts appelés au coup de feu</strong></td></tr></tbody></table></div>
+
+      <h3>3. Le réseau</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Définition courte</th><th>Analogie restaurant</th></tr></thead><tbody><tr><td><strong>Service</strong></td><td>Adresse et nom stables devant des Pods</td><td>Le <strong>passe-plat</strong> : les serveurs y déposent sans savoir quel cuisinier prend</td></tr><tr><td><strong>ClusterIP</strong> / <strong>NodePort</strong> / <strong>LoadBalancer</strong></td><td>Interne / port sur chaque nœud / IP externe</td><td>Interphone interne / <strong>porte de service</strong> / <strong>entrée principale</strong> avec numéro public</td></tr><tr><td><strong>Ingress</strong> / <strong>Gateway API</strong></td><td>Règles d'entrée HTTP(S) vers les Services</td><td>L'<strong>hôtesse d'accueil</strong> qui oriente selon la réservation</td></tr><tr><td><strong>Contrôleur d'ingress</strong> (Traefik…)</td><td>Le logiciel qui applique ces règles</td><td>L'<strong>hôtesse en personne</strong> (l'Ingress n'est que sa consigne écrite)</td></tr><tr><td><strong>NetworkPolicy</strong></td><td>Pare-feu entre Pods</td><td>Les <strong>portes verrouillées</strong> entre cuisine, réserve et salle</td></tr><tr><td><strong>DNS interne</strong></td><td>Noms de Services</td><td>L'<strong>annuaire interne</strong></td></tr></tbody></table></div>
+
+      <h3>4. Configuration, stockage et organisation</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Définition courte</th><th>Analogie restaurant</th></tr></thead><tbody><tr><td><strong>ConfigMap</strong></td><td>Configuration non sensible</td><td>Les <strong>consignes affichées</strong> en cuisine</td></tr><tr><td><strong>Secret</strong></td><td>Données sensibles (encodées, pas forcément chiffrées)</td><td>Le <strong>coffre</strong> de la direction (qui n'est sûr que si on le ferme à clé)</td></tr><tr><td><strong>Namespace</strong></td><td>Espace de noms logique</td><td>Les <strong>salles ou étages</strong> : on s'organise sans s'isoler totalement</td></tr><tr><td><strong>Label</strong> / sélecteur</td><td>Étiquette clé=valeur et sa requête</td><td>Les <strong>étiquettes de couleur</strong> (« tout ce qui est vert va au poste 3 »)</td></tr><tr><td><strong>Annotation</strong></td><td>Métadonnée libre non sélectionnable</td><td>Une <strong>note volante</strong> sur la commande</td></tr><tr><td><strong>Volume</strong></td><td>Stockage attaché à un Pod</td><td>Un <strong>plan de travail</strong> propre au poste</td></tr><tr><td><strong>PV</strong></td><td>Un volume du cluster</td><td>Une <strong>chambre froide</strong> du restaurant</td></tr><tr><td><strong>PVC</strong></td><td>Demande de stockage d'une application</td><td>Un <strong>bon de commande</strong> « 10 Go de froid, s'il vous plaît »</td></tr><tr><td><strong>StorageClass</strong></td><td>Modèle de provisionnement dynamique</td><td>Le <strong>fournisseur de frigos</strong> qui livre à la demande</td></tr><tr><td><strong>Taint</strong> / <strong>toleration</strong></td><td>Nœud qui repousse / Pod qui accepte</td><td>Un <strong>poste réservé</strong> à la pâtisserie / le cuisinier qui y est habilité</td></tr><tr><td><strong>Affinité</strong></td><td>Règle de proximité ou d'éloignement entre Pods</td><td>« <strong>Ne mets pas les deux serveurs de pâtes au même poste</strong> »</td></tr><tr><td><strong>Drain</strong> / <strong>cordon</strong></td><td>Évacuer un nœud / le fermer aux nouveaux Pods</td><td><strong>Fermer un poste</strong> pour entretien en relogeant l'équipe</td></tr><tr><td><strong>PodDisruptionBudget</strong></td><td>Minimum de Pods disponibles pendant une maintenance</td><td>« <strong>Au moins 2 cuisiniers</strong> doivent rester au grill »</td></tr></tbody></table></div>
+
+      <h3>5. Sécurité, déploiement et extensions</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Définition courte</th><th>Analogie restaurant</th></tr></thead><tbody><tr><td><strong>RBAC</strong></td><td>Qui peut faire quoi</td><td>Les <strong>badges d'accès</strong> par fonction</td></tr><tr><td><strong>Role / ClusterRole</strong></td><td>Liste de droits (un namespace / tout le cluster)</td><td>Une <strong>fiche de poste</strong> (pour une salle / pour tout le restaurant)</td></tr><tr><td><strong>ServiceAccount</strong></td><td>Identité d'un Pod</td><td>Le <strong>badge d'un robot</strong> de cuisine</td></tr><tr><td><strong>Pod Security</strong></td><td>Profils de sécurité des Pods</td><td>Le <strong>règlement d'hygiène</strong> imposé à tous les postes</td></tr><tr><td><strong>Helm</strong> / <strong>chart</strong></td><td>Gestionnaire de paquets / paquet</td><td>Une <strong>formule menu prête à l'emploi</strong> (recettes + consignes + quantités)</td></tr><tr><td><strong>values.yaml</strong></td><td>Paramètres d'un chart</td><td>Les <strong>réglages de la formule</strong> (nombre de couverts)</td></tr><tr><td><strong>Kustomize</strong></td><td>Variantes d'un même manifeste</td><td>La <strong>même carte</strong> avec une variante été et une variante hiver</td></tr><tr><td><strong>GitOps</strong> (Argo CD, Flux, Fleet)</td><td>Le cluster suit un dépôt Git</td><td>Le <strong>menu officiel affiché</strong> : la salle s'aligne dessus et corrige toute dérive</td></tr><tr><td><strong>CRD</strong></td><td>Nouveau type d'objet dans l'API</td><td>Un <strong>nouveau poste de travail</strong> inventé pour le restaurant</td></tr><tr><td><strong>Operator</strong></td><td>CRD + contrôleur qui exploite une application</td><td>Un <strong>spécialiste engagé</strong> (le sommelier) qui gère seul sa spécialité</td></tr><tr><td><strong>Admission</strong> (webhook, Kyverno)</td><td>Contrôle ou modifie les objets à leur création</td><td>Le <strong>contrôle à la réception</strong> des marchandises</td></tr><tr><td><strong>cert-manager</strong></td><td>Certificats automatiques</td><td>Le <strong>renouvellement automatique des licences</strong></td></tr><tr><td><strong>Service mesh</strong></td><td>Chiffrement et observation des échanges entre services</td><td>Un <strong>réseau de serveurs-interprètes</strong> qui chiffre et note chaque échange</td></tr></tbody></table></div>
+
+      <h3>6. Outils et vocabulaire d'exploitation</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Définition courte</th><th>Analogie restaurant</th></tr></thead><tbody><tr><td><strong>kubectl</strong></td><td>Ligne de commande officielle</td><td>Le <strong>talkie-walkie</strong> pour donner des ordres à la direction</td></tr><tr><td><strong>kubeconfig</strong> / contexte</td><td>Adresses, identités et cluster actif</td><td>Le <strong>trousseau de clés et badges</strong> (quel restaurant, quel droit)</td></tr><tr><td><strong>Manifeste</strong> (YAML)</td><td>Description d'un objet voulu</td><td>Le <strong>bon de commande</strong> écrit</td></tr><tr><td><strong>Déclaratif / impératif</strong></td><td>Décrire l'état voulu / donner des ordres un à un</td><td>« <strong>Je veux 3 cuisiniers</strong> » / « <strong>embauche-en un</strong> »</td></tr><tr><td><strong>Rolling update</strong></td><td>Mise à jour progressive</td><td>Changer les cuisiniers <strong>un à un</strong> sans fermer</td></tr><tr><td><strong>Rollback</strong></td><td>Retour à la version précédente</td><td><strong>Remettre l'ancienne recette</strong> après un plat raté</td></tr><tr><td><strong>CrashLoopBackOff</strong></td><td>Conteneur qui plante et redémarre en boucle</td><td>Un cuisinier qui <strong>brûle le plat, recommence, le brûle encore</strong></td></tr><tr><td><strong>OOMKilled</strong></td><td>Tué pour dépassement de mémoire</td><td>Le <strong>disjoncteur</strong> qui saute car trop de plaques allumées</td></tr><tr><td><strong>Pending</strong></td><td>Pod pas encore placé</td><td>Une commande <strong>sans poste libre</strong></td></tr><tr><td><strong>Quorum</strong></td><td>Majorité nécessaire (etcd)</td><td>Le <strong>vote à la majorité</strong> des responsables pour valider une décision</td></tr><tr><td><strong>HA</strong> (haute disponibilité)</td><td>Pas de point de défaillance unique</td><td><strong>Plusieurs directeurs</strong> : si l'un s'absente, la salle continue</td></tr><tr><td><strong>Air-gap</strong></td><td>Environnement sans Internet</td><td>Un <strong>restaurant en autarcie</strong> : tout est livré par camion, rien ne vient du dehors</td></tr></tbody></table></div>
+      <div class="tip"><strong>Pour retenir l'essentiel :</strong> tu décris le résultat voulu (le <em>planning</em>) ; la direction (<em>control plane</em>) le consigne dans son cahier (<em>etcd</em>) ; le chef de passe (<em>scheduler</em>) place les commandes ; les chefs de poste (<em>kubelet</em>) font cuisiner ; le contrôleur de salle remplace toute absence. Rien d'autre à savoir pour démarrer.</div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section" id="s4">
+    <div class="section-header"><span class="section-num">4</span><span class="section-title-text">kubectl, kubeconfig et manifestes YAML</span><span class="section-nb">Outil</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">kubectl</span><span class="tag">kubeconfig</span><span class="tag">YAML</span><span class="tag">Namespaces</span></div>
 
@@ -285,9 +341,9 @@ spec:
     </div>
   </div>
 
-  <!-- S3 -->
-  <div class="section" id="s3">
-    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">Workloads : Pods, Deployments, StatefulSets, Jobs</span><span class="section-nb">Charges</span></div>
+  <!-- S5 -->
+  <div class="section" id="s5">
+    <div class="section-header"><span class="section-num">5</span><span class="section-title-text">Workloads : Pods, Deployments, StatefulSets, Jobs</span><span class="section-nb">Charges</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">Deployment</span><span class="tag">StatefulSet</span><span class="tag">DaemonSet</span><span class="tag">Probes</span></div>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Objet</th><th>Pour quoi faire</th><th>À retenir</th></tr></thead><tbody><tr><td><strong>Pod</strong></td><td>Un ou plusieurs conteneurs liés</td><td>Éphémère : un Pod supprimé n'est pas « réparé », il est remplacé</td></tr><tr><td><strong>ReplicaSet</strong></td><td>Maintient N Pods identiques</td><td>Rarement utilisé directement</td></tr><tr><td><strong>Deployment</strong></td><td>Applications <em>sans état</em> : mises à jour progressives, retour arrière</td><td>Stratégie <code>RollingUpdate</code> (<code>maxSurge</code>, <code>maxUnavailable</code>)</td></tr><tr><td><strong>StatefulSet</strong></td><td>Applications <em>avec état</em> (bases de données)</td><td>Identité stable (<code>db-0</code>, <code>db-1</code>), stockage par réplica (<code>volumeClaimTemplates</code>), démarrage ordonné, Service <em>headless</em></td></tr><tr><td><strong>DaemonSet</strong></td><td>Un Pod <strong>par nœud</strong></td><td>Agents de logs, de supervision, CNI</td></tr><tr><td><strong>Job</strong> / <strong>CronJob</strong></td><td>Tâche ponctuelle / planifiée</td><td><code>backoffLimit</code>, <code>ttlSecondsAfterFinished</code>, <code>concurrencyPolicy</code></td></tr></tbody></table></div>
@@ -310,9 +366,9 @@ spec:
     </div>
   </div>
 
-  <!-- S4 -->
-  <div class="section" id="s4">
-    <div class="section-header"><span class="section-num">4</span><span class="section-title-text">Configuration : ConfigMap, Secret, variables, labels</span><span class="section-nb">Config</span></div>
+  <!-- S6 -->
+  <div class="section" id="s6">
+    <div class="section-header"><span class="section-num">6</span><span class="section-title-text">Configuration : ConfigMap, Secret, variables, labels</span><span class="section-nb">Config</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">ConfigMap</span><span class="tag">Secret</span><span class="tag">Labels</span><span class="tag">Annotations</span></div>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Objet</th><th>Contenu</th><th>Remarques</th></tr></thead><tbody><tr><td><strong>ConfigMap</strong></td><td>Configuration non sensible (clé=valeur, fichiers)</td><td>Injectée en variables d'environnement ou montée en fichiers ; les fichiers montés sont mis à jour, pas les variables</td></tr><tr><td><strong>Secret</strong></td><td>Données sensibles (mots de passe, jetons, certificats)</td><td><strong>Encodé en base64, pas chiffré</strong> : sécuriser via RBAC, chiffrement d'etcd au repos, ou un gestionnaire externe (Vault, External Secrets, Sealed Secrets)</td></tr></tbody></table></div>
@@ -323,9 +379,9 @@ kubectl get secret db -o jsonpath='{.data.password}' | base64 -d</code></div>
     </div>
   </div>
 
-  <!-- S5 -->
-  <div class="section" id="s5">
-    <div class="section-header"><span class="section-num">5</span><span class="section-title-text">Réseau : Services, Ingress, Gateway API, NetworkPolicy</span><span class="section-nb">Réseau</span></div>
+  <!-- S7 -->
+  <div class="section" id="s7">
+    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Réseau : Services, Ingress, Gateway API, NetworkPolicy</span><span class="section-nb">Réseau</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">Service</span><span class="tag">Ingress</span><span class="tag">Gateway API</span><span class="tag">CNI</span></div>
       <div class="info"><strong>Modèle réseau :</strong> chaque Pod a sa propre IP ; tous les Pods peuvent se joindre sans NAT ; les IP de Pods changent, d'où les <strong>Services</strong> : une adresse stable (ClusterIP) et un nom DNS devant un ensemble de Pods sélectionnés par labels.</div>
@@ -352,9 +408,9 @@ spec:
     </div>
   </div>
 
-  <!-- S6 -->
-  <div class="section" id="s6">
-    <div class="section-header"><span class="section-num">6</span><span class="section-title-text">Stockage : Volumes, PV, PVC, StorageClass, CSI</span><span class="section-nb">Données</span></div>
+  <!-- S8 -->
+  <div class="section" id="s8">
+    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Stockage : Volumes, PV, PVC, StorageClass, CSI</span><span class="section-nb">Données</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">PV</span><span class="tag">PVC</span><span class="tag">StorageClass</span><span class="tag">CSI</span></div>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Objet</th><th>Rôle</th></tr></thead><tbody><tr><td><strong>PersistentVolume (PV)</strong></td><td>Un morceau de stockage du cluster (créé à la main ou dynamiquement)</td></tr><tr><td><strong>PersistentVolumeClaim (PVC)</strong></td><td>La <em>demande</em> de l'application : taille, mode d'accès, classe</td></tr><tr><td><strong>StorageClass</strong></td><td>Modèle de provisionnement dynamique (provisioner CSI, paramètres, politique)</td></tr><tr><td><strong>CSI</strong></td><td>Interface standard des pilotes de stockage</td></tr><tr><td><strong>VolumeSnapshot</strong></td><td>Instantané d'un PVC (si le pilote CSI le gère)</td></tr></tbody></table></div>
@@ -370,9 +426,9 @@ spec:
     </div>
   </div>
 
-  <!-- S7 -->
-  <div class="section" id="s7">
-    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Ordonnancement et ressources du cluster</span><span class="section-nb">Placement</span></div>
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Ordonnancement et ressources du cluster</span><span class="section-nb">Placement</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">Scheduler</span><span class="tag">Taints</span><span class="tag">Affinités</span><span class="tag">Autoscaling</span></div>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Mécanisme</th><th>Effet</th></tr></thead><tbody><tr><td><code>nodeSelector</code></td><td>Place le Pod sur les nœuds ayant ce label</td></tr><tr><td><code>nodeAffinity</code></td><td>Règles plus souples (requis ou préféré)</td></tr><tr><td><code>podAffinity</code> / <code>podAntiAffinity</code></td><td>Rapprocher ou <strong>éloigner</strong> des Pods (ex. répartir les réplicas sur des nœuds différents)</td></tr><tr><td><strong>Taints</strong> (nœud) + <strong>tolerations</strong> (Pod)</td><td>Le nœud repousse les Pods, sauf ceux qui le tolèrent (nœuds dédiés, control plane)</td></tr><tr><td><code>topologySpreadConstraints</code></td><td>Répartition équilibrée par nœud / zone</td></tr><tr><td><code>priorityClassName</code></td><td>Priorité et préemption quand le cluster est plein</td></tr></tbody></table></div>
@@ -386,9 +442,9 @@ kubectl taint nodes w1 dedicated=db:NoSchedule</code></div>
     </div>
   </div>
 
-  <!-- S8 -->
-  <div class="section" id="s8">
-    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Sécurité : RBAC, comptes de service, Pod Security</span><span class="section-nb">Sécurité</span></div>
+  <!-- S10 -->
+  <div class="section" id="s10">
+    <div class="section-header"><span class="section-num">10</span><span class="section-title-text">Sécurité : RBAC, comptes de service, Pod Security</span><span class="section-nb">Sécurité</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">RBAC</span><span class="tag">ServiceAccount</span><span class="tag">Pod Security</span><span class="tag">Secrets</span></div>
 
@@ -403,9 +459,9 @@ kubectl auth can-i --list -n monapp</code></div>
     </div>
   </div>
 
-  <!-- S9 -->
-  <div class="section" id="s9">
-    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Helm, Kustomize et GitOps</span><span class="section-nb">Déploiement</span></div>
+  <!-- S11 -->
+  <div class="section" id="s11">
+    <div class="section-header"><span class="section-num">11</span><span class="section-title-text">Helm, Kustomize et GitOps</span><span class="section-nb">Déploiement</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">Helm</span><span class="tag">Kustomize</span><span class="tag">Argo CD</span><span class="tag">Flux</span></div>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Outil</th><th>Principe</th><th>Quand</th></tr></thead><tbody><tr><td><strong>Helm</strong></td><td>Gestionnaire de paquets : <em>charts</em> modélisés (Go templates) + <code>values.yaml</code> ; releases versionnées</td><td>Installer des logiciels tiers (cert-manager, Rancher, Prometheus…) et packager ses applications</td></tr><tr><td><strong>Kustomize</strong></td><td>Superpositions (<code>base</code> + <code>overlays</code>) de YAML, sans templates ; intégré à <code>kubectl -k</code></td><td>Variantes dev / prod d'un même manifeste</td></tr><tr><td><strong>Argo CD</strong> / <strong>Flux</strong></td><td><strong>GitOps</strong> : le cluster se synchronise sur Git (état voulu = dépôt)</td><td>Déploiement continu, détection de dérive, retour arrière par <code>git revert</code></td></tr></tbody></table></div>
@@ -420,9 +476,9 @@ helm template ./chart -f values.yaml | kubectl apply --dry-run=server -f -</code
     </div>
   </div>
 
-  <!-- S10 -->
-  <div class="section" id="s10">
-    <div class="section-header"><span class="section-num">10</span><span class="section-title-text">Observabilité et dépannage</span><span class="section-nb">Exploitation</span></div>
+  <!-- S12 -->
+  <div class="section" id="s12">
+    <div class="section-header"><span class="section-num">12</span><span class="section-title-text">Observabilité et dépannage</span><span class="section-nb">Exploitation</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">Logs</span><span class="tag">Métriques</span><span class="tag">Events</span><span class="tag">Debug</span></div>
       <div class="concept-grid"><div class="concept-card"><h4>Les trois piliers</h4><ul><li><strong>Métriques</strong> : metrics-server (<code>kubectl top</code>), Prometheus + Grafana, kube-state-metrics</li><li><strong>Journaux</strong> : <code>kubectl logs</code>, collecte centralisée (Loki, Elastic, Fluent Bit)</li><li><strong>Traces</strong> : OpenTelemetry</li></ul></div><div class="concept-card"><h4>Où regarder</h4><ul><li><code>kubectl describe</code> (section <em>Events</em>)</li><li><code>kubectl get events -A --sort-by=.lastTimestamp</code></li><li>Journaux du kubelet / du runtime sur le nœud (<code>journalctl -u kubelet</code>)</li></ul></div></div>
@@ -435,9 +491,9 @@ kubectl run dns --rm -it --image=busybox:1.36 -- nslookup web.monapp.svc.cluster
     </div>
   </div>
 
-  <!-- S11 -->
-  <div class="section" id="s11">
-    <div class="section-header"><span class="section-num">11</span><span class="section-title-text">Administration du cluster : etcd, certificats, mises à jour</span><span class="section-nb">Admin</span></div>
+  <!-- S13 -->
+  <div class="section" id="s13">
+    <div class="section-header"><span class="section-num">13</span><span class="section-title-text">Administration du cluster : etcd, certificats, mises à jour</span><span class="section-nb">Admin</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">etcd</span><span class="tag">Certificats</span><span class="tag">Upgrade</span><span class="tag">HA</span></div>
       <div class="concept-grid"><div class="concept-card"><h4>Haute disponibilité du control plane</h4><ul><li><strong>3 nœuds control plane</strong> (impair) avec etcd empilé (« stacked ») ou etcd externe</li><li>Point d'accès unique à l'API : load balancer / IP virtuelle (kube-vip, HAProxy)</li><li>Quorum etcd : (n/2)+1 ; 3 nœuds tolèrent 1 panne, 5 en tolèrent 2</li></ul></div><div class="concept-card"><h4>Sauvegarde etcd</h4><ul><li>Un instantané etcd = <strong>l'état du cluster</strong> (pas les données des volumes)</li><li>kubeadm : <code>etcdctl snapshot save</code> ; distributions (RKE2, k3s) : outil intégré</li><li>Tester la <strong>restauration</strong> régulièrement</li></ul></div><div class="concept-card"><h4>Certificats</h4><ul><li>Les certificats du control plane expirent (souvent <strong>1 an</strong> par défaut)</li><li>Surveiller : <code>kubeadm certs check-expiration</code> ; renouvellement automatique lors des mises à jour</li><li>Les distributions ont leurs propres commandes de rotation</li></ul></div></div>
@@ -448,9 +504,9 @@ kubectl run dns --rm -it --image=busybox:1.36 -- nslookup web.monapp.svc.cluster
     </div>
   </div>
 
-  <!-- S12 -->
-  <div class="section" id="s12">
-    <div class="section-header"><span class="section-num">12</span><span class="section-title-text">Extensions : CRD, Operators, admission et Gateway API</span><span class="section-nb">Avancé</span></div>
+  <!-- S14 -->
+  <div class="section" id="s14">
+    <div class="section-header"><span class="section-num">14</span><span class="section-title-text">Extensions : CRD, Operators, admission et Gateway API</span><span class="section-nb">Avancé</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">CRD</span><span class="tag">Operator</span><span class="tag">Webhooks</span><span class="tag">cert-manager</span></div>
       <ul><li><strong>CustomResourceDefinition (CRD)</strong> : ajoute de nouveaux types d'objets à l'API (<code>Certificate</code>, <code>Cluster</code> d'un opérateur de base de données…)</li><li><strong>Operator</strong> = CRD + contrôleur qui automatise l'exploitation d'une application (déploiement, sauvegarde, bascule) : bases de données, Prometheus, cert-manager…</li><li><strong>Admission</strong> : webhooks qui valident ou modifient les objets à la création ; outils de politiques : <strong>Kyverno</strong>, OPA Gatekeeper, <em>ValidatingAdmissionPolicy</em> (natif)</li><li><strong>cert-manager</strong> : émission et renouvellement automatiques de certificats (Let's Encrypt, CA interne)</li><li><strong>Service mesh</strong> (Istio, Linkerd, Cilium) : chiffrement mTLS, observabilité, trafic : à n'ajouter que si le besoin est réel</li></ul>
@@ -458,9 +514,9 @@ kubectl run dns --rm -it --image=busybox:1.36 -- nslookup web.monapp.svc.cluster
     </div>
   </div>
 
-  <!-- S13 -->
-  <div class="section" id="s13">
-    <div class="section-header"><span class="section-num">13</span><span class="section-title-text">Pièges et aide-mémoire</span><span class="section-nb">Révision</span></div>
+  <!-- S15 -->
+  <div class="section" id="s15">
+    <div class="section-header"><span class="section-num">15</span><span class="section-title-text">Pièges et aide-mémoire</span><span class="section-nb">Révision</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">Pièges</span><span class="tag">Ports</span><span class="tag">Fichiers</span></div>
       <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Piège</th><th>Conséquence</th><th>Parade</th></tr></thead><tbody><tr><td>Pas de <code>requests</code> / <code>limits</code></td><td>Voisins bruyants, OOM, placement mauvais</td><td>Définir des requests réalistes et une limite mémoire</td></tr><tr><td>Tag <code>latest</code></td><td>Déploiements non reproductibles</td><td>Tag précis ou digest</td></tr><tr><td>Un seul réplica sans PDB</td><td>Coupure à chaque drain</td><td>≥ 2 réplicas + PodDisruptionBudget</td></tr><tr><td>Secret considéré « chiffré »</td><td>Fuite via lecture RBAC ou etcd</td><td>RBAC strict, chiffrement au repos, gestionnaire externe</td></tr><tr><td>Pas de sauvegarde etcd testée</td><td>Cluster irrécupérable</td><td>Snapshots planifiés + restauration testée</td></tr><tr><td>Mise à jour en sautant une version mineure</td><td>API manquantes, composants incompatibles</td><td>Une mineure à la fois</td></tr><tr><td>NetworkPolicy avec un CNI qui ne la gère pas</td><td>Fausse impression de sécurité</td><td>Vérifier le support du CNI</td></tr><tr><td><code>cluster-admin</code> donné largement</td><td>Compromission totale possible</td><td>Rôles ciblés, groupes</td></tr><tr><td>Service sans Pods (labels différents)</td><td>« Connection refused »</td><td><code>kubectl get endpoints</code></td></tr><tr><td>ingress-nginx maintenu en production</td><td>Plus de correctifs de sécurité</td><td>Migrer vers Traefik / Gateway API</td></tr></tbody></table></div>
@@ -470,9 +526,9 @@ kubectl run dns --rm -it --image=busybox:1.36 -- nslookup web.monapp.svc.cluster
     </div>
   </div>
 
-  <!-- S14 -->
-  <div class="section" id="s14">
-    <div class="section-header"><span class="section-num">14</span><span class="section-title-text">Passer les certifications Kubernetes (CKA, CKAD, CKS)</span><span class="section-nb">Certifs</span></div>
+  <!-- S16 -->
+  <div class="section" id="s16">
+    <div class="section-header"><span class="section-num">16</span><span class="section-title-text">Passer les certifications Kubernetes (CKA, CKAD, CKS)</span><span class="section-nb">Certifs</span></div>
     <div class="section-body">
       <div class="tags"><span class="tag">CKA</span><span class="tag">CKAD</span><span class="tag">CKS</span><span class="tag">Examen pratique</span></div>
       <div class="info">Les certifications de la <strong>Linux Foundation / CNCF</strong> sont des <strong>examens pratiques en ligne de commande</strong> (pas des QCM) : on résout des tâches sur de vrais clusters. Vérifier toujours le <strong>programme à jour</strong>, la version de Kubernetes de l'examen et les règles sur <a href="https://training.linuxfoundation.org/">training.linuxfoundation.org</a>.</div>
@@ -481,17 +537,22 @@ kubectl run dns --rm -it --image=busybox:1.36 -- nslookup web.monapp.svc.cluster
     </div>
   </div>
 
-  <!-- S15 -->
-  <div class="section" id="s15">
-    <div class="section-header"><span class="section-num">15</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
+  <!-- S17 -->
+  <div class="section" id="s17">
+    <div class="section-header"><span class="section-num">17</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
     <div class="section-body">
-      <div class="tags"><span class="tag">Pratique</span><span class="tag">29 questions</span></div>
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">34 questions</span></div>
 
       <h3>Plan de labo en 6 séances</h3>
       <ol><li><strong>Séance 1 : cluster jetable.</strong> kind ou minikube ; explorer <code>kubectl get nodes</code>, <code>api-resources</code>, <code>explain</code></li><li><strong>Séance 2 : workloads.</strong> Deployment avec probes et limits, mise à jour progressive, <code>rollout undo</code>, Job et CronJob</li><li><strong>Séance 3 : réseau.</strong> Service ClusterIP / NodePort, Ingress ou Gateway, NetworkPolicy « tout refuser » puis ouvertures ciblées</li><li><strong>Séance 4 : stockage.</strong> PVC dynamique, StatefulSet à 3 réplicas, supprimer un Pod et vérifier la persistance</li><li><strong>Séance 5 : sécurité.</strong> RBAC (Role + RoleBinding + <code>auth can-i</code>), Pod Security <em>restricted</em>, Secret en volume</li><li><strong>Séance 6 : exploitation.</strong> <code>drain</code> + PDB, HPA, panne simulée et dépannage (Pending, CrashLoopBackOff), snapshot etcd. Puis passer à la fiche <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a></li></ol>
 
       <h3>Auto-évaluation — clique pour voir la réponse</h3>
       <div class="qr-list">
+        <details><summary>Quelle différence entre K8s, K3s et RKE2 ?</summary><p>K8s est l'abréviation de Kubernetes ; K3s est une distribution légère (labo, edge) ; RKE2 est une distribution durcie (datacenter, conformité). Les deux sont du Kubernetes certifié.</p></details>
+        <details><summary>K9s est-il une distribution Kubernetes ?</summary><p>Non : c'est une interface en terminal pour piloter un cluster existant, comme un kubectl plus visuel.</p></details>
+        <details><summary>À quoi sert K6 ?</summary><p>C'est un outil de tests de charge (Grafana k6) qui simule des utilisateurs ; il n'est pas lié à Kubernetes, même s'il peut s'y exécuter.</p></details>
+        <details><summary>Que change-t-on en passant de K3s à RKE2 ?</summary><p>L'installation, les réglages par défaut et les composants fournis (etcd, CIS, SELinux) ; les objets Kubernetes que l'on utilise restent les mêmes.</p></details>
+        <details><summary>Quand choisir kind ou minikube plutôt que K3s ?</summary><p>Pour un cluster jetable sur son poste de développement ; K3s convient à un vrai serveur léger (labo, edge).</p></details>
         <details><summary>Quelle est la différence entre un Pod et un Deployment ?</summary><p>Un Pod est l'unité qui exécute les conteneurs, éphémère ; un Deployment maintient un nombre voulu de Pods identiques et gère les mises à jour progressives et les retours arrière.</p></details>
         <details><summary>Quel composant stocke l'état du cluster ?</summary><p>etcd : base clé-valeur distribuée, accessible seulement via l'API ; à sauvegarder.</p></details>
         <details><summary>Que fait le scheduler ?</summary><p>Il choisit le nœud d'un Pod non placé selon les ressources demandées, affinités, taints et contraintes.</p></details>
