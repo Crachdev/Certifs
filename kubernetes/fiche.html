@@ -203,7 +203,7 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
     <div class="ps-stats">
       <div class="ps-stat"><b>17</b><span>Sections</span></div>
       <div class="ps-stat"><b>1.3x</b><span>Version</span></div>
-      <div class="ps-stat"><b>34</b><span>Q/R</span></div>
+      <div class="ps-stat"><b>50</b><span>Q/R</span></div>
     </div>
   </div>
 
@@ -228,7 +228,13 @@ details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
       <a href="#s14" class="toc-item"><span class="toc-num">14</span>Extensions : CRD, Operators, admission</a>
       <a href="#s15" class="toc-item"><span class="toc-num">15</span>Pièges et aide-mémoire</a>
       <a href="#s16" class="toc-item"><span class="toc-num">16</span>Certifications CKA, CKAD, CKS</a>
-      <a href="#s17" class="toc-item"><span class="toc-num">17</span>Plan de labo et Q/R</a>
+      <a href="#s17" class="toc-item"><span class="toc-num">17</span>Montée en charge : HPA, VPA, PDB</a>
+      <a href="#s18" class="toc-item"><span class="toc-num">18</span>Sauvegarde avec Velero</a>
+      <a href="#s19" class="toc-item"><span class="toc-num">19</span>Gestion des secrets</a>
+      <a href="#s20" class="toc-item"><span class="toc-num">20</span>Dépannage pas à pas</a>
+      <a href="#s21" class="toc-item"><span class="toc-num">21</span>Entraînement type CKA / CKAD</a>
+      <a href="#s22" class="toc-item"><span class="toc-num">22</span>Argo CD en labo</a>
+      <a href="#s23" class="toc-item"><span class="toc-num">23</span>Plan de labo et Q/R</a>
     </div>
   </div>
 
@@ -570,14 +576,293 @@ kubectl run dns --rm -it --image=busybox:1.36 -- nslookup web.monapp.svc.cluster
     </div>
   </div>
 
-  <!-- S17 -->
+    <!-- S17 -->
   <div class="section" id="s17">
-    <div class="section-header"><span class="section-num">17</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
+    <div class="section-header"><span class="section-num">17</span><span class="section-title-text">Montée en charge : requests, HPA, VPA et PDB</span><span class="section-nb">Performance</span></div>
     <div class="section-body">
-      <div class="tags"><span class="tag">Pratique</span><span class="tag">34 questions</span></div>
+      <div class="tags"><span class="tag">HPA</span><span class="tag">VPA</span><span class="tag">PDB</span><span class="tag">Probes</span></div>
+      <figure class="fig"><svg viewBox="0 0 560 240" role="img" aria-label="Autoscaling horizontal (HPA)"><defs><marker id="ar401" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="f-ar" d="M0 0 L10 5 L0 10 z"/></marker><marker id="ar401s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="f-ar" d="M10 0 L0 5 L10 10 z"/></marker></defs><rect class="f-nb" x="0" y="30" width="120" height="60" rx="7"/><text class="f-t" x="60.0" y="56.5" text-anchor="middle">metrics-server</text><text class="f-ts" x="60.0" y="72.5" text-anchor="middle">CPU · RAM des Pods</text><rect class="f-ac" x="150" y="30" width="110" height="60" rx="7"/><text class="f-tw" x="205.0" y="56.5" text-anchor="middle">HPA</text><text class="f-tws" x="205.0" y="72.5" text-anchor="middle">cible : 70 % CPU</text><rect class="f-n" x="300" y="30" width="110" height="60" rx="7"/><text class="f-t" x="355.0" y="56.5" text-anchor="middle">Deployment</text><text class="f-ts" x="355.0" y="72.5" text-anchor="middle">replicas ajustés</text><rect class="f-ok" x="450" y="30" width="110" height="60" rx="7"/><text class="f-t" x="505.0" y="56.5" text-anchor="middle">Pods</text><text class="f-ts" x="505.0" y="72.5" text-anchor="middle">2 → 6</text><path class="f-a" d="M120 60 L150 60" marker-end="url(#ar401)"/><path class="f-a" d="M260 60 L300 60" marker-end="url(#ar401)"/><path class="f-a" d="M410 60 L450 60" marker-end="url(#ar401)"/><path class="f-ad" d="M505 90 L505 136 L60 136 L60 90" marker-end="url(#ar401)"/><text class="f-ts" x="282" y="154" text-anchor="middle">mesure en continu (environ toutes les 15 s)</text><text class="f-tm" x="280" y="190" text-anchor="middle">réplicas voulus = ceil( réplicas × mesure / cible )</text><text class="f-ts" x="280" y="214" text-anchor="middle">sans requests CPU/RAM sur les Pods, pas de pourcentage calculable</text></svg><figcaption>Le HPA compare la mesure à la cible et ajuste le nombre de réplicas ; il agit avec un délai pour éviter les yo-yo.</figcaption></figure>
+      <div class="info"><strong>Idée :</strong> Kubernetes place les Pods selon leurs <strong>requests</strong> (ce qu'ils réservent) et les bride avec leurs <strong>limits</strong> (le plafond). Tout l'autoscaling repose sur des requests réalistes : sans elles, ni le scheduler ni l'autoscaler ne peuvent décider correctement.</div>
 
-      <h3>Plan de labo en 6 séances</h3>
-      <ol><li><strong>Séance 1 : cluster jetable.</strong> kind ou minikube ; explorer <code>kubectl get nodes</code>, <code>api-resources</code>, <code>explain</code></li><li><strong>Séance 2 : workloads.</strong> Deployment avec probes et limits, mise à jour progressive, <code>rollout undo</code>, Job et CronJob</li><li><strong>Séance 3 : réseau.</strong> Service ClusterIP / NodePort, Ingress ou Gateway, NetworkPolicy « tout refuser » puis ouvertures ciblées</li><li><strong>Séance 4 : stockage.</strong> PVC dynamique, StatefulSet à 3 réplicas, supprimer un Pod et vérifier la persistance</li><li><strong>Séance 5 : sécurité.</strong> RBAC (Role + RoleBinding + <code>auth can-i</code>), Pod Security <em>restricted</em>, Secret en volume</li><li><strong>Séance 6 : exploitation.</strong> <code>drain</code> + PDB, HPA, panne simulée et dépannage (Pending, CrashLoopBackOff), snapshot etcd. Puis passer à la fiche <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a></li></ol>
+      <h3>Requests, limits et classes de qualité de service</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Notion</th><th>Effet</th><th>À retenir</th></tr></thead><tbody><tr><td><code>requests</code></td><td>Réservation utilisée pour placer le Pod sur un nœud</td><td>Base du calcul de pourcentage du HPA</td></tr><tr><td><code>limits</code> CPU</td><td>Au-delà, le conteneur est ralenti (throttling)</td><td>Beaucoup d'équipes ne fixent que le request CPU</td></tr><tr><td><code>limits</code> mémoire</td><td>Au-delà, le conteneur est tué (<code>OOMKilled</code>, code 137)</td><td>La mémoire n'est pas compressible</td></tr><tr><td>QoS <strong>Guaranteed</strong></td><td>requests = limits pour tous les conteneurs</td><td>Dernier à être évincé en cas de pression</td></tr><tr><td>QoS <strong>Burstable</strong></td><td>requests inférieurs aux limits</td><td>Cas le plus courant</td></tr><tr><td>QoS <strong>BestEffort</strong></td><td>Aucun request ni limit</td><td>Premier évincé : à éviter en production</td></tr></tbody></table></div>
+      <div class="code-block"><code>resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    memory: 512Mi</code></div>
+
+      <h3>HPA : ajuster le nombre de réplicas</h3>
+      <p>Le <strong>Horizontal Pod Autoscaler</strong> mesure l'utilisation (CPU, mémoire ou métrique personnalisée) et modifie le nombre de réplicas d'un Deployment. Il a besoin du <code>metrics-server</code>.</p>
+      <div class="code-block"><code><span class="comment"># Version rapide</span>
+kubectl autoscale deployment web --min=2 --max=10 --cpu-percent=70
+kubectl get hpa -w
+
+<span class="comment"># Version déclarative (autoscaling/v2)</span>
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300</code></div>
+      <ul><li><strong>Formule :</strong> réplicas voulus = ceil( réplicas actuels × mesure / cible ).</li><li><strong>Stabilisation :</strong> par défaut la descente attend 5 minutes, pour éviter les va-et-vient.</li><li><strong>Tester :</strong> lancer un Pod qui boucle des requêtes sur le Service et regarder <code>kubectl get hpa -w</code>.</li><li><strong>Piège :</strong> un Pod sans <code>requests</code> CPU donne un HPA en <code>&lt;unknown&gt;</code>.</li></ul>
+
+      <h3>VPA, Cluster Autoscaler et KEDA</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Outil</th><th>Ce qu'il ajuste</th><th>Remarque</th></tr></thead><tbody><tr><td><strong>VPA</strong></td><td>Les requests et limits d'un Pod (vertical)</td><td>Module à installer ; le mode <code>Off</code> ne fait que recommander ; ne pas le combiner avec un HPA sur la même métrique</td></tr><tr><td><strong>Cluster Autoscaler</strong>, Karpenter</td><td>Le nombre de <strong>nœuds</strong></td><td>Surtout dans le cloud ; sur Proxmox, passer par Rancher (pools de nœuds) ou Cluster API</td></tr><tr><td><strong>KEDA</strong></td><td>Réplicas selon des événements (file de messages, cron…)</td><td>Peut mettre à zéro et réveiller une application</td></tr></tbody></table></div>
+
+      <h3>PodDisruptionBudget et sondes</h3>
+      <p>Un <strong>PDB</strong> protège une application contre les interruptions volontaires (drain d'un nœud, mise à jour) en imposant un minimum de Pods disponibles. <code>kubectl drain</code> le respecte et attend.</p>
+      <div class="code-block"><code>apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: web</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Sonde</th><th>Question posée</th><th>Si elle échoue</th></tr></thead><tbody><tr><td><code>startupProbe</code></td><td>L'application a-t-elle fini de démarrer ?</td><td>Redémarrage ; les autres sondes attendent</td></tr><tr><td><code>readinessProbe</code></td><td>Peut-elle recevoir du trafic ?</td><td>Retirée des Services, sans redémarrage</td></tr><tr><td><code>livenessProbe</code></td><td>Est-elle toujours en vie ?</td><td>Conteneur redémarré</td></tr></tbody></table></div>
+      <div class="code-block"><code>readinessProbe:
+  httpGet: {path: /ready, port: 8080}
+  periodSeconds: 5
+livenessProbe:
+  httpGet: {path: /healthz, port: 8080}
+  initialDelaySeconds: 10
+startupProbe:
+  httpGet: {path: /healthz, port: 8080}
+  failureThreshold: 30
+  periodSeconds: 5</code></div>
+      <div class="warn">Une liveness trop agressive redémarre en boucle une application simplement lente : préférer une startupProbe pour absorber un démarrage long.</div>
+    </div>
+  </div>
+
+  <!-- S18 -->
+  <div class="section" id="s18">
+    <div class="section-header"><span class="section-num">18</span><span class="section-title-text">Sauvegarde des applications avec Velero</span><span class="section-nb">Sauvegarde</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Velero</span><span class="tag">Snapshots</span><span class="tag">Restauration</span><span class="tag">Hooks</span></div>
+      <figure class="fig"><svg viewBox="0 0 560 262" role="img" aria-label="Velero : sauvegarder les applications Kubernetes"><defs><marker id="ar402" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="f-ar" d="M0 0 L10 5 L0 10 z"/></marker><marker id="ar402s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="f-ar" d="M10 0 L0 5 L10 10 z"/></marker></defs><rect class="f-nb" x="0" y="90" width="130" height="60" rx="7"/><text class="f-t" x="65.0" y="116.5" text-anchor="middle">Cluster</text><text class="f-ts" x="65.0" y="132.5" text-anchor="middle">ressources + volumes</text><rect class="f-ac" x="200" y="90" width="130" height="60" rx="7"/><text class="f-tw" x="265.0" y="116.5" text-anchor="middle">Velero</text><text class="f-tws" x="265.0" y="132.5" text-anchor="middle">backup · schedule</text><rect class="f-wn" x="430" y="40" width="130" height="60" rx="7"/><text class="f-t" x="495.0" y="66.5" text-anchor="middle">Stockage objet</text><text class="f-ts" x="495.0" y="82.5" text-anchor="middle">S3 · MinIO</text><rect class="f-n" x="430" y="140" width="130" height="60" rx="7"/><text class="f-t" x="495.0" y="166.5" text-anchor="middle">Snapshots</text><text class="f-ts" x="495.0" y="182.5" text-anchor="middle">volumes (CSI)</text><path class="f-a" d="M130 120 L200 120" marker-end="url(#ar402)"/><text class="f-ts" x="165.0" y="112.0" text-anchor="middle">API</text><path class="f-a" d="M330 108 L430 72" marker-end="url(#ar402)"/><text class="f-ts" x="376.0" y="76.0" text-anchor="middle">manifests</text><path class="f-a" d="M330 132 L430 170" marker-end="url(#ar402)"/><text class="f-ts" x="376.0" y="165.0" text-anchor="middle">volumes</text><text class="f-tm" x="280" y="232" text-anchor="middle">velero backup create · schedule create · restore create</text><text class="f-ts" x="280" y="252" text-anchor="middle">restaurer dans un autre cluster = migrer</text></svg><figcaption>Velero sauvegarde les objets du cluster dans un stockage objet et les volumes via des snapshots ; différent d'une sauvegarde etcd.</figcaption></figure>
+      <div class="info"><strong>Velero</strong> sauvegarde et restaure les objets Kubernetes d'un namespace ou du cluster (Deployments, Services, ConfigMaps…) ainsi que les volumes associés. Il complète la sauvegarde <strong>etcd</strong> (voir <a href='../rke2-rancher/fiche.html#s8'>fiche RKE2, section 8</a>) : etcd protège le cluster, Velero protège les applications et permet de les déplacer.</div>
+
+      <h3>etcd ou Velero ?</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th></th><th>Snapshot etcd</th><th>Velero</th></tr></thead><tbody><tr><td>Granularité</td><td>Tout le cluster</td><td>Une application, un namespace ou tout</td></tr><tr><td>Données des volumes</td><td>Non</td><td>Oui (snapshots CSI ou sauvegarde de fichiers)</td></tr><tr><td>Restaurer une seule application</td><td>Non</td><td>Oui</td></tr><tr><td>Migrer vers un autre cluster</td><td>Non</td><td>Oui</td></tr><tr><td>Cas d'usage</td><td>Reconstruire un control plane</td><td>Supprimer un namespace par erreur, migrer, reprendre après un incident applicatif</td></tr></tbody></table></div>
+      <p>Les deux sont complémentaires : on fait les deux.</p>
+
+      <h3>Installer Velero avec un stockage objet (MinIO ou S3)</h3>
+      <div class="code-block"><code>velero install \
+  --provider aws \
+  --plugins velero/velero-plugin-for-aws:vX.Y.Z \
+  --bucket velero \
+  --secret-file ./credentials-velero \
+  --backup-location-config region=minio,s3ForcePathStyle=true,s3Url=http://minio.exemple:9000 \
+  --use-node-agent --default-volumes-to-fs-backup</code></div>
+      <div class="tip">Remplace <code>vX.Y.Z</code> par la version du plugin compatible avec ta version de Velero (voir la documentation de Velero).</div>
+
+      <h3>Sauvegarder, planifier, restaurer</h3>
+      <div class="code-block"><code><span class="comment"># Sauvegarde ponctuelle d'un namespace</span>
+velero backup create app-nightly --include-namespaces app --ttl 720h
+
+<span class="comment"># Sauvegarde quotidienne à 2 h, conservée 30 jours</span>
+velero schedule create app-daily --schedule="0 2 * * *" --include-namespaces app --ttl 720h
+
+<span class="comment"># Suivre et vérifier</span>
+velero backup get
+velero backup describe app-nightly --details
+velero backup logs app-nightly
+
+<span class="comment"># Restaurer, ici dans un autre namespace pour tester</span>
+velero restore create --from-backup app-nightly --namespace-mappings app:app-test</code></div>
+
+      <h3>Comment les volumes sont sauvegardés</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Méthode</th><th>Principe</th><th>Quand</th></tr></thead><tbody><tr><td>Snapshots CSI</td><td>Le pilote de stockage crée un instantané du volume</td><td>Rapide ; nécessite un pilote CSI avec snapshots (Longhorn, Ceph…) et une <code>VolumeSnapshotClass</code> étiquetée pour Velero</td></tr><tr><td>Sauvegarde de fichiers (node agent, Kopia)</td><td>Un agent lit les fichiers du volume et les envoie au stockage objet</td><td>Plus lent, mais indépendant du stockage : pratique pour migrer ou pour un stockage sans snapshots</td></tr></tbody></table></div>
+
+      <h3>Cohérence des bases de données</h3>
+      <p>Une sauvegarde de volume à chaud peut être incohérente. Les <strong>hooks</strong> exécutent une commande avant et après la sauvegarde (gel du système de fichiers, vidage de la base) via des annotations sur le Pod :</p>
+      <div class="code-block"><code>pre.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--freeze", "/data"]'
+post.hook.backup.velero.io/command: '["/sbin/fsfreeze", "--unfreeze", "/data"]'</code></div>
+      <div class="warn"><strong>Pièges :</strong> Velero ne remplace pas une sauvegarde applicative de base de données ; une restauration ne remplace pas les ressources qui existent déjà (elles sont ignorées) ; teste toujours une restauration dans un namespace jetable.</div>
+    </div>
+  </div>
+
+  <!-- S19 -->
+  <div class="section" id="s19">
+    <div class="section-header"><span class="section-num">19</span><span class="section-title-text">Gestion des secrets</span><span class="section-nb">Sécurité</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Secrets</span><span class="tag">Sealed Secrets</span><span class="tag">ESO</span><span class="tag">SOPS</span><span class="tag">Vault</span></div>
+      <figure class="fig"><svg viewBox="0 0 560 246" role="img" aria-label="Gérer les secrets sans les mettre en clair"><defs><marker id="ar403" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="f-ar" d="M0 0 L10 5 L0 10 z"/></marker><marker id="ar403s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="f-ar" d="M10 0 L0 5 L10 10 z"/></marker></defs><rect class="f-wn" x="0" y="30" width="118" height="56" rx="7"/><text class="f-t" x="59.0" y="54.5" text-anchor="middle">Vault ·</text><text class="f-t" x="59.0" y="70.5" text-anchor="middle">SM cloud</text><rect class="f-n" x="147" y="30" width="118" height="56" rx="7"/><text class="f-t" x="206.0" y="54.5" text-anchor="middle">External</text><text class="f-t" x="206.0" y="70.5" text-anchor="middle">Secrets</text><rect class="f-ac" x="294" y="30" width="118" height="176" rx="7"/><text class="f-tw" x="353.0" y="114.5" text-anchor="middle">Secret</text><text class="f-tw" x="353.0" y="130.5" text-anchor="middle">Kubernetes</text><rect class="f-ok" x="441" y="84" width="118" height="60" rx="7"/><text class="f-t" x="500.0" y="110.5" text-anchor="middle">Pod</text><text class="f-ts" x="500.0" y="126.5" text-anchor="middle">monté en volume</text><path class="f-a" d="M118 58 L147 58" marker-end="url(#ar403)"/><path class="f-a" d="M265 58 L294 58" marker-end="url(#ar403)"/><path class="f-a" d="M412 114 L441 114" marker-end="url(#ar403)"/><rect class="f-nb" x="0" y="150" width="118" height="56" rx="7"/><text class="f-t" x="59.0" y="174.5" text-anchor="middle">SealedSecret</text><text class="f-t" x="59.0" y="190.5" text-anchor="middle">dans Git</text><rect class="f-n" x="147" y="150" width="118" height="56" rx="7"/><text class="f-t" x="206.0" y="174.5" text-anchor="middle">Controller</text><text class="f-t" x="206.0" y="190.5" text-anchor="middle">Sealed Secrets</text><path class="f-a" d="M118 178 L147 178" marker-end="url(#ar403)"/><path class="f-a" d="M265 178 L294 178" marker-end="url(#ar403)"/><text class="f-ts" x="280" y="232" text-anchor="middle">chiffrement au repos dans etcd + droits RBAC restreints</text></svg><figcaption>Soit on synchronise depuis un coffre externe, soit on commite un secret chiffré que seul le cluster sait ouvrir.</figcaption></figure>
+      <div class="info">Un <strong>Secret</strong> Kubernetes est seulement encodé en base64, pas chiffré : quiconque peut le lire via l'API ou accéder à etcd voit le contenu. Protéger les secrets, c'est jouer sur quatre leviers : chiffrement au repos, contrôle d'accès, stockage hors cluster et gestion dans Git.</div>
+
+      <h3>Chiffrer les secrets dans etcd</h3>
+      <ul><li>Kubernetes chiffre les Secrets au repos avec une <code>EncryptionConfiguration</code> (fournisseurs <code>aescbc</code>, <code>secretbox</code> ou un KMS externe).</li><li><strong>RKE2</strong> sait l'activer d'une ligne : <code>secrets-encryption: true</code> dans <code>config.yaml</code>, état avec <code>rke2 secrets-encrypt status</code>.</li><li>Après activation, réécrire les secrets existants pour les chiffrer : <code>kubectl get secrets -A -o json | kubectl replace -f -</code>.</li><li>Vérification : une lecture brute dans etcd doit montrer le préfixe du fournisseur (par exemple <code>k8s:enc:aescbc</code>) et non le texte clair.</li></ul>
+
+      <h3>Quatre approches pour les secrets d'application</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Solution</th><th>Principe</th><th>Quand l'utiliser</th></tr></thead><tbody><tr><td><strong>Sealed Secrets</strong></td><td>Un secret chiffré avec la clé publique du cluster ; le <code>SealedSecret</code> peut être commité dans Git, seul le contrôleur du cluster sait le déchiffrer</td><td>GitOps simple, petite équipe</td></tr><tr><td><strong>External Secrets Operator</strong></td><td>Synchronise un secret depuis un coffre externe (Vault, AWS Secrets Manager, Azure Key Vault) vers un Secret Kubernetes</td><td>Coffre centralisé existant, rotation automatique</td></tr><tr><td><strong>SOPS + age</strong></td><td>Chiffre les valeurs d'un fichier YAML avec une clé ; déchiffré par Flux ou un plugin Argo CD</td><td>Équipes qui veulent des fichiers chiffrés lisibles dans Git</td></tr><tr><td><strong>Vault</strong> (agent ou CSI)</td><td>Injecte les secrets dans le Pod sans Secret Kubernetes persistant</td><td>Besoins élevés : secrets dynamiques, audit détaillé</td></tr></tbody></table></div>
+
+      <h3>Sealed Secrets en pratique</h3>
+      <div class="code-block"><code><span class="comment"># Créer un secret, le chiffrer, le commiter</span>
+kubectl create secret generic db --from-literal=password='S3cret!' \
+  --dry-run=client -o yaml | kubeseal --format yaml &gt; db-sealed.yaml
+git add db-sealed.yaml
+
+<span class="comment"># Le déployer : le contrôleur crée le vrai Secret</span>
+kubectl apply -f db-sealed.yaml
+kubectl get secret db</code></div>
+      <div class="tip">Un SealedSecret est lié à son nom et à son namespace : il ne se déchiffre pas ailleurs. Sauvegarde aussi la clé du contrôleur. Vérifie la maintenance du projet et la provenance des images à l'installation.</div>
+
+      <h3>External Secrets Operator en pratique</h3>
+      <div class="code-block"><code>apiVersion: external-secrets.io/v1beta1   # v1 dans les versions récentes : vérifie
+kind: ExternalSecret
+metadata:
+  name: db-credentials
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  target:
+    name: db-credentials
+  data:
+  - secretKey: password
+    remoteRef:
+      key: secret/app/db
+      property: password</code></div>
+
+      <h3>Réflexes de sécurité</h3>
+      <ul><li><strong>RBAC :</strong> limiter <code>get</code>, <code>list</code> et <code>watch</code> sur <code>secrets</code> ; <code>list</code> révèle déjà les valeurs. Contrôle avec <code>kubectl auth can-i get secrets --as alice</code>.</li><li>Préférer un <strong>montage en volume</strong> aux variables d'environnement (fuites dans les journaux et <code>describe</code>).</li><li>Jamais de secret en clair dans Git, dans une image ou dans un fichier de valeurs Helm.</li><li><strong>Rotation :</strong> prévoir comment remplacer un secret sans coupure (redéploiement ou rechargement de l'application).</li><li>Comptes de service : jetons à durée limitée (projected tokens) plutôt que des jetons permanents.</li></ul>
+    </div>
+  </div>
+
+  <!-- S20 -->
+  <div class="section" id="s20">
+    <div class="section-header"><span class="section-num">20</span><span class="section-title-text">Dépannage pas à pas : sept scénarios</span><span class="section-nb">Diagnostic</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Troubleshooting</span><span class="tag">describe</span><span class="tag">logs</span><span class="tag">Events</span></div>
+      <div class="info"><strong>Méthode :</strong> on remonte toujours du plus visible au plus profond : l'état (<code>get</code>), les événements (<code>describe</code>), les journaux (<code>logs</code>), puis l'intérieur du conteneur (<code>exec</code> ou <code>debug</code>). Ne rien changer avant d'avoir compris.</div>
+
+      <h3>La boîte à outils du diagnostic</h3>
+      <div class="code-block"><code>kubectl get pods -A -o wide
+kubectl describe pod web-7d4b9c-abcde         <span class="comment"># section Events en bas</span>
+kubectl get events --sort-by=.lastTimestamp
+kubectl logs web-7d4b9c-abcde -c app --previous <span class="comment"># journal du conteneur précédent</span>
+kubectl exec -it web-7d4b9c-abcde -- sh
+kubectl debug -it pod/web-7d4b9c-abcde --image=busybox --target=app
+kubectl get endpointslices -l kubernetes.io/service-name=web
+kubectl run -it --rm dns --image=busybox:1.36 --restart=Never -- nslookup web</code></div>
+
+      <h3>Sept scénarios classiques</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Symptôme</th><th>Où regarder</th><th>Causes fréquentes</th><th>Correction</th></tr></thead><tbody><tr><td><code>ImagePullBackOff</code> / <code>ErrImagePull</code></td><td><code>describe pod</code> (Events)</td><td>Nom ou étiquette d'image erroné, dépôt privé sans identifiants, limite de pull</td><td>Corriger l'image, créer un <code>imagePullSecret</code> et le référencer</td></tr><tr><td><code>CrashLoopBackOff</code></td><td><code>logs --previous</code>, code de sortie</td><td>Erreur de démarrage, variable manquante, sonde liveness trop stricte</td><td>Corriger la configuration, assouplir la sonde</td></tr><tr><td><code>OOMKilled</code> (code 137)</td><td><code>describe pod</code> (Last State)</td><td>Limite mémoire trop basse, fuite</td><td>Augmenter la limite ou corriger l'application</td></tr><tr><td><code>Pending</code></td><td><code>describe pod</code> (message du scheduler)</td><td>Ressources insuffisantes, taint non toléré, PVC non lié, affinité impossible</td><td>Ajouter des ressources, ajuster requests, tolerations ou StorageClass</td></tr><tr><td>Service sans réponse</td><td><code>get endpointslices</code></td><td>Sélecteur ne correspond pas aux étiquettes, readiness en échec, mauvais port</td><td>Aligner labels et selector, corriger la sonde ou le <code>targetPort</code></td></tr><tr><td>Ingress en 502 ou 404</td><td>Journal du contrôleur d'Ingress, <code>describe ingress</code></td><td>Backend sans endpoints, mauvais hôte ou chemin, classe d'Ingress absente</td><td>Corriger le Service, la règle ou <code>ingressClassName</code></td></tr><tr><td>Nœud <code>NotReady</code></td><td><code>describe node</code>, <code>journalctl -u kubelet</code> (RKE2 : <code>-u rke2-agent</code> ou <code>rke2-server</code>)</td><td>kubelet arrêté, disque plein, plus d'espace mémoire, réseau CNI en panne</td><td>Redémarrer le service, libérer l'espace, vérifier le CNI</td></tr></tbody></table></div>
+
+      <h3>Arbre de décision pour un Pod qui ne tourne pas</h3>
+      <ol><li><code>kubectl get pod</code> : quel statut ? <code>Pending</code> → scheduler ; <code>ContainerCreating</code> → image, volume ou réseau ; <code>CrashLoopBackOff</code> → journaux.</li><li><code>kubectl describe pod</code> : lire les Events du bas vers le haut.</li><li>Journaux : <code>kubectl logs</code>, puis <code>--previous</code> si le conteneur a déjà redémarré.</li><li>Réseau : DNS du cluster (<code>nslookup</code>), endpoints du Service, NetworkPolicy.</li><li>Nœud : espace disque, mémoire, kubelet, runtime (<code>crictl ps</code>).</li></ol>
+      <div class="tip">Sur une application sans shell, <code>kubectl debug</code> ajoute un conteneur éphémère avec les outils, sans modifier le Pod d'origine.</div>
+    </div>
+  </div>
+
+  <!-- S21 -->
+  <div class="section" id="s21">
+    <div class="section-header"><span class="section-num">21</span><span class="section-title-text">Entraînement type CKA / CKAD</span><span class="section-nb">Certification</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">CKA</span><span class="tag">CKAD</span><span class="tag">Pratique</span><span class="tag">Chrono</span></div>
+      <div class="info">Les examens <strong>CKA</strong> et <strong>CKAD</strong> sont des épreuves pratiques chronométrées dans un terminal : on résout des tâches sur de vrais clusters, avec accès à la documentation officielle. Ce qui fait la différence, c'est la vitesse et l'automatisme. Chaque exercice ci-dessous se fait en quelques minutes, sans regarder la solution.</div>
+
+      <h3>Poids des domaines de la CKA</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Domaine</th><th>Poids</th></tr></thead><tbody><tr><td>Dépannage (troubleshooting)</td><td>30 %</td></tr><tr><td>Architecture, installation et configuration du cluster</td><td>25 %</td></tr><tr><td>Services et réseau</td><td>20 %</td></tr><tr><td>Workloads et ordonnancement</td><td>15 %</td></tr><tr><td>Stockage</td><td>10 %</td></tr></tbody></table></div>
+      <div class="tip">Vérifie le programme et les poids sur le site de la Linux Foundation : ils évoluent d'une version à l'autre.</div>
+
+      <h3>Préparer son terminal</h3>
+      <div class="code-block"><code>alias k=kubectl
+source &lt;(kubectl completion bash) &amp;&amp; complete -F __start_kubectl k
+export do="--dry-run=client -o yaml"      <span class="comment"># k create deploy web --image=nginx $do &gt; d.yaml</span>
+export now="--force --grace-period 0"      <span class="comment"># supprimer vite : k delete pod x $now</span>
+kubectl config use-context &lt;contexte&gt;      <span class="comment"># à chaque nouvelle question !</span></code></div>
+
+      <h3>Douze exercices avec corrigés</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>#</th><th>Énoncé</th><th>Corrigé (essentiel)</th><th>Domaine</th></tr></thead><tbody><tr><td>1</td><td>Créer un Deployment <code>web</code> (nginx 1.27, 3 réplicas)</td><td><code>kubectl create deployment web --image=nginx:1.27 --replicas=3</code></td><td>Workloads</td></tr><tr><td>2</td><td>Passer l'image en 1.28, vérifier, puis revenir en arrière</td><td><code>kubectl set image deployment/web nginx=nginx:1.28</code> ; <code>kubectl rollout status deploy/web</code> ; <code>kubectl rollout undo deploy/web</code></td><td>Workloads</td></tr><tr><td>3</td><td>Exposer <code>web</code> en NodePort sur le port 80</td><td><code>kubectl expose deployment web --port=80 --type=NodePort</code></td><td>Réseau</td></tr><tr><td>4</td><td>Un Pod qui lit un ConfigMap en variables d'environnement</td><td><code>kubectl create configmap app --from-literal=MODE=prod</code> ; générer le Pod avec <code>$do</code> puis ajouter <code>envFrom: - configMapRef: {name: app}</code></td><td>Workloads</td></tr><tr><td>5</td><td>Donner à <code>alice</code> la lecture des Pods du namespace <code>dev</code></td><td><code>kubectl create role pod-reader --verb=get,list,watch --resource=pods -n dev</code> ; <code>kubectl create rolebinding rb --role=pod-reader --user=alice -n dev</code> ; <code>kubectl auth can-i list pods -n dev --as alice</code></td><td>Cluster</td></tr><tr><td>6</td><td>NetworkPolicy : seuls les Pods <code>app=front</code> joignent <code>app=api</code> sur le port 8080</td><td>Copier l'exemple de la documentation : <code>podSelector</code> app=api, <code>ingress</code> depuis <code>podSelector</code> app=front, port 8080 ; tester avec un Pod jetable</td><td>Réseau</td></tr><tr><td>7</td><td>PVC de 1 Gi (RWO) monté dans un Pod</td><td>Copier le modèle PVC puis <code>volumes</code> / <code>volumeMounts</code> du Pod depuis la documentation ; <code>kubectl get pvc</code> doit afficher <code>Bound</code></td><td>Stockage</td></tr><tr><td>8</td><td>Réserver le nœud <code>node1</code> à des Pods GPU</td><td><code>kubectl taint nodes node1 dedicated=gpu:NoSchedule</code> ; ajouter la <code>toleration</code> correspondante au Pod</td><td>Workloads</td></tr><tr><td>9</td><td>Sauvegarder puis restaurer etcd (kubeadm)</td><td><code>ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key snapshot save /backup/etcd.db</code> ; restauration : <code>etcdutl snapshot restore /backup/etcd.db --data-dir /var/lib/etcd-restore</code> puis pointer le manifeste etcd sur ce dossier</td><td>Cluster</td></tr><tr><td>10</td><td>Vider un nœud, le mettre à jour, le remettre en service</td><td><code>kubectl drain node1 --ignore-daemonsets --delete-emptydir-data</code> ; mise à jour (<code>kubeadm upgrade</code>) ; <code>kubectl uncordon node1</code></td><td>Cluster</td></tr><tr><td>11</td><td>Créer un Pod statique sur un nœud</td><td>Trouver <code>staticPodPath</code> dans la configuration du kubelet (souvent <code>/etc/kubernetes/manifests</code>) et y déposer le manifeste</td><td>Cluster</td></tr><tr><td>12</td><td>Un nœud est <code>NotReady</code> : le réparer</td><td><code>systemctl status kubelet</code> ; <code>journalctl -u kubelet</code> ; corriger (service arrêté, configuration, runtime) ; <code>systemctl restart kubelet</code></td><td>Dépannage</td></tr></tbody></table></div>
+
+      <h3>Stratégie le jour J</h3>
+      <ul><li>Environ 2 heures pour une quinzaine de tâches : <strong>passer</strong> sur une question bloquante et y revenir.</li><li>Les tâches faciles et bien notées d'abord ; le dépannage demande du temps de réflexion.</li><li>Changer de <strong>contexte</strong> (<code>kubectl config use-context</code>) à chaque question, c'est l'erreur la plus fréquente.</li><li><code>kubectl explain pod.spec --recursive</code> remplace souvent la recherche dans la documentation.</li><li>Se chronométrer : refaire chaque exercice jusqu'à passer sous 3 minutes.</li></ul>
+    </div>
+  </div>
+
+  <!-- S22 -->
+  <div class="section" id="s22">
+    <div class="section-header"><span class="section-num">22</span><span class="section-title-text">Argo CD en labo</span><span class="section-nb">GitOps pratique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Argo CD</span><span class="tag">GitOps</span><span class="tag">Application</span><span class="tag">Fleet</span></div>
+      <figure class="fig"><svg viewBox="0 0 560 250" role="img" aria-label="Argo CD : Git décide, le cluster suit"><defs><marker id="ar404" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="f-ar" d="M0 0 L10 5 L0 10 z"/></marker><marker id="ar404s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="f-ar" d="M10 0 L0 5 L10 10 z"/></marker></defs><rect class="f-ac" x="0" y="50" width="120" height="60" rx="7"/><text class="f-tw" x="60.0" y="76.5" text-anchor="middle">Dépôt Git</text><text class="f-tws" x="60.0" y="92.5" text-anchor="middle">Helm · Kustomize</text><rect class="f-n" x="220" y="50" width="120" height="60" rx="7"/><text class="f-t" x="280.0" y="76.5" text-anchor="middle">Argo CD</text><text class="f-ts" x="280.0" y="92.5" text-anchor="middle">poll 3 min ou</text><text class="f-ts" x="280.0" y="105.5" text-anchor="middle">webhook</text><rect class="f-ok" x="440" y="50" width="120" height="60" rx="7"/><text class="f-t" x="500.0" y="76.5" text-anchor="middle">Cluster</text><text class="f-ts" x="500.0" y="92.5" text-anchor="middle">état réel</text><path class="f-a" d="M120 80 L220 80" marker-end="url(#ar404)"/><text class="f-ts" x="170.0" y="72.0" text-anchor="middle">lit</text><path class="f-a" d="M340 80 L440 80" marker-end="url(#ar404)"/><text class="f-ts" x="390.0" y="72.0" text-anchor="middle">sync</text><path class="f-ad" d="M500 110 L500 150 L280 150 L280 110" marker-end="url(#ar404)"/><text class="f-ts" x="390" y="144" text-anchor="middle">état réel vs Git</text><text class="f-tg" x="46" y="214" text-anchor="middle">statuts</text><rect class="f-ok" x="100" y="196" width="110" height="36" rx="7"/><text class="f-t" x="155.0" y="218.5" text-anchor="middle">Synced</text><rect class="f-wn" x="230" y="196" width="110" height="36" rx="7"/><text class="f-t" x="285.0" y="218.5" text-anchor="middle">OutOfSync</text><rect class="f-ko" x="360" y="196" width="110" height="36" rx="7"/><text class="f-t" x="415.0" y="218.5" text-anchor="middle">Degraded</text></svg><figcaption>Argo CD compare en continu Git et le cluster ; un écart donne OutOfSync, corrigé automatiquement si la synchro auto est activée.</figcaption></figure>
+      <div class="info"><strong>Argo CD</strong> est un outil GitOps : il surveille un dépôt Git et applique son contenu au cluster, puis signale et corrige les écarts. Rancher offre un équivalent intégré, <strong>Fleet</strong> (voir <a href='../rke2-rancher/fiche.html'>fiche RKE2 et Rancher</a>).</div>
+
+      <h3>Installer Argo CD en labo</h3>
+      <div class="code-block"><code>kubectl create namespace argocd
+kubectl apply -n argocd --server-side -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl -n argocd get pods
+
+<span class="comment"># Mot de passe initial de l'utilisateur admin</span>
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+<span class="comment"># Accéder à l'interface sur https://localhost:8080</span>
+kubectl -n argocd port-forward svc/argocd-server 8080:443</code></div>
+      <div class="tip">Pour un usage réel, installe plutôt une version précise (manifeste ou chart Helm) et change le mot de passe administrateur, puis supprime le secret initial.</div>
+
+      <h3>Une première application</h3>
+      <p>Un dépôt Git contient un dossier <code>apps/web</code> avec les manifestes (ou un chart Helm). On déclare une <strong>Application</strong> :</p>
+      <div class="code-block"><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: web
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/mon-org/mon-depot.git
+    targetRevision: main
+    path: apps/web
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: web
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true</code></div>
+
+      <h3>Ce que l'on observe</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Statut</th><th>Signification</th></tr></thead><tbody><tr><td><strong>Synced</strong></td><td>Le cluster correspond à Git</td></tr><tr><td><strong>OutOfSync</strong></td><td>Git et cluster diffèrent (modification manuelle ou nouveau commit)</td></tr><tr><td><strong>Healthy</strong></td><td>Les ressources fonctionnent (Pods prêts, etc.)</td></tr><tr><td><strong>Degraded</strong></td><td>Une ressource est en échec</td></tr></tbody></table></div>
+      <ul><li><strong><code>automated</code> :</strong> applique tout seul chaque commit ; sans, la synchronisation est manuelle (bouton Sync).</li><li><strong><code>prune</code> :</strong> supprime du cluster ce qui a disparu de Git.</li><li><strong><code>selfHeal</code> :</strong> annule les modifications faites à la main dans le cluster.</li><li><strong>Retour arrière :</strong> on fait un <code>git revert</code>, pas un rollback dans l'interface.</li><li>Argo CD interroge Git environ toutes les 3 minutes ; un webhook accélère la détection.</li></ul>
+
+      <h3>Organiser plusieurs applications</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Motif</th><th>Principe</th></tr></thead><tbody><tr><td><strong>App of apps</strong></td><td>Une Application parente déclare les autres Applications</td></tr><tr><td><strong>ApplicationSet</strong></td><td>Génère automatiquement des Applications (une par cluster, par dossier ou par environnement)</td></tr><tr><td>Environnements</td><td>Un dossier ou une branche par environnement, avec Kustomize ou Helm pour les différences</td></tr></tbody></table></div>
+
+      <h3>Argo CD ou Fleet ?</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th></th><th>Argo CD</th><th>Fleet (Rancher)</th></tr></thead><tbody><tr><td>Interface</td><td>Riche, centrée sur l'état de chaque application</td><td>Intégrée à Rancher, centrée sur les groupes de clusters</td></tr><tr><td>Plusieurs clusters</td><td>Oui, en les enregistrant</td><td>Natif, pensé pour des flottes de clusters</td></tr><tr><td>Quand le choisir</td><td>Beaucoup d'applications, besoin de visualiser et de diagnostiquer</td><td>Déjà sur Rancher, déploiements identiques sur de nombreux clusters</td></tr></tbody></table></div>
+      <div class="warn"><strong>Pièges :</strong> les secrets ne doivent pas être commités en clair (voir la section sur les secrets) ; l'ordre de création des CRD et des ressources qui les utilisent demande des <em>sync waves</em> ; un <code>selfHeal</code> activé annule vite un correctif manuel urgent.</div>
+    </div>
+  </div>
+<!-- S23 -->
+  <div class="section" id="s23">
+    <div class="section-header"><span class="section-num">23</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">50 questions</span></div>
+
+      <h3>Plan de labo en 7 séances</h3>
+      <ol><li><strong>Séance 1 : cluster jetable.</strong> kind ou minikube ; explorer <code>kubectl get nodes</code>, <code>api-resources</code>, <code>explain</code></li><li><strong>Séance 2 : workloads.</strong> Deployment avec probes et limits, mise à jour progressive, <code>rollout undo</code>, Job et CronJob</li><li><strong>Séance 3 : réseau.</strong> Service ClusterIP / NodePort, Ingress ou Gateway, NetworkPolicy « tout refuser » puis ouvertures ciblées</li><li><strong>Séance 4 : stockage.</strong> PVC dynamique, StatefulSet à 3 réplicas, supprimer un Pod et vérifier la persistance</li><li><strong>Séance 5 : sécurité.</strong> RBAC (Role + RoleBinding + <code>auth can-i</code>), Pod Security <em>restricted</em>, Secret en volume</li><li><strong>Séance 6 : exploitation.</strong> <code>drain</code> + PDB, HPA, panne simulée et dépannage (Pending, CrashLoopBackOff), snapshot etcd. Puis passer à la fiche <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a></li><li><strong>Séance 7 : compléments.</strong> HPA sous charge, sauvegarde et restauration Velero d'un namespace, Sealed Secrets, une application déployée par Argo CD, puis un chrono sur 3 exercices CKA</li></ol>
 
       <h3>Auto-évaluation — clique pour voir la réponse</h3>
       <div class="qr-list">
@@ -615,6 +900,22 @@ kubectl run dns --rm -it --image=busybox:1.36 -- nslookup web.monapp.svc.cluster
         <details><summary>Qu'est-ce qu'un Operator ?</summary><p>Un CRD plus un contrôleur qui automatise l'exploitation d'une application (déploiement, sauvegarde, bascule).</p></details>
         <details><summary>À quoi sert cert-manager ?</summary><p>À émettre et renouveler automatiquement des certificats (Let's Encrypt, CA interne).</p></details>
         <details><summary>Comment les certifications CKA/CKAD/CKS sont-elles évaluées ?</summary><p>Par des examens pratiques en ligne de commande sur de vrais clusters, pas par des QCM.</p></details>
+        <details><summary>Pourquoi définir des requests sur les Pods quand on utilise un HPA ?</summary><p>Le HPA calcule un pourcentage d'utilisation par rapport aux requests ; sans requests CPU, la métrique est indéterminée (<code>&lt;unknown&gt;</code>) et l'autoscaling ne fonctionne pas.</p></details>
+        <details><summary>Quelle formule le HPA utilise-t-il pour calculer le nombre de réplicas ?</summary><p>réplicas voulus = ceil( réplicas actuels × mesure actuelle / cible ), avec un délai de stabilisation à la descente (5 minutes par défaut) pour éviter les oscillations.</p></details>
+        <details><summary>Quelle différence entre limit CPU et limit mémoire quand le conteneur la dépasse ?</summary><p>Au-delà de la limite CPU, le conteneur est ralenti (throttling) ; au-delà de la limite mémoire, il est tué (OOMKilled, code 137).</p></details>
+        <details><summary>À quoi sert un PodDisruptionBudget ?</summary><p>À garantir un minimum de Pods disponibles pendant les interruptions volontaires (drain d'un nœud, mise à jour) : le drain attend plutôt que de passer sous ce minimum.</p></details>
+        <details><summary>Quelle différence entre readinessProbe et livenessProbe ?</summary><p>La readiness retire le Pod des Services sans le redémarrer ; la liveness redémarre le conteneur. Une startupProbe laisse le temps à un démarrage long.</p></details>
+        <details><summary>Pourquoi faire à la fois un snapshot etcd et des sauvegardes Velero ?</summary><p>etcd permet de reconstruire le cluster, mais pas de restaurer une application seule ni ses volumes ; Velero sauvegarde les applications et volumes et sert aussi à migrer vers un autre cluster.</p></details>
+        <details><summary>Comment Velero sauvegarde-t-il les volumes ?</summary><p>Par snapshots CSI (rapide, dépend du pilote de stockage) ou par sauvegarde de fichiers via un agent sur les nœuds (plus lent mais indépendant du stockage).</p></details>
+        <details><summary>Un Secret Kubernetes est-il chiffré ?</summary><p>Non, il est seulement encodé en base64. Il faut activer le chiffrement au repos dans etcd, restreindre le RBAC et éviter de stocker les secrets en clair dans Git.</p></details>
+        <details><summary>Quelle différence entre Sealed Secrets et External Secrets Operator ?</summary><p>Sealed Secrets permet de commiter un secret chiffré dans Git que seul le cluster déchiffre ; External Secrets Operator synchronise des secrets depuis un coffre externe (Vault, gestionnaire cloud).</p></details>
+        <details><summary>Comment activer le chiffrement des secrets au repos sur RKE2 ?</summary><p>Avec <code>secrets-encryption: true</code> dans <code>config.yaml</code> ; l'état se contrôle avec <code>rke2 secrets-encrypt status</code>.</p></details>
+        <details><summary>Un Pod est en CrashLoopBackOff : quelle démarche suivre ?</summary><p>Lire <code>kubectl logs --previous</code> et le code de sortie dans <code>describe pod</code>, puis chercher une erreur de démarrage, une variable manquante ou une sonde liveness trop stricte.</p></details>
+        <details><summary>Un Service ne répond pas alors que les Pods tournent : que vérifier ?</summary><p>Les endpoints du Service : le sélecteur doit correspondre aux étiquettes des Pods, les Pods doivent être Ready, et le port cible doit être le bon.</p></details>
+        <details><summary>Quels sont les domaines de la CKA par ordre de poids ?</summary><p>Dépannage (30 %), architecture et installation du cluster (25 %), services et réseau (20 %), workloads et ordonnancement (15 %), stockage (10 %) ; à vérifier sur le programme en vigueur.</p></details>
+        <details><summary>Quelle est l'erreur la plus fréquente pendant l'examen CKA ?</summary><p>Oublier de changer de contexte (<code>kubectl config use-context</code>) au début de chaque question et agir sur le mauvais cluster.</p></details>
+        <details><summary>Que font les options automated, prune et selfHeal d'Argo CD ?</summary><p>automated applique chaque commit, prune supprime du cluster ce qui a disparu de Git, selfHeal annule les modifications manuelles faites dans le cluster.</p></details>
+        <details><summary>Comment revenir en arrière avec Argo CD ?</summary><p>On revient en arrière dans Git avec un <code>git revert</code>, puis Argo CD synchronise le cluster sur ce nouvel état.</p></details>
       </div>
     </div>
   </div>
