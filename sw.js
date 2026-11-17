@@ -4,7 +4,7 @@
  * Permet l'installation PWA + notifications push (Feature 12).
  */
 
-const CACHE_NAME = "certifs-v57";
+const CACHE_NAME = "certifs-v58";
 
 // Assets à précacher au premier install (shell complet)
 const PRECACHE = [
