@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#5b4bb7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Labo IaC — Parc Linux et cluster RKE2 sur Proxmox</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#5b4bb7;--accent-soft:#ebe8fa;
+  --ps:#2b2f36;--ps-mid:#5b4bb7;--ps-light:#f6d9b8;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#a99bff;--accent-soft:#1d1a38;
+  --ps:#3a3f48;--ps-mid:#a99bff;--ps-light:#1d1a38;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#a99bff;--accent-soft:#1d1a38;
+  --ps:#3a3f48;--ps-mid:#a99bff;--ps-light:#1d1a38;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.8rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+h4{font-size:.9rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--f-mono)}
+p{margin:6px 0 10px}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Header */
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.top-actions{display:flex;gap:8px;align-items:center}
+details{border:1px solid var(--line);border-radius:7px;padding:9px 14px;margin:8px 0;background:var(--sheet)}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details[open] summary{color:var(--accent);margin-bottom:6px}
+details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PS Banner */
+.ps-banner{background:var(--ps);border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.ps-banner-left .label{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ps-banner-left h1{color:#fff;font-size:1.5rem}
+.ps-banner-left p{color:rgba(255,255,255,.7);font-size:.88rem;margin:4px 0 0}
+.ps-stats{display:flex;gap:16px;flex-wrap:wrap}
+.ps-stat{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;text-align:center;min-width:80px}
+.ps-stat b{display:block;font:700 1.3rem var(--f-mono);color:#fff}
+.ps-stat span{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em}
+
+/* Sommaire rapide */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:28px}
+.toc h4{margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;text-decoration:none;color:var(--ink);font-size:.85rem;transition:background .15s}
+.toc-item:hover{background:var(--accent-soft);color:var(--accent)}
+.toc-num{font:600 .7rem var(--f-mono);background:var(--ps-light);color:var(--ps-mid);padding:1px 6px;border-radius:3px;min-width:28px;text-align:center}
+
+/* Sections */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.section-header{background:var(--ps);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.section-num{font:700 .75rem var(--f-mono);background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:4px}
+.section-title-text{font:700 1rem var(--f-display);color:#fff;flex:1}
+.section-nb{font:500 .7rem var(--f-mono);color:rgba(255,255,255,.55)}
+.section-body{padding:20px}
+
+/* Blocs de contenu */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.concept-card{border:1px solid var(--line);border-radius:7px;padding:12px 14px}
+.concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
+.concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
+.concept-card ul li{margin:2px 0}
+.concept-card.warn{border-left:3px solid var(--warn);border-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+
+/* Cmdlets */
+.cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+.cmdlet-table th{text-align:left;padding:7px 10px;background:var(--accent-soft);color:var(--accent);font:600 .72rem var(--f-mono);letter-spacing:.05em;border-bottom:2px solid var(--line)}
+.cmdlet-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmdlet-table tr:last-child td{border-bottom:0}
+.cmdlet-table td:first-child{font:500 .85rem var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmdlet-table td:last-child{color:var(--muted)}
+.cmdlet-table td:nth-child(2){color:var(--ink)}
+.cmdlet-table-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+
+/* Code blocks */
+.code-block{background:var(--ps);border-radius:7px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.code-block code{font:500 .85rem var(--f-mono);color:#f6d9b8;white-space:pre;display:block;line-height:1.6}
+.code-block .comment{color:rgba(255,255,255,.4)}
+.code-block .keyword{color:#9cdcfe}
+.code-block .string{color:#ce9178}
+.code-block .cmdlet{color:#dcdcaa}
+.code-block .param{color:#9cdcfe}
+
+/* Astuce / Attention */
+.tip{background:var(--ok-soft);border-left:3px solid var(--ok);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.tip strong{color:var(--ok)}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.warn strong{color:var(--warn)}
+.info{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.info strong{color:var(--accent)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font:500 .72rem var(--f-mono);padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.admin{background:var(--ok-soft);color:var(--ok)}
+.tag.cloud{background:#ebe8fa;color:#5b4bb7}
+.tag.script{background:#f3e8ff;color:#6b21a8}
+
+/* Comparatif */
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.compare-table th{padding:7px 10px;text-align:left;border-bottom:2px solid var(--line);font:600 .72rem var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.compare-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table td:first-child{font:600 .85rem var(--f-mono);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  h1{font-size:1.3rem}
+  .ps-banner{padding:14px 16px}
+  .ps-banner-left h1{font-size:1.2rem}
+  .ps-stats{gap:8px}
+  .ps-stat{padding:8px 10px;min-width:64px}
+  .ps-stat b{font-size:1rem}
+  .concept-grid{grid-template-columns:1fr}
+  .toc-grid{grid-template-columns:1fr}
+  .section-body{padding:14px}
+  .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">DevOps · Labo guidé</div>
+      <h1>Labo guidé — Parc Linux et RKE2 sur Proxmox</h1>
+    </div>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="ps-banner">
+    <div class="ps-banner-left">
+      <div class="label">Labo guidé · Terraform + Ansible + RKE2</div>
+      <h1>Labo IaC — Linux et RKE2 sur Proxmox, par le code</h1>
+      <p>Terraform · cloud-init · Ansible · RKE2 HA · Rancher · reconstruction</p>
+    </div>
+    <div class="ps-stats">
+      <div class="ps-stat"><b>9</b><span>Sections</span></div>
+      <div class="ps-stat"><b>Labo</b><span>Version</span></div>
+      <div class="ps-stat"><b>15</b><span>Q/R</span></div>
+    </div>
+  </div>
+
+  <div class="info"><strong>Statut :</strong> labo guidé construit à partir des fiches du site ; les exemples HCL / YAML sont des <strong>points de départ non testés ici</strong> : valide-les sur ton Proxmox (versions du provider <code>bpg/proxmox</code>, réseau, DNS). Voir <a href="../proxmox-devops/fiche.html">Proxmox DevOps</a>, <a href="../linux/fiche.html">Linux</a>, <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a>.</div>
+
+  <div class="toc">
+    <h4>Sommaire</h4>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">1</span>Objectif, architecture, prérequis</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>Poste de contrôle et dépôt Git</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>A : VM Linux avec Terraform</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">4</span>A : configurer avec Ansible</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">5</span>B : VM du cluster RKE2</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">6</span>B : RKE2 avec un rôle Ansible</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>B : Rancher et applications</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Industrialiser et reconstruire</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Plan de labo et Q/R</a>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div class="section" id="s1">
+    <div class="section-header"><span class="section-num">1</span><span class="section-title-text">Objectif, architecture et prérequis</span><span class="section-nb">Cadrage</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Labo</span><span class="tag">IaC</span><span class="tag">Proxmox</span></div>
+      <div class="info">Ce labo enchaîne <strong>deux parcours</strong> sur un même Proxmox de test : <strong>A</strong> un petit parc Linux (3 VM) configuré par Ansible ; <strong>B</strong> un cluster RKE2 (3 serveurs + 1 worker) créé entièrement par code, puis Rancher dessus. Tout est reproductible : on détruit et on recommence en quelques minutes.</div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Rôle</th><th>VM</th><th>Spécification de départ</th></tr></thead><tbody><tr><td>Contrôleur Ansible / Terraform</td><td>poste admin (Linux ou WSL2)</td><td>Terraform, Ansible, Git, kubectl, helm</td></tr><tr><td>Parc Linux (parcours A)</td><td><code>lin-01</code> Ubuntu, <code>lin-02</code> Rocky, <code>lin-03</code> Ubuntu</td><td>2 vCPU / 2 Go / 20 Go</td></tr><tr><td>RKE2 serveurs (parcours B)</td><td><code>rke2-s1..s3</code></td><td>4 vCPU / 8 Go / 40 Go (SSD)</td></tr><tr><td>RKE2 worker</td><td><code>rke2-w1</code></td><td>4 vCPU / 8 Go / 40 Go</td></tr><tr><td>IP virtuelle API</td><td><code>10.0.0.50</code> (kube-vip) ou load balancer</td><td>Réservée hors plage DHCP</td></tr></tbody></table></div>
+      <ul><li><strong>Prérequis :</strong> fiches <a href="../proxmox-devops/fiche.html">Proxmox DevOps</a> (jeton API, modèle cloud-init, Terraform), <a href="../linux/fiche.html">Linux</a> et <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a></li><li>Ressources : environ 24 vCPU et 40 Go de RAM pour tout garder allumé ; sinon réduire à 1 serveur RKE2 au début</li><li>Un modèle cloud-init Ubuntu (<code>tpl-ubuntu</code>, VMID 9000) et un Rocky (<code>tpl-rocky</code>, VMID 9001) existent déjà</li></ul>
+      <div class="warn"><strong>Honnêteté :</strong> les exemples ci-dessous sont des points de départ <strong>à valider sur ton Proxmox</strong> (versions du provider <code>bpg/proxmox</code>, noms d'attributs, réseau). Corrige-les en lisant le message d'erreur plutôt qu'en copiant à l'aveugle.</div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section" id="s2">
+    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">Poste de contrôle et dépôt Git</span><span class="section-nb">Cadrage</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Git</span><span class="tag">Structure</span><span class="tag">Secrets</span></div>
+      <div class="code-block"><code>mkdir -p ~/lab-iac/{terraform,ansible/{inventory,group_vars,roles}} &amp;&amp; cd ~/lab-iac
+git init
+printf 'terraform/.terraform/\n*.tfstate*\n*.tfvars\nansible/.vault_pass\n' &gt; .gitignore
+<span class="comment"># Outils</span>
+terraform version ; ansible --version ; kubectl version --client ; helm version
+ansible-galaxy collection install community.proxmox kubernetes.core</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Dossier</th><th>Contenu</th></tr></thead><tbody><tr><td><code>terraform/</code></td><td>VM Proxmox (parcours A et B)</td></tr><tr><td><code>ansible/inventory/</code></td><td>Inventaire (statique ou dynamique Proxmox)</td></tr><tr><td><code>ansible/roles/</code></td><td>Rôles : <code>base</code>, <code>hardening</code>, <code>rke2</code></td></tr><tr><td><code>ansible/group_vars/</code></td><td>Variables par groupe (secrets via Ansible Vault)</td></tr></tbody></table></div>
+      <ul><li><strong>Jamais</strong> de jeton ni de mot de passe dans Git : <code>terraform.tfvars</code> ignoré, variables d'environnement (<code>TF_VAR_pve_api_token</code>), Ansible Vault</li><li>Un commit par étape : tu pourras revenir en arrière et montrer ton travail</li></ul>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">Parcours A : créer 3 VM Linux avec Terraform</span><span class="section-nb">Parcours A</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Terraform</span><span class="tag">cloud-init</span><span class="tag">for_each</span></div>
+      <div class="code-block"><code><span class="comment"># terraform/linux.tf : 3 VM clonées depuis les modèles cloud-init</span>
+locals {
+  linux = {
+    lin-01 = { tpl = 9000, ip = "10.0.0.61/24" }
+    lin-02 = { tpl = 9001, ip = "10.0.0.62/24" }
+    lin-03 = { tpl = 9000, ip = "10.0.0.63/24" }
+  }
+}
+
+resource "proxmox_virtual_environment_vm" "linux" {
+  for_each  = local.linux
+  name      = each.key
+  node_name = "pve1"
+  tags      = ["terraform", "lab", "linux"]
+
+  clone { vm_id = each.value.tpl }
+  agent { enabled = true }
+  cpu   { cores = 2 }
+  memory { dedicated = 2048 }
+
+  network_device { bridge = "vmbr0" }
+
+  initialization {
+    ip_config {
+      ipv4 {
+        address = each.value.ip
+        gateway = "10.0.0.1"
+      }
+    }
+    user_account {
+      username = "ops"
+      keys     = [var.ssh_public_key]
+    }
+  }
+}</code></div>
+      <div class="code-block"><code>cd terraform
+export TF_VAR_pve_endpoint=https://pve1.lab.local:8006/
+export TF_VAR_pve_api_token='terraform@pve!tf=SECRET'
+terraform init &amp;&amp; terraform plan &amp;&amp; terraform apply
+ssh ops@10.0.0.61 'hostnamectl'      <span class="comment"># vérifier la connexion par clé</span></code></div>
+      <div class="tip">Prends le réflexe <code>plan</code> → lecture → <code>apply</code>. Pour repartir de zéro : <code>terraform destroy</code> (uniquement dans ce labo).</div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section" id="s4">
+    <div class="section-header"><span class="section-num">4</span><span class="section-title-text">Parcours A : configurer le parc avec Ansible</span><span class="section-nb">Parcours A</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Ansible</span><span class="tag">Rôles</span><span class="tag">Idempotence</span></div>
+      <div class="code-block"><code><span class="comment"># ansible/inventory/hosts.yml</span>
+all:
+  vars:
+    ansible_user: ops
+  children:
+    linux:
+      hosts:
+        lin-01: { ansible_host: 10.0.0.61 }
+        lin-02: { ansible_host: 10.0.0.62 }
+        lin-03: { ansible_host: 10.0.0.63 }</code></div>
+      <div class="code-block"><code><span class="comment"># ansible/site.yml : socle commun (adapté Debian et RHEL)</span>
+- hosts: linux
+  become: true
+  tasks:
+    - name: Paquets de base
+      ansible.builtin.package:
+        name: [vim, htop, tmux, rsync, curl, chrony]
+        state: present
+
+    - name: Service NTP
+      ansible.builtin.service:
+        name: "{{ 'chronyd' if ansible_os_family == 'RedHat' else 'chrony' }}"
+        state: started
+        enabled: true
+
+    - name: Durcir SSH (pas de root, pas de mot de passe)
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?{{ item.k }} "
+        line: "{{ item.k }} {{ item.v }}"
+        validate: /usr/sbin/sshd -t -f %s
+      loop:
+        - { k: PermitRootLogin, v: "no" }
+        - { k: PasswordAuthentication, v: "no" }
+      notify: reload ssh
+
+  handlers:
+    - name: reload ssh
+      ansible.builtin.service:
+        name: "{{ 'sshd' if ansible_os_family == 'RedHat' else 'ssh' }}"
+        state: reloaded</code></div>
+      <div class="code-block"><code>cd ../ansible
+ansible all -i inventory/hosts.yml -m ping
+ansible-playbook -i inventory/hosts.yml site.yml --check --diff     <span class="comment"># simulation</span>
+ansible-playbook -i inventory/hosts.yml site.yml                    <span class="comment"># application</span>
+ansible-playbook -i inventory/hosts.yml site.yml                    <span class="comment"># 2e passage : changed=0 = idempotent</span></code></div>
+      <ul><li><strong>Idempotence :</strong> un second passage ne doit rien changer ; sinon la tâche est mal écrite</li><li>Tester l'accès SSH dans une 2<sup>e</sup> session avant de recharger sshd (le module <code>validate</code> protège la syntaxe, pas ta clé)</li><li>Variante : inventaire dynamique <code>community.proxmox.proxmox</code> (voir la fiche DevOps) pour ne plus maintenir la liste à la main</li></ul>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div class="section" id="s5">
+    <div class="section-header"><span class="section-num">5</span><span class="section-title-text">Parcours B : créer les VM du cluster RKE2</span><span class="section-nb">Parcours B</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Terraform</span><span class="tag">Cloud-init</span><span class="tag">IP fixes</span></div>
+      <div class="code-block"><code><span class="comment"># terraform/rke2.tf : 3 serveurs + 1 worker</span>
+locals {
+  rke2 = {
+    rke2-s1 = { ip = "10.0.0.51/24" }
+    rke2-s2 = { ip = "10.0.0.52/24" }
+    rke2-s3 = { ip = "10.0.0.53/24" }
+    rke2-w1 = { ip = "10.0.0.54/24" }
+  }
+}
+
+resource "proxmox_virtual_environment_vm" "rke2" {
+  for_each  = local.rke2
+  name      = each.key
+  node_name = "pve1"
+  tags      = ["terraform", "lab", "rke2"]
+
+  clone { vm_id = 9000 }
+  agent { enabled = true }
+  cpu   { cores = 4 }
+  memory { dedicated = 8192 }
+
+  disk {
+    datastore_id = "local-lvm"
+    interface    = "scsi0"
+    size         = 40
+    discard      = "on"
+    iothread     = true
+  }
+
+  network_device { bridge = "vmbr0" }
+
+  initialization {
+    ip_config {
+      ipv4 {
+        address = each.value.ip
+        gateway = "10.0.0.1"
+      }
+    }
+    dns { servers = ["10.0.0.1"] }
+    user_account {
+      username = "ops"
+      keys     = [var.ssh_public_key]
+    }
+  }
+}
+
+output "rke2_ips" {
+  value = { for k, v in local.rke2 : k =&gt; v.ip }
+}</code></div>
+      <ul><li>Pour tester la redondance, répartis les VM sur plusieurs nœuds Proxmox (<code>node_name</code>) si tu as un cluster : sinon un seul nœud Proxmox est un point de défaillance commun</li><li>Vérifie que <code>rke2-s1..s3</code> et l'IP virtuelle <code>10.0.0.50</code> sont hors de la plage DHCP</li><li>Les disques SSD comptent : la latence disque est la première cause d'instabilité d'etcd</li></ul>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="section" id="s6">
+    <div class="section-header"><span class="section-num">6</span><span class="section-title-text">Parcours B : installer RKE2 avec un rôle Ansible</span><span class="section-nb">Parcours B</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Rôle rke2</span><span class="tag">Token</span><span class="tag">HA</span><span class="tag">kube-vip</span></div>
+      <div class="code-block"><code><span class="comment"># ansible/inventory/rke2.yml</span>
+all:
+  vars:
+    ansible_user: ops
+    rke2_channel: v1.36
+    rke2_api_name: rke2.lab.local          <span class="comment"># DNS -&gt; 10.0.0.50</span>
+    rke2_token: "{{ vault_rke2_token }}"   <span class="comment"># dans group_vars/all/vault.yml chiffré</span>
+  children:
+    rke2_first:   { hosts: { rke2-s1: { ansible_host: 10.0.0.51 } } }
+    rke2_servers: { hosts: { rke2-s2: { ansible_host: 10.0.0.52 }, rke2-s3: { ansible_host: 10.0.0.53 } } }
+    rke2_agents:  { hosts: { rke2-w1: { ansible_host: 10.0.0.54 } } }</code></div>
+      <div class="code-block"><code><span class="comment"># ansible/roles/rke2/tasks/main.yml (extrait)</span>
+- name: Préparer l'hôte (swap, modules)
+  ansible.builtin.shell: |
+    swapoff -a
+    modprobe br_netfilter overlay
+  changed_when: false
+
+- name: Créer le dossier de config
+  ansible.builtin.file: { path: /etc/rancher/rke2, state: directory, mode: "0755" }
+
+- name: config.yaml
+  ansible.builtin.template:
+    src: "{{ 'config-first.yaml.j2' if inventory_hostname in groups['rke2_first'] else 'config-join.yaml.j2' }}"
+    dest: /etc/rancher/rke2/config.yaml
+    mode: "0600"
+
+- name: Installer RKE2
+  ansible.builtin.shell: &gt;
+    curl -sfL https://get.rke2.io |
+    INSTALL_RKE2_CHANNEL={{ rke2_channel }}
+    INSTALL_RKE2_TYPE={{ 'agent' if inventory_hostname in groups['rke2_agents'] else 'server' }} sh -
+  args: { creates: /usr/local/bin/rke2 }
+
+- name: Démarrer le service
+  ansible.builtin.systemd:
+    name: "{{ 'rke2-agent' if inventory_hostname in groups['rke2_agents'] else 'rke2-server' }}"
+    enabled: true
+    state: started</code></div>
+      <div class="code-block"><code><span class="comment"># templates/config-first.yaml.j2</span>
+token: {{ rke2_token }}
+tls-san:
+  - {{ rke2_api_name }}
+  - 10.0.0.50
+secrets-encryption: true
+
+<span class="comment"># templates/config-join.yaml.j2 (serveurs 2 et 3, et agent)</span>
+server: https://{{ rke2_api_name }}:9345
+token: {{ rke2_token }}
+tls-san:
+  - {{ rke2_api_name }}</code></div>
+      <ol><li>Jouer le rôle sur <code>rke2_first</code> seul, attendre que le nœud soit <em>Ready</em> (<code>kubectl get nodes</code>)</li><li>Jouer sur <code>rke2_servers</code> avec <code>serial: 1</code> (un nœud à la fois)</li><li>Jouer sur <code>rke2_agents</code></li><li>Récupérer <code>/etc/rancher/rke2/rke2.yaml</code>, remplacer <code>127.0.0.1</code> par <code>rke2.lab.local</code></li></ol>
+      <div class="warn"><strong>Point dur :</strong> l'API doit répondre sur <code>rke2.lab.local</code> <em>avant</em> que les serveurs 2 et 3 ne rejoignent. Pour le labo, fais pointer le DNS vers <code>rke2-s1</code> au début, puis installe <strong>kube-vip</strong> (ou un HAProxy) pour l'IP <code>10.0.0.50</code> une fois le cluster formé. Le <code>shell</code> + <code>creates</code> ci-dessus est volontairement simple : à transformer en rôle propre ensuite.</div>
+    </div>
+  </div>
+
+  <!-- S7 -->
+  <div class="section" id="s7">
+    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Rancher et premières applications (Helm + Fleet)</span><span class="section-nb">Parcours B</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Helm</span><span class="tag">cert-manager</span><span class="tag">Rancher</span><span class="tag">GitOps</span></div>
+      <div class="code-block"><code>export KUBECONFIG=~/lab-iac/kubeconfig-rke2.yaml
+kubectl get nodes -o wide
+
+helm repo add jetstack https://charts.jetstack.io
+helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+helm repo update
+helm install cert-manager jetstack/cert-manager -n cert-manager --create-namespace --set crds.enabled=true
+helm install rancher rancher-latest/rancher -n cattle-system --create-namespace \
+  --set hostname=rancher.lab.local --set replicas=3 --set bootstrapPassword='ChangeMoi-123'
+kubectl -n cattle-system rollout status deploy/rancher</code></div>
+      <ul><li>Fais pointer <code>rancher.lab.local</code> vers l'IP virtuelle ; ouvre l'interface, change le mot de passe</li><li>Vérifie la compatibilité du chart Rancher avec le contrôleur d'ingress de ta version de RKE2 (voir la fiche RKE2 : à valider en labo)</li><li>Pour la suite : créer un dépôt Git d'applications et le brancher à <strong>Fleet</strong> ou Argo CD (GitOps)</li></ul>
+    </div>
+  </div>
+
+  <!-- S8 -->
+  <div class="section" id="s8">
+    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Industrialiser : pipeline, destruction et reconstruction</span><span class="section-nb">Aller plus loin</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">CI/CD</span><span class="tag">Reconstruction</span><span class="tag">Sauvegarde</span></div>
+      <ol><li><code>terraform destroy</code> du cluster RKE2, puis <code>terraform apply</code> + rôle Ansible : le cluster revient <strong>sans clic</strong></li><li>Mesurer le temps de reconstruction : c'est ton RTO d'infrastructure</li><li>Automatiser dans un pipeline (GitLab CI / GitHub Actions) : <code>terraform plan</code> sur chaque merge request, <code>apply</code> après revue</li><li>Prendre des snapshots etcd (<code>rke2 etcd-snapshot save</code>) et simuler une restauration (fiche RKE2, section 7)</li><li>Sauvegarder les VM avec PBS (Proxmox Backup Server) en complément</li></ol>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Couche</th><th>Outil</th><th>Où est l'état voulu ?</th></tr></thead><tbody><tr><td>VM</td><td>Terraform</td><td><code>terraform/*.tf</code> + state (distant et verrouillé en équipe)</td></tr><tr><td>Système + RKE2</td><td>Ansible</td><td><code>ansible/</code> (rôles, variables, vault)</td></tr><tr><td>Applications</td><td>Helm / Fleet / Argo CD</td><td>Dépôt Git d'applications</td></tr><tr><td>Sauvegarde</td><td>etcd snapshots, PBS, Velero</td><td>Stockage objet / hors site</td></tr></tbody></table></div>
+      <div class="tip">Quand ce labo fonctionne de bout en bout, tu as la maquette de ton futur projet : <strong>VMware → Proxmox</strong> (fiche Proxmox VE) pour les VM existantes, <strong>Terraform + Ansible</strong> pour les nouvelles.</div>
+    </div>
+  </div>
+
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">15 questions</span></div>
+
+      <h3>Plan en 6 séances</h3>
+      <ol><li><strong>Séance 1 :</strong> poste de contrôle, dépôt Git, jeton API Proxmox, <code>terraform plan</code> sur 1 VM</li><li><strong>Séance 2 :</strong> parcours A : 3 VM Linux par Terraform, accès SSH par clé</li><li><strong>Séance 3 :</strong> parcours A : playbook <code>site.yml</code>, <code>--check --diff</code>, idempotence, durcissement SSH</li><li><strong>Séance 4 :</strong> parcours B : 4 VM RKE2, rôle Ansible, premier serveur Ready</li><li><strong>Séance 5 :</strong> parcours B : serveurs 2 et 3, worker, IP virtuelle, premier snapshot etcd</li><li><strong>Séance 6 :</strong> Rancher en Helm, Fleet, puis <code>destroy</code> + reconstruction chronométrée</li></ol>
+
+      <h3>Auto-évaluation — clique pour voir la réponse</h3>
+      <div class="qr-list">
+        <details><summary>Pourquoi combiner Terraform et Ansible ?</summary><p>Terraform crée l'infrastructure (VM, réseau) de façon déclarative ; Ansible configure l'intérieur (paquets, services, RKE2). Chacun a son domaine.</p></details>
+        <details><summary>Qu'est-ce que l'idempotence dans Ansible ?</summary><p>Rejouer un playbook ne change rien si l'état voulu est déjà atteint (changed=0).</p></details>
+        <details><summary>À quoi servent --check et --diff ?</summary><p>Simuler sans appliquer et afficher les différences prévues.</p></details>
+        <details><summary>Comment éviter les secrets dans Git ?</summary><p>Variables d'environnement, tfvars ignoré, Ansible Vault, gestionnaire de secrets.</p></details>
+        <details><summary>Pourquoi utiliser for_each avec un map ?</summary><p>Pour créer plusieurs ressources similaires, chacune identifiée par une clé stable (ajouter ou retirer une VM ne touche pas les autres).</p></details>
+        <details><summary>Que fait cloud-init sur une VM clonée ?</summary><p>Applique au premier démarrage le nom, l'IP, l'utilisateur et la clé SSH.</p></details>
+        <details><summary>Pourquoi 3 serveurs RKE2 ?</summary><p>Pour le quorum etcd : la perte d'un serveur est tolérée.</p></details>
+        <details><summary>Pourquoi jouer serial: 1 sur les serveurs ?</summary><p>Pour qu'ils rejoignent un à un et garder le quorum stable.</p></details>
+        <details><summary>À quoi sert tls-san ?</summary><p>Inclure dans le certificat de l'API tous les noms et IP par lesquels on la joint.</p></details>
+        <details><summary>Pourquoi une IP virtuelle pour l'API ?</summary><p>Pour un point d'entrée unique qui survit à la perte d'un serveur (kube-vip ou load balancer).</p></details>
+        <details><summary>Quels sont les prérequis de l'installation Helm de Rancher ?</summary><p>Un cluster RKE2 sain, cert-manager, un nom DNS, le dépôt Rancher et un mot de passe d'amorçage.</p></details>
+        <details><summary>Comment mesurer un RTO d'infrastructure avec ce labo ?</summary><p>Détruire puis reconstruire par Terraform et Ansible en chronométrant le retour d'un cluster fonctionnel.</p></details>
+        <details><summary>Que sauvegarder en plus du code ?</summary><p>Les snapshots etcd, les volumes (Velero ou outil du stockage), le state Terraform et les VM (PBS).</p></details>
+        <details><summary>Quel est le risque d'un seul nœud Proxmox ?</summary><p>Un point de défaillance commun : toutes les VM du cluster tombent ensemble ; répartir sur plusieurs nœuds en vrai.</p></details>
+        <details><summary>Quand utiliser l'inventaire dynamique Proxmox ?</summary><p>Quand les VM sont créées par code : l'inventaire se construit depuis l'API plutôt qu'à la main.</p></details>
+      </div>
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)">
+    Labo IaC ·
+    <a href="https://registry.terraform.io/providers/bpg/proxmox/latest/docs" target="_blank" style="color:var(--accent);text-decoration:none">Provider bpg/proxmox</a> ·
+    <a href="https://docs.ansible.com/ansible/latest/collections/community/proxmox/" target="_blank" style="color:var(--accent);text-decoration:none">community.proxmox</a> ·
+    <a href="https://docs.rke2.io/" target="_blank" style="color:var(--accent);text-decoration:none">Documentation RKE2</a>
+  </footer>
+
+</div>
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("labo-iac-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("labo-iac-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>
