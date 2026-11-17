@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#c2321a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche Git et CI/CD — Débutant</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#c2321a;--accent-soft:#fbe6e1;
+  --ps:#2b2f36;--ps-mid:#c2321a;--ps-light:#f6d9b8;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#ff7a63;--accent-soft:#36130d;
+  --ps:#3a3f48;--ps-mid:#ff7a63;--ps-light:#36130d;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#ff7a63;--accent-soft:#36130d;
+  --ps:#3a3f48;--ps-mid:#ff7a63;--ps-light:#36130d;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.8rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+h4{font-size:.9rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--f-mono)}
+p{margin:6px 0 10px}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Header */
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.top-actions{display:flex;gap:8px;align-items:center}
+details{border:1px solid var(--line);border-radius:7px;padding:9px 14px;margin:8px 0;background:var(--sheet)}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details[open] summary{color:var(--accent);margin-bottom:6px}
+details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PS Banner */
+.ps-banner{background:var(--ps);border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.ps-banner-left .label{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ps-banner-left h1{color:#fff;font-size:1.5rem}
+.ps-banner-left p{color:rgba(255,255,255,.7);font-size:.88rem;margin:4px 0 0}
+.ps-stats{display:flex;gap:16px;flex-wrap:wrap}
+.ps-stat{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;text-align:center;min-width:80px}
+.ps-stat b{display:block;font:700 1.3rem var(--f-mono);color:#fff}
+.ps-stat span{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em}
+
+/* Sommaire rapide */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:28px}
+.toc h4{margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;text-decoration:none;color:var(--ink);font-size:.85rem;transition:background .15s}
+.toc-item:hover{background:var(--accent-soft);color:var(--accent)}
+.toc-num{font:600 .7rem var(--f-mono);background:var(--ps-light);color:var(--ps-mid);padding:1px 6px;border-radius:3px;min-width:28px;text-align:center}
+
+/* Sections */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.section-header{background:var(--ps);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.section-num{font:700 .75rem var(--f-mono);background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:4px}
+.section-title-text{font:700 1rem var(--f-display);color:#fff;flex:1}
+.section-nb{font:500 .7rem var(--f-mono);color:rgba(255,255,255,.55)}
+.section-body{padding:20px}
+
+/* Blocs de contenu */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.concept-card{border:1px solid var(--line);border-radius:7px;padding:12px 14px}
+.concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
+.concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
+.concept-card ul li{margin:2px 0}
+.concept-card.warn{border-left:3px solid var(--warn);border-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+
+/* Cmdlets */
+.cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+.cmdlet-table th{text-align:left;padding:7px 10px;background:var(--accent-soft);color:var(--accent);font:600 .72rem var(--f-mono);letter-spacing:.05em;border-bottom:2px solid var(--line)}
+.cmdlet-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmdlet-table tr:last-child td{border-bottom:0}
+.cmdlet-table td:first-child{font:500 .85rem var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmdlet-table td:last-child{color:var(--muted)}
+.cmdlet-table td:nth-child(2){color:var(--ink)}
+.cmdlet-table-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+
+/* Code blocks */
+.code-block{background:var(--ps);border-radius:7px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.code-block code{font:500 .85rem var(--f-mono);color:#f6d9b8;white-space:pre;display:block;line-height:1.6}
+.code-block .comment{color:rgba(255,255,255,.4)}
+.code-block .keyword{color:#9cdcfe}
+.code-block .string{color:#ce9178}
+.code-block .cmdlet{color:#dcdcaa}
+.code-block .param{color:#9cdcfe}
+
+/* Astuce / Attention */
+.tip{background:var(--ok-soft);border-left:3px solid var(--ok);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.tip strong{color:var(--ok)}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.warn strong{color:var(--warn)}
+.info{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.info strong{color:var(--accent)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font:500 .72rem var(--f-mono);padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.admin{background:var(--ok-soft);color:var(--ok)}
+.tag.cloud{background:#fbe6e1;color:#c2321a}
+.tag.script{background:#f3e8ff;color:#6b21a8}
+
+/* Comparatif */
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.compare-table th{padding:7px 10px;text-align:left;border-bottom:2px solid var(--line);font:600 .72rem var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.compare-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table td:first-child{font:600 .85rem var(--f-mono);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  h1{font-size:1.3rem}
+  .ps-banner{padding:14px 16px}
+  .ps-banner-left h1{font-size:1.2rem}
+  .ps-stats{gap:8px}
+  .ps-stat{padding:8px 10px;min-width:64px}
+  .ps-stat b{font-size:1rem}
+  .concept-grid{grid-template-columns:1fr}
+  .toc-grid{grid-template-columns:1fr}
+  .section-body{padding:14px}
+  .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">DevOps · Git et CI/CD</div>
+      <h1>Fiche — Git et CI/CD (débutant)</h1>
+    </div>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="ps-banner">
+    <div class="ps-banner-left">
+      <div class="label">Débutant · Git · Pull requests · Pipelines</div>
+      <h1>Git et CI/CD — le socle du DevOps</h1>
+      <p>Commits · Branches · Pull requests · GitHub Actions · GitLab CI · GitOps</p>
+    </div>
+    <div class="ps-stats">
+      <div class="ps-stat"><b>12</b><span>Sections</span></div>
+      <div class="ps-stat"><b>Git</b><span>Version</span></div>
+      <div class="ps-stat"><b>18</b><span>Q/R</span></div>
+    </div>
+  </div>
+
+  <div class="info"><strong>Pour qui :</strong> un administrateur système qui n'a jamais pratiqué Git. <strong>Les exemples de pipelines sont des points de départ</strong> : versions d'actions, d'images et de hooks à vérifier et mettre à jour (marquées « à vérifier »), tests à faire sur un dépôt de labo. Les outils tiers (gitleaks, pre-commit, Trivy…) sont donnés comme repères.</div>
+
+  <div class="toc">
+    <h4>Sommaire</h4>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">1</span>Pourquoi Git et le CI/CD</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>Premiers pas</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>gitignore et secrets</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">4</span>Branches, fusions, conflits</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">5</span>Dépôts distants et pull requests</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">6</span>Revenir en arrière</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Hooks et bonnes pratiques</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>CI/CD : GitHub Actions</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>GitLab CI et pipeline d'infra</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span>GitOps et équipe</a>
+      <a href="#s11" class="toc-item"><span class="toc-num">11</span>Dépannage et aide-mémoire</a>
+      <a href="#s12" class="toc-item"><span class="toc-num">12</span>Plan de labo et Q/R</a>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div class="section" id="s1">
+    <div class="section-header"><span class="section-num">1</span><span class="section-title-text">Pourquoi Git et à quoi sert le CI/CD</span><span class="section-nb">Fondations</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Git</span><span class="tag">Versionnement</span><span class="tag">CI/CD</span><span class="tag">DevOps</span></div>
+      <div class="info"><strong>Git</strong> est un système de <strong>gestion de versions</strong> : il garde l'historique de chaque fichier, qui a changé quoi, quand et pourquoi, et permet de revenir en arrière ou de travailler à plusieurs sans s'écraser. <strong>Analogie :</strong> un <em>cahier de bord de chantier</em> où chaque modification est une page datée et signée, avec la possibilité de rouvrir n'importe quelle page ancienne.</div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Sans Git</th><th>Avec Git</th></tr></thead><tbody><tr><td><code>config_v2_FINAL_ok.yml</code></td><td>Un historique propre, une seule version courante</td></tr><tr><td>« Qui a modifié ça ? »</td><td><code>git blame</code>, <code>git log</code></td></tr><tr><td>Peur de casser quelque chose</td><td>Retour arrière en une commande</td></tr><tr><td>Travail à deux = écrasements</td><td>Branches et fusions</td></tr><tr><td>Déploiement manuel</td><td>Pipeline déclenché par un commit (CI/CD)</td></tr></tbody></table></div>
+
+      <h3>Le fil du DevOps</h3>
+      <ol><li>Tout est <strong>un fichier texte</strong> : code, Terraform, playbooks Ansible, manifestes Kubernetes</li><li>Tout est <strong>dans Git</strong> : l'historique devient la mémoire de l'infrastructure</li><li>Chaque changement passe par une <strong>demande de fusion</strong> relue (pull request / merge request)</li><li>Un <strong>pipeline CI/CD</strong> vérifie automatiquement (format, validation, tests, plan) puis déploie</li><li>Le résultat est <strong>reproductible</strong> : on peut reconstruire de zéro</li></ol>
+      <div class="tip">Pour un ex-admin Windows : Git remplace les dossiers « anciennes versions », et un pipeline remplace la liste de clics du « mode opératoire ».</div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section" id="s2">
+    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">Premiers pas : installer, configurer, premier dépôt</span><span class="section-nb">Git</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">init</span><span class="tag">add</span><span class="tag">commit</span><span class="tag">config</span></div>
+      <div class="code-block"><code>git --version
+git config --global user.name "Ton Nom"
+git config --global user.email "toi@exemple.fr"
+git config --global init.defaultBranch main
+git config --global pull.rebase false         <span class="comment"># ou true selon ta préférence d'équipe</span>
+
+mkdir mon-infra &amp;&amp; cd mon-infra
+git init
+echo "# Mon infra" &gt; README.md
+git status
+git add README.md
+git commit -m "Premier commit"
+git log --oneline</code></div>
+
+      <h3>Les trois zones à comprendre</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Zone</th><th>Rôle</th><th>Analogie</th><th>Commande</th></tr></thead><tbody><tr><td>Répertoire de travail</td><td>Tes fichiers tels qu'ils sont maintenant</td><td>Le <strong>bureau</strong> en désordre</td><td>(édition normale)</td></tr><tr><td>Index (staging)</td><td>Ce qui sera dans le prochain commit</td><td>Le <strong>plateau d'envoi</strong></td><td><code>git add</code></td></tr><tr><td>Dépôt (historique)</td><td>Les commits enregistrés</td><td>Les <strong>archives</strong></td><td><code>git commit</code></td></tr></tbody></table></div>
+      <div class="code-block"><code>git status                  <span class="comment"># où en suis-je ?</span>
+git diff                    <span class="comment"># ce que j'ai modifié (non ajouté)</span>
+git diff --staged           <span class="comment"># ce qui est prêt à être commité</span>
+git add -p                  <span class="comment"># choisir morceau par morceau</span>
+git commit -m "Ajoute le rôle ssh"
+git log --oneline --graph --decorate --all</code></div>
+      <ul><li><strong>Un commit = un changement cohérent</strong>, avec un message qui dit <em>pourquoi</em> (« Désactive l'authentification par mot de passe SSH »)</li><li>Commits fréquents et petits : plus faciles à relire et à annuler</li><li><strong>Ne jamais</strong> faire <code>git add .</code> sans regarder <code>git status</code> avant (secrets, binaires, fichiers temporaires)</li></ul>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">.gitignore, secrets et ce qu'il ne faut jamais commiter</span><span class="section-nb">Git</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">.gitignore</span><span class="tag">Secrets</span><span class="tag">gitleaks</span><span class="tag">Rotation</span></div>
+      <div class="code-block"><code><span class="comment"># .gitignore d'un dépôt d'infra</span>
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+.vault_pass
+*.pem
+*.key
+.env
+kubeconfig*
+__pycache__/
+.DS_Store</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>À ne jamais commiter</th><th>Pourquoi</th><th>Alternative</th></tr></thead><tbody><tr><td>Mots de passe, jetons API, clés privées SSH</td><td>Visibles pour toujours dans l'historique</td><td>Variables d'environnement, Ansible Vault, gestionnaire de secrets, secrets du CI</td></tr><tr><td><code>terraform.tfstate</code></td><td>Contient des secrets et l'état réel</td><td>Backend distant verrouillé (S3, GitLab…)</td></tr><tr><td><code>kubeconfig</code>, jetons de cluster</td><td>Accès administrateur au cluster</td><td>Fournis à la demande, jamais versionnés</td></tr><tr><td>Gros binaires, images ISO</td><td>Dépôt qui gonfle</td><td>Registre d'artefacts, Git LFS</td></tr></tbody></table></div>
+      <div class="warn"><strong>Si un secret a été commité :</strong> le <strong>révoquer / changer immédiatement</strong> est la vraie solution. Le retirer ensuite de l'historique (<code>git filter-repo</code>, <code>BFG</code>) est un complément, pas un remède : le secret a déjà pu être copié (clones, forks, caches).</div>
+      <div class="code-block"><code><span class="comment"># Détection de secrets avant le commit (outil gitleaks, à installer)</span>
+gitleaks detect --source . --verbose
+<span class="comment"># Ou en pré-commit : voir la section « hooks »</span></code></div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section" id="s4">
+    <div class="section-header"><span class="section-num">4</span><span class="section-title-text">Branches, fusions et conflits</span><span class="section-nb">Git</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">branch</span><span class="tag">merge</span><span class="tag">rebase</span><span class="tag">conflits</span></div>
+      <div class="code-block"><code>git switch -c ajout-monitoring       <span class="comment"># créer et aller sur une branche</span>
+git branch -a ; git switch main
+git merge ajout-monitoring              <span class="comment"># fusionner dans la branche courante</span>
+git branch -d ajout-monitoring          <span class="comment"># supprimer la branche fusionnée</span></code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Notion</th><th>Explication</th><th>Analogie</th></tr></thead><tbody><tr><td>Branche</td><td>Une ligne de développement parallèle</td><td>Une <strong>copie de travail</strong> d'un plan, sans toucher l'original</td></tr><tr><td><code>main</code></td><td>La branche de référence</td><td>Le <strong>plan validé</strong></td></tr><tr><td>Merge</td><td>Fusion avec un commit de fusion</td><td><strong>Coller</strong> la copie annotée sur le plan</td></tr><tr><td>Rebase</td><td>Rejouer tes commits au-dessus de la branche de base</td><td><strong>Réécrire</strong> tes notes sur la dernière version du plan</td></tr><tr><td>Fast-forward</td><td>Avancer simplement le pointeur</td><td>Rien à fusionner : on avance</td></tr></tbody></table></div>
+
+      <h3>Résoudre un conflit</h3>
+      <ol><li>Git s'arrête et marque les fichiers : <code>git status</code> les liste</li><li>Ouvre le fichier : zones <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> (ta version / l'autre)</li><li>Garde le bon contenu, supprime les marqueurs</li><li><code>git add fichier</code> puis <code>git commit</code> (ou <code>git merge --continue</code>)</li><li>En cas de panique : <code>git merge --abort</code></li></ol>
+      <ul><li>Branches <strong>courtes</strong> : une idée, un sujet, quelques jours au plus</li><li>Mets à jour ta branche avant de fusionner : <code>git fetch</code> puis <code>git merge origin/main</code> (ou <code>rebase</code>)</li><li><strong>Ne rebase jamais</strong> une branche déjà partagée avec d'autres</li></ul>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div class="section" id="s5">
+    <div class="section-header"><span class="section-num">5</span><span class="section-title-text">Dépôts distants, GitHub / GitLab et pull requests</span><span class="section-nb">Collaboration</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">remote</span><span class="tag">push</span><span class="tag">pull request</span><span class="tag">SSH</span></div>
+      <div class="code-block"><code>ssh-keygen -t ed25519 -C "toi@poste"           <span class="comment"># puis ajouter la clé publique sur GitHub / GitLab</span>
+git remote add origin git@github.com:org/mon-infra.git
+git push -u origin main
+git clone git@github.com:org/mon-infra.git
+git fetch ; git pull ; git push
+git remote -v</code></div>
+
+      <h3>Le flux de travail courant (GitHub Flow)</h3>
+      <ol><li><code>git switch -c fix-ntp</code> : une branche par sujet</li><li>Modifier, commiter, <code>git push -u origin fix-ntp</code></li><li>Ouvrir une <strong>pull request</strong> (GitHub) ou <strong>merge request</strong> (GitLab) vers <code>main</code></li><li>Le pipeline tourne, un collègue relit et commente</li><li>Fusion après validation ; suppression de la branche</li></ol>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Réglage conseillé</th><th>Pourquoi</th></tr></thead><tbody><tr><td>Protéger <code>main</code> (pas de push direct)</td><td>Tout passe par relecture et pipeline</td></tr><tr><td>Exiger des vérifications réussies avant fusion</td><td>Un pipeline rouge bloque</td></tr><tr><td>Au moins 1 approbation</td><td>Un second regard</td></tr><tr><td>Historique linéaire (squash)</td><td>Un commit propre par fonctionnalité</td></tr></tbody></table></div>
+      <div class="tip">Même seul, travaille par branche et pull request : tu prends le réflexe, tu gardes un historique lisible, et le pipeline te protège de toi-même.</div>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="section" id="s6">
+    <div class="section-header"><span class="section-num">6</span><span class="section-title-text">Revenir en arrière sans casser : restore, revert, reset, stash</span><span class="section-nb">Git</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">restore</span><span class="tag">revert</span><span class="tag">reset</span><span class="tag">stash</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Situation</th><th>Commande</th><th>Effet</th></tr></thead><tbody><tr><td>Annuler mes modifs non commitées sur un fichier</td><td><code>git restore fichier</code></td><td>Remet le fichier tel que dans le dernier commit (<strong>perd les modifs</strong>)</td></tr><tr><td>Retirer un fichier de l'index</td><td><code>git restore --staged fichier</code></td><td>Garde les modifs, enlève de la préparation</td></tr><tr><td>Corriger le dernier commit (non poussé)</td><td><code>git commit --amend</code></td><td>Modifie le message ou ajoute des fichiers</td></tr><tr><td>Annuler un commit <em>déjà partagé</em></td><td><code>git revert &lt;commit&gt;</code></td><td>Crée un nouveau commit qui annule l'ancien : <strong>sûr</strong></td></tr><tr><td>Reculer ma branche locale (non poussée)</td><td><code>git reset --hard &lt;commit&gt;</code></td><td><strong>Destructif</strong> : réécrit la branche locale</td></tr><tr><td>Mettre de côté mon travail</td><td><code>git stash</code> / <code>git stash pop</code></td><td>Range puis reprend</td></tr><tr><td>Retrouver un commit « perdu »</td><td><code>git reflog</code></td><td>Journal de tous les déplacements de HEAD</td></tr></tbody></table></div>
+      <div class="warn"><strong>Règle d'or :</strong> sur ce qui est déjà poussé et partagé, utilise <code>revert</code>. <code>reset --hard</code> et <code>push --force</code> réécrivent l'historique et peuvent faire perdre le travail des autres : à réserver à tes branches personnelles (et préférer <code>--force-with-lease</code>).</div>
+    </div>
+  </div>
+
+  <!-- S7 -->
+  <div class="section" id="s7">
+    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Hooks, conventions et bonnes pratiques</span><span class="section-nb">Git</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">pre-commit</span><span class="tag">Conventions</span><span class="tag">Tags</span><span class="tag">Release</span></div>
+      <ul><li><strong>Messages de commit</strong> : impératif, court en titre (≈ 50 caractères), détail en corps ; des conventions comme <em>Conventional Commits</em> (<code>feat:</code>, <code>fix:</code>, <code>docs:</code>) facilitent les journaux de version</li><li><strong>Tags</strong> : <code>git tag -a v1.2.0 -m "…"</code> pour figer une version ; <code>git push --tags</code></li><li><strong>pre-commit</strong> : exécuter des vérifications avant chaque commit (format, lint, détection de secrets)</li><li><strong>CODEOWNERS</strong> : désigner les relecteurs obligatoires d'un dossier</li><li><strong>Monorepo ou plusieurs dépôts</strong> : un dépôt « infrastructure » (Terraform, Ansible) distinct des applications est un bon début</li></ul>
+      <div class="code-block"><code><span class="comment"># .pre-commit-config.yaml (outil pre-commit)</span>
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0                   <span class="comment"># version à vérifier / mettre à jour</span>
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: detect-private-key
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.96.0                  <span class="comment"># idem</span>
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate</code></div>
+    </div>
+  </div>
+
+  <!-- S8 -->
+  <div class="section" id="s8">
+    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">CI/CD : notions et GitHub Actions</span><span class="section-nb">CI/CD</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">CI</span><span class="tag">CD</span><span class="tag">Actions</span><span class="tag">Runners</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Terme</th><th>Sens</th><th>Analogie</th></tr></thead><tbody><tr><td><strong>CI</strong> (intégration continue)</td><td>À chaque changement : construire, vérifier, tester automatiquement</td><td>Le <strong>contrôle qualité à la réception</strong> de chaque pièce</td></tr><tr><td><strong>CD</strong> (livraison / déploiement continu)</td><td>Livrer automatiquement (ou après validation) vers un environnement</td><td>La <strong>chaîne de montage</strong> jusqu'au client</td></tr><tr><td><strong>Pipeline</strong></td><td>Suite d'étapes (stages / jobs)</td><td>La <strong>ligne de production</strong></td></tr><tr><td><strong>Runner</strong></td><td>Machine qui exécute les jobs</td><td>L'<strong>ouvrier</strong> de la chaîne</td></tr><tr><td><strong>Artefact</strong></td><td>Fichier produit par un job (plan, image, rapport)</td><td>Le <strong>colis</strong> passé à l'étape suivante</td></tr><tr><td><strong>Environnement</strong></td><td>Cible : test, préprod, prod</td><td>Les <strong>sites d'installation</strong></td></tr></tbody></table></div>
+      <div class="code-block"><code><span class="comment"># .github/workflows/terraform.yml : plan sur pull request, apply manuel sur main</span>
+name: terraform
+on:
+  pull_request:
+    paths: [ "terraform/**" ]
+  push:
+    branches: [ main ]
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: terraform } }
+    steps:
+      - uses: actions/checkout@v4              <span class="comment"># version à vérifier / mettre à jour</span>
+      - uses: hashicorp/setup-terraform@v3     <span class="comment"># idem</span>
+      - run: terraform fmt -check
+      - run: terraform init -backend=false
+      - run: terraform validate
+      - run: terraform plan
+        env:
+          TF_VAR_pve_api_token: ${{ secrets.PVE_API_TOKEN }}   <span class="comment"># secret du dépôt</span>
+
+  apply:
+    if: github.ref == 'refs/heads/main'
+    needs: plan
+    environment: production           <span class="comment"># approbation manuelle exigée</span>
+    runs-on: self-hosted              <span class="comment"># runner dans ton réseau (Proxmox non exposé)</span>
+    steps:
+      - uses: actions/checkout@v4
+      - run: terraform -chdir=terraform apply -auto-approve</code></div>
+      <ul><li>Les <strong>secrets</strong> viennent du coffre du CI (<code>secrets.X</code>), jamais du dépôt</li><li>Un Proxmox interne n'est pas joignable depuis les runners hébergés : prévoir un <strong>runner auto-hébergé</strong> dans ton réseau</li><li>Épingle les versions des actions (ou leur empreinte) et mets-les à jour : c'est de la chaîne d'approvisionnement</li></ul>
+    </div>
+  </div>
+
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">CI/CD avec GitLab CI et un pipeline d'infrastructure complet</span><span class="section-nb">CI/CD</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">GitLab CI</span><span class="tag">Terraform</span><span class="tag">Ansible</span><span class="tag">Approbation</span></div>
+      <div class="code-block"><code><span class="comment"># .gitlab-ci.yml</span>
+stages: [ lint, plan, apply, configure ]
+
+variables:
+  TF_ROOT: terraform
+
+lint:
+  stage: lint
+  image: hashicorp/terraform:1.9          <span class="comment"># version à adapter</span>
+  script:
+    - cd $TF_ROOT &amp;&amp; terraform fmt -check &amp;&amp; terraform init -backend=false &amp;&amp; terraform validate
+
+plan:
+  stage: plan
+  image: hashicorp/terraform:1.9
+  script:
+    - cd $TF_ROOT &amp;&amp; terraform init &amp;&amp; terraform plan -out=plan.tfplan
+  artifacts:
+    paths: [ terraform/plan.tfplan ]
+
+apply:
+  stage: apply
+  image: hashicorp/terraform:1.9
+  script:
+    - cd $TF_ROOT &amp;&amp; terraform apply plan.tfplan
+  when: manual                           <span class="comment"># validation humaine</span>
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+configure:
+  stage: configure
+  image: willhallonline/ansible:latest   <span class="comment"># image à choisir / épingler</span>
+  script:
+    - cd ansible &amp;&amp; ansible-playbook -i inventory site.yml --diff
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual</code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Étape du pipeline</th><th>Vérifie / fait</th><th>Outil</th></tr></thead><tbody><tr><td>lint</td><td>Formatage et syntaxe</td><td><code>terraform fmt</code>, <code>validate</code>, <code>ansible-lint</code>, <code>yamllint</code></td></tr><tr><td>scan</td><td>Secrets, vulnérabilités, mauvaises pratiques</td><td>gitleaks, Trivy, tfsec / Checkov</td></tr><tr><td>plan</td><td>Ce qui va changer</td><td><code>terraform plan</code> (sortie jointe à la MR)</td></tr><tr><td>apply</td><td>Appliquer, après approbation</td><td><code>terraform apply</code></td></tr><tr><td>configure</td><td>Configurer les machines</td><td><code>ansible-playbook --check</code> puis réel</td></tr><tr><td>post-déploiement</td><td>Vérifier que ça marche</td><td>tests de fumée (<code>curl</code>, <code>kubectl get</code>), supervision</td></tr></tbody></table></div>
+      <div class="warn">Ne branche jamais un <code>apply</code> automatique sur la production sans <strong>plan relu</strong> et <strong>approbation</strong>. Commence par un environnement de labo.</div>
+    </div>
+  </div>
+
+  <!-- S10 -->
+  <div class="section" id="s10">
+    <div class="section-header"><span class="section-num">10</span><span class="section-title-text">GitOps et workflow d'équipe</span><span class="section-nb">GitOps</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Argo CD</span><span class="tag">Flux</span><span class="tag">Fleet</span><span class="tag">Revue</span></div>
+      <ul><li><strong>GitOps</strong> : le dépôt Git est la <em>source de vérité</em> ; un opérateur (Argo CD, Flux, Fleet) synchronise le cluster sur le dépôt et corrige toute dérive</li><li><strong>Revue de code</strong> : un changement d'infra se relit comme du code (taille raisonnable, <code>terraform plan</code> joint, explication du <em>pourquoi</em>)</li><li><strong>Environnements</strong> : dossiers ou branches par environnement (<code>envs/test</code>, <code>envs/prod</code>), promotion par pull request</li><li><strong>Retour arrière</strong> : <code>git revert</code> du commit fautif, le pipeline redéploie l'état précédent</li><li><strong>Traçabilité</strong> : qui a changé quoi, quand, avec quelle validation (utile pour l'audit)</li></ul>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Pratique</th><th>Gain</th></tr></thead><tbody><tr><td>Un changement = une pull request</td><td>Relecture et historique clair</td></tr><tr><td>Pipeline obligatoire avant fusion</td><td>Zéro « ça marchait chez moi »</td></tr><tr><td>Déploiement piloté par Git</td><td>Reconstruction possible, dérive détectée</td></tr><tr><td>Secrets hors dépôt</td><td>Pas de fuite dans l'historique</td></tr><tr><td>Documentation dans le dépôt (README, runbooks)</td><td>La connaissance suit le code</td></tr></tbody></table></div>
+      <div class="tip">Liens : <a href="../labo-iac/fiche.html">Labo IaC</a> (Terraform + Ansible + Fleet), <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a> (Fleet), <a href="../kubernetes/fiche.html">Kubernetes</a> (GitOps).</div>
+    </div>
+  </div>
+
+  <!-- S11 -->
+  <div class="section" id="s11">
+    <div class="section-header"><span class="section-num">11</span><span class="section-title-text">Dépannage Git et aide-mémoire</span><span class="section-nb">Aide-mémoire</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Erreurs</span><span class="tag">Pièges</span><span class="tag">Commandes</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Message / problème</th><th>Cause</th><th>Solution</th></tr></thead><tbody><tr><td><code>rejected … non-fast-forward</code></td><td>Le distant a des commits que tu n'as pas</td><td><code>git pull</code> (ou <code>fetch</code> + <code>merge/rebase</code>) puis <code>push</code></td></tr><tr><td><code>detached HEAD</code></td><td>Tu es sur un commit, pas sur une branche</td><td><code>git switch main</code> ou <code>git switch -c nouvelle</code> pour garder ton travail</td></tr><tr><td><code>Permission denied (publickey)</code></td><td>Clé SSH absente ou non ajoutée</td><td><code>ssh -T git@github.com</code>, vérifier l'agent et la clé publique sur le serveur</td></tr><tr><td>Commit sur la mauvaise branche</td><td>—</td><td><code>git switch -c bonne-branche</code> puis remettre l'ancienne branche à l'état voulu (<code>reset</code>) ou <code>cherry-pick</code></td></tr><tr><td>Fichier ignoré qui est quand même suivi</td><td>Il était déjà commité</td><td><code>git rm --cached fichier</code> puis commit</td></tr><tr><td>Gros fichier poussé par erreur</td><td>—</td><td>Le retirer puis nettoyer l'historique (<code>filter-repo</code>) ; révoquer si secret</td></tr><tr><td>Pipeline rouge sans raison claire</td><td>Version d'outil, secret manquant, runner</td><td>Lire le log du job, reproduire localement avec la même image</td></tr></tbody></table></div>
+      <div class="code-block"><code>git status ; git log --oneline --graph --all ; git diff ; git stash list ; git reflog
+git blame fichier ; git log -p -- fichier ; git bisect start        <span class="comment"># chercher le commit fautif</span>
+git cherry-pick &lt;commit&gt; ; git tag ; git remote -v ; git config --list</code></div>
+    </div>
+  </div>
+
+  <!-- S12 -->
+  <div class="section" id="s12">
+    <div class="section-header"><span class="section-num">12</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">18 questions</span></div>
+
+      <h3>Plan de labo en 6 séances</h3>
+      <ol><li><strong>Séance 1 :</strong> installer Git, configurer l'identité, créer un dépôt, 5 commits avec <code>add -p</code>, lire <code>log --graph</code></li><li><strong>Séance 2 :</strong> <code>.gitignore</code>, détecter un faux secret avec gitleaks, simuler un secret commité et décider quoi faire</li><li><strong>Séance 3 :</strong> branches, merge, provoquer puis résoudre un conflit, essayer <code>rebase</code> sur une branche perso</li><li><strong>Séance 4 :</strong> clé SSH, dépôt GitHub / GitLab, branche + pull request relue (par toi-même ou un ami), protection de <code>main</code></li><li><strong>Séance 5 :</strong> pipeline de lint (YAML, Terraform fmt / validate) déclenché à chaque pull request</li><li><strong>Séance 6 :</strong> pipeline <code>plan</code> + <code>apply</code> manuel sur le dépôt du <a href="../labo-iac/fiche.html">Labo IaC</a> avec un runner dans ton réseau, puis retour arrière par <code>revert</code></li></ol>
+
+      <h3>Auto-évaluation — clique pour voir la réponse</h3>
+      <div class="qr-list">
+        <details><summary>Quelle est la différence entre git add et git commit ?</summary><p>add place les modifications dans l'index (préparation) ; commit enregistre l'index dans l'historique.</p></details>
+        <details><summary>À quoi sert git status ?</summary><p>À voir l'état du dépôt : fichiers modifiés, préparés ou non suivis.</p></details>
+        <details><summary>Pourquoi travailler par branches ?</summary><p>Pour isoler un changement, le relire et le tester avant de le fusionner dans main.</p></details>
+        <details><summary>Que contient un fichier .gitignore ?</summary><p>Les motifs de fichiers que Git ne doit pas suivre (secrets, état Terraform, fichiers temporaires).</p></details>
+        <details><summary>Un secret a été commité : que faire en premier ?</summary><p>Le révoquer ou le changer immédiatement ; nettoyer l'historique ensuite n'est qu'un complément.</p></details>
+        <details><summary>Quelle différence entre merge et rebase ?</summary><p>Merge crée un commit de fusion et garde l'historique réel ; rebase rejoue tes commits sur la base mise à jour pour un historique linéaire (jamais sur une branche partagée).</p></details>
+        <details><summary>Comment annuler un commit déjà poussé ?</summary><p>git revert, qui crée un commit inverse sans réécrire l'historique.</p></details>
+        <details><summary>Que fait git reset --hard ?</summary><p>Déplace la branche et efface les modifications locales : destructif, à éviter sur ce qui est partagé.</p></details>
+        <details><summary>À quoi sert git reflog ?</summary><p>À retrouver un commit « perdu » grâce au journal des déplacements de HEAD.</p></details>
+        <details><summary>Qu'est-ce qu'une pull request ?</summary><p>Une demande de fusion d'une branche, avec relecture et pipeline, avant intégration dans main.</p></details>
+        <details><summary>Quelle différence entre CI et CD ?</summary><p>CI : vérifier et tester automatiquement chaque changement ; CD : le livrer automatiquement (ou après validation) vers un environnement.</p></details>
+        <details><summary>Qu'est-ce qu'un runner ?</summary><p>La machine qui exécute les jobs du pipeline ; auto-hébergé s'il doit joindre un réseau interne.</p></details>
+        <details><summary>Où mettre les secrets d'un pipeline ?</summary><p>Dans le coffre du CI (secrets / variables protégées), jamais dans le dépôt.</p></details>
+        <details><summary>Pourquoi un terraform plan sur chaque pull request ?</summary><p>Pour relire exactement ce qui va changer avant d'accepter la fusion.</p></details>
+        <details><summary>Pourquoi une approbation avant terraform apply en production ?</summary><p>Pour éviter un déploiement involontaire : un humain valide le plan.</p></details>
+        <details><summary>Qu'est-ce que le GitOps ?</summary><p>L'état voulu est dans Git et un opérateur synchronise le cluster, détecte la dérive et permet le retour arrière par Git.</p></details>
+        <details><summary>Que signifie « détached HEAD » ?</summary><p>On est positionné sur un commit et non sur une branche : créer une branche pour garder son travail.</p></details>
+        <details><summary>Que faire si git push est rejeté (non-fast-forward) ?</summary><p>Récupérer les commits distants (pull ou fetch + merge / rebase), puis repousser.</p></details>
+      </div>
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)">
+    Fiche Git et CI/CD ·
+    <a href="https://git-scm.com/book/fr/v2" target="_blank" style="color:var(--accent);text-decoration:none">Pro Git (livre officiel, FR)</a> ·
+    <a href="https://docs.github.com/actions" target="_blank" style="color:var(--accent);text-decoration:none">Documentation GitHub Actions</a> ·
+    <a href="https://docs.gitlab.com/ee/ci/" target="_blank" style="color:var(--accent);text-decoration:none">Documentation GitLab CI</a>
+  </footer>
+
+</div>
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("git-cicd-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("git-cicd-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>

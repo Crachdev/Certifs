@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#3f51b5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Parcours DevOps — Plan de progression</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#3f51b5;--accent-soft:#e8eaf6;
+  --ps:#2b2f36;--ps-mid:#3f51b5;--ps-light:#f6d9b8;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#8c9eff;--accent-soft:#1a1f3d;
+  --ps:#3a3f48;--ps-mid:#8c9eff;--ps-light:#1a1f3d;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#8c9eff;--accent-soft:#1a1f3d;
+  --ps:#3a3f48;--ps-mid:#8c9eff;--ps-light:#1a1f3d;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.8rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+h4{font-size:.9rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--f-mono)}
+p{margin:6px 0 10px}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Header */
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.top-actions{display:flex;gap:8px;align-items:center}
+details{border:1px solid var(--line);border-radius:7px;padding:9px 14px;margin:8px 0;background:var(--sheet)}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details[open] summary{color:var(--accent);margin-bottom:6px}
+details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PS Banner */
+.ps-banner{background:var(--ps);border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.ps-banner-left .label{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ps-banner-left h1{color:#fff;font-size:1.5rem}
+.ps-banner-left p{color:rgba(255,255,255,.7);font-size:.88rem;margin:4px 0 0}
+.ps-stats{display:flex;gap:16px;flex-wrap:wrap}
+.ps-stat{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;text-align:center;min-width:80px}
+.ps-stat b{display:block;font:700 1.3rem var(--f-mono);color:#fff}
+.ps-stat span{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em}
+
+/* Sommaire rapide */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:28px}
+.toc h4{margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;text-decoration:none;color:var(--ink);font-size:.85rem;transition:background .15s}
+.toc-item:hover{background:var(--accent-soft);color:var(--accent)}
+.toc-num{font:600 .7rem var(--f-mono);background:var(--ps-light);color:var(--ps-mid);padding:1px 6px;border-radius:3px;min-width:28px;text-align:center}
+
+/* Sections */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.section-header{background:var(--ps);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.section-num{font:700 .75rem var(--f-mono);background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:4px}
+.section-title-text{font:700 1rem var(--f-display);color:#fff;flex:1}
+.section-nb{font:500 .7rem var(--f-mono);color:rgba(255,255,255,.55)}
+.section-body{padding:20px}
+
+/* Blocs de contenu */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.concept-card{border:1px solid var(--line);border-radius:7px;padding:12px 14px}
+.concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
+.concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
+.concept-card ul li{margin:2px 0}
+.concept-card.warn{border-left:3px solid var(--warn);border-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+
+/* Cmdlets */
+.cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+.cmdlet-table th{text-align:left;padding:7px 10px;background:var(--accent-soft);color:var(--accent);font:600 .72rem var(--f-mono);letter-spacing:.05em;border-bottom:2px solid var(--line)}
+.cmdlet-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmdlet-table tr:last-child td{border-bottom:0}
+.cmdlet-table td:first-child{font:500 .85rem var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmdlet-table td:last-child{color:var(--muted)}
+.cmdlet-table td:nth-child(2){color:var(--ink)}
+.cmdlet-table-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+
+/* Code blocks */
+.code-block{background:var(--ps);border-radius:7px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.code-block code{font:500 .85rem var(--f-mono);color:#f6d9b8;white-space:pre;display:block;line-height:1.6}
+.code-block .comment{color:rgba(255,255,255,.4)}
+.code-block .keyword{color:#9cdcfe}
+.code-block .string{color:#ce9178}
+.code-block .cmdlet{color:#dcdcaa}
+.code-block .param{color:#9cdcfe}
+
+/* Astuce / Attention */
+.tip{background:var(--ok-soft);border-left:3px solid var(--ok);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.tip strong{color:var(--ok)}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.warn strong{color:var(--warn)}
+.info{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.info strong{color:var(--accent)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font:500 .72rem var(--f-mono);padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.admin{background:var(--ok-soft);color:var(--ok)}
+.tag.cloud{background:#e8eaf6;color:#3f51b5}
+.tag.script{background:#f3e8ff;color:#6b21a8}
+
+/* Comparatif */
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.compare-table th{padding:7px 10px;text-align:left;border-bottom:2px solid var(--line);font:600 .72rem var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.compare-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table td:first-child{font:600 .85rem var(--f-mono);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  h1{font-size:1.3rem}
+  .ps-banner{padding:14px 16px}
+  .ps-banner-left h1{font-size:1.2rem}
+  .ps-stats{gap:8px}
+  .ps-stat{padding:8px 10px;min-width:64px}
+  .ps-stat b{font-size:1rem}
+  .concept-grid{grid-template-columns:1fr}
+  .toc-grid{grid-template-columns:1fr}
+  .section-body{padding:14px}
+  .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">Parcours · Plan de progression</div>
+      <h1>Parcours — Admin Proxmox et DevOps</h1>
+    </div>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="ps-banner">
+    <div class="ps-banner-left">
+      <div class="label">Plan en 5 phases · Priorités · Livrables · Projet de migration</div>
+      <h1>Parcours — de l'admin Windows à l'admin Proxmox / DevOps</h1>
+      <p>5 phases · priorités P1/P2/P3 · livrables · critères de réussite · projet VMware → Proxmox</p>
+    </div>
+    <div class="ps-stats">
+      <div class="ps-stat"><b>10</b><span>Sections</span></div>
+      <div class="ps-stat"><b>12-14 sem.</b><span>Version</span></div>
+      <div class="ps-stat"><b>8</b><span>Q/R</span></div>
+    </div>
+  </div>
+
+  <div class="info"><strong>Hypothèse :</strong> environ 5 heures par semaine, ce qui donne 12 à 14 semaines. <strong>Les durées sont indicatives</strong> : adapte-les à ton rythme réel. Les priorités (P1 / P2 / P3) sont une recommandation pour un projet de migration VMware → Proxmox, à ajuster selon tes besoins.</div>
+
+  <div class="toc">
+    <h4>Sommaire</h4>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">1</span>Principe et règles du jeu</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>La carte des fiches</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>Priorités P1, P2, P3</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">4</span>Phase 1 : Linux et Git</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">5</span>Phase 2 : Proxmox VE</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">6</span>Phase 3 : automatiser Proxmox</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Phases 4 et 5 : supervision et Kubernetes</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Projet final et suivi</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Pièges de progression</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span>Faire vivre le parcours</a>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div class="section" id="s1">
+    <div class="section-header"><span class="section-num">1</span><span class="section-title-text">Principe du parcours et règles du jeu</span><span class="section-nb">Cadrage</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Plan</span><span class="tag">Priorités</span><span class="tag">Rythme</span><span class="tag">Pratique</span></div>
+      <div class="info"><strong>Objectif :</strong> passer d'administrateur Windows / virtualisation à <strong>administrateur Proxmox et DevOps</strong>, et arriver prêt à piloter un projet de <strong>migration VMware → Proxmox</strong>. Ce parcours ordonne les fiches du site en <strong>5 phases</strong>, chacune avec un <strong>livrable</strong> et un <strong>critère de réussite</strong>.</div>
+
+      <h3>Hypothèse de rythme (à adapter)</h3>
+      <ul><li>Base de calcul : <strong>environ 5 heures par semaine</strong> (3 séances d'environ 1 h 30). Si tu disposes de moins, étire les phases sans changer l'ordre.</li><li>Durée totale indicative : <strong>12 à 14 semaines</strong>. C'est une estimation, pas une promesse : le temps réel dépend de ta prise en main du labo.</li></ul>
+
+      <h3>Les 6 règles</h3>
+      <ol><li><strong>70 % de pratique, 30 % de lecture.</strong> Une fiche lue sans labo ne compte pas comme terminée.</li><li><strong>Un seul sujet à la fois.</strong> Pas de phase suivante tant que le critère de réussite n'est pas atteint.</li><li><strong>Tout dans Git dès la phase 1</strong> : tes notes, scripts et fichiers de labo.</li><li><strong>Chaque erreur rencontrée est notée</strong> (symptôme, cause, correction) : c'est ta documentation personnelle.</li><li><strong>Détruire et reconstruire</strong> régulièrement : c'est le test d'une vraie compétence.</li><li><strong>Un point d'étape par semaine</strong> (modèle en section 8) : 10 minutes, honnêtement.</li></ol>
+      <div class="warn"><strong>Piège numéro 1 :</strong> la dispersion (tout lire, rien installer). Si une semaine se termine sans manipulation, la semaine suivante est consacrée à rattraper la manipulation, pas à avancer.</div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section" id="s2">
+    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">La carte : quelles fiches, dans quel ordre, pourquoi</span><span class="section-nb">Cadrage</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Dépendances</span><span class="tag">Fiches</span><span class="tag">Ordre</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Phase</th><th>Thème</th><th>Fiche du site</th><th>Pourquoi à ce moment</th></tr></thead><tbody><tr><td><strong>1</strong></td><td>Bases Linux</td><td><a href="../linux/fiche.html">Linux : débutant et boîte à outils</a></td><td>Tout le reste tourne sur Linux</td></tr><tr><td><strong>1</strong></td><td>Git</td><td><a href="../git-cicd/fiche.html">Git et CI/CD</a></td><td>Pour versionner dès le début</td></tr><tr><td><strong>2</strong></td><td>Virtualisation Proxmox</td><td><a href="../proxmox-ve/fiche.html">Proxmox VE</a> + <a href="../proxmox-ve/glossaire.html">glossaire</a></td><td>Ton cœur de métier, avec tes repères Hyper-V / VMware</td></tr><tr><td><strong>3</strong></td><td>Automatisation Proxmox</td><td><a href="../proxmox-devops/fiche.html">Proxmox DevOps</a></td><td>API, jetons, cloud-init, Terraform, Ansible</td></tr><tr><td><strong>3</strong></td><td>Application guidée</td><td><a href="../labo-iac/fiche.html">Labo IaC</a></td><td>Relie tout par le code</td></tr><tr><td><strong>4</strong></td><td>Supervision</td><td><a href="../supervision/fiche.html">Supervision</a></td><td>On ne déploie pas sans surveiller</td></tr><tr><td><strong>5</strong></td><td>Conteneurs</td><td><a href="../kubernetes/fiche.html">Kubernetes</a></td><td>Socle de RKE2 et Rancher</td></tr><tr><td><strong>5</strong></td><td>Plateforme Kubernetes</td><td><a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a></td><td>Production et gestion multi-clusters</td></tr><tr><td><strong>Projet</strong></td><td>Migration VMware → Proxmox</td><td><a href="../proxmox-ve/fiche.html">Proxmox VE</a> (section 16, 18, 19) + <a href="../proxmox-ve/runbook.html">runbook</a></td><td>La finalité du parcours</td></tr></tbody></table></div>
+      <div class="tip">Les phases 4 (supervision) et 5 (Kubernetes) peuvent s'inverser selon ton projet. <strong>La migration VMware → Proxmox n'a pas besoin de Kubernetes</strong> : si ton échéance est proche, saute la phase 5 (ou reporte-la) et consacre le temps gagné au projet de migration.</div>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">Priorités : P1, P2, P3</span><span class="section-nb">Cadrage</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Priorités</span><span class="tag">Essentiel</span><span class="tag">Bonus</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Priorité</th><th>Signification</th><th>Contenu</th></tr></thead><tbody><tr><td><strong>P1</strong> — indispensable au projet</td><td>À maîtriser avant de toucher la production</td><td>Linux (shell, droits, services, disques, réseau, SSH) ; Git (commits, branches, pull requests) ; Proxmox (VM, stockage, réseau, sauvegarde PBS, cluster et quorum, migration depuis VMware)</td></tr><tr><td><strong>P2</strong> — fortement recommandé</td><td>Gain de temps et de fiabilité majeur</td><td>Terraform + cloud-init + Ansible sur Proxmox ; supervision de base (Prometheus, Grafana, alertes) ; pipelines CI/CD simples</td></tr><tr><td><strong>P3</strong> — pour la suite</td><td>Utile, pas bloquant pour la migration</td><td>Kubernetes, RKE2, Rancher ; Fleet / GitOps ; Loki et traces ; durcissement CIS ; Packer</td></tr></tbody></table></div>
+      <ul><li><strong>Si tu manques de temps : P1 d'abord, P2 ensuite, P3 plus tard</strong>, sans culpabilité</li><li>Chaque phase ci-dessous indique sa priorité</li></ul>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section" id="s4">
+    <div class="section-header"><span class="section-num">4</span><span class="section-title-text">Phase 1 — Linux et Git (semaines 1 à 3) · P1</span><span class="section-nb">Phase 1</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Linux</span><span class="tag">Git</span><span class="tag">Priorité P1</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Semaine</th><th>Objectif</th><th>À faire</th><th>Fiche</th></tr></thead><tbody><tr><td>1</td><td>Être à l'aise dans le shell</td><td>2 VM (Ubuntu + Rocky), navigation, droits, pipes, utilisateurs et sudo</td><td><a href="../linux/fiche.html">Linux</a>, séances 1 à 3</td></tr><tr><td>2</td><td>Gérer un serveur</td><td>systemd, paquets, disques et LVM, réseau, SSH par clés, sauvegarde rsync</td><td><a href="../linux/fiche.html">Linux</a>, séances 4 à 7</td></tr><tr><td>3</td><td>Versionner son travail</td><td>Dépôt Git, branches, pull request, conflit résolu, <code>.gitignore</code>, secrets</td><td><a href="../git-cicd/fiche.html">Git et CI/CD</a>, séances 1 à 4</td></tr></tbody></table></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Livrable</th><th>Critère de réussite (à cocher honnêtement)</th></tr></thead><tbody><tr><td>Dépôt Git <code>notes-admin</code></td><td>Au moins 15 commits propres ; une pull request fusionnée ; aucun secret dedans</td></tr><tr><td>2 VM Linux durcies</td><td>SSH par clé uniquement, pare-feu actif, sauvegarde rsync restaurée avec succès</td></tr><tr><td>Un script bash robuste</td><td><code>set -euo pipefail</code>, variables entre guillemets, <code>shellcheck</code> sans erreur</td></tr></tbody></table></div>
+      <div class="info"><strong>Tu as réussi si</strong> tu peux, sans notes, créer un utilisateur, ouvrir un port, diagnostiquer un service qui ne démarre pas et faire un <code>git revert</code>.</div>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div class="section" id="s5">
+    <div class="section-header"><span class="section-num">5</span><span class="section-title-text">Phase 2 — Proxmox VE (semaines 4 à 7) · P1</span><span class="section-nb">Phase 2</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Proxmox</span><span class="tag">Stockage</span><span class="tag">Cluster</span><span class="tag">Migration</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Semaine</th><th>Objectif</th><th>À faire</th><th>Fiche</th></tr></thead><tbody><tr><td>4</td><td>Installer et comprendre</td><td>Proxmox (VM imbriquée ou machine dédiée), interface, stockage, réseau (bridge, VLAN), première VM et premier conteneur LXC</td><td><a href="../proxmox-ve/fiche.html">Proxmox VE</a>, sections 1 à 10 + <a href="../proxmox-ve/glossaire.html">glossaire</a></td></tr><tr><td>5</td><td>Protéger</td><td>Snapshots, sauvegardes vzdump, PBS, restauration, pare-feu</td><td><a href="../proxmox-ve/fiche.html">Proxmox VE</a> (sauvegarde, pare-feu)</td></tr><tr><td>6</td><td>Cluster et HA</td><td>Cluster à 3 nœuds (virtualisés si besoin), quorum, QDevice, HA, migration à chaud</td><td><a href="../proxmox-ve/fiche.html">Proxmox VE</a> : labo des 8 manipulations (quorum / HA)</td></tr><tr><td>7</td><td>Migrer depuis VMware</td><td>Conversion (qemu-img / assistant d'import), pilotes VirtIO, scénarios, post-migration</td><td><a href="../proxmox-ve/fiche.html">Proxmox VE</a> : section migration, <a href="../proxmox-ve/runbook.html">runbook</a></td></tr></tbody></table></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Livrable</th><th>Critère de réussite</th></tr></thead><tbody><tr><td>Mini-environnement Proxmox de labo</td><td>Cluster 3 nœuds sain, 3 VM et 1 CT, une VM en HA qui redémarre après coupure d'un nœud</td></tr><tr><td>Une VM issue de VMware (ou d'un OVA / VMDK de test)</td><td>Convertie, démarrant avec VirtIO, réseau OK, sauvegardée et restaurée</td></tr><tr><td>Runbook de migration commencé</td><td>Inventaire de 5 VM fictives rempli dans le <a href="../proxmox-ve/runbook.html">runbook</a></td></tr></tbody></table></div>
+      <div class="info"><strong>Tu as réussi si</strong> tu peux expliquer à un collègue le quorum, la différence snapshot / sauvegarde, et refaire une migration VMware → Proxmox complète en suivant ton runbook.</div>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="section" id="s6">
+    <div class="section-header"><span class="section-num">6</span><span class="section-title-text">Phase 3 — Automatiser Proxmox (semaines 8 à 10) · P2</span><span class="section-nb">Phase 3</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Terraform</span><span class="tag">Ansible</span><span class="tag">cloud-init</span><span class="tag">CI/CD</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Semaine</th><th>Objectif</th><th>À faire</th><th>Fiche</th></tr></thead><tbody><tr><td>8</td><td>API et modèles</td><td>Jeton d'API, modèle cloud-init, <code>pvesh</code>, première VM par Terraform</td><td><a href="../proxmox-devops/fiche.html">Proxmox DevOps</a>, sections 1 à 6</td></tr><tr><td>9</td><td>Configurer par code</td><td>Playbook Ansible, idempotence, rôles, inventaire dynamique</td><td><a href="../proxmox-devops/fiche.html">Proxmox DevOps</a> + <a href="../labo-iac/fiche.html">Labo IaC</a> (parcours A)</td></tr><tr><td>10</td><td>Pipeline</td><td>Pipeline plan / apply manuel, secrets dans le CI, destruction et reconstruction</td><td><a href="../git-cicd/fiche.html">Git et CI/CD</a> (sections CI/CD) + <a href="../labo-iac/fiche.html">Labo IaC</a></td></tr></tbody></table></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Livrable</th><th>Critère de réussite</th></tr></thead><tbody><tr><td>Dépôt <code>lab-iac</code></td><td>Terraform + Ansible, pipeline vert, aucun secret</td></tr><tr><td>Parc de 3 VM reconstructible</td><td><code>destroy</code> puis reconstruction complète en moins de 15 minutes (à mesurer : c'est ton RTO d'infrastructure)</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S7 -->
+  <div class="section" id="s7">
+    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Phases 4 et 5 — Supervision puis Kubernetes (semaines 11 à 14) · P2 / P3</span><span class="section-nb">Phase 4 et 5</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Supervision</span><span class="tag">Kubernetes</span><span class="tag">RKE2</span><span class="tag">Rancher</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Semaine</th><th>Objectif</th><th>À faire</th><th>Fiche</th></tr></thead><tbody><tr><td>11</td><td>Savoir si ça va mal · P2</td><td>Prometheus + Grafana + Alertmanager, <code>node_exporter</code> sur le parc, 3 alertes testées, supervision de Proxmox</td><td><a href="../supervision/fiche.html">Supervision</a>, séances 1 à 4</td></tr><tr><td>12</td><td>Comprendre Kubernetes · P3</td><td>Cluster jetable, Deployment, Service, volume, RBAC</td><td><a href="../kubernetes/fiche.html">Kubernetes</a> : glossaire (section 3) puis séances 1 à 4</td></tr><tr><td>13</td><td>Monter RKE2 · P3</td><td>3 serveurs + 1 worker, sauvegarde etcd, restauration testée</td><td><a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a>, séances 1 à 3</td></tr><tr><td>14</td><td>Piloter avec Rancher · P3</td><td>Rancher en Helm, SSO, cluster importé / créé, Fleet, monitoring, sauvegarde</td><td><a href="../labo-iac/fiche.html">Labo IaC</a> (parcours B) + <a href="../rke2-rancher/fiche.html">RKE2 et Rancher</a>, séances 4 à 6</td></tr></tbody></table></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Livrable</th><th>Critère de réussite</th></tr></thead><tbody><tr><td>Pile de supervision</td><td>Alerte reçue lors d'une panne provoquée</td></tr><tr><td>Cluster RKE2 HA sous Rancher</td><td>Reconstruction par code ; restauration etcd réussie</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S8 -->
+  <div class="section" id="s8">
+    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Projet final : migration VMware → Proxmox (jalons) et suivi hebdomadaire</span><span class="section-nb">Projet</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Migration</span><span class="tag">Jalons</span><span class="tag">Suivi</span><span class="tag">Runbook</span></div>
+
+      <h3>Jalons du projet (à situer après la phase 2, en parallèle des suivantes)</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Jalon</th><th>Contenu</th><th>Critère</th></tr></thead><tbody><tr><td>J1 — Inventaire</td><td>Toutes les VM : OS, CPU, RAM, disques, réseaux, dépendances, criticité</td><td>Tableau d'inventaire complet (<a href="../proxmox-ve/runbook.html">runbook</a>)</td></tr><tr><td>J2 — Cible</td><td>Dimensionnement Proxmox, stockage, réseau, sauvegarde PBS, cluster et quorum</td><td>Schéma d'architecture validé</td></tr><tr><td>J3 — Pilote</td><td>Migrer 3 VM non critiques, mesurer l'indisponibilité</td><td>Retour d'expérience écrit</td></tr><tr><td>J4 — Vagues</td><td>Regrouper les VM par vagues, plan de retour arrière par vague</td><td>Planning signé par les parties prenantes</td></tr><tr><td>J5 — Bascule</td><td>Exécution, validation applicative, supervision et sauvegardes actives</td><td>Checklist de recette cochée</td></tr><tr><td>J6 — Clôture</td><td>Décommissionnement VMware, documentation, formation de l'équipe</td><td>Dossier d'exploitation livré</td></tr></tbody></table></div>
+
+      <h3>Point d'étape hebdomadaire (10 minutes)</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Question</th><th>Ma réponse</th></tr></thead><tbody><tr><td>Ce que j'ai manipulé cette semaine (pas seulement lu)</td><td>…</td></tr><tr><td>Ce qui a marché du premier coup / ce qui a coincé</td><td>…</td></tr><tr><td>Erreurs notées dans mon journal</td><td>…</td></tr><tr><td>Critère de réussite de la phase : atteint ? (oui / non / à moitié)</td><td>…</td></tr><tr><td>Objectif de la semaine prochaine (un seul)</td><td>…</td></tr><tr><td>Ce qui me ralentit (temps, matériel, motivation)</td><td>…</td></tr></tbody></table></div>
+      <div class="tip">Copie ce tableau dans ton dépôt Git (un fichier par semaine). Au bout de trois mois, tu auras un journal de formation et un dossier de preuves à montrer.</div>
+    </div>
+  </div>
+
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Pièges de progression et comment les éviter</span><span class="section-nb">Projet</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Dispersion</span><span class="tag">Perfectionnisme</span><span class="tag">Copier-coller</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Piège</th><th>Symptôme</th><th>Parade</th></tr></thead><tbody><tr><td>Dispersion</td><td>10 onglets ouverts, aucune VM allumée</td><td>Un seul sujet, un seul livrable par semaine</td></tr><tr><td>Copier-coller sans comprendre</td><td>« Ça marche » mais impossible à expliquer</td><td>Après chaque commande : l'expliquer à voix haute ; la refaire sans modèle</td></tr><tr><td>Perfectionnisme</td><td>Reprendre la phase 1 pour la quatrième fois</td><td>Critère de réussite atteint = on avance</td></tr><tr><td>Labo trop gros d'emblée</td><td>Machine saturée, découragement</td><td>Commencer en version réduite (1 serveur RKE2, 2 VM)</td></tr><tr><td>Pas de sauvegarde ni de notes</td><td>Perte d'un labo, impossibilité de reproduire</td><td>Git + snapshots + journal d'erreurs</td></tr><tr><td>Sauter les P1 pour les P3</td><td>Kubernetes avant de savoir lire un journal Linux</td><td>Respecter l'ordre des phases</td></tr><tr><td>Attendre d'être « prêt »</td><td>Le projet de migration ne démarre jamais</td><td>Lancer J1 (inventaire) dès la phase 2 : c'est utile et sans risque</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S10 -->
+  <div class="section" id="s10">
+    <div class="section-header"><span class="section-num">10</span><span class="section-title-text">Faire vivre le parcours</span><span class="section-nb">Pratique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">8 questions</span></div>
+
+      <h3>Faire vivre ce parcours</h3>
+      <ol><li>Copie ce parcours dans ton dépôt Git (<code>PARCOURS.md</code>) et coche les livrables au fur et à mesure</li><li>Ajuste les durées à ton rythme réel dès la fin de la phase 1</li><li>Reviens ici toutes les deux semaines : <em>la phase suivante est-elle vraiment à ta portée ?</em></li></ol>
+
+      <h3>Auto-évaluation — clique pour voir la réponse</h3>
+      <div class="qr-list">
+        <details><summary>Quelle est la règle de dosage entre lecture et pratique ?</summary><p>Environ 70 % de pratique et 30 % de lecture : une fiche lue sans labo n'est pas terminée.</p></details>
+        <details><summary>Quelles sont les priorités P1 du parcours ?</summary><p>Linux, Git et Proxmox (VM, stockage, réseau, sauvegarde, cluster et quorum, migration depuis VMware).</p></details>
+        <details><summary>Peut-on sauter Kubernetes pour la migration VMware → Proxmox ?</summary><p>Oui : Kubernetes (P3) n'est pas nécessaire à la migration ; on le reporte si l'échéance est proche.</p></details>
+        <details><summary>Quel est le critère pour passer à la phase suivante ?</summary><p>Le critère de réussite de la phase en cours est atteint (livrables et capacité à expliquer sans notes).</p></details>
+        <details><summary>Pourquoi détruire et reconstruire régulièrement le labo ?</summary><p>C'est la preuve d'une vraie maîtrise, et cela mesure le temps de reconstruction (RTO d'infrastructure).</p></details>
+        <details><summary>Pourquoi tenir un journal d'erreurs ?</summary><p>Chaque erreur résolue devient une documentation personnelle réutilisable, et un dossier de preuves.</p></details>
+        <details><summary>À quel moment lancer l'inventaire de la migration ?</summary><p>Dès la phase 2 : il est utile, sans risque, et évite d'attendre d'être « prêt ».</p></details>
+        <details><summary>Quel est le piège numéro 1 ?</summary><p>La dispersion : lire beaucoup, ne rien installer ; la parade est un seul sujet et un livrable par semaine.</p></details>
+      </div>
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)">
+    Parcours DevOps ·
+    <a href="../proxmox-ve/fiche.html" target="_blank" style="color:var(--accent);text-decoration:none">Fiche Proxmox VE</a> ·
+    <a href="../linux/fiche.html" target="_blank" style="color:var(--accent);text-decoration:none">Fiche Linux</a> ·
+    <a href="../labo-iac/fiche.html" target="_blank" style="color:var(--accent);text-decoration:none">Labo IaC</a>
+  </footer>
+
+</div>
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("parcours-devops-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("parcours-devops-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>

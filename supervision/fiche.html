@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2e7d32">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Fiche Supervision — Prometheus, Grafana, Loki</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;
+  --accent:#2e7d32;--accent-soft:#e3f3e4;
+  --ps:#2b2f36;--ps-mid:#2e7d32;--ps-light:#f6d9b8;
+  --ok:#1d7a4f;--ok-soft:#e3f3ea;--ko:#b4372f;--ko-soft:#f9e6e4;
+  --warn:#8a5a00;--warn-soft:#fff3cd;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#66c06b;--accent-soft:#112a14;
+  --ps:#3a3f48;--ps-mid:#66c06b;--ps-light:#112a14;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}}
+:root[data-theme="dark"]{
+  --paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;
+  --accent:#66c06b;--accent-soft:#112a14;
+  --ps:#3a3f48;--ps-mid:#66c06b;--ps-light:#112a14;
+  --ok:#5ccf95;--ok-soft:#163327;--ko:#f08a80;--ko-soft:#3a1d1b;
+  --warn:#e0a030;--warn-soft:#2a1f00;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.8rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+h4{font-size:.9rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-family:var(--f-mono)}
+p{margin:6px 0 10px}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Header */
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.top-actions{display:flex;gap:8px;align-items:center}
+details{border:1px solid var(--line);border-radius:7px;padding:9px 14px;margin:8px 0;background:var(--sheet)}
+summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details[open] summary{color:var(--accent);margin-bottom:6px}
+details p{margin:4px 0 2px;font-size:.88rem;color:var(--ink)}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body);transition:border-color .15s,color .15s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PS Banner */
+.ps-banner{background:var(--ps);border-radius:10px;padding:20px 24px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.ps-banner-left .label{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ps-banner-left h1{color:#fff;font-size:1.5rem}
+.ps-banner-left p{color:rgba(255,255,255,.7);font-size:.88rem;margin:4px 0 0}
+.ps-stats{display:flex;gap:16px;flex-wrap:wrap}
+.ps-stat{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;text-align:center;min-width:80px}
+.ps-stat b{display:block;font:700 1.3rem var(--f-mono);color:#fff}
+.ps-stat span{font-size:.7rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em}
+
+/* Sommaire rapide */
+.toc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:28px}
+.toc h4{margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.toc-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;text-decoration:none;color:var(--ink);font-size:.85rem;transition:background .15s}
+.toc-item:hover{background:var(--accent-soft);color:var(--accent)}
+.toc-num{font:600 .7rem var(--f-mono);background:var(--ps-light);color:var(--ps-mid);padding:1px 6px;border-radius:3px;min-width:28px;text-align:center}
+
+/* Sections */
+.section{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.section-header{background:var(--ps);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.section-num{font:700 .75rem var(--f-mono);background:rgba(255,255,255,.18);color:#fff;padding:3px 8px;border-radius:4px}
+.section-title-text{font:700 1rem var(--f-display);color:#fff;flex:1}
+.section-nb{font:500 .7rem var(--f-mono);color:rgba(255,255,255,.55)}
+.section-body{padding:20px}
+
+/* Blocs de contenu */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.concept-card{border:1px solid var(--line);border-radius:7px;padding:12px 14px}
+.concept-card h4{color:var(--accent);margin-bottom:6px;font-size:.82rem}
+.concept-card ul,.concept-card p{margin:0;padding-left:1.1em;font-size:.88rem}
+.concept-card ul li{margin:2px 0}
+.concept-card.warn{border-left:3px solid var(--warn);border-color:var(--warn)}
+.concept-card.warn h4{color:var(--warn)}
+
+/* Cmdlets */
+.cmdlet-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+.cmdlet-table th{text-align:left;padding:7px 10px;background:var(--accent-soft);color:var(--accent);font:600 .72rem var(--f-mono);letter-spacing:.05em;border-bottom:2px solid var(--line)}
+.cmdlet-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmdlet-table tr:last-child td{border-bottom:0}
+.cmdlet-table td:first-child{font:500 .85rem var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmdlet-table td:last-child{color:var(--muted)}
+.cmdlet-table td:nth-child(2){color:var(--ink)}
+.cmdlet-table-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+
+/* Code blocks */
+.code-block{background:var(--ps);border-radius:7px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.code-block code{font:500 .85rem var(--f-mono);color:#f6d9b8;white-space:pre;display:block;line-height:1.6}
+.code-block .comment{color:rgba(255,255,255,.4)}
+.code-block .keyword{color:#9cdcfe}
+.code-block .string{color:#ce9178}
+.code-block .cmdlet{color:#dcdcaa}
+.code-block .param{color:#9cdcfe}
+
+/* Astuce / Attention */
+.tip{background:var(--ok-soft);border-left:3px solid var(--ok);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.tip strong{color:var(--ok)}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.warn strong{color:var(--warn)}
+.info{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:.88rem}
+.info strong{color:var(--accent)}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{font:500 .72rem var(--f-mono);padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.tag.admin{background:var(--ok-soft);color:var(--ok)}
+.tag.cloud{background:#e3f3e4;color:#2e7d32}
+.tag.script{background:#f3e8ff;color:#6b21a8}
+
+/* Comparatif */
+.compare-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.compare-table th{padding:7px 10px;text-align:left;border-bottom:2px solid var(--line);font:600 .72rem var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.compare-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:0}
+.compare-table td:first-child{font:600 .85rem var(--f-mono);white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  h1{font-size:1.3rem}
+  .ps-banner{padding:14px 16px}
+  .ps-banner-left h1{font-size:1.2rem}
+  .ps-stats{gap:8px}
+  .ps-stat{padding:8px 10px;min-width:64px}
+  .ps-stat b{font-size:1rem}
+  .concept-grid{grid-template-columns:1fr}
+  .toc-grid{grid-template-columns:1fr}
+  .section-body{padding:14px}
+  .cmdlet-table td,.cmdlet-table th{padding:5px 7px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">Exploitation · Supervision</div>
+      <h1>Fiche — Supervision (Prometheus, Grafana, Loki)</h1>
+    </div>
+    <div class="top-actions">
+      <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="ps-banner">
+    <div class="ps-banner-left">
+      <div class="label">Métriques · Alertes · Journaux · Proxmox · Kubernetes</div>
+      <h1>Supervision — savoir avant les utilisateurs</h1>
+      <p>Prometheus · Grafana · Alertmanager · Loki · exporters · Kubernetes</p>
+    </div>
+    <div class="ps-stats">
+      <div class="ps-stat"><b>11</b><span>Sections</span></div>
+      <div class="ps-stat"><b>Prom</b><span>Version</span></div>
+      <div class="ps-stat"><b>18</b><span>Q/R</span></div>
+    </div>
+  </div>
+
+  <div class="info"><strong>Statut :</strong> fiche de départ construite à partir de pratiques courantes. <strong>Les versions d'images, de charts et le statut de certains composants (Promtail / Alloy) évoluent</strong> : vérifie la documentation avant de figer un choix ; les fichiers sont des points de départ à tester en labo. Les identifiants de tableaux Grafana ne sont pas donnés : à chercher dans le catalogue grafana.com. <strong>Prérequis conseillés :</strong> <a href="../linux/fiche.html">Linux</a>, <a href="../kubernetes/fiche.html">Kubernetes</a>.</div>
+
+  <div class="toc">
+    <h4>Sommaire</h4>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">1</span>Pourquoi superviser, quoi mesurer</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">2</span>Choisir ses outils</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">3</span>Prometheus : la collecte</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">4</span>Installer la pile en labo</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">5</span>Alertes</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">6</span>Journaux centralisés : Loki</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">7</span>Proxmox, Linux, Windows</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">8</span>Kubernetes, RKE2, Rancher</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">9</span>Grafana et capacité</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span>Dépannage et aide-mémoire</a>
+      <a href="#s11" class="toc-item"><span class="toc-num">11</span>Plan de labo et Q/R</a>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div class="section" id="s1">
+    <div class="section-header"><span class="section-num">1</span><span class="section-title-text">Pourquoi superviser et quoi mesurer</span><span class="section-nb">Fondations</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Métriques</span><span class="tag">Logs</span><span class="tag">Traces</span><span class="tag">SLO</span></div>
+      <div class="info"><strong>Superviser</strong>, c'est savoir <em>avant tes utilisateurs</em> que quelque chose va mal, et avoir de quoi comprendre pourquoi. <strong>Analogie :</strong> le <em>tableau de bord d'une voiture</em> (témoins, jauges) plus la <em>boîte noire</em> pour comprendre un incident.</div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Pilier</th><th>Question</th><th>Exemple</th><th>Outils courants</th></tr></thead><tbody><tr><td><strong>Métriques</strong></td><td>Comment va le système, en chiffres dans le temps ?</td><td>CPU, mémoire, latence, erreurs / seconde</td><td>Prometheus, Zabbix, Netdata</td></tr><tr><td><strong>Journaux (logs)</strong></td><td>Que s'est-il passé exactement ?</td><td>Ligne d'erreur d'une application</td><td>Loki, Elastic, rsyslog</td></tr><tr><td><strong>Traces</strong></td><td>Où le temps passe-t-il dans une requête ?</td><td>Appel A → B → base</td><td>OpenTelemetry, Tempo, Jaeger</td></tr><tr><td><strong>Alertes</strong></td><td>Qui doit agir, et maintenant ?</td><td>« Disque à 90 % »</td><td>Alertmanager, Grafana Alerting</td></tr><tr><td><strong>Tableaux de bord</strong></td><td>À quoi ça ressemble d'un coup d'œil ?</td><td>Santé du cluster</td><td>Grafana</td></tr></tbody></table></div>
+
+      <h3>Que mesurer en priorité : les « 4 signaux dorés »</h3>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Signal</th><th>Sens</th><th>Exemple</th></tr></thead><tbody><tr><td><strong>Latence</strong></td><td>Temps de réponse</td><td>95<sup>e</sup> centile des requêtes</td></tr><tr><td><strong>Trafic</strong></td><td>Demande reçue</td><td>Requêtes par seconde</td></tr><tr><td><strong>Erreurs</strong></td><td>Échecs</td><td>Taux de réponses 5xx</td></tr><tr><td><strong>Saturation</strong></td><td>À quel point la ressource est pleine</td><td>CPU, mémoire, disque, file d'attente</td></tr></tbody></table></div>
+      <ul><li>Pour l'infrastructure : méthode <strong>USE</strong> (Utilisation, Saturation, Erreurs) par ressource ; pour les services : méthode <strong>RED</strong> (Rate, Errors, Duration)</li><li><strong>SLI</strong> = ce qu'on mesure ; <strong>SLO</strong> = l'objectif (99,9 % des requêtes réussies) ; <strong>SLA</strong> = l'engagement contractuel</li></ul>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="section" id="s2">
+    <div class="section-header"><span class="section-num">2</span><span class="section-title-text">Choisir ses outils</span><span class="section-nb">Fondations</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Prometheus</span><span class="tag">Zabbix</span><span class="tag">Netdata</span><span class="tag">Uptime Kuma</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Outil</th><th>Modèle</th><th>Fort</th><th>À savoir</th></tr></thead><tbody><tr><td><strong>Prometheus + Grafana</strong></td><td>Collecte (pull) de métriques, requêtes PromQL</td><td>Standard cloud-native, Kubernetes, énorme écosystème</td><td>Stockage court terme ; pas de logs</td></tr><tr><td><strong>Loki</strong></td><td>Journaux indexés par labels</td><td>Léger, intégré à Grafana</td><td>Complémentaire à Prometheus</td></tr><tr><td><strong>Zabbix</strong></td><td>Serveur + agents, modèles, SNMP</td><td>Parc traditionnel (serveurs, réseau, matériel), alertes riches</td><td>Plus « classique » ; très complet</td></tr><tr><td><strong>Netdata</strong></td><td>Agent temps réel très détaillé</td><td>Installation immédiate, diagnostic fin</td><td>Rétention limitée sans centralisation</td></tr><tr><td><strong>Uptime Kuma</strong></td><td>Surveillance de disponibilité (HTTP, ping, port)</td><td>Simplicité, page d'état</td><td>Pas de métriques profondes</td></tr><tr><td><strong>Elastic / OpenSearch</strong></td><td>Recherche et analyse de logs</td><td>Recherche puissante</td><td>Gourmand en ressources</td></tr></tbody></table></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Besoin</th><th>Choix courant</th></tr></thead><tbody><tr><td>Kubernetes, applications modernes</td><td>Prometheus + Grafana (+ Loki)</td></tr><tr><td>Parc mixte serveurs / réseau / matériel</td><td>Zabbix (ou Prometheus + exporters)</td></tr><tr><td>Un premier tableau de bord en 10 minutes</td><td>Netdata ou Uptime Kuma</td></tr><tr><td>Proxmox</td><td>Serveur de métriques intégré vers InfluxDB / Graphite, ou <code>prometheus-pve-exporter</code></td></tr></tbody></table></div>
+      <div class="tip">Ne cherche pas l'outil parfait : commence par <strong>Prometheus + Grafana + Alertmanager</strong>. C'est l'ensemble que tu retrouveras partout (Kubernetes, Rancher) et sur lequel la CKA et les entretiens s'appuient.</div>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="section" id="s3">
+    <div class="section-header"><span class="section-num">3</span><span class="section-title-text">Prometheus : le cœur de la collecte</span><span class="section-nb">Prometheus</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Scrape</span><span class="tag">Exporters</span><span class="tag">PromQL</span><span class="tag">TSDB</span></div>
+      <ul><li><strong>Pull</strong> : Prometheus <em>vient chercher</em> les métriques sur des cibles HTTP (<code>/metrics</code>) à intervalle régulier (<code>scrape_interval</code>)</li><li><strong>Exporter</strong> : petit service qui expose les métriques d'un système (<code>node_exporter</code> pour Linux, <code>windows_exporter</code>, <code>blackbox_exporter</code> pour tester des URL)</li><li><strong>Métrique</strong> = nom + labels + valeur (<code>node_cpu_seconds_total{mode="idle",instance="srv1"}</code>)</li><li>Types : <strong>counter</strong> (monte seulement), <strong>gauge</strong> (monte et descend), <strong>histogram</strong> (répartition)</li></ul>
+      <div class="code-block"><code><span class="comment"># prometheus.yml</span>
+global:
+  scrape_interval: 30s
+rule_files:
+  - rules/*.yml
+alerting:
+  alertmanagers:
+    - static_configs: [ { targets: [ 'localhost:9093' ] } ]
+scrape_configs:
+  - job_name: node
+    static_configs:
+      - targets: [ '10.0.0.61:9100', '10.0.0.62:9100' ]
+  - job_name: web
+    metrics_path: /probe
+    params: { module: [ http_2xx ] }
+    static_configs: [ { targets: [ 'https://monsite.fr' ] } ]
+    relabel_configs:
+      - source_labels: [ __address__ ]
+        target_label: __param_target
+      - target_label: __address__
+        replacement: localhost:9115          <span class="comment"># blackbox_exporter</span></code></div>
+
+      <h3>Requêtes PromQL utiles</h3>
+      <div class="code-block"><code><span class="comment"># CPU utilisé (%) par machine</span>
+100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+
+<span class="comment"># Mémoire disponible (%)</span>
+node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100
+
+<span class="comment"># Disque : espace libre (%) hors systèmes temporaires</span>
+node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes * 100
+
+<span class="comment"># Cibles injoignables</span>
+up == 0
+
+<span class="comment"># Disque plein dans 24 h (prévision linéaire sur 6 h)</span>
+predict_linear(node_filesystem_avail_bytes[6h], 24*3600) &lt; 0</code></div>
+      <div class="warn"><strong>Piège classique :</strong> un <em>counter</em> s'utilise avec <code>rate()</code>, jamais en valeur brute. Attention aussi aux labels à forte cardinalité (identifiant utilisateur, URL complète) qui font exploser la mémoire de Prometheus.</div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="section" id="s4">
+    <div class="section-header"><span class="section-num">4</span><span class="section-title-text">Installer la pile en labo (Docker Compose)</span><span class="section-nb">Prometheus</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Docker Compose</span><span class="tag">Grafana</span><span class="tag">Alertmanager</span><span class="tag">node_exporter</span></div>
+      <div class="code-block"><code><span class="comment"># docker-compose.yml : Prometheus + Alertmanager + Grafana + node_exporter</span>
+services:
+  prometheus:
+    image: prom/prometheus:latest           <span class="comment"># épingler une version en vrai</span>
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./rules:/etc/prometheus/rules:ro
+      - prom-data:/prometheus
+    ports: [ "9090:9090" ]
+  alertmanager:
+    image: prom/alertmanager:latest
+    volumes: [ "./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro" ]
+    ports: [ "9093:9093" ]
+  grafana:
+    image: grafana/grafana:latest
+    volumes: [ "grafana-data:/var/lib/grafana" ]
+    ports: [ "3000:3000" ]
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports: [ "9100:9100" ]
+volumes:
+  prom-data: {}
+  grafana-data: {}</code></div>
+      <ol><li><code>docker compose up -d</code> ; ouvrir <code>:9090</code> (Prometheus, onglet <em>Targets</em>) et <code>:3000</code> (Grafana)</li><li>Dans Grafana : <strong>Connections → Data sources → Prometheus</strong> (<code>http://prometheus:9090</code>)</li><li>Importer un tableau de bord communautaire pour <em>Node Exporter</em> (Dashboards → Import, identifier du catalogue grafana.com : à rechercher)</li><li>Installer <code>node_exporter</code> sur chaque VM Linux (paquet de la distribution ou binaire + service systemd) et l'ajouter aux cibles</li></ol>
+      <div class="code-block"><code><span class="comment"># Sur une VM Debian / Ubuntu</span>
+sudo apt install prometheus-node-exporter
+systemctl status prometheus-node-exporter ; curl -s localhost:9100/metrics | head</code></div>
+      <div class="info">En production : versions <strong>épinglées</strong>, stockage persistant et sauvegardé, authentification et TLS devant Grafana, accès restreint à Prometheus.</div>
+    </div>
+  </div>
+
+  <!-- S5 -->
+  <div class="section" id="s5">
+    <div class="section-header"><span class="section-num">5</span><span class="section-title-text">Alertes : ce qui réveille quelqu'un (et ce qui ne doit pas)</span><span class="section-nb">Alertes</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Règles</span><span class="tag">Alertmanager</span><span class="tag">Sévérité</span><span class="tag">Fatigue d'alertes</span></div>
+      <div class="code-block"><code><span class="comment"># rules/infra.yml</span>
+groups:
+  - name: infra
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.instance }} injoignable depuis 5 min"
+      - alert: DiskAlmostFull
+        expr: node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes &lt; 0.10
+        for: 15m
+        labels: { severity: warning }
+        annotations:
+          summary: "Disque {{ $labels.mountpoint }} sur {{ $labels.instance }} presque plein"
+      - alert: HighCPU
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) &gt; 90
+        for: 15m
+        labels: { severity: warning }</code></div>
+      <div class="code-block"><code><span class="comment"># alertmanager.yml : routage vers un e-mail (exemple)</span>
+route:
+  receiver: equipe
+  group_by: [ alertname ]
+  group_wait: 30s
+  repeat_interval: 4h
+receivers:
+  - name: equipe
+    email_configs:
+      - to: ops@exemple.fr
+        from: alertes@exemple.fr
+        smarthost: smtp.exemple.fr:587
+        auth_username: alertes
+        auth_password_file: /etc/alertmanager/smtp.pass   <span class="comment"># secret hors dépôt</span></code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Bonne pratique</th><th>Pourquoi</th></tr></thead><tbody><tr><td>Alerter sur un <strong>symptôme</strong> (service lent, erreurs) plutôt que sur une cause (CPU à 80 %)</td><td>Moins de faux positifs</td></tr><tr><td>Utiliser <code>for:</code> pour absorber les pics</td><td>Évite les alertes qui clignotent</td></tr><tr><td>Chaque alerte = une <strong>action</strong> claire (lien vers un runbook)</td><td>Sinon on l'ignore</td></tr><tr><td>Deux niveaux : <code>warning</code> (journée) et <code>critical</code> (immédiat)</td><td>Respecte le sommeil de l'équipe</td></tr><tr><td>Revoir régulièrement les alertes bruyantes</td><td>La <strong>fatigue d'alertes</strong> est un risque de sécurité</td></tr><tr><td>Tester qu'une alerte arrive vraiment (e-mail, chat)</td><td>Une alerte jamais testée ne sert à rien</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="section" id="s6">
+    <div class="section-header"><span class="section-num">6</span><span class="section-title-text">Journaux centralisés : Loki et alternatives</span><span class="section-nb">Logs</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Loki</span><span class="tag">Alloy</span><span class="tag">rsyslog</span><span class="tag">journald</span></div>
+      <ul><li><strong>Pourquoi centraliser :</strong> ne plus se connecter machine par machine, conserver les journaux après la mort d'un conteneur ou d'une VM, corréler plusieurs sources</li><li><strong>Loki</strong> n'indexe que les <em>labels</em> (pas le texte) : moins cher que Elastic ; on cherche avec <strong>LogQL</strong></li><li><strong>Agents de collecte :</strong> Promtail (historique), <strong>Grafana Alloy</strong> (successeur annoncé), Fluent Bit, Vector : <em>vérifie l'état actuel de Promtail dans la documentation avant de le choisir</em></li><li><strong>Linux :</strong> journald et rsyslog peuvent aussi envoyer vers un serveur central (<code>@@serveur:514</code>)</li></ul>
+      <div class="code-block"><code><span class="comment"># LogQL : exemples (dans Grafana → Explore, source Loki)</span>
+{job="varlogs"} |= "error"                            <span class="comment"># lignes contenant error</span>
+{namespace="monapp"} |~ "timeout|refused"            <span class="comment"># expression régulière</span>
+sum by (pod) (rate({namespace="monapp"} |= "error" [5m]))   <span class="comment"># erreurs / seconde par pod</span></code></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Règle</th><th>Détail</th></tr></thead><tbody><tr><td>Journaliser en <strong>texte structuré</strong> (JSON) quand c'est possible</td><td>Plus facile à filtrer</td></tr><tr><td>Ne <strong>jamais</strong> journaliser de secrets ni de données personnelles</td><td>RGPD, sécurité</td></tr><tr><td>Définir une <strong>rétention</strong> (ex. 30 jours) et une rotation</td><td>Le disque est fini</td></tr><tr><td>Horloge synchronisée (NTP)</td><td>Corréler des événements entre machines</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S7 -->
+  <div class="section" id="s7">
+    <div class="section-header"><span class="section-num">7</span><span class="section-title-text">Superviser Proxmox, Linux et Windows</span><span class="section-nb">Cibles</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">pve-exporter</span><span class="tag">node_exporter</span><span class="tag">windows_exporter</span><span class="tag">SNMP</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Cible</th><th>Méthode</th><th>Détails</th></tr></thead><tbody><tr><td><strong>Proxmox VE</strong></td><td>Serveur de métriques intégré (Datacenter → Metric Server : InfluxDB ou Graphite) <em>ou</em> <code>prometheus-pve-exporter</code> interrogeant l'API</td><td>Utiliser un <strong>jeton d'API en lecture seule</strong> (rôle <code>PVEAuditor</code>)</td></tr><tr><td><strong>Serveurs Linux</strong></td><td><code>node_exporter</code> (9100)</td><td>CPU, mémoire, disque, réseau, systemd (collecteur à activer)</td></tr><tr><td><strong>Serveurs Windows</strong></td><td><code>windows_exporter</code> (9182)</td><td>Compteurs de performance, services, IIS, SQL…</td></tr><tr><td><strong>Matériel / réseau</strong></td><td>SNMP (<code>snmp_exporter</code>) ou Zabbix</td><td>Commutateurs, onduleurs, baies</td></tr><tr><td><strong>Sites et certificats</strong></td><td><code>blackbox_exporter</code> ou Uptime Kuma</td><td>Disponibilité HTTP, expiration des certificats TLS</td></tr><tr><td><strong>Sauvegardes</strong></td><td>Statut des tâches PBS / vzdump, fraîcheur de la dernière sauvegarde</td><td>Alerte si une sauvegarde manque, plus important qu'une alerte CPU</td></tr></tbody></table></div>
+      <div class="code-block"><code><span class="comment"># Jeton en lecture seule pour l'exporter Proxmox (à valider selon ta version)</span>
+pveum user add monitoring@pve
+pveum aclmod / -user monitoring@pve -role PVEAuditor
+pveum user token add monitoring@pve prom --privsep 0</code></div>
+      <ul><li>Pense à superviser <strong>le superviseur</strong> : si Prometheus tombe, qui le saura ? (un contrôle externe, un « dead man's switch »)</li><li>Alerte d'expiration de certificat : <code>probe_ssl_earliest_cert_expiry - time() &lt; 86400 * 14</code></li></ul>
+    </div>
+  </div>
+
+  <!-- S8 -->
+  <div class="section" id="s8">
+    <div class="section-header"><span class="section-num">8</span><span class="section-title-text">Superviser Kubernetes, RKE2 et Rancher</span><span class="section-nb">Cibles</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">kube-prometheus-stack</span><span class="tag">kube-state-metrics</span><span class="tag">metrics-server</span><span class="tag">Rancher Monitoring</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Composant</th><th>Rôle</th></tr></thead><tbody><tr><td><strong>metrics-server</strong></td><td>Métriques CPU / mémoire pour <code>kubectl top</code> et l'HPA (pas un système de supervision)</td></tr><tr><td><strong>kube-state-metrics</strong></td><td>État des objets (Pods, Deployments, nœuds) en métriques</td></tr><tr><td><strong>node_exporter</strong></td><td>Métriques des nœuds</td></tr><tr><td><strong>kube-prometheus-stack</strong></td><td>Chart Helm : Prometheus Operator, Grafana, Alertmanager, règles et tableaux de bord prêts à l'emploi</td></tr><tr><td><strong>Rancher Monitoring</strong></td><td>Chart du catalogue Rancher, basé sur cette pile, installable par cluster depuis l'interface</td></tr></tbody></table></div>
+      <div class="code-block"><code>helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install monitoring prometheus-community/kube-prometheus-stack -n monitoring --create-namespace \
+  --version X.Y.Z -f values.yaml          <span class="comment"># fixer la version du chart, régler stockage et rétention</span>
+kubectl -n monitoring get pods</code></div>
+
+      <h3>Alertes Kubernetes à prévoir</h3>
+      <ul><li>Nœud <em>NotReady</em> ; Pod en <code>CrashLoopBackOff</code> ou redémarrages répétés ; Pods <code>Pending</code> longtemps</li><li>Volume persistant presque plein ; certificats du control plane proches de l'expiration ; etcd lent ou sans leader</li><li>Dépassement de requests / limits, <code>OOMKilled</code></li><li>Pour RKE2 : état des <strong>snapshots etcd</strong> (fraîcheur de la dernière sauvegarde)</li></ul>
+      <div class="tip">Dans Rancher : <strong>Apps → Charts → Monitoring</strong> sur chaque cluster géré (voir <a href="../labo-iac/fiche.html">Labo IaC</a>, partie Rancher). Règle le <strong>stockage</strong> et la <strong>rétention</strong> pour ne pas remplir un disque.</div>
+    </div>
+  </div>
+
+  <!-- S9 -->
+  <div class="section" id="s9">
+    <div class="section-header"><span class="section-num">9</span><span class="section-title-text">Tableaux de bord Grafana et capacité</span><span class="section-nb">Grafana</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Dashboards</span><span class="tag">Variables</span><span class="tag">Provisioning</span><span class="tag">Capacité</span></div>
+      <ul><li>Un bon tableau de bord répond à <strong>une question</strong> (« le cluster est-il sain ? ») ; en haut les indicateurs critiques, le détail en dessous</li><li><strong>Variables</strong> (instance, namespace) pour réutiliser un même tableau pour plusieurs cibles</li><li><strong>Provisioning</strong> : sources de données et tableaux décrits en fichiers (JSON / YAML) <strong>dans Git</strong> plutôt que créés à la main</li><li>Utiliser les tableaux communautaires comme point de départ, les adapter, supprimer le superflu</li><li><strong>Capacité :</strong> suivre les tendances (disque qui grossit, mémoire qui monte) et planifier avant la saturation (<code>predict_linear</code>)</li></ul>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>À mettre sur un tableau d'exploitation</th><th>Pourquoi</th></tr></thead><tbody><tr><td>Disponibilité des services</td><td>Premier indicateur pour tous</td></tr><tr><td>Saturation CPU / RAM / disque / réseau</td><td>Anticiper les pannes</td></tr><tr><td>Erreurs et latence des applications</td><td>Vision utilisateur</td></tr><tr><td>Dernière sauvegarde réussie</td><td>La sauvegarde est une métrique de santé</td></tr><tr><td>Certificats : jours restants</td><td>Évite les pannes bêtes</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- S10 -->
+  <div class="section" id="s10">
+    <div class="section-header"><span class="section-num">10</span><span class="section-title-text">Dépannage de la supervision et aide-mémoire</span><span class="section-nb">Aide-mémoire</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Targets</span><span class="tag">Scrape</span><span class="tag">Cardinalité</span><span class="tag">Rétention</span></div>
+      <div class="cmdlet-table-wrap"><table class="cmdlet-table"><thead><tr><th>Symptôme</th><th>Causes fréquentes</th><th>Vérifier</th></tr></thead><tbody><tr><td>Cible « DOWN » dans Prometheus</td><td>Pare-feu (9100…), exporter arrêté, mauvaise adresse</td><td><code>curl http://cible:9100/metrics</code> depuis le serveur Prometheus</td></tr><tr><td>Pas de données dans Grafana</td><td>Mauvaise source de données, requête vide, intervalle trop court</td><td>Tester la requête dans Prometheus (<em>Graph</em>) puis dans Grafana</td></tr><tr><td>Alerte qui ne part pas</td><td>Règle non chargée, <code>for:</code> trop long, Alertmanager non joint, routage</td><td>Prometheus → Alerts ; Alertmanager → statut ; logs du service</td></tr><tr><td>Prometheus lent / gourmand</td><td>Cardinalité excessive, rétention trop longue, disque lent</td><td><code>prometheus_tsdb_head_series</code>, requêtes coûteuses</td></tr><tr><td>Trous dans les courbes</td><td>Cible instable, scrape_timeout, restart</td><td>Courbe de <code>up</code>, journaux de l'exporter</td></tr><tr><td>Alertes en rafale la nuit</td><td>Seuils mal réglés, pas de <code>for:</code>, pas de regroupement</td><td>Revoir règles et <code>group_by</code></td></tr></tbody></table></div>
+      <div class="code-block"><code>promtool check config prometheus.yml ; promtool check rules rules/*.yml
+amtool check-config alertmanager.yml
+curl -s localhost:9090/api/v1/targets | head ; curl -s localhost:9090/-/ready
+docker compose logs -f prometheus</code></div>
+    </div>
+  </div>
+
+  <!-- S11 -->
+  <div class="section" id="s11">
+    <div class="section-header"><span class="section-num">11</span><span class="section-title-text">Plan de labo et Q/R</span><span class="section-nb">Pratique</span></div>
+    <div class="section-body">
+      <div class="tags"><span class="tag">Pratique</span><span class="tag">18 questions</span></div>
+
+      <h3>Plan de labo en 6 séances</h3>
+      <ol><li><strong>Séance 1 :</strong> lancer la pile (Compose) sur une VM, ajouter <code>node_exporter</code> sur 2 VM, voir les cibles <em>UP</em></li><li><strong>Séance 2 :</strong> écrire 5 requêtes PromQL (CPU, RAM, disque, <code>up</code>, prévision de disque) et un premier tableau Grafana</li><li><strong>Séance 3 :</strong> 3 règles d'alerte + Alertmanager vers e-mail ou chat ; provoquer une panne et vérifier la réception</li><li><strong>Séance 4 :</strong> ajouter Proxmox (jeton PVEAuditor + exporter) et <code>blackbox_exporter</code> sur 2 sites, avec alerte d'expiration de certificat</li><li><strong>Séance 5 :</strong> installer Loki + collecteur, lire les journaux d'une VM et d'un Pod, requêtes LogQL</li><li><strong>Séance 6 :</strong> <code>kube-prometheus-stack</code> (ou Rancher Monitoring) sur le cluster RKE2 du <a href="../labo-iac/fiche.html">Labo IaC</a>, alertes Kubernetes, tableaux dans Git</li></ol>
+
+      <h3>Auto-évaluation — clique pour voir la réponse</h3>
+      <div class="qr-list">
+        <details><summary>Quels sont les trois piliers de l'observabilité ?</summary><p>Métriques, journaux (logs) et traces.</p></details>
+        <details><summary>Quels sont les 4 signaux dorés ?</summary><p>Latence, trafic, erreurs et saturation.</p></details>
+        <details><summary>Quelle différence entre SLI, SLO et SLA ?</summary><p>SLI : l'indicateur mesuré ; SLO : l'objectif visé ; SLA : l'engagement contractuel.</p></details>
+        <details><summary>Prometheus fonctionne-t-il en push ou en pull ?</summary><p>En pull : il interroge périodiquement les endpoints /metrics des cibles.</p></details>
+        <details><summary>À quoi sert un exporter ?</summary><p>À exposer au format Prometheus les métriques d'un système qui n'en publie pas nativement (node_exporter, blackbox_exporter…).</p></details>
+        <details><summary>Pourquoi utiliser rate() sur un counter ?</summary><p>Un counter ne fait qu'augmenter ; rate() donne la variation par seconde, qui est la grandeur utile.</p></details>
+        <details><summary>Que fait up == 0 ?</summary><p>Sélectionne les cibles qui n'ont pas répondu au dernier scrape.</p></details>
+        <details><summary>À quoi sert la clause for dans une règle d'alerte ?</summary><p>À exiger que la condition dure un certain temps avant de déclencher, pour éviter les alertes sur des pics.</p></details>
+        <details><summary>Quel est le rôle d'Alertmanager ?</summary><p>Regrouper, dédupliquer, router et espacer les notifications d'alerte (e-mail, chat, astreinte).</p></details>
+        <details><summary>Qu'est-ce que la fatigue d'alertes ?</summary><p>Trop d'alertes inutiles : l'équipe finit par les ignorer, y compris les vraies.</p></details>
+        <details><summary>Pourquoi alerter sur un symptôme plutôt que sur une cause ?</summary><p>Parce qu'il reflète l'impact réel pour l'utilisateur et génère moins de faux positifs.</p></details>
+        <details><summary>Quelle différence entre Prometheus et Loki ?</summary><p>Prometheus stocke des métriques numériques ; Loki stocke des journaux indexés par labels.</p></details>
+        <details><summary>Quel est le piège de la cardinalité ?</summary><p>Des labels aux valeurs très nombreuses (identifiant, URL complète) multiplient les séries et saturent la mémoire de Prometheus.</p></details>
+        <details><summary>Comment superviser Proxmox ?</summary><p>Via le serveur de métriques intégré (InfluxDB / Graphite) ou prometheus-pve-exporter avec un jeton API en lecture seule.</p></details>
+        <details><summary>Quel est le rôle de kube-state-metrics ?</summary><p>Exposer l'état des objets Kubernetes (Pods, Deployments, nœuds) sous forme de métriques.</p></details>
+        <details><summary>Quelle différence entre metrics-server et Prometheus ?</summary><p>metrics-server fournit CPU / mémoire pour kubectl top et l'HPA, sans historique ; Prometheus conserve l'historique et alimente les alertes.</p></details>
+        <details><summary>Qui supervise le superviseur ?</summary><p>Un contrôle externe ou un « dead man's switch » : une alerte permanente dont l'absence signale la panne de la supervision.</p></details>
+        <details><summary>Pourquoi suivre la fraîcheur de la dernière sauvegarde ?</summary><p>Une sauvegarde qui échoue en silence est une panne future : c'est une métrique de santé essentielle.</p></details>
+      </div>
+    </div>
+  </div>
+
+  <footer style="border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)">
+    Fiche Supervision ·
+    <a href="https://prometheus.io/docs/" target="_blank" style="color:var(--accent);text-decoration:none">Documentation Prometheus</a> ·
+    <a href="https://grafana.com/docs/" target="_blank" style="color:var(--accent);text-decoration:none">Documentation Grafana</a> ·
+    <a href="https://grafana.com/docs/loki/latest/" target="_blank" style="color:var(--accent);text-decoration:none">Documentation Loki</a>
+  </footer>
+
+</div>
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("supervision-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("supervision-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>

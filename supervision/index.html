@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2b2f36">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Certifs">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<title>Supervision — Prometheus, Grafana, Loki</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2032%22%3E%3Ctext%20y=%2228%22%20font-size=%2228%22%3E🖥️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{--paper:#f4f6f8;--sheet:#ffffff;--ink:#15202b;--muted:#5b6876;--line:#d9e0e7;--accent:#2e7d32;--accent-soft:#e3f3e4;--ps:#2b2f36;--ps-mid:#2e7d32;--ok:#1d7a4f;--ok-soft:#e3f3ea;--f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;--f-body:"Public Sans","Segoe UI",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#66c06b;--accent-soft:#112a14;--ps:#3a3f48;--ps-mid:#66c06b;--ok:#5ccf95;--ok-soft:#163327;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0a0e14;--sheet:#111820;--ink:#dce8f2;--muted:#8097ae;--line:#1e2d3e;--accent:#66c06b;--accent-soft:#112a14;--ps:#3a3f48;--ps-mid:#66c06b;--ok:#5ccf95;--ok-soft:#163327;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1,h2{font-family:var(--f-display);margin:0;line-height:1.15}
+h1{font-size:1.7rem;font-weight:700}
+h2{font-size:1.1rem;font-weight:600}
+.eyebrow{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+.top-bar{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:20px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.home-link{display:inline-flex;align-items:center;gap:5px;font:500 .72rem var(--f-mono);color:var(--muted);text-decoration:none;letter-spacing:.04em;margin-bottom:8px;opacity:.75;transition:opacity .15s}
+.home-link:hover{opacity:1;color:var(--accent)}
+.theme-btn{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--muted);cursor:pointer;font:500 .82rem var(--f-body)}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Hero PS */
+.ps-hero{background:var(--ps);border-radius:12px;padding:28px 28px 24px;margin-bottom:28px}
+.ps-hero .label{font:600 .68rem var(--f-mono);color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.ps-hero h1{color:#fff;font-size:1.6rem;margin-bottom:8px}
+.ps-hero p{color:rgba(255,255,255,.65);font-size:.9rem;margin:0 0 20px}
+.ps-hero-actions{display:flex;flex-wrap:wrap;gap:10px}
+.btn-fiche{display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--ps);padding:10px 20px;border-radius:7px;font:700 .9rem var(--f-display);text-decoration:none;transition:opacity .15s}
+.btn-fiche:hover{opacity:.9}
+.btn-ms{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);color:#fff;padding:10px 20px;border-radius:7px;font:600 .88rem var(--f-body);text-decoration:none;border:1px solid rgba(255,255,255,.2);transition:background .15s}
+.btn-ms:hover{background:rgba(255,255,255,.2)}
+.ps-meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.12)}
+.ps-meta-item{display:flex;align-items:center;gap:6px;font-size:.82rem;color:rgba(255,255,255,.55)}
+.ps-meta-item strong{color:rgba(255,255,255,.85)}
+
+/* Parcours grid */
+.section-label{font:700 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+.parcours-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:32px}
+.parcours-card{background:var(--sheet);border:1px solid var(--line);border-radius:9px;overflow:hidden;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;transition:border-color .15s,box-shadow .15s}
+.parcours-card:hover{border-color:var(--accent);box-shadow:0 3px 12px rgba(0,0,0,.07)}
+.parcours-stripe{height:4px;background:var(--ps-mid)}
+.parcours-body{padding:14px 16px;flex:1}
+.parcours-num{font:600 .68rem var(--f-mono);color:var(--muted);margin-bottom:5px}
+.parcours-title{font:700 .92rem var(--f-display);line-height:1.3;margin-bottom:6px}
+.parcours-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.p-tag{font:500 .66rem var(--f-mono);padding:1px 6px;border-radius:3px;background:var(--accent-soft);color:var(--accent)}
+.parcours-foot{padding:8px 16px;border-top:1px solid var(--line);font:500 .72rem var(--f-mono);color:var(--muted);display:flex;justify-content:space-between}
+
+footer{border-top:1px solid var(--line);padding-top:20px;font-size:.8rem;color:var(--muted)}
+footer a{color:var(--accent);text-decoration:none}
+
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px}
+  .ps-hero{padding:20px 16px 18px}
+  .ps-hero h1{font-size:1.3rem}
+  .parcours-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-bar">
+    <div>
+      <a href="../" class="home-link">← Accueil</a>
+      <div class="eyebrow">Virtualisation · Proxmox VE 9</div>
+      <h1>Proxmox VE — fiche de révision</h1>
+    </div>
+    <button class="theme-btn" id="themeToggle" title="Basculer le thème">🌙</button>
+  </div>
+
+  <div class="ps-hero">
+    <div class="label">Apprentissage autonome · Supervision</div>
+    <h1>Supervision</h1>
+    <p>Métriques · Alertes · Journaux · Proxmox · Kubernetes<br>
+    Fiche avec plan de labo et auto-évaluation : savoir qu'un problème arrive avant vos utilisateurs.</p>
+    <div class="ps-hero-actions">
+      <a href="fiche.html" class="btn-fiche">📄 Ouvrir la fiche complète</a>
+      <a href="../labo-iac/index.html" class="btn-ms">➡ Application : Labo IaC</a>
+      <a href="https://prometheus.io/docs/" target="_blank" class="btn-ms">↗ Documentation officielle</a>
+      
+    </div>
+    <div class="ps-meta">
+      <div class="ps-meta-item"><strong>11</strong> sections</div>
+      <div class="ps-meta-item"><strong>18</strong> questions d'auto-évaluation</div>
+      <div class="ps-meta-item"><strong>6</strong> séances de labo</div>
+    </div>
+  </div>
+
+  <!-- Sections -->
+  <div class="section-label">Les 11 sections de la fiche</div>
+  <div class="parcours-grid">
+
+    <a href="fiche.html#s1" class="parcours-card">
+      <div class="parcours-stripe"></div>
+      <div class="parcours-body">
+        <div class="parcours-num">Section 1</div>
+        <div class="parcours-title">Pourquoi superviser, quoi mesurer</div>
+        <div class="parcours-tags"><span class="p-tag">Métriques</span><span class="p-tag">Logs</span><span class="p-tag">SLO</span></div>
+      </div>
+      <div class="parcours-foot"><span>Fondations</span><span>→</span></div>
+    </a>
+
+    <a href="fiche.html#s2" class="parcours-card">
+      <div class="parcours-stripe"></div>
+      <div class="parcours-body">
+        <div class="parcours-num">Section 2</div>
+        <div class="parcours-title">Choisir ses outils</div>
+        <div class="parcours-tags"><span class="p-tag">Prometheus</span><span class="p-tag">Zabbix</span></div>
+      </div>
+      <div class="parcours-foot"><span>Fondations</span><span>→</span></div>
+    </a>
+
+    <a href="fiche.html#s3" class="parcours-card">
+      <div class="parcours-stripe"></div>
+      <div class="parcours-body">
+        <div class="parcours-num">Section 3</div>
+        <div class="parcours-title">Prometheus : la collecte</div>
+        <div class="parcours-tags"><span class="p-tag">Scrape</span><span class="p-tag">PromQL</span></div>
+      </div>
+      <div class="parcours-foot"><span>Prometheus</span><span>→</span></div>
+    </a>
+
+    <a href="fiche.html#s4" class="parcours-card">
+      <div class="parcours-stripe"></div>
+      <div class="parcours-body">
+        <div class="parcours-num">Section 4</div>
+        <div class="parcours-title">Installer la pile en labo</div>
+        <div class="parcours-tags"><span class="p-tag">Compose</span><span class="p-tag">Grafana</span></div>
+      </div>
+      <div class="parcours-foot"><span>Prometheus</span><span>→</span></div>
+    </a>
+
+    <a href="fiche.html#s5" class="parcours-card">
+      <div class="parcours-stripe"></div>
+      <div class="parcours-body">
+        <div class="parcours-num">Section 5</div>
+        <div class="parcours-title">Alertes</div>
+        <div class="parcours-tags"><span class="p-tag">Règles</span><span class="p-tag">Alertmanager</span></div>
+      </div>
+      <div class="parcours-foot"><span>Alertes</span><span>→</span></div>
+    </a>
+
+    <a href="fiche.html#s6" class="parcours-card">
+      <div class="parcours-stripe"></div>
+      <div class="parcours-body">
+        <div class="parcours-num">Section 6</div>
+        <div class="parcours-title">Journaux centralisés : Loki</div>
+        <div class="parcours-tags"><span class="p-tag">Loki</span><span class="p-tag">LogQL</span></div>
+      </div>
+      <div class="parcours-foot"><span>Logs</span><span>→</span></div>
+    </a>
+
+    <a href="fiche.html#s7" class="parcours-card">
+      <div class="parcours-stripe"></div>
+      <div class="parcours-body">
+        <div class="parcours-num">Section 7</div>
+        <div class="parcours-title">Proxmox, Linux, Windows</div>
+        <div class="parcours-tags"><span class="p-tag">pve-exporter</span><span class="p-tag">SNMP</span></div>
+      </div>
+      <div class="parcours-foot"><span>Cibles</span><span>→</span></div>
+    </a>
+
+    <a href="fiche.html#s8" class="parcours-card">
+      <div class="parcours-stripe"></div>
+      <div class="parcours-body">
+        <div class="parcours-num">Section 8</div>
+        <div class="parcours-title">Kubernetes, RKE2, Rancher</div>
+        <div class="parcours-tags"><span class="p-tag">kube-prometheus-stack</span></div>
+      </div>
+      <div class="parcours-foot"><span>Cibles</span><span>→</span></div>
+    </a>
+
+    <a href="fiche.html#s9" class="parcours-card">
+      <div class="parcours-stripe"></div>
+      <div class="parcours-body">
+        <div class="parcours-num">Section 9</div>
+        <div class="parcours-title">Grafana et capacité</div>
+        <div class="parcours-tags"><span class="p-tag">Dashboards</span><span class="p-tag">Capacité</span></div>
+      </div>
+      <div class="parcours-foot"><span>Grafana</span><span>→</span></div>
+    </a>
+
+    <a href="fiche.html#s10" class="parcours-card">
+      <div class="parcours-stripe"></div>
+      <div class="parcours-body">
+        <div class="parcours-num">Section 10</div>
+        <div class="parcours-title">Dépannage et aide-mémoire</div>
+        <div class="parcours-tags"><span class="p-tag">Targets</span><span class="p-tag">Cardinalité</span></div>
+      </div>
+      <div class="parcours-foot"><span>Aide-mémoire</span><span>→</span></div>
+    </a>
+
+    <a href="fiche.html#s11" class="parcours-card">
+      <div class="parcours-stripe"></div>
+      <div class="parcours-body">
+        <div class="parcours-num">Section 11</div>
+        <div class="parcours-title">Plan de labo et Q/R</div>
+        <div class="parcours-tags"><span class="p-tag">6 séances</span><span class="p-tag">18 Q/R</span></div>
+      </div>
+      <div class="parcours-foot"><span>Pratique</span><span>→</span></div>
+    </a>
+
+  </div>
+
+  <footer>
+    Fiche Supervision · Documentation officielle ·
+    <a href="https://prometheus.io/docs/" target="_blank">Documentation</a>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const btn = document.getElementById("themeToggle");
+  const root = document.documentElement;
+  let theme = "auto";
+  try { theme = localStorage.getItem("supervision-theme") || "auto"; } catch(e){}
+  function apply(t){
+    if(t==="dark"){ root.setAttribute("data-theme","dark"); btn.textContent="☀️"; }
+    else if(t==="light"){ root.setAttribute("data-theme","light"); btn.textContent="🌙"; }
+    else { root.removeAttribute("data-theme"); btn.textContent="🌙"; }
+  }
+  apply(theme);
+  btn.addEventListener("click", function(){
+    theme = theme==="auto"||theme==="light" ? "dark" : "light";
+    try { localStorage.setItem("supervision-theme", theme); } catch(e){}
+    apply(theme);
+  });
+})();
+</script>
+</body>
+</html>
